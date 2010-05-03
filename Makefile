@@ -47,8 +47,11 @@ tar:
 
 
 # Remove the NDEBUG that python tries to use
-python:
-	CFLAGS="-m32 -O0 -g -D_GLIBCXX_DEBUG -UNDEBUG" /sw/bin/python setup.py build
+python2:
+	CFLAGS="-m32 -O0 -g -D_GLIBCXX_DEBUG -UNDEBUG" /sw/bin/python2.6 setup.py build
+
+python3:
+	CFLAGS="-m32 -O0 -g -D_GLIBCXX_DEBUG -UNDEBUG" /sw/bin/python3 setup.py build
 
 libais.a: ${OBJS}
 	ls ${OBJS}
