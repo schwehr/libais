@@ -15,41 +15,41 @@ ais1_2_3_to_pydict(const char *nmea_payload) {
     Ais1_2_3 msg(nmea_payload);
 
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyString_FromString("id"), PyInt_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyString_FromString("repeat_indicator"), PyInt_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyString_FromString("mmsi"), PyInt_FromLong(msg.mmsi));
+    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
+    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
+    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
 
-    PyDict_SetItem(dict, PyString_FromString("nav_status"), PyInt_FromLong(msg.nav_status));
-    PyDict_SetItem(dict, PyString_FromString("rot_over_range"), PyBool_FromLong(msg.rot_over_range));
-    PyDict_SetItem(dict, PyString_FromString("rot"), PyFloat_FromDouble(msg.rot));
-    PyDict_SetItem(dict, PyString_FromString("sog"), PyFloat_FromDouble(msg.sog));
-    PyDict_SetItem(dict, PyString_FromString("position_accuracy"), PyInt_FromLong(msg.position_accuracy));
-    PyDict_SetItem(dict, PyString_FromString("x"), PyFloat_FromDouble(msg.x));
-    PyDict_SetItem(dict, PyString_FromString("y"), PyFloat_FromDouble(msg.y));
-    PyDict_SetItem(dict, PyString_FromString("cog"), PyFloat_FromDouble(msg.cog));
-    PyDict_SetItem(dict, PyString_FromString("true_heading"), PyInt_FromLong(msg.true_heading));
-    PyDict_SetItem(dict, PyString_FromString("timestamp"), PyInt_FromLong(msg.timestamp));
-    PyDict_SetItem(dict, PyString_FromString("special_manoeuvre"), PyInt_FromLong(msg.special_manoeuvre));
-    PyDict_SetItem(dict, PyString_FromString("spare"), PyInt_FromLong(msg.spare));
-    PyDict_SetItem(dict, PyString_FromString("raim"), PyBool_FromLong(msg.raim));
+    PyDict_SetItem(dict, PyUnicode_FromString("nav_status"), PyLong_FromLong(msg.nav_status));
+    PyDict_SetItem(dict, PyUnicode_FromString("rot_over_range"), PyBool_FromLong(msg.rot_over_range));
+    PyDict_SetItem(dict, PyUnicode_FromString("rot"), PyFloat_FromDouble(msg.rot));
+    PyDict_SetItem(dict, PyUnicode_FromString("sog"), PyFloat_FromDouble(msg.sog));
+    PyDict_SetItem(dict, PyUnicode_FromString("position_accuracy"), PyLong_FromLong(msg.position_accuracy));
+    PyDict_SetItem(dict, PyUnicode_FromString("x"), PyFloat_FromDouble(msg.x));
+    PyDict_SetItem(dict, PyUnicode_FromString("y"), PyFloat_FromDouble(msg.y));
+    PyDict_SetItem(dict, PyUnicode_FromString("cog"), PyFloat_FromDouble(msg.cog));
+    PyDict_SetItem(dict, PyUnicode_FromString("true_heading"), PyLong_FromLong(msg.true_heading));
+    PyDict_SetItem(dict, PyUnicode_FromString("timestamp"), PyLong_FromLong(msg.timestamp));
+    PyDict_SetItem(dict, PyUnicode_FromString("special_manoeuvre"), PyLong_FromLong(msg.special_manoeuvre));
+    PyDict_SetItem(dict, PyUnicode_FromString("spare"), PyLong_FromLong(msg.spare));
+    PyDict_SetItem(dict, PyUnicode_FromString("raim"), PyBool_FromLong(msg.raim));
 
     if (msg.received_stations_valid)
-        PyDict_SetItem(dict, PyString_FromString("received_stations"), PyInt_FromLong(msg.received_stations));
+        PyDict_SetItem(dict, PyUnicode_FromString("received_stations"), PyLong_FromLong(msg.received_stations));
     if (msg.slot_number_valid)
-        PyDict_SetItem(dict, PyString_FromString("slot_number"), PyInt_FromLong(msg.slot_number));
+        PyDict_SetItem(dict, PyUnicode_FromString("slot_number"), PyLong_FromLong(msg.slot_number));
     if (msg.utc_valid) {
-        PyDict_SetItem(dict, PyString_FromString("utc_hour"), PyInt_FromLong(msg.utc_hour));
-        PyDict_SetItem(dict, PyString_FromString("utc_min"), PyInt_FromLong(msg.utc_min));
-        PyDict_SetItem(dict, PyString_FromString("utc_spare"), PyInt_FromLong(msg.utc_spare));
+        PyDict_SetItem(dict, PyUnicode_FromString("utc_hour"), PyLong_FromLong(msg.utc_hour));
+        PyDict_SetItem(dict, PyUnicode_FromString("utc_min"), PyLong_FromLong(msg.utc_min));
+        PyDict_SetItem(dict, PyUnicode_FromString("utc_spare"), PyLong_FromLong(msg.utc_spare));
     }
 
     if (msg.slot_offset_valid)
-        PyDict_SetItem(dict, PyString_FromString("slot_offset"), PyInt_FromLong(msg.slot_offset));
+        PyDict_SetItem(dict, PyUnicode_FromString("slot_offset"), PyLong_FromLong(msg.slot_offset));
 
     if (msg.slot_increment_valid) {
-        PyDict_SetItem(dict, PyString_FromString("slot_increment"), PyInt_FromLong(msg.slot_increment));
-        PyDict_SetItem(dict, PyString_FromString("slots_to_allocate"), PyInt_FromLong(msg.slots_to_allocate));
-        PyDict_SetItem(dict, PyString_FromString("keep_flag"), PyBool_FromLong(msg.keep_flag));
+        PyDict_SetItem(dict, PyUnicode_FromString("slot_increment"), PyLong_FromLong(msg.slot_increment));
+        PyDict_SetItem(dict, PyUnicode_FromString("slots_to_allocate"), PyLong_FromLong(msg.slots_to_allocate));
+        PyDict_SetItem(dict, PyUnicode_FromString("keep_flag"), PyBool_FromLong(msg.keep_flag));
     }
 
     return dict;
@@ -63,38 +63,38 @@ ais4_11_to_pydict(const char *nmea_payload) {
     Ais4_11 msg(nmea_payload);
 
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyString_FromString("id"), PyInt_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyString_FromString("repeat_indicator"), PyInt_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyString_FromString("mmsi"), PyInt_FromLong(msg.mmsi));
+    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
+    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
+    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
 
-    PyDict_SetItem(dict, PyString_FromString("year"), PyInt_FromLong(msg.year));
-    PyDict_SetItem(dict, PyString_FromString("month"), PyInt_FromLong(msg.month));
-    PyDict_SetItem(dict, PyString_FromString("day"), PyInt_FromLong(msg.day));
-    PyDict_SetItem(dict, PyString_FromString("hour"), PyInt_FromLong(msg.hour));
-    PyDict_SetItem(dict, PyString_FromString("minute"), PyInt_FromLong(msg.minute));
-    PyDict_SetItem(dict, PyString_FromString("second"), PyInt_FromLong(msg.second));
+    PyDict_SetItem(dict, PyUnicode_FromString("year"), PyLong_FromLong(msg.year));
+    PyDict_SetItem(dict, PyUnicode_FromString("month"), PyLong_FromLong(msg.month));
+    PyDict_SetItem(dict, PyUnicode_FromString("day"), PyLong_FromLong(msg.day));
+    PyDict_SetItem(dict, PyUnicode_FromString("hour"), PyLong_FromLong(msg.hour));
+    PyDict_SetItem(dict, PyUnicode_FromString("minute"), PyLong_FromLong(msg.minute));
+    PyDict_SetItem(dict, PyUnicode_FromString("second"), PyLong_FromLong(msg.second));
 
-    PyDict_SetItem(dict, PyString_FromString("position_accuracy"), PyInt_FromLong(msg.position_accuracy));
-    PyDict_SetItem(dict, PyString_FromString("x"), PyFloat_FromDouble(msg.x));
-    PyDict_SetItem(dict, PyString_FromString("y"), PyFloat_FromDouble(msg.y));
+    PyDict_SetItem(dict, PyUnicode_FromString("position_accuracy"), PyLong_FromLong(msg.position_accuracy));
+    PyDict_SetItem(dict, PyUnicode_FromString("x"), PyFloat_FromDouble(msg.x));
+    PyDict_SetItem(dict, PyUnicode_FromString("y"), PyFloat_FromDouble(msg.y));
 
-    PyDict_SetItem(dict, PyString_FromString("fix_type"), PyInt_FromLong(msg.fix_type));
-    PyDict_SetItem(dict, PyString_FromString("spare"), PyInt_FromLong(msg.spare));
-    PyDict_SetItem(dict, PyString_FromString("raim"), PyBool_FromLong(msg.raim));
+    PyDict_SetItem(dict, PyUnicode_FromString("fix_type"), PyLong_FromLong(msg.fix_type));
+    PyDict_SetItem(dict, PyUnicode_FromString("spare"), PyLong_FromLong(msg.spare));
+    PyDict_SetItem(dict, PyUnicode_FromString("raim"), PyBool_FromLong(msg.raim));
 
 
     if (msg.received_stations_valid)
-        PyDict_SetItem(dict, PyString_FromString("received_stations"), PyInt_FromLong(msg.received_stations));
+        PyDict_SetItem(dict, PyUnicode_FromString("received_stations"), PyLong_FromLong(msg.received_stations));
     if (msg.slot_number_valid)
-        PyDict_SetItem(dict, PyString_FromString("slot_number"), PyInt_FromLong(msg.slot_number));
+        PyDict_SetItem(dict, PyUnicode_FromString("slot_number"), PyLong_FromLong(msg.slot_number));
     if (msg.utc_valid) {
-        PyDict_SetItem(dict, PyString_FromString("utc_hour"), PyInt_FromLong(msg.utc_hour));
-        PyDict_SetItem(dict, PyString_FromString("utc_min"), PyInt_FromLong(msg.utc_min));
-        PyDict_SetItem(dict, PyString_FromString("utc_spare"), PyInt_FromLong(msg.utc_spare));
+        PyDict_SetItem(dict, PyUnicode_FromString("utc_hour"), PyLong_FromLong(msg.utc_hour));
+        PyDict_SetItem(dict, PyUnicode_FromString("utc_min"), PyLong_FromLong(msg.utc_min));
+        PyDict_SetItem(dict, PyUnicode_FromString("utc_spare"), PyLong_FromLong(msg.utc_spare));
     }
 
     if (msg.slot_offset_valid)
-        PyDict_SetItem(dict, PyString_FromString("slot_offset"), PyInt_FromLong(msg.slot_offset));
+        PyDict_SetItem(dict, PyUnicode_FromString("slot_offset"), PyLong_FromLong(msg.slot_offset));
     
     return dict;
 }
@@ -106,27 +106,27 @@ ais5_to_pydict(const char *nmea_payload) {
     Ais5 msg(nmea_payload);
 
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyString_FromString("id"), PyInt_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyString_FromString("repeat_indicator"), PyInt_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyString_FromString("mmsi"), PyInt_FromLong(msg.mmsi));
+    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
+    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
+    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
 
-    PyDict_SetItem(dict, PyString_FromString("ais_version"), PyInt_FromLong(msg.ais_version));
-    PyDict_SetItem(dict, PyString_FromString("imo_num"), PyInt_FromLong(msg.imo_num));
-    PyDict_SetItem(dict, PyString_FromString("callsign"), PyString_FromString(msg.callsign.c_str()));
-    PyDict_SetItem(dict, PyString_FromString("name"), PyString_FromString(msg.name.c_str()));
-    PyDict_SetItem(dict, PyString_FromString("type_and_cargo"), PyInt_FromLong(msg.type_and_cargo));
-    PyDict_SetItem(dict, PyString_FromString("dim_a"), PyInt_FromLong(msg.dim_a));
-    PyDict_SetItem(dict, PyString_FromString("dim_b"), PyInt_FromLong(msg.dim_b));
-    PyDict_SetItem(dict, PyString_FromString("dim_c"), PyInt_FromLong(msg.dim_c));
-    PyDict_SetItem(dict, PyString_FromString("dim_d"), PyInt_FromLong(msg.dim_d));
-    PyDict_SetItem(dict, PyString_FromString("fix_type"), PyInt_FromLong(msg.fix_type));
-    PyDict_SetItem(dict, PyString_FromString("eta_month"), PyInt_FromLong(msg.eta_month));
-    PyDict_SetItem(dict, PyString_FromString("eta_day"), PyInt_FromLong(msg.eta_day));
-    PyDict_SetItem(dict, PyString_FromString("eta_minute"), PyInt_FromLong(msg.eta_minute));
-    PyDict_SetItem(dict, PyString_FromString("draught"), PyInt_FromLong(msg.draught));
-    PyDict_SetItem(dict, PyString_FromString("destination"), PyString_FromString(msg.destination.c_str()));
-    PyDict_SetItem(dict, PyString_FromString("dte"), PyInt_FromLong(msg.dte));
-    PyDict_SetItem(dict, PyString_FromString("spare"), PyInt_FromLong(msg.spare));
+    PyDict_SetItem(dict, PyUnicode_FromString("ais_version"), PyLong_FromLong(msg.ais_version));
+    PyDict_SetItem(dict, PyUnicode_FromString("imo_num"), PyLong_FromLong(msg.imo_num));
+    PyDict_SetItem(dict, PyUnicode_FromString("callsign"), PyUnicode_FromString(msg.callsign.c_str()));
+    PyDict_SetItem(dict, PyUnicode_FromString("name"), PyUnicode_FromString(msg.name.c_str()));
+    PyDict_SetItem(dict, PyUnicode_FromString("type_and_cargo"), PyLong_FromLong(msg.type_and_cargo));
+    PyDict_SetItem(dict, PyUnicode_FromString("dim_a"), PyLong_FromLong(msg.dim_a));
+    PyDict_SetItem(dict, PyUnicode_FromString("dim_b"), PyLong_FromLong(msg.dim_b));
+    PyDict_SetItem(dict, PyUnicode_FromString("dim_c"), PyLong_FromLong(msg.dim_c));
+    PyDict_SetItem(dict, PyUnicode_FromString("dim_d"), PyLong_FromLong(msg.dim_d));
+    PyDict_SetItem(dict, PyUnicode_FromString("fix_type"), PyLong_FromLong(msg.fix_type));
+    PyDict_SetItem(dict, PyUnicode_FromString("eta_month"), PyLong_FromLong(msg.eta_month));
+    PyDict_SetItem(dict, PyUnicode_FromString("eta_day"), PyLong_FromLong(msg.eta_day));
+    PyDict_SetItem(dict, PyUnicode_FromString("eta_minute"), PyLong_FromLong(msg.eta_minute));
+    PyDict_SetItem(dict, PyUnicode_FromString("draught"), PyLong_FromLong(msg.draught));
+    PyDict_SetItem(dict, PyUnicode_FromString("destination"), PyUnicode_FromString(msg.destination.c_str()));
+    PyDict_SetItem(dict, PyUnicode_FromString("dte"), PyLong_FromLong(msg.dte));
+    PyDict_SetItem(dict, PyUnicode_FromString("spare"), PyLong_FromLong(msg.spare));
 
     return dict;
 }
@@ -145,19 +145,19 @@ ais7_13_to_pydict(const char *nmea_payload) {
     Ais7_13 msg(nmea_payload);
     
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyString_FromString("id"), PyInt_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyString_FromString("repeat_indicator"), PyInt_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyString_FromString("mmsi"), PyInt_FromLong(msg.mmsi));
+    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
+    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
+    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
 
     PyObject *list = PyList_New(msg.dest_mmsi.size());
     for (size_t i=0; i < msg.dest_mmsi.size(); i++) {
         PyObject *tuple = PyTuple_New(2);
-        PyTuple_SetItem(tuple,0,PyInt_FromLong(msg.dest_mmsi[i]));
-        PyTuple_SetItem(tuple,1,PyInt_FromLong(msg.seq_num[i]));
+        PyTuple_SetItem(tuple,0,PyLong_FromLong(msg.dest_mmsi[i]));
+        PyTuple_SetItem(tuple,1,PyLong_FromLong(msg.seq_num[i]));
 
         PyList_SetItem(list,i, tuple);
     }
-    PyDict_SetItem(dict, PyString_FromString("acks"), list);
+    PyDict_SetItem(dict, PyUnicode_FromString("acks"), list);
 
     return dict;
 }
@@ -330,6 +330,7 @@ static PyMethodDef ais_methods[] = {
     {NULL, NULL, 0, NULL},
 };
 
+#if 0
 PyMODINIT_FUNC
 initais(void) 
 {
@@ -342,5 +343,102 @@ initais(void)
     build_nmea_lookup();
     std::cerr << "built lookup table in initais" << std::endl;
 }
+#else
+//////////////////////////////////////////////////////////////////////
+// Python 3 initialization
+//////////////////////////////////////////////////////////////////////
 
+struct module_state {
+    PyObject *error;
+};
+
+#if PY_MAJOR_VERSION >= 3
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+#else
+#define GETSTATE(m) (&_state)
+static struct module_state _state;
+#endif
+
+#if 0
+static PyObject *
+error_out(PyObject *m) {
+    struct module_state *st = GETSTATE(m);
+    PyErr_SetString(st->error, "something bad happened");
+    return NULL;
 }
+
+static PyMethodDef ais_methods[] = {
+    {"error_out", (PyCFunction)error_out, METH_NOARGS, NULL},
+    {NULL, NULL}
+};
+#endif
+
+#if PY_MAJOR_VERSION >= 3
+
+static int ais_traverse(PyObject *m, visitproc visit, void *arg) {
+    Py_VISIT(GETSTATE(m)->error);
+    return 0;
+}
+
+static int ais_clear(PyObject *m) {
+    Py_CLEAR(GETSTATE(m)->error);
+    return 0;
+}
+
+
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "ais",
+        NULL,
+        sizeof(struct module_state),
+        ais_methods,
+        NULL,
+        ais_traverse,
+        ais_clear,
+        NULL
+};
+
+#define INITERROR return NULL
+
+PyObject *
+PyInit_ais(void)
+
+#warning "Should be okay"
+
+#else
+#define INITERROR return
+
+void
+initais(void)
+#endif
+{
+#if PY_MAJOR_VERSION >= 3
+    PyObject *module = PyModule_Create(&moduledef);
+#else
+    PyObject *module = Py_InitModule("ais", ais_methods);
+#endif
+
+    if (module == NULL)
+        INITERROR;
+    struct module_state *st = GETSTATE(module);
+
+    st->error = PyErr_NewException("ais.Error", NULL, NULL);
+    if (st->error == NULL) {
+        Py_DECREF(module);
+        INITERROR;
+    }
+
+    // Initialize the lookuptable
+    build_nmea_lookup();
+
+#if PY_MAJOR_VERSION >= 3
+    return module;
+#endif
+}
+
+
+
+#endif
+
+
+} // extern "C"
