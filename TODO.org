@@ -1,0 +1,6 @@
+
+* List of things that need to be done for this library.
+
+- Python error handling
+- code all the messages that are around
+- build testing infrastructure (nose?)
