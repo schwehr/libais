@@ -1,13 +1,12 @@
 // AIS message 4 or 11
 
-
 #include "ais.h"
 
 #include <iostream>
 #include <bitset>
 #include <string>
 #include <cassert>
-#include <cmath>
+//#include <cmath>
 
 Ais4_11::Ais4_11(const char *nmea_payload) {
 
@@ -78,12 +77,13 @@ Ais4_11::Ais4_11(const char *nmea_payload) {
 
 void Ais4_11::print() {
     std::cout << ( ( 4==message_id )?"bs_report: ":"utc response: ") << message_id << "\n"
-         << "\tdate/time: " << year << "-" << month << "-" << day
-         << "T" << hour << ":" << minute << ":" << second << "Z\n"
-         << "\tposition_accuracy: " << position_accuracy << "\n"
-         << "\tlocation: " << x << " " << y << "\n"
-         << "\tspare: " << spare << "\n"
-         << "\traim: " << (raim?"true":"false") << "\n"
+              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n"
+              << "\tdate/time: " << year << "-" << month << "-" << day
+              << "T" << hour << ":" << minute << ":" << second << "Z\n"
+              << "\tposition_accuracy: " << position_accuracy << "\n"
+              << "\tlocation: " << x << " " << y << "\n"
+              << "\tspare: " << spare << "\n"
+              << "\traim: " << (raim?"true":"false") << "\n"
               << std::endl;
         ;
         

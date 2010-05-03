@@ -6,6 +6,8 @@ ais_module = Extension('ais',
                                'ais123.cpp',
                                'ais4_11.cpp',
                                'ais5.cpp',
+                               # ais6
+                               'ais7_13.cpp',
                                ])
 
 setup (name = 'ais',

@@ -131,6 +131,38 @@ ais5_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+    /*
+PyObject* 
+ais6_to_pydict(const char *nmea_payload) {
+    assert(false);
+    }*/
+
+PyObject* 
+ais7_13_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    const size_t num_bits = strlen(nmea_payload) * 6;
+    assert ( (40+32*1)==num_bits or (40+32*2)==num_bits or (40+32*3)==num_bits or (40+32*4) == num_bits);
+    Ais7_13 msg(nmea_payload);
+    
+    PyObject *dict = PyDict_New();
+    PyDict_SetItem(dict, PyString_FromString("id"), PyInt_FromLong(msg.message_id));
+    PyDict_SetItem(dict, PyString_FromString("repeat_indicator"), PyInt_FromLong(msg.repeat_indicator));
+    PyDict_SetItem(dict, PyString_FromString("mmsi"), PyInt_FromLong(msg.mmsi));
+
+    PyObject *list = PyList_New(msg.dest_mmsi.size());
+    for (size_t i=0; i < msg.dest_mmsi.size(); i++) {
+        PyObject *tuple = PyTuple_New(2);
+        PyTuple_SetItem(tuple,0,PyInt_FromLong(msg.dest_mmsi[i]));
+        PyTuple_SetItem(tuple,1,PyInt_FromLong(msg.seq_num[i]));
+
+        PyList_SetItem(list,i, tuple);
+    }
+    PyDict_SetItem(dict, PyString_FromString("acks"), list);
+
+    return dict;
+}
+
+
 static PyObject *
 decode(PyObject *self, PyObject *args) {
 
@@ -175,9 +207,10 @@ decode(PyObject *self, PyObject *args) {
         break;
         
 // 7 - ACK for addressed binary message
+// 13 - ASRM Ack  (safety message)
+    case '=': // FALLTHROUGH
     case '7':
-        // result = ais7_to_pydict(nmea_payload);
-        assert (false);
+        result = ais7_13_to_pydict(nmea_payload);
         break;
         
 // 8 - Binary broadcast message (BBM)
@@ -206,11 +239,8 @@ decode(PyObject *self, PyObject *args) {
         assert (false);
         break;
 
-    // 13 - ASRM Ack
-    case '=':
-        // result = ais13_to_pydict(nmea_payload);
-        assert (false);
-        break;
+        // 13 - See 7
+
     // 14 - SRBM
     case '>':
         // result = ais14_to_pydict(nmea_payload);

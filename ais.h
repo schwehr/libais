@@ -5,7 +5,9 @@
 #include <bitset>
 #include <string>
 #include <cassert>
-//using namespace std;
+#include <vector>
+
+#include <iostream> // for checkpoint
 
 extern bool nmea_ord_initialized; // If this is false, you need to call build_nmea_lookup.
 
@@ -106,7 +108,7 @@ class Ais4_11 {
     Ais4_11(const char *nmea_payload);
     void print();
 };
-std::ostream& operator<< (std::ostream& o, Ais4_11 const& a);
+std::ostream& operator<< (std::ostream& o, Ais4_11 const& msg);
 
 
 class Ais5 {
@@ -136,6 +138,34 @@ class Ais5 {
     Ais5(const char *nmea_payload);
     void print();
 };
+std::ostream& operator<< (std::ostream& o, Ais5 const& msg);
+
+// FIX: figure out how to handle Ais6
+
+// msg 6 and 12 ack 
+class Ais7_13 {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi; // source ID
+
+    int spare;
+
+    std::vector<int> dest_mmsi;
+    std::vector<int> seq_num;
+
+    Ais7_13(const char *nmea_payload);
+    void print();
+};
+
+std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
+
+
+#define CHECKPOINT std::cerr <<  __FILE__ << ":" << __LINE__ << " checkpoint" << std::endl
+
+//////////////////////////////////////////////////////////////////////
+// Support templates for decoding
+//////////////////////////////////////////////////////////////////////
 
 extern std::bitset<6> nmea_ord[128];
 
@@ -143,7 +173,9 @@ template<size_t T>
 void aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
     assert (nmea_payload);
     assert (strlen(nmea_payload) <= T/6 );
-    for (size_t char_idx=0; nmea_payload != '\0' && char_idx < T/6; char_idx++) {
+    CHECKPOINT;
+    for (size_t char_idx=0; nmea_payload[char_idx] != '\0' && char_idx < T/6; char_idx++) {
+        //std::cout << "FIX: " << char_idx << std::endl;
         const std::bitset<6> bs_for_char = nmea_ord[ int(nmea_payload[char_idx]) ];
         for (size_t offset=0; offset < 6 ; offset++) {
             bits[char_idx*6 + offset] = bs_for_char[offset];

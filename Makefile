@@ -13,7 +13,7 @@ CXXFLAGS += -Wredundant-decls
 CXXFLAGS += -Werror
 
 
-SRCS:= ais.cpp ais123.cpp ais4_11.cpp ais5.cpp
+SRCS:= ais.cpp ais123.cpp ais4_11.cpp ais5.cpp ais7_13.cpp
 OBJS:=${SRCS:.cpp=.o}
 
 default:
@@ -37,9 +37,10 @@ all: python libais.a
 DIST:=libais-${shell cat VERSION}
 TAR:=${DIST}.tar
 tar:
+	rm -f ${TAR}.bz2 ${TAR}
 	rm -rf ${DIST}
 	mkdir ${DIST}
-	cp -p *.cpp *.h [A-Z]* ${DIST}/
+	cp -p *.cpp *.h [A-Z]* *.py ${DIST}/
 	tar cf ${TAR} ${DIST}
 	bzip2 -9 ${TAR}
 	rm -rf ${DIST}
@@ -56,3 +57,5 @@ libais.a: ${OBJS}
 
 clean:
 	-rm -rf *.o build *.a
+
+test_libais: ${OBJS} test_libais.cpp
