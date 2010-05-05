@@ -6,13 +6,20 @@
 #include <iostream>
 using namespace std;
 
+PyObject *ais_py_exception;
+
+
 extern "C" {
 
 PyObject *
 ais1_2_3_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
-    assert(168/6 == strlen(nmea_payload));
+
     Ais1_2_3 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais1_2_3: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
 
     PyObject *dict = PyDict_New();
     PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
@@ -59,8 +66,13 @@ ais1_2_3_to_pydict(const char *nmea_payload) {
 PyObject * 
 ais4_11_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
-    assert(168/6 == strlen(nmea_payload));
+    //assert(168/6 == strlen(nmea_payload));  // Should be checked inside the class
+
     Ais4_11 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais4_11: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
 
     PyObject *dict = PyDict_New();
     PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
@@ -102,8 +114,12 @@ ais4_11_to_pydict(const char *nmea_payload) {
 PyObject * 
 ais5_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
-    assert((424+2)/6 == strlen(nmea_payload));
+    //assert((424+2)/6 == strlen(nmea_payload));  Check inside the class
     Ais5 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais5: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
 
     PyObject *dict = PyDict_New();
     PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
@@ -140,9 +156,14 @@ ais6_to_pydict(const char *nmea_payload) {
 PyObject* 
 ais7_13_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
-    const size_t num_bits = strlen(nmea_payload) * 6;
-    assert ( (40+32*1)==num_bits or (40+32*2)==num_bits or (40+32*3)==num_bits or (40+32*4) == num_bits);
+    //const size_t num_bits = strlen(nmea_payload) * 6;
+    //assert ( (40+32*1)==num_bits or (40+32*2)==num_bits or (40+32*3)==num_bits or (40+32*4) == num_bits);
+    // checked inside the message
     Ais7_13 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais7_13: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
     
     PyObject *dict = PyDict_New();
     PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
@@ -172,8 +193,10 @@ decode(PyObject *self, PyObject *args) {
     }
 
     const char *nmea_payload;
-    if (!PyArg_ParseTuple(args, "s", &nmea_payload))
-        return NULL;
+    if (!PyArg_ParseTuple(args, "s", &nmea_payload)) {
+        PyErr_Format(ais_py_exception, "ais.decode: expected string argument");
+        return 0;
+    }
     cout << "nmea_payload: " << nmea_payload << endl;
 
     PyObject *result=0;
@@ -203,7 +226,7 @@ decode(PyObject *self, PyObject *args) {
 // 6 - Addressed binary message
     case '6':
         // result = ais6_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 6 not yet handled");
         break;
         
 // 7 - ACK for addressed binary message
@@ -216,19 +239,19 @@ decode(PyObject *self, PyObject *args) {
 // 8 - Binary broadcast message (BBM)
     case '8':
         // result = ais8_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 8 not yet handled");
         break;
         
 // 9 - SAR Position
     case '9':
         // result = ais9_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 9 not yet handled");
         break;
 
     // 10 - UTC Query
     case ':':
         //result = ais10_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 10 (;) not yet handled");
         break;
 
         // 11 - See 4
@@ -236,7 +259,7 @@ decode(PyObject *self, PyObject *args) {
     // 12 - ASRM
     case '<':
         // result = ais12_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 12 (<) not yet handled");
         break;
 
         // 13 - See 7
@@ -244,84 +267,84 @@ decode(PyObject *self, PyObject *args) {
     // 14 - SRBM
     case '>':
         // result = ais14_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 14 (>) not yet handled");
         break;
     // 15 - Interrogation
     case '?':
         // result = ais15_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 15 (?) not yet handled");
         break;
 // 16 - Assigned mode command
     case '@':
         // result = ais16_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 16 (@) not yet handled");
         break;
         
 // 17 - GNSS broadcast
     case 'A':
         // result = ais17_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 17 (A) not yet handled");
         break;
         
 // 18 - Position, Class B
     case 'B':
-        // result = ais18_to_pydict(nmea_payload);
-        assert (false);
+        result = ais18_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 18 (B) not yet handled");
         break;
         
 // 19 - Position and ship, Class B
     case 'C':
         // result = ais19_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 19 (C) not yet handled");
         break;
         
 // 20 - Data link management
     case 'D':
         // result = ais20_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 20 (D) not yet handled");
         break;
         
 // 21 - Aids to navigation report
     case 'E':
         // result = ais21_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 21 (E) not yet handled");
         break;
         
 // 22 - Channel Management
     case 'F':
         // result = ais22_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 22 (F) not yet handled");
         break;
         
 // 23 - Group Assignment Command
     case 'G':
         // result = ais23_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 23 (G) not yet handled");
         break;
         
 // 24 - Static data report
     case 'H':
         // result = ais24_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 24 (H) not yet handled");
         break;
     
 // 25 - Single slit binary message - addressed or broadcast
     case 'I':
         // result = ais25_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 25 (I) not yet handled");
         break;
         
 // 26 - Multi slot binary message with comm state
     case 'J':
         // result = ais26_to_pydict(nmea_payload);
-        assert (false);
+        PyErr_Format(ais_py_exception, "ais.decode: message 26 (J) not yet handled");
         break;
     
     default:
         assert (false);
     }
 
-    assert (result);
+
     return result;
 }       
 
@@ -428,8 +451,9 @@ initais(void)
         INITERROR;
     }
 
-    // Initialize the lookuptable
+    // Initialize the lookuptable and exception
     build_nmea_lookup();
+    ais_py_exception = PyErr_NewException("ais.decode.error", 0, 0);
 
 #if PY_MAJOR_VERSION >= 3
     return module;

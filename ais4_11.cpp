@@ -9,13 +9,19 @@
 //#include <cmath>
 
 Ais4_11::Ais4_11(const char *nmea_payload) {
+    init();
 
     std::bitset<168> bs; 
-    aivdm_to_bits(bs, nmea_payload);
-    std::cout << bs << "\n";
+
+    status = aivdm_to_bits(bs, nmea_payload);
+    if (had_error()) return;
 
     message_id = ubits(bs, 0, 6);
-    assert (message_id == 4 or message_id == 11);
+    if (message_id != 4 and message_id != 11) {
+        status = AIS_ERR_WRONG_MSG_TYPE;
+        return;
+    }
+
     repeat_indicator = ubits(bs,6,2);
     mmsi = ubits(bs,8,30);
 

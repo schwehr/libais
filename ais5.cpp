@@ -8,18 +8,15 @@
 #include <string>
 #include <cassert>
 #include <cmath>
-//using namespace std;
-
-#define UNUSED __attribute((__unused__))
-
-
 
 
 Ais5::Ais5(const char *nmea_payload) {
+    init();
+
     std::bitset<426> bs; // 424 + 2 spare bits
-    aivdm_to_bits(bs, nmea_payload);
+    status = aivdm_to_bits(bs, nmea_payload);
+    if (had_error()) return;
     
-    std::cout << bs << std::endl;
     message_id = ubits(bs, 0, 6);
 
     message_id = ubits(bs, 0, 6);

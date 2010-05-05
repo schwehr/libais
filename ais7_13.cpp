@@ -5,37 +5,37 @@
 //#include <string>
 #include <cassert>
 //#include <vector>
-using namespace std;
+//using namespace std;
 
 Ais7_13::Ais7_13(const char *nmea_payload) {
+    init();
+
     assert (nmea_payload);
     const size_t num_bits = strlen(nmea_payload) * 6;
-    cout << "num_bits: " << num_bits << endl;
+    //cout << "num_bits: " << num_bits << endl;
     
-    assert ( (40+32*1)==num_bits or (40+32*2)==num_bits or (40+32*3)==num_bits or (40+32*4) == num_bits);
+    if (! ((40+32*1)==num_bits or (40+32*2)==num_bits or (40+32*3)==num_bits or (40+32*4)==num_bits) ){
+        status = AIS_ERR_BAD_BIT_COUNT;
+        return;
+    }       
 
     std::bitset<168> bs;
-    CHECKPOINT;
-
-    aivdm_to_bits(bs, nmea_payload);
+    status = aivdm_to_bits(bs, nmea_payload);
+    if (had_error()) return;
 
     message_id = ubits(bs, 0, 6);
-    cout << "message_id: " << message_id << endl;
-    assert (message_id == 7 or message_id == 13);
+    if (message_id != 7 and message_id != 13) {
+        status = AIS_ERR_WRONG_MSG_TYPE; 
+        return;
+    }
     repeat_indicator = ubits(bs,6,2);
     mmsi = ubits(bs,8,30);
-
     spare = ubits(bs,38,2);
 
     const size_t num_acks = (num_bits - 40) / 32;
     for (size_t i=0; i < num_acks; i++) {
-        const size_t start = 40 + i*32;
-        cout << i << ": " << start << endl;
-        const int id = ubits(bs,40+i*32,30);
-        cout << "id: " << id << endl;
-        const int seq = ubits(bs,40+i*32+30,2);
-        dest_mmsi.push_back(id);
-        seq_num.push_back(seq);
+        dest_mmsi.push_back(ubits(bs,40+i*32,30));
+        seq_num.push_back(ubits(bs,40+i*32+30,2));
     }
 }
 

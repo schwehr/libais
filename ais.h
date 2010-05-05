@@ -15,7 +15,30 @@ void build_nmea_lookup();
  
 //void aivdm_to_bits(bitset<168> &bits, const char *nmea_payload);
 
-class Ais1_2_3 {
+enum AIS_STATUS {
+    AIS_OK,
+    AIS_ERR_BAD_BIT_COUNT,
+    AIS_ERR_WRONG_MSG_TYPE,
+    AIS_ERR_BAD_NMEA_CHR,
+    AIS_ERR_BAD_PTR,
+    AIS_ERR_UNKNOWN_MSG_TYPE,
+    AIS_ERR_MSG_NOT_IMPLEMENTED, // Meaning I haven't got to it yet
+    AIS_ERR_EXPECTED_STRING,
+    AIS_STATUS_NUM_CODES
+};
+
+extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
+
+class AisMsg {
+public:
+    bool had_error() {return status != AIS_OK;}
+    AIS_STATUS get_error() {return status;}
+protected:
+    AIS_STATUS status; // AIS_OK or error code
+    void init() {status = AIS_OK;}
+};
+
+class Ais1_2_3 : public AisMsg {
 public:
     int message_id;
     int repeat_indicator;
@@ -68,7 +91,7 @@ public:
 std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a);
 
 // 4 bsreport and 11 utc date response
-class Ais4_11 {
+class Ais4_11 : public AisMsg {
  public:
     int message_id;
     int repeat_indicator;
@@ -111,7 +134,7 @@ class Ais4_11 {
 std::ostream& operator<< (std::ostream& o, Ais4_11 const& msg);
 
 
-class Ais5 {
+class Ais5 : public AisMsg {
  public:
     int message_id;
     int repeat_indicator;
@@ -143,7 +166,7 @@ std::ostream& operator<< (std::ostream& o, Ais5 const& msg);
 // FIX: figure out how to handle Ais6
 
 // msg 6 and 12 ack 
-class Ais7_13 {
+class Ais7_13 : public AisMsg {
 public:
     int message_id;
     int repeat_indicator;
@@ -170,17 +193,21 @@ std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 extern std::bitset<6> nmea_ord[128];
 
 template<size_t T>
-void aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
+AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
     assert (nmea_payload);
     assert (strlen(nmea_payload) <= T/6 );
-    CHECKPOINT;
     for (size_t char_idx=0; nmea_payload[char_idx] != '\0' && char_idx < T/6; char_idx++) {
-        //std::cout << "FIX: " << char_idx << std::endl;
-        const std::bitset<6> bs_for_char = nmea_ord[ int(nmea_payload[char_idx]) ];
+        int c = int(nmea_payload[char_idx]);
+        if (c<48 or c>119 or (c>=88 and c<=95) ) {
+            //std::cout << "bad character: '" << nmea_payload[char_idx] << "' " << c << std::endl;
+            return AIS_ERR_BAD_NMEA_CHR;
+        }
+        const std::bitset<6> bs_for_char = nmea_ord[ c ];
         for (size_t offset=0; offset < 6 ; offset++) {
             bits[char_idx*6 + offset] = bs_for_char[offset];
         }
     }
+    return AIS_OK;
 }
 
 template<size_t T>

@@ -1,5 +1,4 @@
 // Since Apr 2010
-// g++ ais_pos.cxx -o ais_pos -g -Wall -O3 -Wimplicit -W -Wredundant-decls -pedantic  -funroll-loops -fexpensive-optimizations 
 
 #include "ais.h"
 
@@ -8,25 +7,33 @@
 #include <string>
 #include <cassert>
 #include <cmath>
-//using namespace std;
 
 
 Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
-    //build_nmea_lookup();
+    assert(nmea_payload);
+
+    init();
+
+    if (strlen(nmea_payload) != 168/6) {
+        status = AIS_ERR_BAD_BIT_COUNT;
+        return;
+    }
 
     std::bitset<168> bs; // 1 slot
-    aivdm_to_bits(bs, nmea_payload);
-    std::cout << bs;
+    status = aivdm_to_bits(bs, nmea_payload);
+    if (had_error()) return;
 
     message_id = ubits(bs, 0, 6);
-    assert (message_id >= 1 and message_id <= 3);
+    if (message_id < 1 or message_id > 3) {
+        status = AIS_ERR_WRONG_MSG_TYPE;
+        return;
+    }
 
     repeat_indicator = ubits(bs,6,2);
     mmsi = ubits(bs,8,30);
     nav_status = ubits(bs,38,4);
 
     const int rot_raw = sbits(bs,42,8);
-    assert(rot_raw == -128);
     rot_over_range = abs(rot_raw) > 126 ? true : false ;
     rot = 4.733 * sqrt(fabs(rot_raw));
     if (rot_raw < 0) rot = -rot;
@@ -85,6 +92,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
             assert (false);
         }
     } else {
+        std::cout << "expecting 3: " << message_id << std::endl;
         assert (3 == message_id);
         slot_increment = ubits(bs, 151, 13);
         slot_increment_valid = true;

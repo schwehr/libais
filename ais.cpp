@@ -14,7 +14,7 @@ std::bitset<6> nmea_ord[128];
 bool nmea_ord_initialized = false;
 
 void build_nmea_lookup() {
-    std::cout << "building lut..." << std::endl;
+    //std::cout << "building lut..." << std::endl;
     for (int c=0; c < 128; c++) {
         int val = c - 48;
         if (val>=40) val-= 8;
@@ -29,5 +29,16 @@ void build_nmea_lookup() {
     nmea_ord_initialized = true;
 }
 
+// for decoding str bits inside of a binary message
 const std::string bits_to_char_tbl="@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";
 
+const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
+    "AIS_ERR_NONE",
+    "AIS_ERR_BAD_BIT_COUNT",
+    "AIS_ERR_WRONG_MSG_TYPE",
+    "AIS_ERR_BAD_NMEA_CHR",
+    "AIS_ERR_BAD_PTR",
+    "AIS_ERR_UNKNOWN_MSG_TYPE",
+    "AIS_ERR_MSG_NOT_IMPLEMENTED",
+    "AIS_ERR_EXPECTED_STRING"
+};
