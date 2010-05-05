@@ -15,6 +15,8 @@ CXXFLAGS += -Werror
 #CFLAGS := ${CXXFLAGS}
 
 SRCS:= ais.cpp ais123.cpp ais4_11.cpp ais5.cpp ais7_13.cpp
+#
+SRCS+= ais18.cpp
 OBJS:=${SRCS:.cpp=.o}
 
 default:

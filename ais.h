@@ -184,6 +184,67 @@ public:
 std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 
 
+// B - Class B position report
+class Ais18 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    int spare;
+    float sog;
+    int position_accuracy;
+    float x, y; // Long and lat
+    float cog;
+    int true_heading;
+    int timestamp;
+    int spare2;
+    int unit_flag;
+    int display_flag;
+    int dsc_flag;
+    int band_flag;
+    int m22_flag;
+    int mode_flag;
+    bool raim;
+    int commstate_flag;
+
+    // SOTDMA
+    int sync_state;
+    int slot_timeout;
+
+    // Based on slot_timeout which ones are valid
+    int received_stations;
+    bool received_stations_valid;
+    
+    int slot_number;
+    bool slot_number_valid;
+
+    bool utc_valid;  // Only means that the values are set.  Can still have 
+    int utc_hour;
+    int utc_min;
+    int utc_spare;
+
+    int slot_offset;
+    bool slot_offset_valid;
+
+    // ITDMA
+    int slot_increment;
+    bool slot_increment_valid;
+
+    int slots_to_allocate;      
+    bool slots_to_allocate_valid;
+
+    bool keep_flag;
+    bool keep_flag_valid;
+
+    Ais18(const char *nmea_payload);
+    void print();
+};
+
+std::ostream& operator<< (std::ostream& o, Ais18 const& msg);
+
+
+
+
 #define CHECKPOINT std::cerr <<  __FILE__ << ":" << __LINE__ << " checkpoint" << std::endl
 
 //////////////////////////////////////////////////////////////////////
@@ -256,3 +317,4 @@ const std::string ais_str(const std::bitset<T> &bits, const size_t start, const 
     }
     return result;
 }
+
