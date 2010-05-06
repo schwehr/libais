@@ -183,6 +183,19 @@ public:
 
 std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 
+// Safety broadcast
+class Ais14 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    std::string text;
+    int expected_num_spare_bits; // The bits in the nmea_payload not used
+    Ais14(const char *nmea_payload);
+    void print();
+};
+
+std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
 
 // B - Class B position report
 class Ais18 : public AisMsg {

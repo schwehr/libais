@@ -1,10 +1,11 @@
 // Since Apr 2010
+// Class A shipdata
 #include "ais.h"
 
 //#include <iostream>
 //#include <bitset>
 //#include <string>
-#include <cassert>
+//#include <cassert>
 //#include <cmath>
 
 

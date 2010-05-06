@@ -264,7 +264,7 @@ decode(PyObject *self, PyObject *args) {
 
         // 13 - See 7
 
-    // 14 - SRBM
+    // 14 - SRBM - Safety broadcast
     case '>':
         // result = ais14_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 14 (>) not yet handled");

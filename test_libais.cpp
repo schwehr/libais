@@ -50,6 +50,32 @@ int main(UNUSED char *argc, UNUSED char* argv[]) {
     }
 #endif
 
+
+    //////////////////////////////////////////////////////////////////////
+    // 14 - Safety Broadcast
+    //////////////////////////////////////////////////////////////////////
+
+    if (true) {
+        // From GPSD - !AIVDM,1,1,,A,>5?Per18=HB1U:1@E=B0m<L,2*51
+        { 
+            Ais14 msg(">5?Per18=HB1U:1@E=B0m<L"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 14 1\n";
+            std::cout << "\n"; 
+        }
+        // From GPSD - !AIVDM,1,1,,A,>3R1p10E3;;R0USCR0HO>0@gN10kGJp,2*7F
+        { 
+            Ais14 msg(">3R1p10E3;;R0USCR0HO>0@gN10kGJp"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n"; 
+        }
+        // From GPSD - !AIVDM,1,1,,A,>4aDT81@E=@,2*2E
+        { 
+            Ais14 msg(">4aDT81@E=@"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n"; 
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////
     // 18 - Class B
     //////////////////////////////////////////////////////////////////////
@@ -78,7 +104,7 @@ int main(UNUSED char *argc, UNUSED char* argv[]) {
     // 19 - Class B equip pos report
     //////////////////////////////////////////////////////////////////////
 
-    if (true) {
+    if (false) {
         // !AIVDM,1,1,,B,C5N3SRP0IFJKmE4:v6pBGw`@62PaLELTBJ:V00000000S0D:R220,0*3A,b003669952,1272415462
         { 
             Ais19 msg("C5N3SRP0IFJKmE4:v6pBGw`@62PaLELTBJ:V00000000S0D:R220"); 
