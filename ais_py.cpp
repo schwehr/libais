@@ -4,9 +4,11 @@
 #include <Python.h>
 #include <cassert>
 #include <iostream>
+#include <string>
 using namespace std;
 
 PyObject *ais_py_exception;
+const std::string exception_name("ais.decode.Error");
 
 
 extern "C" {
@@ -183,6 +185,142 @@ ais7_13_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+PyObject*
+ais14_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais14 msg(nmea_payload);
+
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais14: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
+    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
+    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
+    PyDict_SetItem(dict, PyUnicode_FromString("text"), PyUnicode_FromString(msg.text.c_str()));
+    //PyDict_SetItem(dict, PyUnicode_FromString("text"), PyUnicode_FromString(msg.text.c_str()) );
+
+    return dict;
+}
+
+PyObject*
+ais18_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais18 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais18: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
+    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
+    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("sog"), PyFloat_FromDouble(msg.sog));
+    PyDict_SetItem(dict, PyUnicode_FromString("position_accuracy"), PyLong_FromLong(msg.position_accuracy));
+    PyDict_SetItem(dict, PyUnicode_FromString("x"), PyFloat_FromDouble(msg.x));
+    PyDict_SetItem(dict, PyUnicode_FromString("y"), PyFloat_FromDouble(msg.y));
+    PyDict_SetItem(dict, PyUnicode_FromString("cog"), PyFloat_FromDouble(msg.cog));
+    PyDict_SetItem(dict, PyUnicode_FromString("true_heading"), PyLong_FromLong(msg.true_heading));
+    PyDict_SetItem(dict, PyUnicode_FromString("timestamp"), PyLong_FromLong(msg.timestamp));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("spare2"), PyLong_FromLong(msg.spare2));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("unit_flag"), PyLong_FromLong(msg.unit_flag));
+    PyDict_SetItem(dict, PyUnicode_FromString("display_flag"), PyLong_FromLong(msg.display_flag));
+    PyDict_SetItem(dict, PyUnicode_FromString("dsc_flag"), PyLong_FromLong(msg.dsc_flag));
+    PyDict_SetItem(dict, PyUnicode_FromString("band_flag"), PyLong_FromLong(msg.band_flag));
+    PyDict_SetItem(dict, PyUnicode_FromString("m22_flag"), PyLong_FromLong(msg.m22_flag));
+    PyDict_SetItem(dict, PyUnicode_FromString("mode_flag"), PyLong_FromLong(msg.mode_flag));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("raim"), PyBool_FromLong(msg.raim));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("commstate_flag"), PyLong_FromLong(msg.commstate_flag));
+    if (0==msg.unit_flag) {
+        if (0==msg.commstate_flag) {
+            // SOTDMA
+            PyDict_SetItem(dict, PyUnicode_FromString("slot_timeout"), PyLong_FromLong(msg.slot_timeout));
+            switch (msg.slot_timeout) {
+            case 0:
+                PyDict_SetItem(dict, PyUnicode_FromString("slot_offset"), PyLong_FromLong(msg.slot_offset));
+                break;
+            case 1:
+                PyDict_SetItem(dict, PyUnicode_FromString("utc_hour"), PyLong_FromLong(msg.utc_hour));
+                PyDict_SetItem(dict, PyUnicode_FromString("utc_min"), PyLong_FromLong(msg.utc_min));
+                PyDict_SetItem(dict, PyUnicode_FromString("utc_spare"), PyLong_FromLong(msg.utc_spare));
+                break;
+            case 2: // FALLTHROUGH
+            case 4: // FALLTHROUGH
+            case 6:
+                PyDict_SetItem(dict, PyUnicode_FromString("slot_number"), PyLong_FromLong(msg.slot_number));
+                break;
+            case 3: // FALLTHROUGH
+            case 5: // FALLTHROUGH
+            case 7:
+                PyDict_SetItem(dict, PyUnicode_FromString("received_stations"), PyLong_FromLong(msg.received_stations));
+                break;
+            default:
+                std::cout << "ERROR: slot_timeout: " << msg.slot_timeout << std::endl;
+                msg.print();
+                assert(false); // Should never get here.
+            }
+            
+        } else {
+            // ITDMA
+            PyDict_SetItem(dict, PyUnicode_FromString("slot_increment"), PyLong_FromLong(msg.slot_increment));
+            PyDict_SetItem(dict, PyUnicode_FromString("slots_to_allocate"), PyLong_FromLong(msg.slots_to_allocate));
+            PyDict_SetItem(dict, PyUnicode_FromString("keep_flag"), PyLong_FromLong(msg.keep_flag));
+        } 
+    } // do nothing if unit flag is 1... in CS mode and no commstate
+                   
+    return dict;
+}
+
+PyObject*
+ais19_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais19 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais18: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
+    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
+    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("sog"), PyFloat_FromDouble(msg.sog));
+    PyDict_SetItem(dict, PyUnicode_FromString("position_accuracy"), PyLong_FromLong(msg.position_accuracy));
+    PyDict_SetItem(dict, PyUnicode_FromString("x"), PyFloat_FromDouble(msg.x));
+    PyDict_SetItem(dict, PyUnicode_FromString("y"), PyFloat_FromDouble(msg.y));
+    PyDict_SetItem(dict, PyUnicode_FromString("cog"), PyFloat_FromDouble(msg.cog));
+    PyDict_SetItem(dict, PyUnicode_FromString("true_heading"), PyLong_FromLong(msg.true_heading));
+    PyDict_SetItem(dict, PyUnicode_FromString("timestamp"), PyLong_FromLong(msg.timestamp));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("spare2"), PyLong_FromLong(msg.spare2));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("name"), PyUnicode_FromString(msg.name.c_str()));
+    PyDict_SetItem(dict, PyUnicode_FromString("type_and_cargo"), PyLong_FromLong(msg.type_and_cargo));
+    PyDict_SetItem(dict, PyUnicode_FromString("dim_a"), PyLong_FromLong(msg.dim_a));
+    PyDict_SetItem(dict, PyUnicode_FromString("dim_b"), PyLong_FromLong(msg.dim_b));
+    PyDict_SetItem(dict, PyUnicode_FromString("dim_c"), PyLong_FromLong(msg.dim_c));
+    PyDict_SetItem(dict, PyUnicode_FromString("dim_d"), PyLong_FromLong(msg.dim_d));
+    PyDict_SetItem(dict, PyUnicode_FromString("fix_type"), PyLong_FromLong(msg.fix_type));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("raim"), PyBool_FromLong(msg.raim));
+
+    PyDict_SetItem(dict, PyUnicode_FromString("dte"), PyLong_FromLong(msg.dte));
+    PyDict_SetItem(dict, PyUnicode_FromString("assigned_mode"), PyLong_FromLong(msg.assigned_mode));
+    PyDict_SetItem(dict, PyUnicode_FromString("spare3"), PyLong_FromLong(msg.spare3));
+
+    return dict;
+}
+
+
 
 static PyObject *
 decode(PyObject *self, PyObject *args) {
@@ -197,7 +335,7 @@ decode(PyObject *self, PyObject *args) {
         PyErr_Format(ais_py_exception, "ais.decode: expected string argument");
         return 0;
     }
-    cout << "nmea_payload: " << nmea_payload << endl;
+    //cout << "nmea_payload: " << nmea_payload << endl;
 
     PyObject *result=0;
 
@@ -205,75 +343,70 @@ decode(PyObject *self, PyObject *args) {
     // The grand dispatcher
     //
     switch (nmea_payload[0]) {
+
     // Class A Position
     case '1': // FALLTHROUGH
     case '2': // FALLTHROUGH
     case '3':
         result = ais1_2_3_to_pydict(nmea_payload);
         break;
-    // 4 - Basestation report
-    // 11 - UTC date response
+
+        // 4 - Basestation report
+        // 11 - UTC date response
     case '4': // FALLTHROUGH 
     case ';':
         result = ais4_11_to_pydict(nmea_payload);
         break;
 
-// 5 - Ship and Cargo
-    case '5':
+    case '5': // 5 - Ship and Cargo
         result = ais5_to_pydict(nmea_payload);
         break;
         
-// 6 - Addressed binary message
-    case '6':
+    case '6': // 6 - Addressed binary message
         // result = ais6_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 6 not yet handled");
         break;
         
-// 7 - ACK for addressed binary message
-// 13 - ASRM Ack  (safety message)
+        // 7 - ACK for addressed binary message
+        // 13 - ASRM Ack  (safety message)
     case '=': // FALLTHROUGH
     case '7':
         result = ais7_13_to_pydict(nmea_payload);
         break;
         
-// 8 - Binary broadcast message (BBM)
-    case '8':
+    case '8': // 8 - Binary broadcast message (BBM)
         // result = ais8_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 8 not yet handled");
         break;
         
-// 9 - SAR Position
-    case '9':
+    case '9': // 9 - SAR Position
         // result = ais9_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 9 not yet handled");
         break;
 
-    // 10 - UTC Query
-    case ':':
+    case ':': // 10 - UTC Query
         //result = ais10_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 10 (;) not yet handled");
         break;
 
         // 11 - See 4
-
-    // 12 - ASRM
-    case '<':
+   
+    case '<': // 12 - ASRM
         // result = ais12_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 12 (<) not yet handled");
         break;
 
         // 13 - See 7
 
-    // 14 - SRBM - Safety broadcast
-    case '>':
-        // result = ais14_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 14 (>) not yet handled");
+    case '>': // 14 - SRBM - Safety broadcast
+        result = ais14_to_pydict(nmea_payload);
         break;
-    // 15 - Interrogation
-    case '?':
+
+    case '?': // 15 - Interrogation
         // result = ais15_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 15 (?) not yet handled");
         break;
+
 // 16 - Assigned mode command
     case '@':
         // result = ais16_to_pydict(nmea_payload);
@@ -289,13 +422,11 @@ decode(PyObject *self, PyObject *args) {
 // 18 - Position, Class B
     case 'B':
         result = ais18_to_pydict(nmea_payload);
-        //PyErr_Format(ais_py_exception, "ais.decode: message 18 (B) not yet handled");
         break;
         
 // 19 - Position and ship, Class B
     case 'C':
-        // result = ais19_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 19 (C) not yet handled");
+        result = ais19_to_pydict(nmea_payload);
         break;
         
 // 20 - Data link management
@@ -341,7 +472,11 @@ decode(PyObject *self, PyObject *args) {
         break;
     
     default:
-        assert (false);
+        //assert (false);
+        std::cout << "Unknown message type: '" << nmea_payload[0] << "'\n"
+                  << "\tline: " << nmea_payload << std::endl;
+        PyErr_Format(ais_py_exception, "ais.decode: message %c not known", nmea_payload[0]);
+
     }
 
 
@@ -445,7 +580,8 @@ initais(void)
         INITERROR;
     struct module_state *st = GETSTATE(module);
 
-    st->error = PyErr_NewException("ais.Error", NULL, NULL);
+
+    st->error = PyErr_NewException((char *)exception_name.c_str(), NULL, NULL);
     if (st->error == NULL) {
         Py_DECREF(module);
         INITERROR;

@@ -35,8 +35,17 @@ counters = {}
 for i in range(30):
     counters[i] = 0
 
+
+line_queue = LineQueue()
+
+
 #for line_num, line in enumerate(file('/nobackup/dl1/20100505.norm')):
-for line_num, line in enumerate(open('test-2M.norm')):
+for line_num, text in enumerate(open('test-2M.norm')):
+
+    line_queue.put(text)
+
+    # Here Line queue
+    
     if line_num % 100000 == 0: print ("line: %d   %d" % (line_num,match_count) )
 
     try:
@@ -44,10 +53,19 @@ for line_num, line in enumerate(open('test-2M.norm')):
         match_count += 1
     except:
         continue
+
+    if match.total != 1:
+        # FIX: add normalization code here
+        # norm_queue.put(match)
+        # match = norm_queue.get()
+        # if match is None: continue
+        continue
+
     try:
         msg = ais.decode(match['body'])
     except:
-        pass
+        pass # Bad or unhandled message
+
     counters[msg['id']] += 1
 
 print ('match_count:',match_count)

@@ -9,6 +9,7 @@
 //#include <cmath>
 
 Ais4_11::Ais4_11(const char *nmea_payload) {
+    assert(nmea_payload);
     init();
 
     std::bitset<168> bs; 
@@ -52,7 +53,7 @@ Ais4_11::Ais4_11(const char *nmea_payload) {
 
     slot_timeout = ubits(bs,151,3);
 
-    std::cout << "slot_timeout:" << slot_timeout << std::endl;
+    //std::cout << "slot_timeout:" << slot_timeout << std::endl;
     switch (slot_timeout) {
     case 0:
         slot_offset = ubits(bs, 154, 14);
