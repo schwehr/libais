@@ -14,7 +14,8 @@ CXXFLAGS += -Werror
 
 #CFLAGS := ${CXXFLAGS}
 
-SRCS := ais.cpp ais123.cpp ais4_11.cpp ais5.cpp ais7_13.cpp
+SRCS := ais.cpp 
+SRCS += ais1_2_3.cpp ais4_11.cpp ais5.cpp ais7_13.cpp
 #
 SRCS += ais14.cpp
 #
