@@ -16,7 +16,7 @@ CXXFLAGS += -Werror
 
 SRCS:= ais.cpp ais123.cpp ais4_11.cpp ais5.cpp ais7_13.cpp
 #
-SRCS+= ais18.cpp
+SRCS+= ais18.cpp ais19.cpp
 OBJS:=${SRCS:.cpp=.o}
 
 default:
@@ -78,5 +78,7 @@ ais123.o: ais.h
 ais4_11.o: ais.h
 ais5.o: ais.h
 ais7_13.o: ais.h
+ais18.o: ais.h
+ais19.o: ais.h
 ais_py.o: ais.h
 test_libais.o: ais.h

@@ -1,27 +1,25 @@
 // Since Apr 2010
-// g++ ais_pos.cxx -o ais_pos -g -Wall -O3 -Wimplicit -W -Wredundant-decls -pedantic  -funroll-loops -fexpensive-optimizations 
-
 #include "ais.h"
 
-#include <iostream>
-#include <bitset>
-#include <string>
+//#include <iostream>
+//#include <bitset>
+//#include <string>
 #include <cassert>
-#include <cmath>
+//#include <cmath>
 
 
 Ais5::Ais5(const char *nmea_payload) {
+    assert(nmea_payload);
     init();
 
-    std::bitset<426> bs; // 424 + 2 spare bits
+    if (strlen(nmea_payload) != 71) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+
+    std::bitset<426> bs; // 424 + 2 spare bits => 71 characters
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
     
     message_id = ubits(bs, 0, 6);
-
-    message_id = ubits(bs, 0, 6);
-    assert (5 == message_id);
-
+    if (5 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
     repeat_indicator = ubits(bs,6,2);
     mmsi = ubits(bs,8,30);
 
@@ -54,7 +52,7 @@ void Ais5::print() {
          << "\tcallsign: " << callsign << "\n"
          << "\tname: " << name << "\n"
          << "\ttype_and_cargo: " << type_and_cargo << "\n"
-         << "\tdim: " << dim_a << " " << dim_b  << " "<< dim_c << " " << dim_d  << " (m)1y\n"
+         << "\tdim: " << dim_a << " " << dim_b  << " "<< dim_c << " " << dim_d  << " (m)\n"
          << "\tfix_type: " << fix_type << "\n"
          << "\teta: " << eta_month << "-" << eta_day << "T" << eta_hour << ":" << eta_minute << "\n"
          << "\tdestination: " << destination << "\n"

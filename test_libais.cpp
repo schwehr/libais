@@ -54,7 +54,7 @@ int main(UNUSED char *argc, UNUSED char* argv[]) {
     // 18 - Class B
     //////////////////////////////////////////////////////////////////////
 
-    if (true) {
+    if (false) {
         // !AIVDM,1,1,,A,B5N3SRP0FFJFC`4:CQDFKwiP200>,0*75,b003669952,1272413103
         { Ais18 msg("B5N3SRP0FFJFC`4:CQDFKwiP200>"); msg.print(); std::cout << std::endl; }
         // !AIVDM,1,1,,B,B5NGjdP03MkEvV6vJTN`SwuUoP06,0*08,b003669703,1272412832
@@ -69,6 +69,29 @@ int main(UNUSED char *argc, UNUSED char* argv[]) {
         { Ais18 msg("Bov9gKvWbf;juI`NN@CeG1DF;3Gs"); msg.print(); std::cout << std::endl; }
         // !AIVDM,1,1,,B,B@MMSv=E@JJd``ksAupQpveN`VH?,0*3F,d-126,S1407,t130537.00,T37.53680769,r09SSAG1,1272459940
         { Ais18 msg("B@MMSv=E@JJd``ksAupQpveN`VH?"); msg.print(); std::cout << std::endl; }
+
+    }
+
+
+
+    //////////////////////////////////////////////////////////////////////
+    // 19 - Class B equip pos report
+    //////////////////////////////////////////////////////////////////////
+
+    if (true) {
+        // !AIVDM,1,1,,B,C5N3SRP0IFJKmE4:v6pBGw`@62PaLELTBJ:V00000000S0D:R220,0*3A,b003669952,1272415462
+        { 
+            Ais19 msg("C5N3SRP0IFJKmE4:v6pBGw`@62PaLELTBJ:V00000000S0D:R220"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n"; 
+        }
+
+        // !AIVDM,1,1,2,B,C5MtL4al06K?Pa4I99@G`us>@2fF0000000000000000?P000020,0*73,d-080,S2043,t013454.00,T54.48188603,r08RROB1,1272418496
+        { 
+            Ais19 msg("C5MtL4al06K?Pa4I99@G`us>@2fF0000000000000000?P000020"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n"; 
+        }
 
     }
     //////////////////////////////

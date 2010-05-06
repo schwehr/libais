@@ -11,13 +11,9 @@
 
 Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     assert(nmea_payload);
-
     init();
 
-    if (strlen(nmea_payload) != 168/6) {
-        status = AIS_ERR_BAD_BIT_COUNT;
-        return;
-    }
+    if (strlen(nmea_payload) != 168/6) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     std::bitset<168> bs; // 1 slot
     status = aivdm_to_bits(bs, nmea_payload);

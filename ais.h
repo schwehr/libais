@@ -242,7 +242,38 @@ public:
 
 std::ostream& operator<< (std::ostream& o, Ais18 const& msg);
 
+// C - Class B extended ship and position
+class Ais19 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    int spare;
+    float sog;
+    int position_accuracy;
+    float x, y; // Long and lat
+    float cog;
+    int true_heading;
+    int timestamp;
+    int spare2;
+    std::string name;
+    int type_and_cargo;
+    int dim_a;
+    int dim_b;
+    int dim_c;
+    int dim_d;
+    int fix_type;
+    bool raim;
+    int dte;
+    int assigned_mode;
+    int spare3;
 
+    Ais19(const char *nmea_payload);
+    void print();
+
+};
+
+std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
 
 
 #define CHECKPOINT std::cerr <<  __FILE__ << ":" << __LINE__ << " checkpoint" << std::endl
