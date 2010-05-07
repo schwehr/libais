@@ -7,6 +7,28 @@
 
 <ul> <!-- list of all releases -->
 
+  <li>0.2 - 2010-05-06
+  <ul>
+    <li>Added C++ error handling to classes via AIS_STATUS</li>
+    <li>C++ message now inherit from AisMsg and need to call init() in
+  constructor</li>
+    <li>Added C++ messages 7_13, 14, 18, and 19</li>
+    <li>aivdm_to_bits now has error checking</li>
+    <li>ais123.cpp renames to ais1_2_3.cpp</li>
+    <li>Switched to unicode in ais_py.cpp to support Python 3</li>
+    <li>ais_py.cpp has strange INIT to handle Python 2 and 3</li>
+    <li>nais2pg.py is starting to implement a new AIS feed to database
+  daemon</li>
+    <li>Redid my old USCG regex to have better names with lower_lower style</li>
+    <li>LineQueue should now support reading through a socket, which I
+  got wrong before</li>
+    <li>Total redo of the Normalization queue to be much lower
+  overhead and to call the regex only once per line received.  Only
+  keep they body of all but the last message in a sequence.</li>
+    <li>test_libais.cpp is not really a test framework, but it does
+  try out the pure C++ world.</li>
+</ul>
+  
   <li>0.1 - 2010-05-03
   <ul>
     <li>Able to decode messages 1-5 from python</li>
@@ -18,5 +40,5 @@
 
 <hr>
 <address></address>
-<!-- hhmts start --> Last modified: Mon May  3 14:45:59 EDT 2010 <!-- hhmts end -->
+<!-- hhmts start --> Last modified: Thu May  6 22:59:15 EDT 2010 <!-- hhmts end -->
 </body> </html>
