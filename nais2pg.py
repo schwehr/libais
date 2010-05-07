@@ -117,8 +117,22 @@ class NormQueue(Queue.Queue):
         self.stations[station][seq].append(msg['body']) # not first, not last
 
 
+class VesselList:
 
+    def __init__(self):
+        vessels={} # Keyed by MMSI
 
+    def get_sql_create(self):
+        'return SQL to create the name database'
+        # Need mmsi, name, shipandcargo   # but not , cg_timestamp
+
+    def add_vessel(self, vessel_dict):
+        'dict must have mmsi, name, type_and_cargo'
+        new_vessel = False
+        if mmsi in vessels
+        asdfasdf!!!!
+
+        
 if __name__ == '__main__':
 
 
