@@ -473,8 +473,8 @@ decode(PyObject *self, PyObject *args) {
     
     default:
         //assert (false);
-        std::cout << "Unknown message type: '" << nmea_payload[0] << "'\n"
-                  << "\tline: " << nmea_payload << std::endl;
+        //std::cout << "Unknown message type: '" << nmea_payload[0] << "'\n"
+        //          << "\tline: " << nmea_payload << std::endl;
         PyErr_Format(ais_py_exception, "ais.decode: message %c not known", nmea_payload[0]);
 
     }

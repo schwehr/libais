@@ -54,8 +54,8 @@ tar:
 
 # Remove the NDEBUG that python tries to use
 python2:
-	CFLAGS="-m32 -O0 -g -D_GLIBCXX_DEBUG -UNDEBUG" /sw/bin/python2.6 setup.py build
-#	CFLAGS="-m32 -O3 -funroll-loops -fexpensive-optimizations -ffast-math" /sw/bin/python2.6 setup.py build
+	CFLAGS="-m32 -O3 -funroll-loops -fexpensive-optimizations -ffast-math" /sw/bin/python2.6 setup.py build
+#	CFLAGS="-m32 -O0 -g -D_GLIBCXX_DEBUG -UNDEBUG" /sw/bin/python2.6 setup.py build
 
 python3:
 	CFLAGS="-m32 -O0 -g -D_GLIBCXX_DEBUG -UNDEBUG" /sw/bin/python3 setup.py build
