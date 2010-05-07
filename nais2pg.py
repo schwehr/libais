@@ -10,6 +10,9 @@
 import ais
 import re
 
+import psycopg2
+#import psycopg2.extras
+
 # Making this regex more like how I like!  lower_lower
 uscg_ais_nmea_regex_str = r'''^!(?P<talker>AI)(?P<string_type>VD[MO])
 ,(?P<total>\d?)
@@ -117,21 +120,95 @@ class NormQueue(Queue.Queue):
         self.stations[station][seq].append(msg['body']) # not first, not last
 
 
-class VesselList:
+class VesselNames:
 
-    def __init__(self):
-        vessels={} # Keyed by MMSI
-
-    def get_sql_create(self):
+    def __init__(self, db_cx):
+        self.vessels={} # Keyed by MMSI
+        self.cx = db_cx
+        self.cu = db_cx.cursor()
+        try:
+            self.cu.execute(self.get_sql_create_str())
+        except psycopg2.ProgrammingError, e:
+            # already exists - this is okay
+            pass
+        self.cx.commit()
+        
+    def get_sql_create_str(self):
         'return SQL to create the name database'
         # Need mmsi, name, shipandcargo   # but not , cg_timestamp
+        return '''CREATE TABLE vessel_name (
+       mmsi INT PRIMARY KEY,
+       name VARCHAR(25), -- only need 20
+       type_and_cargo INT
+);'''
 
-    def add_vessel(self, vessel_dict):
-        'dict must have mmsi, name, type_and_cargo'
-        new_vessel = False
-        if mmsi in vessels
-        asdfasdf!!!!
+    def insert_or_update(self, mmsi, name, type_and_cargo):
+        'Try update first for speed'
+        if False: # Does not want to work?        
+            self.cu.execute('''BEGIN;
+SAVEPOINT sp1;
+  UPDATE vessel_name SET name=%(name)s, type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;
+ROLLBACK TO sp1;
+  INSERT INTO vessel_name VALUES(%(mmsi)s, %(name)s, %(type_and_cargo)s );
+COMMIT;  
+''',
+                        {'mmsi':mmsi, 'name':name, 'type_and_cargo':type_and_cargo}
+                        )
+        # Lame, but try it.
 
+
+        try:
+            self.cu.execute('UPDATE vessel_name SET name=%s, type_and_cargo=%s WHERE mmsi = %s;',
+                            (mmsi, name, type_and_cargo)
+                            )
+            self.cx.commit()
+            print 'UPDATED vessel name'
+            return
+        
+        except Exception, e:
+            print
+            print 'Exception for',name
+            print Exception
+            print e
+            print type(mmsi), type(name), type(type_and_cargo)
+            print
+            pass
+
+        #try
+        print 'Trying_insert:',mmsi, type(mmsi), name, type(name), type_and_cargo, type(type_and_cargo)
+        
+        self.cu.execute('INSERT INTO vessel_name (mmsi,name,type_and_cargo) VALUES(%s, %s, %s);', (mmsi, str(name.rstrip() ), int(type_and_cargo)) )
+        self.cx.commit()
+        print 'HERE...'
+        #print 'INSERTED vessel name'
+            
+        
+    def update(self, mmsi, name, type_and_cargo):
+        '''dict must have mmsi, name, type_and_cargo
+        returns False if vessel already setup okay
+        return True if vessel must be put in the db
+        '''
+
+        if mmsi in (0,1):
+            # Drop these... useless
+            print 'USELESS'
+            return
+
+        if mmsi not in self.vessels:
+            print 'NEW',name
+            self.vessels[mmsi] = (name, type_and_cargo)
+            self.insert_or_update(mmsi,name,type_and_cargo)
+            return
+
+        old_name, old_type_and_cargo = self.vessels[mmsi]
+
+        if name != old_name or type_and_cargo != old_type_and_cargo:
+            self.vessels[mmsi] = (name, type_and_cargo)
+            self.insert_or_update(mmsi,name,type_and_cargo)
+            return
+
+        # Nothing to do.
+        
         
 if __name__ == '__main__':
 
@@ -141,6 +218,9 @@ if __name__ == '__main__':
     for i in range(30):
         counters[i] = 0
 
+    cx = psycopg2.connect("dbname='ais_test'")
+    
+    vessel_names = VesselNames(cx)
 
     line_queue = LineQueue()
     norm_queue = NormQueue()
@@ -156,7 +236,7 @@ if __name__ == '__main__':
 
         while line_queue.qsize() > 0:
             line = line_queue.get(False)
-
+            #print 'line:',line
             try:
                 match = uscg_ais_nmea_regex.search(line).groupdict()
                 match_count += 1
@@ -186,7 +266,11 @@ if __name__ == '__main__':
                     continue
                     #pass # Bad or unhandled message
 
-                counters[msg['id']] += 1
 
+                counters[msg['id']] += 1
+                if msg['id'] in (5,19):
+                    #print 'UPDATING vessel name', msg
+                    vessel_names.update(msg['mmsi'], msg['name'].rstrip('@'), msg['type_and_cargo'])
+                        
     print ('match_count:',match_count)
     print (counters)
