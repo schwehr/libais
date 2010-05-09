@@ -8,7 +8,6 @@
 #include <cassert>
 #include <cmath>
 
-
 Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     assert(nmea_payload);
     init();

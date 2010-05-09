@@ -10,6 +10,55 @@ using namespace std;
 PyObject *ais_py_exception;
 const std::string exception_name("ais.decode.Error");
 
+    //inline
+void
+DictSafeSetItem(PyObject *dict, const std::string &key, const long val) {
+    PyObject *key_obj = PyUnicode_FromString(key.c_str());
+    PyObject *val_obj = PyLong_FromLong(val);
+    PyDict_SetItem(dict, key_obj, val_obj);
+    Py_DECREF(key_obj);
+    Py_DECREF(val_obj);
+}
+
+void
+DictSafeSetItem(PyObject *dict, const std::string &key, const int val) {
+    PyObject *key_obj = PyUnicode_FromString(key.c_str());
+    PyObject *val_obj = PyLong_FromLong(val);
+    PyDict_SetItem(dict, key_obj, val_obj);
+    Py_DECREF(key_obj);
+    Py_DECREF(val_obj);
+}
+
+void
+DictSafeSetItem(PyObject *dict, const std::string &key, const std::string &val) {
+    PyObject *key_obj = PyUnicode_FromString(key.c_str());
+    PyObject *val_obj = PyUnicode_FromString(val.c_str());
+    PyDict_SetItem(dict, key_obj, val_obj);
+    Py_DECREF(key_obj);
+    Py_DECREF(val_obj);
+}
+
+
+void
+DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
+    PyObject *key_obj = PyUnicode_FromString(key.c_str());
+    PyObject *val_obj = PyBool_FromLong(val);
+    PyDict_SetItem(dict, key_obj, val_obj);
+    Py_DECREF(key_obj);
+    Py_DECREF(val_obj);
+}
+
+// FIX: float -> double?
+void
+DictSafeSetItem(PyObject *dict, const std::string &key, const float val) {
+    PyObject *key_obj = PyUnicode_FromString(key.c_str());
+    PyObject *val_obj = PyFloat_FromDouble(val);
+    PyDict_SetItem(dict, key_obj, val_obj);
+    Py_DECREF(key_obj);
+    Py_DECREF(val_obj);
+}
+
+
 
 extern "C" {
 
@@ -24,41 +73,41 @@ ais1_2_3_to_pydict(const char *nmea_payload) {
     }
 
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("nav_status"), PyLong_FromLong(msg.nav_status));
-    PyDict_SetItem(dict, PyUnicode_FromString("rot_over_range"), PyBool_FromLong(msg.rot_over_range));
-    PyDict_SetItem(dict, PyUnicode_FromString("rot"), PyFloat_FromDouble(msg.rot));
-    PyDict_SetItem(dict, PyUnicode_FromString("sog"), PyFloat_FromDouble(msg.sog));
-    PyDict_SetItem(dict, PyUnicode_FromString("position_accuracy"), PyLong_FromLong(msg.position_accuracy));
-    PyDict_SetItem(dict, PyUnicode_FromString("x"), PyFloat_FromDouble(msg.x));
-    PyDict_SetItem(dict, PyUnicode_FromString("y"), PyFloat_FromDouble(msg.y));
-    PyDict_SetItem(dict, PyUnicode_FromString("cog"), PyFloat_FromDouble(msg.cog));
-    PyDict_SetItem(dict, PyUnicode_FromString("true_heading"), PyLong_FromLong(msg.true_heading));
-    PyDict_SetItem(dict, PyUnicode_FromString("timestamp"), PyLong_FromLong(msg.timestamp));
-    PyDict_SetItem(dict, PyUnicode_FromString("special_manoeuvre"), PyLong_FromLong(msg.special_manoeuvre));
-    PyDict_SetItem(dict, PyUnicode_FromString("spare"), PyLong_FromLong(msg.spare));
-    PyDict_SetItem(dict, PyUnicode_FromString("raim"), PyBool_FromLong(msg.raim));
+    DictSafeSetItem(dict,"nav_status", msg.nav_status);
+    DictSafeSetItem(dict,"rot_over_range", msg.rot_over_range);
+    DictSafeSetItem(dict,"rot",msg.rot);
+    DictSafeSetItem(dict,"sog", msg.sog);
+    DictSafeSetItem(dict,"position_accuracy", msg.position_accuracy);
+    DictSafeSetItem(dict,"x", msg.x);
+    DictSafeSetItem(dict,"y", msg.y);
+    DictSafeSetItem(dict,"cog", msg.cog);
+    DictSafeSetItem(dict,"true_heading", msg.true_heading);
+    DictSafeSetItem(dict,"timestamp", msg.timestamp);
+    DictSafeSetItem(dict,"special_manoeuvre", msg.special_manoeuvre);
+    DictSafeSetItem(dict,"spare", msg.spare);
+    DictSafeSetItem(dict,"raim", msg.raim);
 
     if (msg.received_stations_valid)
-        PyDict_SetItem(dict, PyUnicode_FromString("received_stations"), PyLong_FromLong(msg.received_stations));
+        DictSafeSetItem(dict,"received_stations", msg.received_stations);
     if (msg.slot_number_valid)
-        PyDict_SetItem(dict, PyUnicode_FromString("slot_number"), PyLong_FromLong(msg.slot_number));
+        DictSafeSetItem(dict,"slot_number", msg.slot_number);
     if (msg.utc_valid) {
-        PyDict_SetItem(dict, PyUnicode_FromString("utc_hour"), PyLong_FromLong(msg.utc_hour));
-        PyDict_SetItem(dict, PyUnicode_FromString("utc_min"), PyLong_FromLong(msg.utc_min));
-        PyDict_SetItem(dict, PyUnicode_FromString("utc_spare"), PyLong_FromLong(msg.utc_spare));
+        DictSafeSetItem(dict,"utc_hour", msg.utc_hour);
+        DictSafeSetItem(dict,"utc_min", msg.utc_min);
+        DictSafeSetItem(dict,"utc_spare", msg.utc_spare);
     }
 
     if (msg.slot_offset_valid)
-        PyDict_SetItem(dict, PyUnicode_FromString("slot_offset"), PyLong_FromLong(msg.slot_offset));
+        DictSafeSetItem(dict,"slot_offset", msg.slot_offset);
 
     if (msg.slot_increment_valid) {
-        PyDict_SetItem(dict, PyUnicode_FromString("slot_increment"), PyLong_FromLong(msg.slot_increment));
-        PyDict_SetItem(dict, PyUnicode_FromString("slots_to_allocate"), PyLong_FromLong(msg.slots_to_allocate));
-        PyDict_SetItem(dict, PyUnicode_FromString("keep_flag"), PyBool_FromLong(msg.keep_flag));
+        DictSafeSetItem(dict,"slot_increment", msg.slot_increment);
+        DictSafeSetItem(dict,"slots_to_allocate", msg.slots_to_allocate);
+        DictSafeSetItem(dict,"keep_flag", msg.keep_flag);
     }
 
     return dict;
@@ -77,41 +126,43 @@ ais4_11_to_pydict(const char *nmea_payload) {
     }
 
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("year"), PyLong_FromLong(msg.year));
-    PyDict_SetItem(dict, PyUnicode_FromString("month"), PyLong_FromLong(msg.month));
-    PyDict_SetItem(dict, PyUnicode_FromString("day"), PyLong_FromLong(msg.day));
-    PyDict_SetItem(dict, PyUnicode_FromString("hour"), PyLong_FromLong(msg.hour));
-    PyDict_SetItem(dict, PyUnicode_FromString("minute"), PyLong_FromLong(msg.minute));
-    PyDict_SetItem(dict, PyUnicode_FromString("second"), PyLong_FromLong(msg.second));
+    DictSafeSetItem(dict,"year", msg.year);
+    DictSafeSetItem(dict,"month", msg.month);
+    DictSafeSetItem(dict,"day", msg.day);
+    DictSafeSetItem(dict,"hour", msg.hour);
+    DictSafeSetItem(dict,"minute", msg.minute);
+    DictSafeSetItem(dict,"second", msg.second);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("position_accuracy"), PyLong_FromLong(msg.position_accuracy));
-    PyDict_SetItem(dict, PyUnicode_FromString("x"), PyFloat_FromDouble(msg.x));
-    PyDict_SetItem(dict, PyUnicode_FromString("y"), PyFloat_FromDouble(msg.y));
+    DictSafeSetItem(dict,"position_accuracy", msg.position_accuracy);
+    DictSafeSetItem(dict,"x", msg.x);
+    DictSafeSetItem(dict,"y", msg.y);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("fix_type"), PyLong_FromLong(msg.fix_type));
-    PyDict_SetItem(dict, PyUnicode_FromString("spare"), PyLong_FromLong(msg.spare));
-    PyDict_SetItem(dict, PyUnicode_FromString("raim"), PyBool_FromLong(msg.raim));
+    DictSafeSetItem(dict,"fix_type", msg.fix_type);
+    DictSafeSetItem(dict,"spare", msg.spare);
+    DictSafeSetItem(dict,"raim", msg.raim);
 
 
     if (msg.received_stations_valid)
-        PyDict_SetItem(dict, PyUnicode_FromString("received_stations"), PyLong_FromLong(msg.received_stations));
+        DictSafeSetItem(dict,"received_stations", msg.received_stations);
     if (msg.slot_number_valid)
-        PyDict_SetItem(dict, PyUnicode_FromString("slot_number"), PyLong_FromLong(msg.slot_number));
+        DictSafeSetItem(dict,"slot_number", msg.slot_number);
     if (msg.utc_valid) {
-        PyDict_SetItem(dict, PyUnicode_FromString("utc_hour"), PyLong_FromLong(msg.utc_hour));
-        PyDict_SetItem(dict, PyUnicode_FromString("utc_min"), PyLong_FromLong(msg.utc_min));
-        PyDict_SetItem(dict, PyUnicode_FromString("utc_spare"), PyLong_FromLong(msg.utc_spare));
+        DictSafeSetItem(dict,"utc_hour", msg.utc_hour);
+        DictSafeSetItem(dict,"utc_min", msg.utc_min);
+        DictSafeSetItem(dict,"utc_spare", msg.utc_spare);
     }
 
     if (msg.slot_offset_valid)
-        PyDict_SetItem(dict, PyUnicode_FromString("slot_offset"), PyLong_FromLong(msg.slot_offset));
+        DictSafeSetItem(dict,"slot_offset", msg.slot_offset);
     
     return dict;
 }
+
+
 
 PyObject * 
 ais5_to_pydict(const char *nmea_payload) {
@@ -124,27 +175,28 @@ ais5_to_pydict(const char *nmea_payload) {
     }
 
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
 
-    PyDict_SetItem(dict, PyUnicode_FromString("ais_version"), PyLong_FromLong(msg.ais_version));
-    PyDict_SetItem(dict, PyUnicode_FromString("imo_num"), PyLong_FromLong(msg.imo_num));
-    PyDict_SetItem(dict, PyUnicode_FromString("callsign"), PyUnicode_FromString(msg.callsign.c_str()));
-    PyDict_SetItem(dict, PyUnicode_FromString("name"), PyUnicode_FromString(msg.name.c_str()));
-    PyDict_SetItem(dict, PyUnicode_FromString("type_and_cargo"), PyLong_FromLong(msg.type_and_cargo));
-    PyDict_SetItem(dict, PyUnicode_FromString("dim_a"), PyLong_FromLong(msg.dim_a));
-    PyDict_SetItem(dict, PyUnicode_FromString("dim_b"), PyLong_FromLong(msg.dim_b));
-    PyDict_SetItem(dict, PyUnicode_FromString("dim_c"), PyLong_FromLong(msg.dim_c));
-    PyDict_SetItem(dict, PyUnicode_FromString("dim_d"), PyLong_FromLong(msg.dim_d));
-    PyDict_SetItem(dict, PyUnicode_FromString("fix_type"), PyLong_FromLong(msg.fix_type));
-    PyDict_SetItem(dict, PyUnicode_FromString("eta_month"), PyLong_FromLong(msg.eta_month));
-    PyDict_SetItem(dict, PyUnicode_FromString("eta_day"), PyLong_FromLong(msg.eta_day));
-    PyDict_SetItem(dict, PyUnicode_FromString("eta_minute"), PyLong_FromLong(msg.eta_minute));
-    PyDict_SetItem(dict, PyUnicode_FromString("draught"), PyLong_FromLong(msg.draught));
-    PyDict_SetItem(dict, PyUnicode_FromString("destination"), PyUnicode_FromString(msg.destination.c_str()));
-    PyDict_SetItem(dict, PyUnicode_FromString("dte"), PyLong_FromLong(msg.dte));
-    PyDict_SetItem(dict, PyUnicode_FromString("spare"), PyLong_FromLong(msg.spare));
+    DictSafeSetItem(dict,"id",msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict,"ais_version", msg.ais_version);
+    DictSafeSetItem(dict,"imo_num", msg.imo_num);
+    DictSafeSetItem(dict,"callsign", msg.callsign);
+    DictSafeSetItem(dict,"name", msg.name);
+    DictSafeSetItem(dict,"type_and_cargo", msg.type_and_cargo);
+    DictSafeSetItem(dict,"dim_a", msg.dim_a);
+    DictSafeSetItem(dict,"dim_b", msg.dim_b);
+    DictSafeSetItem(dict,"dim_c", msg.dim_c);
+    DictSafeSetItem(dict,"dim_d", msg.dim_d);
+    DictSafeSetItem(dict,"fix_type", msg.fix_type);
+    DictSafeSetItem(dict,"eta_month", msg.eta_month);
+    DictSafeSetItem(dict,"eta_day", msg.eta_day);
+    DictSafeSetItem(dict,"eta_minute", msg.eta_minute);
+    DictSafeSetItem(dict,"draught", msg.draught);
+    DictSafeSetItem(dict,"destination", msg.destination);
+    DictSafeSetItem(dict,"dte", msg.dte);
+    DictSafeSetItem(dict,"spare", msg.spare);
 
     return dict;
 }
@@ -168,18 +220,20 @@ ais7_13_to_pydict(const char *nmea_payload) {
     }
     
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
 
     PyObject *list = PyList_New(msg.dest_mmsi.size());
     for (size_t i=0; i < msg.dest_mmsi.size(); i++) {
+        // FIX: is this my memory leak?
         PyObject *tuple = PyTuple_New(2);
         PyTuple_SetItem(tuple,0,PyLong_FromLong(msg.dest_mmsi[i]));
         PyTuple_SetItem(tuple,1,PyLong_FromLong(msg.seq_num[i]));
 
         PyList_SetItem(list,i, tuple);
     }
+    // FIX: probably a memory leak with list
     PyDict_SetItem(dict, PyUnicode_FromString("acks"), list);
 
     return dict;
@@ -196,11 +250,10 @@ ais14_to_pydict(const char *nmea_payload) {
     }
 
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
-    PyDict_SetItem(dict, PyUnicode_FromString("text"), PyUnicode_FromString(msg.text.c_str()));
-    //PyDict_SetItem(dict, PyUnicode_FromString("text"), PyUnicode_FromString(msg.text.c_str()) );
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+    DictSafeSetItem(dict,"text", msg.text);
 
     return dict;
 }
@@ -215,52 +268,52 @@ ais18_to_pydict(const char *nmea_payload) {
     }
 
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("sog"), PyFloat_FromDouble(msg.sog));
-    PyDict_SetItem(dict, PyUnicode_FromString("position_accuracy"), PyLong_FromLong(msg.position_accuracy));
-    PyDict_SetItem(dict, PyUnicode_FromString("x"), PyFloat_FromDouble(msg.x));
-    PyDict_SetItem(dict, PyUnicode_FromString("y"), PyFloat_FromDouble(msg.y));
-    PyDict_SetItem(dict, PyUnicode_FromString("cog"), PyFloat_FromDouble(msg.cog));
-    PyDict_SetItem(dict, PyUnicode_FromString("true_heading"), PyLong_FromLong(msg.true_heading));
-    PyDict_SetItem(dict, PyUnicode_FromString("timestamp"), PyLong_FromLong(msg.timestamp));
+    DictSafeSetItem(dict,"sog", msg.sog);
+    DictSafeSetItem(dict,"position_accuracy", msg.position_accuracy);
+    DictSafeSetItem(dict,"x", msg.x);
+    DictSafeSetItem(dict,"y", msg.y);
+    DictSafeSetItem(dict,"cog", msg.cog);
+    DictSafeSetItem(dict,"true_heading", msg.true_heading);
+    DictSafeSetItem(dict,"timestamp", msg.timestamp);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("spare2"), PyLong_FromLong(msg.spare2));
+    DictSafeSetItem(dict,"spare2", msg.spare2);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("unit_flag"), PyLong_FromLong(msg.unit_flag));
-    PyDict_SetItem(dict, PyUnicode_FromString("display_flag"), PyLong_FromLong(msg.display_flag));
-    PyDict_SetItem(dict, PyUnicode_FromString("dsc_flag"), PyLong_FromLong(msg.dsc_flag));
-    PyDict_SetItem(dict, PyUnicode_FromString("band_flag"), PyLong_FromLong(msg.band_flag));
-    PyDict_SetItem(dict, PyUnicode_FromString("m22_flag"), PyLong_FromLong(msg.m22_flag));
-    PyDict_SetItem(dict, PyUnicode_FromString("mode_flag"), PyLong_FromLong(msg.mode_flag));
+    DictSafeSetItem(dict,"unit_flag", msg.unit_flag);
+    DictSafeSetItem(dict,"display_flag", msg.display_flag);
+    DictSafeSetItem(dict,"dsc_flag", msg.dsc_flag);
+    DictSafeSetItem(dict,"band_flag", msg.band_flag);
+    DictSafeSetItem(dict,"m22_flag", msg.m22_flag);
+    DictSafeSetItem(dict,"mode_flag", msg.mode_flag);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("raim"), PyBool_FromLong(msg.raim));
+DictSafeSetItem(dict,"raim", msg.raim);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("commstate_flag"), PyLong_FromLong(msg.commstate_flag));
+    DictSafeSetItem(dict,"commstate_flag", msg.commstate_flag);
     if (0==msg.unit_flag) {
         if (0==msg.commstate_flag) {
             // SOTDMA
-            PyDict_SetItem(dict, PyUnicode_FromString("slot_timeout"), PyLong_FromLong(msg.slot_timeout));
+            DictSafeSetItem(dict,"slot_timeout", msg.slot_timeout);
             switch (msg.slot_timeout) {
             case 0:
-                PyDict_SetItem(dict, PyUnicode_FromString("slot_offset"), PyLong_FromLong(msg.slot_offset));
+                DictSafeSetItem(dict,"slot_offset", msg.slot_offset);
                 break;
             case 1:
-                PyDict_SetItem(dict, PyUnicode_FromString("utc_hour"), PyLong_FromLong(msg.utc_hour));
-                PyDict_SetItem(dict, PyUnicode_FromString("utc_min"), PyLong_FromLong(msg.utc_min));
-                PyDict_SetItem(dict, PyUnicode_FromString("utc_spare"), PyLong_FromLong(msg.utc_spare));
+                DictSafeSetItem(dict,"utc_hour", msg.utc_hour);
+                DictSafeSetItem(dict,"utc_min", msg.utc_min);
+                DictSafeSetItem(dict,"utc_spare", msg.utc_spare);
                 break;
             case 2: // FALLTHROUGH
             case 4: // FALLTHROUGH
             case 6:
-                PyDict_SetItem(dict, PyUnicode_FromString("slot_number"), PyLong_FromLong(msg.slot_number));
+                DictSafeSetItem(dict,"slot_number", msg.slot_number);
                 break;
             case 3: // FALLTHROUGH
             case 5: // FALLTHROUGH
             case 7:
-                PyDict_SetItem(dict, PyUnicode_FromString("received_stations"), PyLong_FromLong(msg.received_stations));
+                DictSafeSetItem(dict,"received_stations", msg.received_stations);
                 break;
             default:
                 std::cout << "ERROR: slot_timeout: " << msg.slot_timeout << std::endl;
@@ -270,9 +323,9 @@ ais18_to_pydict(const char *nmea_payload) {
             
         } else {
             // ITDMA
-            PyDict_SetItem(dict, PyUnicode_FromString("slot_increment"), PyLong_FromLong(msg.slot_increment));
-            PyDict_SetItem(dict, PyUnicode_FromString("slots_to_allocate"), PyLong_FromLong(msg.slots_to_allocate));
-            PyDict_SetItem(dict, PyUnicode_FromString("keep_flag"), PyLong_FromLong(msg.keep_flag));
+            DictSafeSetItem(dict,"slot_increment", msg.slot_increment);
+            DictSafeSetItem(dict,"slots_to_allocate", msg.slots_to_allocate);
+            DictSafeSetItem(dict,"keep_flag", msg.keep_flag);
         } 
     } // do nothing if unit flag is 1... in CS mode and no commstate
                    
@@ -289,33 +342,33 @@ ais19_to_pydict(const char *nmea_payload) {
     }
 
     PyObject *dict = PyDict_New();
-    PyDict_SetItem(dict, PyUnicode_FromString("id"), PyLong_FromLong(msg.message_id));
-    PyDict_SetItem(dict, PyUnicode_FromString("repeat_indicator"), PyLong_FromLong(msg.repeat_indicator));
-    PyDict_SetItem(dict, PyUnicode_FromString("mmsi"), PyLong_FromLong(msg.mmsi));
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("sog"), PyFloat_FromDouble(msg.sog));
-    PyDict_SetItem(dict, PyUnicode_FromString("position_accuracy"), PyLong_FromLong(msg.position_accuracy));
-    PyDict_SetItem(dict, PyUnicode_FromString("x"), PyFloat_FromDouble(msg.x));
-    PyDict_SetItem(dict, PyUnicode_FromString("y"), PyFloat_FromDouble(msg.y));
-    PyDict_SetItem(dict, PyUnicode_FromString("cog"), PyFloat_FromDouble(msg.cog));
-    PyDict_SetItem(dict, PyUnicode_FromString("true_heading"), PyLong_FromLong(msg.true_heading));
-    PyDict_SetItem(dict, PyUnicode_FromString("timestamp"), PyLong_FromLong(msg.timestamp));
+    DictSafeSetItem(dict,"sog", msg.sog);
+    DictSafeSetItem(dict,"position_accuracy", msg.position_accuracy);
+    DictSafeSetItem(dict,"x", msg.x);
+    DictSafeSetItem(dict,"y", msg.y);
+    DictSafeSetItem(dict,"cog", msg.cog);
+    DictSafeSetItem(dict,"true_heading", msg.true_heading);
+    DictSafeSetItem(dict,"timestamp", msg.timestamp);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("spare2"), PyLong_FromLong(msg.spare2));
+    DictSafeSetItem(dict,"spare2", msg.spare2);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("name"), PyUnicode_FromString(msg.name.c_str()));
-    PyDict_SetItem(dict, PyUnicode_FromString("type_and_cargo"), PyLong_FromLong(msg.type_and_cargo));
-    PyDict_SetItem(dict, PyUnicode_FromString("dim_a"), PyLong_FromLong(msg.dim_a));
-    PyDict_SetItem(dict, PyUnicode_FromString("dim_b"), PyLong_FromLong(msg.dim_b));
-    PyDict_SetItem(dict, PyUnicode_FromString("dim_c"), PyLong_FromLong(msg.dim_c));
-    PyDict_SetItem(dict, PyUnicode_FromString("dim_d"), PyLong_FromLong(msg.dim_d));
-    PyDict_SetItem(dict, PyUnicode_FromString("fix_type"), PyLong_FromLong(msg.fix_type));
+    DictSafeSetItem(dict,"name", msg.name);
+    DictSafeSetItem(dict,"type_and_cargo", msg.type_and_cargo);
+    DictSafeSetItem(dict,"dim_a", msg.dim_a);
+    DictSafeSetItem(dict,"dim_b", msg.dim_b);
+    DictSafeSetItem(dict,"dim_c", msg.dim_c);
+    DictSafeSetItem(dict,"dim_d", msg.dim_d);
+    DictSafeSetItem(dict,"fix_type", msg.fix_type);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("raim"), PyBool_FromLong(msg.raim));
+    DictSafeSetItem(dict,"raim", msg.raim);
 
-    PyDict_SetItem(dict, PyUnicode_FromString("dte"), PyLong_FromLong(msg.dte));
-    PyDict_SetItem(dict, PyUnicode_FromString("assigned_mode"), PyLong_FromLong(msg.assigned_mode));
-    PyDict_SetItem(dict, PyUnicode_FromString("spare3"), PyLong_FromLong(msg.spare3));
+    DictSafeSetItem(dict,"dte", msg.dte);
+    DictSafeSetItem(dict,"assigned_mode", msg.assigned_mode);
+    DictSafeSetItem(dict,"spare3", msg.spare3);
 
     return dict;
 }

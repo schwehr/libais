@@ -215,11 +215,14 @@ if __name__ == '__main__':
     norm_queue = NormQueue()
 
 
+    #for line_num, text in enumerate(open('1e6.multi')):
     #for line_num, line in enumerate(file('/nobackup/dl1/20100505.norm')):
-    for line_num, text in enumerate(open('1e6.multi')):
+    for line_num, text in enumerate(open('/Users/schwehr/Desktop/DeepwaterHorizon/ais-dl1/uscg-nais-dl1-2010-04-28.norm.dedup')):
+ 
+
         #if line_num > 300: break
         #print 
-        if line_num % 10000 == 0: print ("line: %d   %d" % (line_num,match_count) )
+        if line_num % 100000 == 0: print ("line: %d   %d" % (line_num,match_count) )
 
         line_queue.put(text)
 
@@ -243,6 +246,10 @@ if __name__ == '__main__':
                 except Queue.Empty:
                     continue
 
+                # FIX: just for debugging
+                #if len(result['body']) < 10: continue
+                #if result['body'][0] != '5': continue
+                
                 try:
                      msg = ais.decode(result['body'])
                 #except ais.decode.error:
@@ -255,8 +262,10 @@ if __name__ == '__main__':
                     continue
                     #pass # Bad or unhandled message
 
+                #continue #  FIX: Remove after debugging
 
                 counters[msg['id']] += 1
+
                 if msg['id'] in (5,19):
                     msg['name'] = msg['name'].rstrip(' @')
                     #print 'UPDATING vessel name', msg

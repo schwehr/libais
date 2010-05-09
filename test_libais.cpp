@@ -4,7 +4,7 @@
 
 #define UNUSED __attribute((__unused__))
 
-int main(UNUSED char *argc, UNUSED char* argv[]) {
+int main(UNUSED int argc, UNUSED char* argv[]) {
     build_nmea_lookup();
 
     ////////////////////////////////////////

@@ -6,6 +6,7 @@
 #include <string>
 #include <cassert>
 #include <vector>
+#include <cstring>
 
 #include <iostream> // for checkpoint
 
