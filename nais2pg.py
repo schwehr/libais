@@ -8,6 +8,8 @@
 # Skip normalization first...
 
 import ais
+from ais import decode # Make sure we have the right ais module
+
 import re
 
 import psycopg2
@@ -120,106 +122,93 @@ class NormQueue(Queue.Queue):
         self.stations[station][seq].append(msg['body']) # not first, not last
 
 
-class VesselNames:
 
-    def __init__(self, db_cx):
-        self.vessels={} # Keyed by MMSI
-        self.cx = db_cx
-        self.cu = db_cx.cursor()
-        try:
-            self.cu.execute(self.get_sql_create_str())
-        except psycopg2.ProgrammingError, e:
-            # already exists - this is okay
-            pass
-        self.cx.commit()
-        
-    def get_sql_create_str(self):
-        'return SQL to create the name database'
-        # Need mmsi, name, shipandcargo   # but not , cg_timestamp
-        return '''CREATE TABLE vessel_name (
+def insert_or_update(cx, cu, sql_insert, sql_update, values):
+    'If the value might be new, try to insert first'
+    #print 'insert_or_update:',values
+    #print 'insert_or_update:',values['mmsi'],values['name'],values['type_and_cargo']
+    success = True
+    try:
+        cu.execute(sql_insert,values)
+    except psycopg2.IntegrityError:
+        # psycopg2.IntegrityError: duplicate key value violates unique constraint
+        print 'insert failed'
+        success = False
+
+    cx.commit()
+    if success: return
+
+    print cu.mogrify(sql_update, values)
+    cu.execute(sql_update, values)
+    cx.commit()
+
+
+sql_vessel_name_create='''CREATE TABLE vessel_name (
        mmsi INT PRIMARY KEY,
        name VARCHAR(25), -- only need 20
        type_and_cargo INT
 );'''
 
-    def insert_or_update(self, mmsi, name, type_and_cargo):
-        'Try update first for speed'
-        if False: # Does not want to work?        
-            self.cu.execute('''BEGIN;
-SAVEPOINT sp1;
-  UPDATE vessel_name SET name=%(name)s, type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;
-ROLLBACK TO sp1;
-  INSERT INTO vessel_name VALUES(%(mmsi)s, %(name)s, %(type_and_cargo)s );
-COMMIT;  
-''',
-                        {'mmsi':mmsi, 'name':name, 'type_and_cargo':type_and_cargo}
-                        )
-        # Lame, but try it.
 
+class VesselNames:
+    'Local caching of vessel names for more speed and less DB load'
+    sql_insert = 'INSERT INTO vessel_name VALUES (%(mmsi)s,%(name)s,%(type_and_cargo)s);'
+    sql_update = 'UPDATE vessel_name SET name = %(name)s, type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;'
+    def __init__(self, db_cx):
+        self.cx = db_cx
+        self.cu = self.cx.cursor()
+        self.vessels = {}
+        # Could do a create and commit here of the table
 
-        try:
-            self.cu.execute('UPDATE vessel_name SET name=%s, type_and_cargo=%s WHERE mmsi = %s;',
-                            (mmsi, name, type_and_cargo)
-                            )
-            self.cx.commit()
-            print 'UPDATED vessel name'
-            return
+    def update(self, vessel_dict):
+        # vessel_dict must have mmsi, name, type_and_cargo
+        mmsi = vessel_dict['mmsi']
+        if mmsi in (0,1,1193046):
+            # These vessels should be reported to the USCG
+            print 'USELESS: mmsi =',mmsi, 'name:',vessel_dict['name']
+            return # Drop these... useless
+
+        name = vessel_dict['name'];
+        type_and_cargo = vessel_dict['type_and_cargo']
         
-        except Exception, e:
-            print
-            print 'Exception for',name
-            print Exception
-            print e
-            print type(mmsi), type(name), type(type_and_cargo)
-            print
-            pass
-
-        #try
-        print 'Trying_insert:',mmsi, type(mmsi), name, type(name), type_and_cargo, type(type_and_cargo)
-        
-        self.cu.execute('INSERT INTO vessel_name (mmsi,name,type_and_cargo) VALUES(%s, %s, %s);', (mmsi, str(name.rstrip() ), int(type_and_cargo)) )
-        self.cx.commit()
-        print 'HERE...'
-        #print 'INSERTED vessel name'
-            
-        
-    def update(self, mmsi, name, type_and_cargo):
-        '''dict must have mmsi, name, type_and_cargo
-        returns False if vessel already setup okay
-        return True if vessel must be put in the db
-        '''
-
-        if mmsi in (0,1):
-            # Drop these... useless
-            print 'USELESS'
-            return
-
         if mmsi not in self.vessels:
-            print 'NEW',name
+            #print 'NEW: mmsi =',mmsi
+            insert_or_update(self.cx, self.cu, self.sql_insert, self.sql_update, vessel_dict)
             self.vessels[mmsi] = (name, type_and_cargo)
-            self.insert_or_update(mmsi,name,type_and_cargo)
             return
 
-        old_name, old_type_and_cargo = self.vessels[mmsi]
-
-        if name != old_name or type_and_cargo != old_type_and_cargo:
-            self.vessels[mmsi] = (name, type_and_cargo)
-            self.insert_or_update(mmsi,name,type_and_cargo)
+        #if mmsi in self.vessels:
+        old_name,old_type_and_cargo = self.vessels[mmsi]
+        if old_name == name and old_type_and_cargo == type_and_cargo:
+            #print 'NO_CHANGE:',mmsi
             return
 
-        # Nothing to do.
-        
+        # Know we have inserted it, so safe to update
+        #if mmsi == 367178330:
+        print 'UPDATING:',mmsi,'  ',
+        print old_name,old_type_and_cargo,'->',
+        print name,type_and_cargo
+            
+        self.cu.execute(self.sql_update, vessel_dict)
+        self.cx.commit()
+        self.vessels[mmsi] = (name, type_and_cargo)
+
         
 if __name__ == '__main__':
-
 
     match_count = 0
     counters = {}
     for i in range(30):
         counters[i] = 0
 
-    cx = psycopg2.connect("dbname='ais_test'")
-    
+    cx = psycopg2.connect("dbname='testing'")
+
+    for i in range(5): print '   *** WARNING ***  - Removing entries from vessel_name for testing'
+    print
+
+    cu = cx.cursor()
+    cu.execute('DELETE FROM vessel_name')
+
     vessel_names = VesselNames(cx)
 
     line_queue = LineQueue()
@@ -227,10 +216,10 @@ if __name__ == '__main__':
 
 
     #for line_num, line in enumerate(file('/nobackup/dl1/20100505.norm')):
-    for line_num, text in enumerate(open('1e6.log')):
+    for line_num, text in enumerate(open('1e6.multi')):
         #if line_num > 300: break
         #print 
-        if line_num % 100000 == 0: print ("line: %d   %d" % (line_num,match_count) )
+        if line_num % 10000 == 0: print ("line: %d   %d" % (line_num,match_count) )
 
         line_queue.put(text)
 
@@ -269,8 +258,13 @@ if __name__ == '__main__':
 
                 counters[msg['id']] += 1
                 if msg['id'] in (5,19):
+                    msg['name'] = msg['name'].rstrip(' @')
                     #print 'UPDATING vessel name', msg
-                    vessel_names.update(msg['mmsi'], msg['name'].rstrip('@'), msg['type_and_cargo'])
+                    #vessel_names.update(msg['mmsi'], msg['name'].rstrip('@'), msg['type_and_cargo'])
+                    #if msg['mmsi'] == 367178330:
+                    #    print ' CHECK:', msg['mmsi'], msg['name']
+                    vessel_names.update(msg)
+                    #print
                         
     print ('match_count:',match_count)
     print (counters)
