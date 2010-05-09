@@ -10,10 +10,17 @@
 import ais
 from ais import decode # Make sure we have the right ais module
 
+import sys
 import re
 
 import psycopg2
 #import psycopg2.extras
+
+def check_ref_counts(a_dict):
+    print ('Checking ref counts on', a_dict)
+    print ('\tmsg:', sys.getrefcount(a_dict))
+    for d in a_dict:
+        print ('\t',d, sys.getrefcount(d))
 
 # Making this regex more like how I like!  lower_lower
 uscg_ais_nmea_regex_str = r'''^!(?P<talker>AI)(?P<string_type>VD[MO])
@@ -132,13 +139,13 @@ def insert_or_update(cx, cu, sql_insert, sql_update, values):
         cu.execute(sql_insert,values)
     except psycopg2.IntegrityError:
         # psycopg2.IntegrityError: duplicate key value violates unique constraint
-        print 'insert failed'
+        print ('insert failed')
         success = False
 
     cx.commit()
     if success: return
 
-    print cu.mogrify(sql_update, values)
+    print (cu.mogrify(sql_update, values))
     cu.execute(sql_update, values)
     cx.commit()
 
@@ -165,14 +172,14 @@ class VesselNames:
         mmsi = vessel_dict['mmsi']
         if mmsi in (0,1,1193046):
             # These vessels should be reported to the USCG
-            print 'USELESS: mmsi =',mmsi, 'name:',vessel_dict['name']
+            print ('USELESS: mmsi =',mmsi, 'name:',vessel_dict['name'])
             return # Drop these... useless
 
         name = vessel_dict['name'];
         type_and_cargo = vessel_dict['type_and_cargo']
         
         if mmsi not in self.vessels:
-            #print 'NEW: mmsi =',mmsi
+            #print ('NEW: mmsi =',mmsi)
             insert_or_update(self.cx, self.cu, self.sql_insert, self.sql_update, vessel_dict)
             self.vessels[mmsi] = (name, type_and_cargo)
             return
@@ -180,14 +187,14 @@ class VesselNames:
         #if mmsi in self.vessels:
         old_name,old_type_and_cargo = self.vessels[mmsi]
         if old_name == name and old_type_and_cargo == type_and_cargo:
-            #print 'NO_CHANGE:',mmsi
+            #print ('NO_CHANGE:',mmsi)
             return
 
         # Know we have inserted it, so safe to update
         #if mmsi == 367178330:
-        print 'UPDATING:',mmsi,'  ',
-        print old_name,old_type_and_cargo,'->',
-        print name,type_and_cargo
+        print ('UPDATING:',mmsi,'  ',)
+        print (old_name,old_type_and_cargo,'->',)
+        print (name,type_and_cargo)
             
         self.cu.execute(self.sql_update, vessel_dict)
         self.cx.commit()
@@ -203,8 +210,8 @@ if __name__ == '__main__':
 
     cx = psycopg2.connect("dbname='testing'")
 
-    for i in range(5): print '   *** WARNING ***  - Removing entries from vessel_name for testing'
-    print
+    for i in range(5): print ('   *** WARNING ***  - Removing entries from vessel_name for testing')
+    print ()
 
     cu = cx.cursor()
     cu.execute('DELETE FROM vessel_name')
@@ -218,23 +225,25 @@ if __name__ == '__main__':
     #for line_num, text in enumerate(open('1e6.multi')):
     #for line_num, line in enumerate(file('/nobackup/dl1/20100505.norm')):
     for line_num, text in enumerate(open('/Users/schwehr/Desktop/DeepwaterHorizon/ais-dl1/uscg-nais-dl1-2010-04-28.norm.dedup')):
- 
+    #for line_num, text in enumerate(open('test.aivdm')):
 
         #if line_num > 300: break
-        #print 
+        #print ()
         if line_num % 100000 == 0: print ("line: %d   %d" % (line_num,match_count) )
+        if 'AIVDM' not in text:
+            continue
 
         line_queue.put(text)
 
         while line_queue.qsize() > 0:
             line = line_queue.get(False)
-            #print 'line:',line
+            #print ('line:',line)
             try:
                 match = uscg_ais_nmea_regex.search(line).groupdict()
                 match_count += 1
             except AttributeError:
                 if 'AIVDM' in line:
-                    print 'BAD_MATCH:',line
+                    print ('BAD_MATCH:',line)
                 continue
 
             norm_queue.put(match)
@@ -253,12 +262,17 @@ if __name__ == '__main__':
                 try:
                      msg = ais.decode(result['body'])
                 #except ais.decode.error:
-                except Exception, e:
-                    #print
-                    #print 'E:',Exception
-                    #print 'e:',e
-#                    if 'not yet handled' not in str(e):
-#                        print 'BAD Decode:',result
+                except Exception as e:
+                    #print ()
+                    
+                    if 'not yet handled' in str(e):
+                        continue
+                    if ' not known' in str(e): continue
+
+                    print ('BAD Decode:',result['body'][0]) #result
+                        #continue
+                    print ('E:',Exception)
+                    print ('e:',e)
                     continue
                     #pass # Bad or unhandled message
 
@@ -266,14 +280,31 @@ if __name__ == '__main__':
 
                 counters[msg['id']] += 1
 
+                if False:
+                    print ('id:',msg['id'], counters[msg['id']])
+
+                    print ('msg', sys.getrefcount(msg), sys.getrefcount(msg['id']))
+
+                    if msg['id'] == 19:
+                        print (' *** x:',sys.getrefcount(msg['x']), sys.getrefcount(msg['dim_c']))
+                    check_ref_counts(msg)
+
+                if msg['id'] == 24:
+                    print msg
+
+                #continue # FIX remove
+
                 if msg['id'] in (5,19):
                     msg['name'] = msg['name'].rstrip(' @')
-                    #print 'UPDATING vessel name', msg
+                    #print ('UPDATING vessel name', msg)
                     #vessel_names.update(msg['mmsi'], msg['name'].rstrip('@'), msg['type_and_cargo'])
                     #if msg['mmsi'] == 367178330:
-                    #    print ' CHECK:', msg['mmsi'], msg['name']
+                    #    print (' CHECK:', msg['mmsi'], msg['name'])
                     vessel_names.update(msg)
-                    #print
+                    #print ()
                         
     print ('match_count:',match_count)
-    print (counters)
+    #print (counters)
+    for key in counters:
+        if counters[key] < 1: continue
+        print ('%d: %d' % (key,counters[key]))

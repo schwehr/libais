@@ -25,6 +25,7 @@ enum AIS_STATUS {
     AIS_ERR_UNKNOWN_MSG_TYPE,
     AIS_ERR_MSG_NOT_IMPLEMENTED, // Meaning I haven't got to it yet
     AIS_ERR_EXPECTED_STRING,
+    AIS_ERR_BAD_MSG_CONTENT,
     AIS_STATUS_NUM_CODES
 };
 
@@ -284,10 +285,41 @@ public:
 
     Ais19(const char *nmea_payload);
     void print();
-
 };
 
 std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
+
+// class Ais20 : public AisMsg {};
+// class Ais21 : public AisMsg {};
+// class Ais22 : public AisMsg {};
+// class Ais23 : public AisMsg {};
+
+// Class B Static Data report
+class Ais24 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+
+    int part_num;
+
+    // Part A
+    std::string name;
+
+    // Part B
+    int type_and_cargo;
+    std::string vendor_id;
+    std::string callsign;
+    int dim_a;
+    int dim_b;
+    int dim_c;
+    int dim_d;
+    int spare;
+
+    Ais24(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 
 
 #define CHECKPOINT std::cerr <<  __FILE__ << ":" << __LINE__ << " checkpoint" << std::endl
@@ -352,7 +384,7 @@ extern const std::string bits_to_char_tbl;
 template<size_t T>
 const std::string ais_str(const std::bitset<T> &bits, const size_t start, const size_t len) {
     assert (start+len < T);
-    
+    assert (len % 6 == 0);
     const size_t num_char = len / 6;
     std::string result(num_char, '@');
     //cout << "str: " << T << " " << start << " " << len << " " << num_char << " " << result << endl;

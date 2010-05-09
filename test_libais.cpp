@@ -55,7 +55,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 14 - Safety Broadcast
     //////////////////////////////////////////////////////////////////////
 
-    if (true) {
+    if (false) {
         // From GPSD - !AIVDM,1,1,,A,>5?Per18=HB1U:1@E=B0m<L,2*51
         { 
             Ais14 msg(">5?Per18=HB1U:1@E=B0m<L"); 
@@ -120,6 +120,28 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         }
 
     }
+
+    //////////////////////////////////////////////////////////////////////
+    // 24 - Class B static data msgs A and B
+    //////////////////////////////////////////////////////////////////////
+
+    if (true) {
+        // !AIVDM,1,1,,B,H5NHcTP<51@4TrM>10584@U<D00,2*77,x337805,b003669710,1241895000
+        { 
+            Ais24 msg("H5NHcTP<51@4TrM>10584@U<D00"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n"; 
+        }
+        // !AIVDM,1,1,,B,HU2K5NTn13BijklG44oppk103210,0*06,s23294,d-114,T44.21624911,x731910,r13RSMT1,1241894986
+        { 
+            Ais24 msg("HU2K5NTn13BijklG44oppk103210"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n"; 
+        }
+
+
+    }
+
     //////////////////////////////
     // DONE
     //////////////////////////////

@@ -10,11 +10,23 @@ using namespace std;
 PyObject *ais_py_exception;
 const std::string exception_name("ais.decode.Error");
 
+#if 0
+// DO NOT do this
+void TupleSafeSetItem(PyObject *tuple, const long position, const long val) {
+    assert(tuple);
+    PyObject *val_obj = PyLong_FromLong(val);
+    assert(val_obj);
+    PyTuple_SetItem(tuple,position, val_obj);
+    Py_DECREF(val_obj);
+}
+#endif
     //inline
 void
 DictSafeSetItem(PyObject *dict, const std::string &key, const long val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyLong_FromLong(val);
+    assert(key_obj);
+    assert(val_obj);
     PyDict_SetItem(dict, key_obj, val_obj);
     Py_DECREF(key_obj);
     Py_DECREF(val_obj);
@@ -24,6 +36,8 @@ void
 DictSafeSetItem(PyObject *dict, const std::string &key, const int val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyLong_FromLong(val);
+    assert(key_obj);
+    assert(val_obj);
     PyDict_SetItem(dict, key_obj, val_obj);
     Py_DECREF(key_obj);
     Py_DECREF(val_obj);
@@ -33,6 +47,8 @@ void
 DictSafeSetItem(PyObject *dict, const std::string &key, const std::string &val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyUnicode_FromString(val.c_str());
+    assert(key_obj);
+    assert(val_obj);
     PyDict_SetItem(dict, key_obj, val_obj);
     Py_DECREF(key_obj);
     Py_DECREF(val_obj);
@@ -43,6 +59,8 @@ void
 DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyBool_FromLong(val);
+    assert(key_obj);
+    assert(val_obj);
     PyDict_SetItem(dict, key_obj, val_obj);
     Py_DECREF(key_obj);
     Py_DECREF(val_obj);
@@ -53,6 +71,8 @@ void
 DictSafeSetItem(PyObject *dict, const std::string &key, const float val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyFloat_FromDouble(val);
+    assert(key_obj);
+    assert(val_obj);
     PyDict_SetItem(dict, key_obj, val_obj);
     Py_DECREF(key_obj);
     Py_DECREF(val_obj);
@@ -228,14 +248,19 @@ ais7_13_to_pydict(const char *nmea_payload) {
     for (size_t i=0; i < msg.dest_mmsi.size(); i++) {
         // FIX: is this my memory leak?
         PyObject *tuple = PyTuple_New(2);
-        PyTuple_SetItem(tuple,0,PyLong_FromLong(msg.dest_mmsi[i]));
-        PyTuple_SetItem(tuple,1,PyLong_FromLong(msg.seq_num[i]));
+        PyTuple_SetItem(tuple,0,PyLong_FromLong(msg.dest_mmsi[i])); // Steals ref
+        PyTuple_SetItem(tuple,1,PyLong_FromLong(msg.seq_num[i])); // Steals ref
+        //TupleSafeSetItem(tuple, 0, msg.dest_mmsi[i]);
+        //TupleSafeSetItem(tuple, 1, msg.seq_num[i]);
 
-        PyList_SetItem(list,i, tuple);
+        PyList_SetItem(list,i, tuple); // Steals ref
+        //Py_DECREF(list);
     }
     // FIX: probably a memory leak with list
     PyDict_SetItem(dict, PyUnicode_FromString("acks"), list);
-
+    Py_DECREF(list);
+    //Py_DECREF(list);
+    //Py_DECREF(dict);
     return dict;
 }
 
@@ -289,7 +314,7 @@ ais18_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"m22_flag", msg.m22_flag);
     DictSafeSetItem(dict,"mode_flag", msg.mode_flag);
 
-DictSafeSetItem(dict,"raim", msg.raim);
+    DictSafeSetItem(dict,"raim", msg.raim);
 
     DictSafeSetItem(dict,"commstate_flag", msg.commstate_flag);
     if (0==msg.unit_flag) {
@@ -337,7 +362,7 @@ ais19_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
     Ais19 msg(nmea_payload);
     if (msg.had_error()) {
-        PyErr_Format(ais_py_exception, "Ais18: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        PyErr_Format(ais_py_exception, "Ais19: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
     }
 
@@ -373,6 +398,50 @@ ais19_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+PyObject*
+ais24_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais24 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais24: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict,"part_num", msg.part_num);
+
+    switch(msg.part_num) {
+
+    case 0: // Part A
+        DictSafeSetItem(dict,"name",msg.name);
+        break;
+
+    case 1: // Part B
+        DictSafeSetItem(dict,"type_and_cargo",msg.type_and_cargo);
+        DictSafeSetItem(dict,"vendor_id",msg.vendor_id);
+        DictSafeSetItem(dict,"callsign",msg.callsign);
+        DictSafeSetItem(dict,"dim_a",msg.dim_a);
+        DictSafeSetItem(dict,"dim_b",msg.dim_b);
+        DictSafeSetItem(dict,"dim_c",msg.dim_c);
+        DictSafeSetItem(dict,"dim_d",msg.dim_d);
+        DictSafeSetItem(dict,"spare",msg.spare);
+        break;
+
+    case 2: // FALLTHROUGH - not yet defined by ITU
+    case 3: // FALLTHROUGH - not yet defined by ITU
+    default:
+        // status = AIS_ERR_BAD_MSG_CONTENT;
+        // FIX: setup python exception
+        return 0;
+    }
+
+
+    return dict;
+}
 
 
 static PyObject *
@@ -460,69 +529,60 @@ decode(PyObject *self, PyObject *args) {
         PyErr_Format(ais_py_exception, "ais.decode: message 15 (?) not yet handled");
         break;
 
-// 16 - Assigned mode command
-    case '@':
+    case '@': // 16 - Assigned mode command
         // result = ais16_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 16 (@) not yet handled");
         break;
         
-// 17 - GNSS broadcast
-    case 'A':
+    case 'A': // 17 - GNSS broadcast
         // result = ais17_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 17 (A) not yet handled");
         break;
         
-// 18 - Position, Class B
-    case 'B':
+    case 'B': // 18 - Position, Class B
         result = ais18_to_pydict(nmea_payload);
         break;
         
-// 19 - Position and ship, Class B
-    case 'C':
+    case 'C': // 19 - Position and ship, Class B
         result = ais19_to_pydict(nmea_payload);
         break;
         
-// 20 - Data link management
-    case 'D':
+    case 'D': // 20 - Data link management
         // result = ais20_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 20 (D) not yet handled");
         break;
         
-// 21 - Aids to navigation report
-    case 'E':
+    case 'E': // 21 - Aids to navigation report
         // result = ais21_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 21 (E) not yet handled");
         break;
         
-// 22 - Channel Management
-    case 'F':
+    case 'F': // 22 - Channel Management
         // result = ais22_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 22 (F) not yet handled");
         break;
         
-// 23 - Group Assignment Command
-    case 'G':
+    case 'G': // 23 - Group Assignment Command
         // result = ais23_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 23 (G) not yet handled");
         break;
         
-// 24 - Static data report
-    case 'H':
-        // result = ais24_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 24 (H) not yet handled");
+    case 'H': // 24 - Static data report
+        result = ais24_to_pydict(nmea_payload);
         break;
     
-// 25 - Single slit binary message - addressed or broadcast
-    case 'I':
+    case 'I': // 25 - Single slot binary message - addressed or broadcast
         // result = ais25_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 25 (I) not yet handled");
         break;
         
-// 26 - Multi slot binary message with comm state
-    case 'J':
+    case 'J': // 26 - Multi slot binary message with comm state
         // result = ais26_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 26 (J) not yet handled");
         break;
+
+        // 27 - K
+        // 28 - L
     
     default:
         //assert (false);
