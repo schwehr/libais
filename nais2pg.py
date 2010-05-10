@@ -9,10 +9,16 @@ from __future__ import print_function
 # Skip normalization first...
 
 import ais
-from ais import decode # Make sure we have the right ais module
+from ais import decode # Make sure we have the correct ais module
 
 import sys
 import re
+
+from pyproj import Proj
+import datetime, time
+import math
+from collections import deque
+
 
 import psycopg2
 #import psycopg2.extras
@@ -293,6 +299,161 @@ class VesselNames:
         self.cx.commit()
         self.vessels[mmsi] = (name, type_and_cargo)
 
+
+# taking from ais_decimate_traffic
+def lon_to_utm_zone(lon):
+    return int(( lon + 180 ) / 6) + 1
+
+def dist (lon1, lat1, lon2, lat2):
+    'calculate 2D distance.  Should be good enough for points that are close together'
+    dx = (lon1-lon2)
+    dy = (lat1-lat2)
+    return math.sqrt(dx*dx + dy*dy)
+
+
+def dist_utm_km (p1, p2):
+    return dist_utm_m (p1[0],p1[1], p2[0],p2[1]) / 1000.
+
+def dist_utm_m (lon1, lat1, lon2, lat2):
+    'calculate 2D distance.  Should be good enough for points that are close together'
+    zone = lon_to_utm_zone( (lon1 + lon2 ) / 2.) # Just don't cross the dateline!
+    params = {'proj':'utm', 'zone':zone}
+    proj = Proj(params)
+
+    utm1 = proj(lon1,lat1)
+    utm2 = proj(lon2,lat2)
+
+    return dist(utm1[0],utm1[1],utm2[0],utm2[1])
+
+class PositionCache:
+    def __init__(self, min_dist_m=200, min_time_s=5 * 60,
+                 #max_tail_count=10, max_tail_time_s = 15*60,
+                 max_tail_count=15, max_tail_time_s = 15*60,
+                 #max_age=60*60, # Drop the vessel after this time?
+                 verbose=True):
+        # 15 minutes is the recommended time?
+        print ('THRESHOLDS dt:',min_time_s, 'dm:',min_dist_m,'\n')
+        self.v = verbose
+        self.vessels = {} # indexed by MMSI
+        self.vessel_tails = {}
+        self.min_dist_m = min_dist_m
+        self.min_time_s = min_time_s
+        self.max_tail_count = max_tail_count
+        self.max_tail_time_s = max_tail_time_s
+        
+        #self.bad_mmsi = set()
+        return
+
+    def _update_tail(self, mmsi, msg):
+        'Called from update.  Do not call this yourself'
+        # Assume update figured out that this is a good position to use
+        #print msg
+        #mmsi = msg['mmsi']
+
+        # Downsample to minimum set to save memory
+        new_pos = {}
+        for field in ('time_stamp', 'y', 'x'):
+            try:
+                new_pos[field] = msg[field]
+            except:
+                new_pos[field] = None
+
+        if mmsi not in self.vessel_tails:
+            print ('TAIL_NEW:',mmsi) #,new_pos)
+            self.vessel_tails[mmsi] = deque([new_pos,])
+            #print ('deque:',self.vessel_tails[mmsi])
+            return
+
+        d = self.vessel_tails[mmsi]
+        d.appendleft(new_pos)
+        #print ('before:',self.vessel_tails[mmsi])
+        while len(d) > self.max_tail_count:
+            print ('POPPING: too many',len(d),self.max_tail_count)
+            d.pop() # Too many so ditch
+        #print ('after:',self.vessel_tails[mmsi])
+
+        # now nuke messages that are too old
+        now = msg['time_stamp']
+        while now - d[-1]['time_stamp'] > self.max_tail_time_s:
+            print ('POPPING: too old',now - d[-1]['time_stamp'],  self.max_tail_time_s)
+            d.pop()
+
+        # Make a WKT line and push it into the db
+        #print ('FIX: wkt')
+
+
+    def update(self,vessel_pos_report, time_stamp=None):
+        msg = vessel_pos_report
+        #
+        # First, is this message useful?
+        #
+        mmsi = msg['mmsi']
+
+        # FIX!!!!!!!!!!!!!!!!!!! just for testing
+        #if mmsi != 366880220:    return
+
+
+        #print ('mmsi:',mmsi)
+        if mmsi < 200000000:
+            #bad_mmsi.add(mmsi)
+            print ('BAD_MMSI:',mmsi)
+            return
+        if msg['x']>180: return # No GPS, so what can we do?
+        if 'repeat_indicator' in msg:
+            if 0 != msg['repeat_indicator']:
+                print ('REPEAT')
+                return # we do not touch repeated material.  danger
+
+        #
+        # Prep the world
+        #
+        #print ('time_stamp_before:', msg['time_stamp'])
+        if time_stamp is not None: msg['time_stamp'] = time_stamp
+        elif 'time_stamp' not in msg or msg['time_stamp'] is None:
+            print ('Setting to now')
+            msg['time_stamp'] = time.time()
+
+        msg['time_stamp'] = float(msg['time_stamp'])
+
+        # else: leave the entry as it came in
+
+
+        new_pos = {} # copy just what we need to conserve memory
+        for field in ('true_heading', 'sog', 'nav_status', 'cog', 'time_stamp', 'y', 'x'):
+            try:
+                new_pos[field] = msg[field]
+            except:
+                new_pos[field] = None
+
+        if mmsi not in self.vessels:
+            #print ('FIX: add or insert to DB', new_pos)
+            #print ('NEW:',mmsi)
+            self.vessels[mmsi] = new_pos
+            self._update_tail(mmsi, new_pos)
+            return
+
+        last = self.vessels[mmsi]
+        #print ('last:',last)
+        
+        #needs_update = False
+        # FIX: move into if when working for speed to try to avoid the distance calc
+        dt = msg['time_stamp'] - last['time_stamp']
+
+        dm = dist_utm_m(msg['x'],msg['y'],last['x'],last['y'])
+
+        if self.min_time_s > dt and dm < self.min_dist_m:
+            #print ('DROPPED:  %d %.0f %.1f' %(mmsi, dt, dm))
+            return # Has not been long enough or moved far enough
+
+        # Go ahead and update it
+        #print ('UPDATING_PATH:',mmsi, dt, dt >= self.min_time_s , dm, dm >= self.min_dist_m)
+        self.vessels[mmsi] = new_pos
+        self._update_tail(mmsi, new_pos)
+
+        # FIX: update the database
+
+        return
+
         
 if __name__ == '__main__':
 
@@ -312,12 +473,16 @@ if __name__ == '__main__':
         # FIX: load from the database
         pass
     
-
+    # Caches
     vessel_names = VesselNames(cx)
+    pos_cache = PositionCache(verbose=True)
+    
+    # FIFOs
 
     line_queue = LineQueue()
     norm_queue = NormQueue()
 
+    #dump_file = open('dump_file','w')
 
     #for line_num, text in enumerate(open('1e6.multi')):
     #for line_num, line in enumerate(file('/nobackup/dl1/20100505.norm')):
@@ -393,6 +558,25 @@ if __name__ == '__main__':
                     if msg['id'] == 19:
                         print (' *** x:',sys.getrefcount(msg['x']), sys.getrefcount(msg['dim_c']))
                     check_ref_counts(msg)
+
+                if msg['id'] in (18,): #(1,): #2,3,18,19):
+                    # for field in ('received_stations', 'rot', 'raim', 'spare','timestamp', 'position_accuracy', 'rot_over_range', 'special_manoeuvre','slot_number',
+                    #               'utc_spare', 'utc_min', 'slots_to_allocate', 'slot_increment','commstate_flag', 'mode_flag', 'utc_hour', 'band_flag', 'keep_flag',
+                    #               ):
+                    #     try:
+                    #         msg.pop(field)
+                    #     except:
+                    #         pass
+                    #print (msg['mmsi'])
+                    #print (','.join(["'%s'" %(key,)for key in msg.keys()]))
+                    #print (result)
+                    msg['time_stamp'] = float(result['time_stamp'])
+                    #if msg['mmsi'] in (304606000, 366904910, 366880220): dump_file.write(str(msg)+',\n')
+                    pos_cache.update(msg)
+                    continue
+
+                continue # FIX for debugging
+
 
                 if msg['id'] == 24:
                     #print24(msg)
