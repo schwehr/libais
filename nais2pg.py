@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 
 # Since 2010-May-06
 # Yet another rewrite of my code to put ais data from a nais feed into postgis
@@ -15,6 +16,15 @@ import re
 
 import psycopg2
 #import psycopg2.extras
+
+
+def print24(msg):
+    if msg['part_num'] == 0:
+        #print (msg)
+        print ('24_A: name = ',msg['name'].rstrip(' @'),'\tmmsi = ',msg['mmsi'])
+        return
+    if msg['part_num'] == 1:
+        print ('24_B: tac  = %3d' % msg['type_and_cargo'],'callsign=',msg['callsign'].rstrip(' @'))
 
 def check_ref_counts(a_dict):
     print ('Checking ref counts on', a_dict)
@@ -156,23 +166,103 @@ sql_vessel_name_create='''CREATE TABLE vessel_name (
        type_and_cargo INT
 );'''
 
-
 class VesselNames:
     'Local caching of vessel names for more speed and less DB load'
     sql_insert = 'INSERT INTO vessel_name VALUES (%(mmsi)s,%(name)s,%(type_and_cargo)s);'
     sql_update = 'UPDATE vessel_name SET name = %(name)s, type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;'
-    def __init__(self, db_cx):
+
+    sql_update_tac  = 'UPDATE vessel_name SET type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;'
+    sql_update_name = 'UPDATE vessel_name SET name = %(name)s WHERE mmsi = %(mmsi)s;'
+
+    def __init__(self, db_cx, verbose=False):
         self.cx = db_cx
         self.cu = self.cx.cursor()
         self.vessels = {}
+        self.v = verbose
         # Could do a create and commit here of the table
+
+    def update_partial(self, vessel_dict):
+        # Only do the name or type_and_cargo... msg 24 class B
+        mmsi = vessel_dict['mmsi']
+        if 'name' in vessel_dict:
+            name = vessel_dict['name'].rstrip(' @')
+            type_and_cargo = None
+        else:
+            assert (msg['part_num']==1)
+            name = None
+            type_and_cargo = msg['type_and_cargo']
+
+        if name is not None and len(name)==0:
+            if self.v: print ('EMPTY NAME:',mmsi)
+            return
+
+        if mmsi < 200000000:
+            if name is not None:
+                #print ('USELESS: mmsi =',mmsi, 'name:',name)
+                pass
+            else:
+                #print ('USELESS: mmsi =',mmsi, 'name:',name, 'type_and_cargo:',type_and_cargo)
+                pass
+            return # Drop these... useless
+
+        new_vessel = {'mmsi':mmsi,'name':name,'type_and_cargo':type_and_cargo}
+
+        # Totally new ship to us
+        if mmsi not in self.vessels:
+            if name is None:
+                # FIX: add logic to hold on to the type_and_cargo for those we do not have names for
+                #self.vessels[mmsi] = (None, type_and_cargo)
+                # Don't update db until we have a name
+                return
+
+            # Have a name - try to insert - FIX: make it insert or update?
+            #print ('before',mmsi)
+            try:
+                self.cu.execute(self.sql_insert,new_vessel)
+                if self.v: print ('ADDED:',name, mmsi)
+            except psycopg2.IntegrityError, e:
+                print (mmsi,'already in the database', str(e))
+                pass # Already in the database
+            #print ('after',mmsi)
+            self.cx.commit()
+            self.vessels[mmsi] = (name, type_and_cargo)
+            return
+
+        old_name,old_type_and_cargo = self.vessels[mmsi]
+
+        if name is None:
+            if type_and_cargo == old_type_and_cargo or old_name == None:
+                #print ('NO_CHANGE_TO_CARGO:',mmsi)
+                return
+            
+            #print ('UPDATING_B:',mmsi,'  ',old_name,old_type_and_cargo,'->',old_name,type_and_cargo)
+            self.cu.execute(self.sql_update_tac, new_vessel)
+            self.cx.commit()
+            #print ('\ttac: ',old_name, type_and_cargo)
+            self.vessels[mmsi] = (old_name, type_and_cargo)
+            return
+
+        # Update the name
+        if name == old_name:
+            #print ('NO_CHANGE_TO_NAME:',mmsi,old_name)
+            return
+
+        if self.v: print ('UPDATING_B:',mmsi,'  ',old_name,'->',name)
+        # FIX: what if someone deletes the entry from the db?
+
+        self.cu.execute(self.sql_update_name, new_vessel)
+        self.cx.commit()
+        #print ('\tname: ',name, old_type_and_cargo)
+        self.vessels[mmsi] = (name, old_type_and_cargo)
+        
 
     def update(self, vessel_dict):
         # vessel_dict must have mmsi, name, type_and_cargo
         mmsi = vessel_dict['mmsi']
-        if mmsi in (0,1,1193046):
+        #if mmsi in (0,1,1193046):
+        if mmsi < 200000000:
             # These vessels should be reported to the USCG
-            print ('USELESS: mmsi =',mmsi, 'name:',vessel_dict['name'])
+            if self.v: print ('USELESS: mmsi =',mmsi, 'name:',vessel_dict['name'])
             return # Drop these... useless
 
         name = vessel_dict['name'];
@@ -192,10 +282,13 @@ class VesselNames:
 
         # Know we have inserted it, so safe to update
         #if mmsi == 367178330:
-        print ('UPDATING:',mmsi,'  ',)
-        print (old_name,old_type_and_cargo,'->',)
-        print (name,type_and_cargo)
-            
+        #print ('UPDATING:',mmsi,'  ',old_name,old_type_and_cargo,'->',name,type_and_cargo)
+        if old_name != name:
+            print ('UPDATING:',mmsi,'  "%s" -> "%s"' % (old_name,name))
+        #print (old_name,old_type_and_cargo,'->',)
+        #print (name,type_and_cargo)
+
+        # FIX: what if someone deletes the entry from the db?
         self.cu.execute(self.sql_update, vessel_dict)
         self.cx.commit()
         self.vessels[mmsi] = (name, type_and_cargo)
@@ -210,11 +303,15 @@ if __name__ == '__main__':
 
     cx = psycopg2.connect("dbname='testing'")
 
-    for i in range(5): print ('   *** WARNING ***  - Removing entries from vessel_name for testing')
-    print ()
-
-    cu = cx.cursor()
-    cu.execute('DELETE FROM vessel_name')
+    if True:
+        for i in range(5): print ('   *** WARNING ***  - Removing entries from vessel_name for testing')
+        print ()
+        cu = cx.cursor()
+        cu.execute('DELETE FROM vessel_name;')
+    else:
+        # FIX: load from the database
+        pass
+    
 
     vessel_names = VesselNames(cx)
 
@@ -226,6 +323,7 @@ if __name__ == '__main__':
     #for line_num, line in enumerate(file('/nobackup/dl1/20100505.norm')):
     for line_num, text in enumerate(open('/Users/schwehr/Desktop/DeepwaterHorizon/ais-dl1/uscg-nais-dl1-2010-04-28.norm.dedup')):
     #for line_num, text in enumerate(open('test.aivdm')):
+    #for line_num, text in enumerate(open('trouble.ais')):
 
         #if line_num > 300: break
         #print ()
@@ -237,6 +335,8 @@ if __name__ == '__main__':
 
         while line_queue.qsize() > 0:
             line = line_queue.get(False)
+            if len(line) < 15 or '!' != line[0]: continue # Try to go faster
+
             #print ('line:',line)
             try:
                 match = uscg_ais_nmea_regex.search(line).groupdict()
@@ -255,9 +355,14 @@ if __name__ == '__main__':
                 except Queue.Empty:
                     continue
 
-                # FIX: just for debugging
-                #if len(result['body']) < 10: continue
-                #if result['body'][0] != '5': continue
+                if len(result['body']) < 10: continue
+                # FIX: make sure we have all the critical messages
+
+                # FIX: add 9
+                if result['body'][0] not in ('1', '2', '3', '5', 'B', 'C', 'H') :
+                    #print( 'skipping',result['body'])
+                    continue
+                #print( 'not skipping',result['body'])
                 
                 try:
                      msg = ais.decode(result['body'])
@@ -290,12 +395,14 @@ if __name__ == '__main__':
                     check_ref_counts(msg)
 
                 if msg['id'] == 24:
-                    print msg
-
+                    #print24(msg)
+                    vessel_names.update_partial(msg)
+                    
                 #continue # FIX remove
 
                 if msg['id'] in (5,19):
-                    msg['name'] = msg['name'].rstrip(' @')
+                    msg['name'] = msg['name'].strip(' @')
+                    if len(msg['name']) == 0: continue # Skip blank names
                     #print ('UPDATING vessel name', msg)
                     #vessel_names.update(msg['mmsi'], msg['name'].rstrip('@'), msg['type_and_cargo'])
                     #if msg['mmsi'] == 367178330:

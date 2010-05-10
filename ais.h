@@ -26,6 +26,7 @@ enum AIS_STATUS {
     AIS_ERR_MSG_NOT_IMPLEMENTED, // Meaning I haven't got to it yet
     AIS_ERR_EXPECTED_STRING,
     AIS_ERR_BAD_MSG_CONTENT,
+    AIS_ERR_MSG_TOO_LONG,
     AIS_STATUS_NUM_CODES
 };
 
@@ -333,7 +334,15 @@ extern std::bitset<6> nmea_ord[128];
 template<size_t T>
 AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
     assert (nmea_payload);
-    assert (strlen(nmea_payload) <= T/6 );
+    if (strlen(nmea_payload) > T/6) {
+#ifndef NDEBUG
+        std::cerr << "ERROR: message longer than max allowed size (" << T/6 << "): found " 
+                  << strlen(nmea_payload) << " characters in " 
+                  << nmea_payload << std::endl;
+#endif
+        return AIS_ERR_MSG_TOO_LONG;
+    }
+    //assert (strlen(nmea_payload) <= T/6 );
     for (size_t char_idx=0; nmea_payload[char_idx] != '\0' && char_idx < T/6; char_idx++) {
         int c = int(nmea_payload[char_idx]);
         if (c<48 or c>119 or (c>=88 and c<=95) ) {
