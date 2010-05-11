@@ -172,6 +172,10 @@ sql_vessel_name_create='''CREATE TABLE vessel_name (
        type_and_cargo INT
 );'''
 
+# psql -f /sw32/share/doc/postgis84/contrib/postgis-1.5/spatial_ref_sys.sql testing
+sql_last_position_create='''CREATE TABLE  last_position ( key SERIAL PRIMARY KEY, userid INTEGER, name character varying(20), cog INTEGER, sog REAL, cg_timestamp TIMESTAMP WITH TIME ZONE DEFAULT now(), cg_r VARCHAR(15), navigationstatus VARCHAR(30), shipandcargo VARCHAR(30) );
+SELECT AddGeometryColumn('last_position','position',4326,'POINT',2);'''
+
 class VesselNames:
     'Local caching of vessel names for more speed and less DB load'
     sql_insert = 'INSERT INTO vessel_name VALUES (%(mmsi)s,%(name)s,%(type_and_cargo)s);'
@@ -325,11 +329,35 @@ def dist_utm_m (lon1, lat1, lon2, lat2):
 
     return dist(utm1[0],utm1[1],utm2[0],utm2[1])
 
+def wkt_line(series_of_xy):
+    assert(len(series_of_xy) > 1)
+    
+    segments = ["%.8f %.8f" % (pt['x'],pt['y']) for pt in series_of_xy]
+    
+    return 'LINESTRING(' + ','.join(segments) + ')'
+
 class PositionCache:
-    def __init__(self, min_dist_m=200, min_time_s=5 * 60,
+
+    sql_insert = '''
+    INSERT INTO last_position (userid, name, cog,sog,cg_timestamp, navigationstatus, shipandcargo, position)
+    VALUES (%(mmsi)s, %(name)s, %(cog)s, %(sog)s, %(datetime)s, %(nav_status)s, %(type_and_cargo)s,
+    ST_GeomFromText('POINT(%(x)s %(y)s)',4326)
+    );'''
+    sql_update = '''
+    UPDATE last_position SET name = %(name)s,
+       cog = %(cog)s,
+       sog = %(sog)s,
+       cg_timestamp = %(time_stamp)s,
+       navigationstatus = %(nav_status),
+       shipandcargo=%(type_and_cargo)s
+       
+    WHERE userid = %(mmsi)s;'''
+
+    def __init__(self, db_cx, min_dist_m=200, min_time_s=5 * 60,
                  #max_tail_count=10, max_tail_time_s = 15*60,
                  max_tail_count=15, max_tail_time_s = 15*60,
                  #max_age=60*60, # Drop the vessel after this time?
+                 vessel_names=None, # a VesselNames object
                  verbose=True):
         # 15 minutes is the recommended time?
         print ('THRESHOLDS dt:',min_time_s, 'dm:',min_dist_m,'\n')
@@ -340,7 +368,9 @@ class PositionCache:
         self.min_time_s = min_time_s
         self.max_tail_count = max_tail_count
         self.max_tail_time_s = max_tail_time_s
-        
+        self.vessel_names = vessel_names
+        self.cx = db_cx
+        self.cu = db_cx.cursor()
         #self.bad_mmsi = set()
         return
 
@@ -359,7 +389,7 @@ class PositionCache:
                 new_pos[field] = None
 
         if mmsi not in self.vessel_tails:
-            print ('TAIL_NEW:',mmsi) #,new_pos)
+            #print ('TAIL_NEW:',mmsi) #,new_pos)
             self.vessel_tails[mmsi] = deque([new_pos,])
             #print ('deque:',self.vessel_tails[mmsi])
             return
@@ -368,18 +398,21 @@ class PositionCache:
         d.appendleft(new_pos)
         #print ('before:',self.vessel_tails[mmsi])
         while len(d) > self.max_tail_count:
-            print ('POPPING: too many',len(d),self.max_tail_count)
+            #print ('POPPING: too many',len(d),self.max_tail_count)
             d.pop() # Too many so ditch
         #print ('after:',self.vessel_tails[mmsi])
 
         # now nuke messages that are too old
         now = msg['time_stamp']
         while now - d[-1]['time_stamp'] > self.max_tail_time_s:
-            print ('POPPING: too old',now - d[-1]['time_stamp'],  self.max_tail_time_s)
+            #print ('POPPING: too old',now - d[-1]['time_stamp'],  self.max_tail_time_s)
             d.pop()
 
+        if len(d)<2: return # Too short to make a line
         # Make a WKT line and push it into the db
         #print ('FIX: wkt')
+        wkt = wkt_line(d)
+        #print ('WKT:',wkt)
 
 
     def update(self,vessel_pos_report, time_stamp=None):
@@ -396,12 +429,12 @@ class PositionCache:
         #print ('mmsi:',mmsi)
         if mmsi < 200000000:
             #bad_mmsi.add(mmsi)
-            print ('BAD_MMSI:',mmsi)
+            #print ('BAD_MMSI:',mmsi)
             return
         if msg['x']>180: return # No GPS, so what can we do?
         if 'repeat_indicator' in msg:
             if 0 != msg['repeat_indicator']:
-                print ('REPEAT')
+                #print ('REPEAT')
                 return # we do not touch repeated material.  danger
 
         #
@@ -413,23 +446,38 @@ class PositionCache:
             print ('Setting to now')
             msg['time_stamp'] = time.time()
 
-        msg['time_stamp'] = float(msg['time_stamp'])
+        msg['time_stamp'] = int(float(msg['time_stamp']))
+        msg['datetime'] = datetime.datetime.utcfromtimestamp(int(float(msg['time_stamp'])))
 
         # else: leave the entry as it came in
 
 
         new_pos = {} # copy just what we need to conserve memory
-        for field in ('true_heading', 'sog', 'nav_status', 'cog', 'time_stamp', 'y', 'x'):
+        for field in ('mmsi', 'true_heading', 'sog', 'nav_status', 'cog', 'time_stamp', 'datetime', 'y', 'x'):
             try:
                 new_pos[field] = msg[field]
             except:
                 new_pos[field] = None
 
+        if mmsi in self.vessel_names.vessels:
+            print (self.vessel_names.vessels[mmsi])
+            new_pos['name'] = self.vessel_names.vessels[mmsi]['name']
+            sys.exit('early') # FIX
+        else:
+            new_pos['name'] = None
+            new_pos['type_and_cargo'] = None
+            
         if mmsi not in self.vessels:
             #print ('FIX: add or insert to DB', new_pos)
             #print ('NEW:',mmsi)
+            print ('NEW:',mmsi,new_pos)
             self.vessels[mmsi] = new_pos
             self._update_tail(mmsi, new_pos)
+            #GeomFromText(%s,4326)
+            #new_pos['position'] =
+            print(self.cu.mogrify(self.sql_insert, new_pos))
+            insert_or_update(self.cx, self.cu, self.sql_insert, self.sql_update, new_pos)
+            sys.exit('early')
             return
 
         last = self.vessels[mmsi]
@@ -454,28 +502,36 @@ class PositionCache:
 
         return
 
-        
-if __name__ == '__main__':
-
+def main():
+    v = True
+    
     match_count = 0
     counters = {}
     for i in range(30):
         counters[i] = 0
 
+    if v: print ('connecting to db')
     cx = psycopg2.connect("dbname='testing'")
+
 
     if True:
         for i in range(5): print ('   *** WARNING ***  - Removing entries from vessel_name for testing')
         print ()
         cu = cx.cursor()
-        cu.execute('DELETE FROM vessel_name;')
+        cu.execute('DELETE FROM vessel_name')
+        cu.execute('DELETE FROM last_position')
+        cx.commit()
     else:
         # FIX: load from the database
         pass
+
+    if v: print ('initilizing caches...')
     
     # Caches
     vessel_names = VesselNames(cx)
-    pos_cache = PositionCache(verbose=True)
+    pos_cache = PositionCache(db_cx=cx,
+                              vessel_names = vessel_names,
+                              verbose=True)
     
     # FIFOs
 
@@ -486,7 +542,10 @@ if __name__ == '__main__':
 
     #for line_num, text in enumerate(open('1e6.multi')):
     #for line_num, line in enumerate(file('/nobackup/dl1/20100505.norm')):
-    for line_num, text in enumerate(open('/Users/schwehr/Desktop/DeepwaterHorizon/ais-dl1/uscg-nais-dl1-2010-04-28.norm.dedup')):
+
+    infile = '/Users/schwehr/Desktop/DeepwaterHorizon/ais-dl1/uscg-nais-dl1-2010-04-28.norm.dedup'
+    if v: print ('reading data from ...',infile)
+    for line_num, text in enumerate(open(infile)):
     #for line_num, text in enumerate(open('test.aivdm')):
     #for line_num, text in enumerate(open('trouble.ais')):
 
@@ -599,3 +658,6 @@ if __name__ == '__main__':
     for key in counters:
         if counters[key] < 1: continue
         print ('%d: %d' % (key,counters[key]))
+
+if __name__ == '__main__':
+    main()
