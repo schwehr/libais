@@ -4,13 +4,18 @@ from __future__ import print_function
 # Since 2010-May-06
 # Yet another rewrite of my code to put ais data from a nais feed into postgis
 
-# First just try to rip a whole day's log.  How long will it take?
-
-# Skip normalization first...
+__author__ = 'Kurt Schwehr'
+__version__ = '$Revision$'.split()[1]
+__revision__  = __version__ # For pylint
+__date__ = '$Date$'.split()[1]
+__copyright__ = '2008'
+__license__   = 'GPL v3'
+__contact__   = 'kurt at ccom.unh.edu'
 
 import ais
 from ais import decode # Make sure we have the correct ais module
 
+import os
 import sys
 import re
 
@@ -20,7 +25,7 @@ import math
 from collections import deque
 
 
-import psycopg2
+import psycopg2 # Bummer... not yet ready for python 3.1
 #import psycopg2.extras
 
 
@@ -502,24 +507,69 @@ class PositionCache:
 
         return
 
+
+def get_parser():
+    from optparse import OptionParser
+    parser = OptionParser(usage="%prog [options] [replay_log_file]",version="%prog "+__version__)
+
+#    parser.add_option('-i', '--in-port', dest='inPort', type='int', default=31414,
+#			help='Where the data comes from [default: %default]')
+#    parser.add_option('-I', '--in-host', dest='inHost', type='string', default='localhost',
+#			help='What host to read data from [default: %default]')
+
+    parser.add_option('-d','--database-name',default='test_ais'
+                      ,help='Name of database within the postgres server [default: %default]')
+
+    parser.add_option('-D','--database-host',default='localhost'
+                      ,help='Host name of the computer serving the dbx [default: %default]')
+    defaultUser = os.getlogin()
+    parser.add_option('-u','--database-user',default=defaultUser
+                      ,help='Host name of the to access the database with [default: %default]')
+    parser.add_option('-p','--database-passwd',default=None
+                      ,help='Password to access the database with [default: None]')
+
+
+    parser.add_option('-C','--create-tables',default=False, action='store_true'
+                      ,help='Create the tables in the database')
+    parser.add_option('--drop-tables',default=False, action='store_true'
+                      ,help='Remove the tables in the database.  DANGER - destroys data')
+    parser.add_option('--delete-table-entries',default=False, action='store_true'
+                      ,help='Remove the contents of vessel_ tables in the database.  DANGER - destroys data')
+
+    parser.add_option('-v','--verbose',default=False,action='store_true'
+                      ,help='Make program output more verbose info as it runs')
+
+    return parser
+
 def main():
-    v = True
-    
+    (options,args) = get_parser().parse_args()
+    v = options.verbose
+
+   
     match_count = 0
     counters = {}
     for i in range(30):
         counters[i] = 0
 
     if v: print ('connecting to db')
-    cx = psycopg2.connect("dbname='testing'")
-
+    print (options)
+    print (type(options))
+    options = dict(options)
+    print (type(options))
+    
+    if options.create_database:
+        create
+    #cx_str = "dbname='{database_name}'".format(**dict(options))
+    cx_str = "dbname='"+options.database_name+"' user='"+options.database_user+"' host='"+options.database_host+"'"
+    cx = psycopg2.connect(cx_str)
+    sys.exit('EAR:U')
 
     if True:
         for i in range(5): print ('   *** WARNING ***  - Removing entries from vessel_name for testing')
         print ()
         cu = cx.cursor()
         cu.execute('DELETE FROM vessel_name')
-        cu.execute('DELETE FROM last_position')
+        cu.execute('DELETE FROM vessel_pos')
         cx.commit()
     else:
         # FIX: load from the database
@@ -543,115 +593,114 @@ def main():
     #for line_num, text in enumerate(open('1e6.multi')):
     #for line_num, line in enumerate(file('/nobackup/dl1/20100505.norm')):
 
-    infile = '/Users/schwehr/Desktop/DeepwaterHorizon/ais-dl1/uscg-nais-dl1-2010-04-28.norm.dedup'
-    if v: print ('reading data from ...',infile)
-    for line_num, text in enumerate(open(infile)):
-    #for line_num, text in enumerate(open('test.aivdm')):
-    #for line_num, text in enumerate(open('trouble.ais')):
+    #infile = '/Users/schwehr/Desktop/DeepwaterHorizon/ais-dl1/uscg-nais-dl1-2010-04-28.norm.dedup'
+    for infile in args:
+        if v: print ('reading data from ...',infile)
+        for line_num, text in enumerate(open(infile)):
 
-        #if line_num > 300: break
-        #print ()
-        if line_num % 100000 == 0: print ("line: %d   %d" % (line_num,match_count) )
-        if 'AIVDM' not in text:
-            continue
-
-        line_queue.put(text)
-
-        while line_queue.qsize() > 0:
-            line = line_queue.get(False)
-            if len(line) < 15 or '!' != line[0]: continue # Try to go faster
-
-            #print ('line:',line)
-            try:
-                match = uscg_ais_nmea_regex.search(line).groupdict()
-                match_count += 1
-            except AttributeError:
-                if 'AIVDM' in line:
-                    print ('BAD_MATCH:',line)
+            #if line_num > 300: break
+            #print ()
+            if line_num % 100000 == 0: print ("line: %d   %d" % (line_num,match_count) )
+            if 'AIVDM' not in text:
                 continue
 
-            norm_queue.put(match)
+            line_queue.put(text)
 
-            while norm_queue.qsize()>0:
-       
+            while line_queue.qsize() > 0:
+                line = line_queue.get(False)
+                if len(line) < 15 or '!' != line[0]: continue # Try to go faster
+
+                #print ('line:',line)
                 try:
-                    result = norm_queue.get(False)
-                except Queue.Empty:
+                    match = uscg_ais_nmea_regex.search(line).groupdict()
+                    match_count += 1
+                except AttributeError:
+                    if 'AIVDM' in line:
+                        print ('BAD_MATCH:',line)
                     continue
 
-                if len(result['body']) < 10: continue
-                # FIX: make sure we have all the critical messages
+                norm_queue.put(match)
 
-                # FIX: add 9
-                if result['body'][0] not in ('1', '2', '3', '5', 'B', 'C', 'H') :
-                    #print( 'skipping',result['body'])
-                    continue
-                #print( 'not skipping',result['body'])
-                
-                try:
-                     msg = ais.decode(result['body'])
-                #except ais.decode.error:
-                except Exception as e:
-                    #print ()
-                    
-                    if 'not yet handled' in str(e):
+                while norm_queue.qsize()>0:
+
+                    try:
+                        result = norm_queue.get(False)
+                    except Queue.Empty:
                         continue
-                    if ' not known' in str(e): continue
 
-                    print ('BAD Decode:',result['body'][0]) #result
-                        #continue
-                    print ('E:',Exception)
-                    print ('e:',e)
-                    continue
-                    #pass # Bad or unhandled message
+                    if len(result['body']) < 10: continue
+                    # FIX: make sure we have all the critical messages
 
-                #continue #  FIX: Remove after debugging
+                    # FIX: add 9
+                    if result['body'][0] not in ('1', '2', '3', '5', 'B', 'C', 'H') :
+                        #print( 'skipping',result['body'])
+                        continue
+                    #print( 'not skipping',result['body'])
 
-                counters[msg['id']] += 1
+                    try:
+                         msg = ais.decode(result['body'])
+                    #except ais.decode.error:
+                    except Exception as e:
+                        #print ()
 
-                if False:
-                    print ('id:',msg['id'], counters[msg['id']])
+                        if 'not yet handled' in str(e):
+                            continue
+                        if ' not known' in str(e): continue
 
-                    print ('msg', sys.getrefcount(msg), sys.getrefcount(msg['id']))
+                        print ('BAD Decode:',result['body'][0]) #result
+                            #continue
+                        print ('E:',Exception)
+                        print ('e:',e)
+                        continue
+                        #pass # Bad or unhandled message
 
-                    if msg['id'] == 19:
-                        print (' *** x:',sys.getrefcount(msg['x']), sys.getrefcount(msg['dim_c']))
-                    check_ref_counts(msg)
+                    #continue #  FIX: Remove after debugging
 
-                if msg['id'] in (18,): #(1,): #2,3,18,19):
-                    # for field in ('received_stations', 'rot', 'raim', 'spare','timestamp', 'position_accuracy', 'rot_over_range', 'special_manoeuvre','slot_number',
-                    #               'utc_spare', 'utc_min', 'slots_to_allocate', 'slot_increment','commstate_flag', 'mode_flag', 'utc_hour', 'band_flag', 'keep_flag',
-                    #               ):
-                    #     try:
-                    #         msg.pop(field)
-                    #     except:
-                    #         pass
-                    #print (msg['mmsi'])
-                    #print (','.join(["'%s'" %(key,)for key in msg.keys()]))
-                    #print (result)
-                    msg['time_stamp'] = float(result['time_stamp'])
-                    #if msg['mmsi'] in (304606000, 366904910, 366880220): dump_file.write(str(msg)+',\n')
-                    pos_cache.update(msg)
-                    continue
+                    counters[msg['id']] += 1
 
-                continue # FIX for debugging
+                    if False:
+                        print ('id:',msg['id'], counters[msg['id']])
+
+                        print ('msg', sys.getrefcount(msg), sys.getrefcount(msg['id']))
+
+                        if msg['id'] == 19:
+                            print (' *** x:',sys.getrefcount(msg['x']), sys.getrefcount(msg['dim_c']))
+                        check_ref_counts(msg)
+
+                    if msg['id'] in (18,): #(1,): #2,3,18,19):
+                        # for field in ('received_stations', 'rot', 'raim', 'spare','timestamp', 'position_accuracy', 'rot_over_range', 'special_manoeuvre','slot_number',
+                        #               'utc_spare', 'utc_min', 'slots_to_allocate', 'slot_increment','commstate_flag', 'mode_flag', 'utc_hour', 'band_flag', 'keep_flag',
+                        #               ):
+                        #     try:
+                        #         msg.pop(field)
+                        #     except:
+                        #         pass
+                        #print (msg['mmsi'])
+                        #print (','.join(["'%s'" %(key,)for key in msg.keys()]))
+                        #print (result)
+                        msg['time_stamp'] = float(result['time_stamp'])
+                        #if msg['mmsi'] in (304606000, 366904910, 366880220): dump_file.write(str(msg)+',\n')
+                        pos_cache.update(msg)
+                        continue
+
+                    continue # FIX for debugging
 
 
-                if msg['id'] == 24:
-                    #print24(msg)
-                    vessel_names.update_partial(msg)
-                    
-                #continue # FIX remove
+                    if msg['id'] == 24:
+                        #print24(msg)
+                        vessel_names.update_partial(msg)
 
-                if msg['id'] in (5,19):
-                    msg['name'] = msg['name'].strip(' @')
-                    if len(msg['name']) == 0: continue # Skip blank names
-                    #print ('UPDATING vessel name', msg)
-                    #vessel_names.update(msg['mmsi'], msg['name'].rstrip('@'), msg['type_and_cargo'])
-                    #if msg['mmsi'] == 367178330:
-                    #    print (' CHECK:', msg['mmsi'], msg['name'])
-                    vessel_names.update(msg)
-                    #print ()
+                    #continue # FIX remove
+
+                    if msg['id'] in (5,19):
+                        msg['name'] = msg['name'].strip(' @')
+                        if len(msg['name']) == 0: continue # Skip blank names
+                        #print ('UPDATING vessel name', msg)
+                        #vessel_names.update(msg['mmsi'], msg['name'].rstrip('@'), msg['type_and_cargo'])
+                        #if msg['mmsi'] == 367178330:
+                        #    print (' CHECK:', msg['mmsi'], msg['name'])
+                        vessel_names.update(msg)
+                        #print ()
                         
     print ('match_count:',match_count)
     #print (counters)
