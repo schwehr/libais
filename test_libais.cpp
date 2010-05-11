@@ -33,8 +33,14 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     ////////////////////////////////////////
     // 7 and 13
     ////////////////////////////////////////
-#if 1
-    if (false) {
+
+    if (true) {
+        // Causes bus error
+        // !AIVDM,1,1,,A,74i:pT000000,0*52,b003669977,1273190417
+        CHECKPOINT;
+        {Ais7_13 msg("74i:pT000000"); msg.print();}
+        CHECKPOINT;
+
         {Ais7_13 msg("75Mu6d0P17IP?PfGSC29WOvb0<14"); msg.print();}
 
         CHECKPOINT;
@@ -48,7 +54,6 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             //msg.print();
         }
     }
-#endif
 
 
     //////////////////////////////////////////////////////////////////////

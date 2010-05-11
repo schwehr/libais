@@ -58,10 +58,11 @@ tar:
 # Remove the NDEBUG that python tries to use
 python2:
 	CFLAGS="-m32 -O3 -funroll-loops -fexpensive-optimizations -ffast-math" /sw/bin/python2.6 setup.py build
-	CFLAGS="-m32 -O0 -g -UNDEBUG" /sw/bin/python2.6 setup.py build
+#	CFLAGS="-m32 -O0 -g -UNDEBUG" /sw/bin/python2.6 setup.py build
 
+# -D_GLIBCXX_DEBUG  This option does not seem to work for g++ versions 4.[0-2]
 python3:
-	CFLAGS="-m32 -O0 -g -D_GLIBCXX_DEBUG -UNDEBUG" /sw/bin/python3 setup.py build
+	CFLAGS="-m32 -O0 -g -UNDEBUG" /sw/bin/python3 setup.py build
 
 libais.a: ${OBJS}
 	ls ${OBJS}

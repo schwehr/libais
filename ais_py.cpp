@@ -493,6 +493,7 @@ decode(PyObject *self, PyObject *args) {
         // 13 - ASRM Ack  (safety message)
     case '=': // FALLTHROUGH
     case '7':
+        //std::cerr << "7_or_14: " << nmea_payload << std::endl;
         result = ais7_13_to_pydict(nmea_payload);
         break;
         
