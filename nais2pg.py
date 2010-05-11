@@ -14,6 +14,7 @@ __contact__   = 'kurt at ccom.unh.edu'
 
 import ais
 from ais import decode # Make sure we have the correct ais module
+import ais_lut # Look up tables for navigation status and such
 
 import os
 import sys
@@ -160,26 +161,17 @@ def insert_or_update(cx, cu, sql_insert, sql_update, values):
         cu.execute(sql_insert,values)
     except psycopg2.IntegrityError:
         # psycopg2.IntegrityError: duplicate key value violates unique constraint
-        print ('insert failed')
+        #print ('insert failed')
         success = False
 
     cx.commit()
     if success: return
 
-    print (cu.mogrify(sql_update, values))
+    #print (cu.mogrify(sql_update, values))
     cu.execute(sql_update, values)
     cx.commit()
 
 
-sql_vessel_name_create='''CREATE TABLE vessel_name (
-       mmsi INT PRIMARY KEY,
-       name VARCHAR(25), -- only need 20
-       type_and_cargo INT
-);'''
-
-# psql -f /sw32/share/doc/postgis84/contrib/postgis-1.5/spatial_ref_sys.sql testing
-sql_last_position_create='''CREATE TABLE  last_position ( key SERIAL PRIMARY KEY, userid INTEGER, name character varying(20), cog INTEGER, sog REAL, cg_timestamp TIMESTAMP WITH TIME ZONE DEFAULT now(), cg_r VARCHAR(15), navigationstatus VARCHAR(30), shipandcargo VARCHAR(30) );
-SELECT AddGeometryColumn('last_position','position',4326,'POINT',2);'''
 
 class VesselNames:
     'Local caching of vessel names for more speed and less DB load'
@@ -203,9 +195,9 @@ class VesselNames:
             name = vessel_dict['name'].rstrip(' @')
             type_and_cargo = None
         else:
-            assert (msg['part_num']==1)
+            assert (vessel_dict['part_num']==1)
             name = None
-            type_and_cargo = msg['type_and_cargo']
+            type_and_cargo = vessel_dict['type_and_cargo']
 
         if name is not None and len(name)==0:
             if self.v: print ('EMPTY NAME:',mmsi)
@@ -236,7 +228,7 @@ class VesselNames:
                 self.cu.execute(self.sql_insert,new_vessel)
                 if self.v: print ('ADDED:',name, mmsi)
             except psycopg2.IntegrityError, e:
-                print (mmsi,'already in the database', str(e))
+                if self.v: print (mmsi,'already in the database', str(e))
                 pass # Already in the database
             #print ('after',mmsi)
             self.cx.commit()
@@ -343,28 +335,39 @@ def wkt_line(series_of_xy):
 
 class PositionCache:
 
-    sql_insert = '''
-    INSERT INTO last_position (userid, name, cog,sog,cg_timestamp, navigationstatus, shipandcargo, position)
-    VALUES (%(mmsi)s, %(name)s, %(cog)s, %(sog)s, %(datetime)s, %(nav_status)s, %(type_and_cargo)s,
+    sql_insert = """
+    INSERT INTO vessel_pos (mmsi, cog, sog, time_stamp, nav_status, pos)
+    VALUES (%(mmsi)s, %(cog)s, %(sog)s, %(datetime)s, %(nav_status)s, 
     ST_GeomFromText('POINT(%(x)s %(y)s)',4326)
-    );'''
-    sql_update = '''
-    UPDATE last_position SET name = %(name)s,
+    );"""
+    sql_update_without_track = """
+    UPDATE vessel_pos SET 
        cog = %(cog)s,
        sog = %(sog)s,
-       cg_timestamp = %(time_stamp)s,
-       navigationstatus = %(nav_status),
-       shipandcargo=%(type_and_cargo)s
-       
-    WHERE userid = %(mmsi)s;'''
+       time_stamp = %(datetime)s,
+       nav_status = %(nav_status)s,
+       pos = ST_GeomFromText('POINT(%(x)s %(y)s)', 4326),
+       track = NULL
+    WHERE mmsi = %(mmsi)s;"""
+    sql_update_with_track = """
+    UPDATE vessel_pos SET 
+       cog = %(cog)s,
+       sog = %(sog)s,
+       time_stamp = %(datetime)s,
+       nav_status = %(nav_status)s,
+       pos = ST_GeomFromText('POINT(%(x)s %(y)s)', 4326),
+       track = ST_GeomFromText(%(track)s, 4326)
+    WHERE mmsi = %(mmsi)s;"""
 
+    
+#        track = ST_GeomFromText('%(track)s', 4326),
     def __init__(self, db_cx, min_dist_m=200, min_time_s=5 * 60,
                  #max_tail_count=10, max_tail_time_s = 15*60,
                  max_tail_count=15, max_tail_time_s = 15*60,
                  #max_age=60*60, # Drop the vessel after this time?
-                 vessel_names=None, # a VesselNames object
                  verbose=True):
         # 15 minutes is the recommended time?
+
         print ('THRESHOLDS dt:',min_time_s, 'dm:',min_dist_m,'\n')
         self.v = verbose
         self.vessels = {} # indexed by MMSI
@@ -373,10 +376,8 @@ class PositionCache:
         self.min_time_s = min_time_s
         self.max_tail_count = max_tail_count
         self.max_tail_time_s = max_tail_time_s
-        self.vessel_names = vessel_names
         self.cx = db_cx
         self.cu = db_cx.cursor()
-        #self.bad_mmsi = set()
         return
 
     def _update_tail(self, mmsi, msg):
@@ -415,10 +416,9 @@ class PositionCache:
 
         if len(d)<2: return # Too short to make a line
         # Make a WKT line and push it into the db
-        #print ('FIX: wkt')
         wkt = wkt_line(d)
         #print ('WKT:',wkt)
-
+        return wkt
 
     def update(self,vessel_pos_report, time_stamp=None):
         msg = vessel_pos_report
@@ -428,7 +428,7 @@ class PositionCache:
         mmsi = msg['mmsi']
 
         # FIX!!!!!!!!!!!!!!!!!!! just for testing
-        #if mmsi != 366880220:    return
+        #if mmsi != 367173260:    return
 
 
         #print ('mmsi:',mmsi)
@@ -463,32 +463,24 @@ class PositionCache:
                 new_pos[field] = msg[field]
             except:
                 new_pos[field] = None
-
-        if mmsi in self.vessel_names.vessels:
-            print (self.vessel_names.vessels[mmsi])
-            new_pos['name'] = self.vessel_names.vessels[mmsi]['name']
-            sys.exit('early') # FIX
+        
+        if new_pos['nav_status'] is not None:
+            new_pos['nav_status'] = ais_lut.nav_status_table[new_pos['nav_status']]
         else:
-            new_pos['name'] = None
-            new_pos['type_and_cargo'] = None
-            
+            new_pos['nav_status'] = 'N/A - Class B device'
+
+
         if mmsi not in self.vessels:
-            #print ('FIX: add or insert to DB', new_pos)
             #print ('NEW:',mmsi)
-            print ('NEW:',mmsi,new_pos)
+            #print ('NEW:',mmsi,new_pos)
             self.vessels[mmsi] = new_pos
             self._update_tail(mmsi, new_pos)
-            #GeomFromText(%s,4326)
-            #new_pos['position'] =
-            print(self.cu.mogrify(self.sql_insert, new_pos))
-            insert_or_update(self.cx, self.cu, self.sql_insert, self.sql_update, new_pos)
-            sys.exit('early')
+            insert_or_update(self.cx, self.cu, self.sql_insert, self.sql_update_without_track, new_pos)
             return
 
         last = self.vessels[mmsi]
         #print ('last:',last)
         
-        #needs_update = False
         # FIX: move into if when working for speed to try to avoid the distance calc
         dt = msg['time_stamp'] - last['time_stamp']
 
@@ -501,9 +493,16 @@ class PositionCache:
         # Go ahead and update it
         #print ('UPDATING_PATH:',mmsi, dt, dt >= self.min_time_s , dm, dm >= self.min_dist_m)
         self.vessels[mmsi] = new_pos
-        self._update_tail(mmsi, new_pos)
+        wkt = self._update_tail(mmsi, new_pos)
+        if wkt is None:
+            #print ('UPDATE:',self.cu.mogrify(self.sql_update_without_track, new_pos))
+            self.cu.execute(self.sql_update_without_track, new_pos)
+        else:
+            new_pos['track'] = wkt
+            #print ('UPDATE:',self.cu.mogrify(self.sql_update_with_track, new_pos))
+            self.cu.execute(self.sql_update_with_track, new_pos)
 
-        # FIX: update the database
+        self.cx.commit()
 
         return
 
@@ -529,22 +528,87 @@ def get_parser():
                       ,help='Password to access the database with [default: None]')
 
 
-    parser.add_option('-C','--create-tables',default=False, action='store_true'
-                      ,help='Create the tables in the database')
-    parser.add_option('--drop-tables',default=False, action='store_true'
-                      ,help='Remove the tables in the database.  DANGER - destroys data')
-    parser.add_option('--delete-table-entries',default=False, action='store_true'
-                      ,help='Remove the contents of vessel_ tables in the database.  DANGER - destroys data')
+    parser.add_option('-c','--create-database',default=False, action='store_true', help='Create the database and setup PostGIS (fink only)')
+    parser.add_option('-C','--create-tables',default=False, action='store_true', help='Create the tables in the database')
+
+    parser.add_option('--drop-database',       default=False, action='store_true', help = 'Remove the database.  DANGER - destroys data')
+    parser.add_option('--drop-tables',         default=False, action='store_true', help = 'Remove the tables in the database.  DANGER - destroys data')
+    parser.add_option('--delete-table-entries',default=False, action='store_true', help = 'Remove the contents of vessel_ tables in the database.  DANGER - destroys data')
 
     parser.add_option('-v','--verbose',default=False,action='store_true'
                       ,help='Make program output more verbose info as it runs')
 
     return parser
 
+def drop_database(db_name,v=True):
+    if v: sys.stderr.write('Dropping database...\n')
+    r=os.system('dropdb -U postgres {db_name}'.format(db_name=db_name))
+    if 0 != r: sys.stderr.write('Failed to dropdb\n')
+
+def create_database(db_name, v=True):
+    if v: sys.stderr.write('Creating database...\n')
+    r = os.system('createdb -U postgres '+db_name)
+    if 0 != r: sys.exit('Unable to create the database.  Exit code: '+str(r))
+    r = os.system('createlang plpgsql '+db_name)
+    #if 0 != r: sys.stderr.write('Failed to add plpgsql\n') # probably already in the template.  likely okay
+    # Add postgis and spatialref sys.  Sorry this is fink specific
+    r = os.system('psql -f /sw/share/doc/postgis84/contrib/postgis-1.5/postgis.sql '+db_name)
+    r = os.system('psql -f /sw/share/doc/postgis84/contrib/postgis-1.5/spatial_ref_sys.sql '+db_name)
+
+sql_create_vessel_name = """
+CREATE TABLE vessel_name (
+       mmsi INTEGER PRIMARY KEY,
+       name VARCHAR(25), -- only need 20
+       type_and_cargo INTEGER,
+       erma_class INTEGER -- 0 do not code differently.  1 == response vessel
+);
+-- FIX: Add indexes for mmsi and erma_class
+"""
+
+sql_create_vessel_pos = """
+CREATE TABLE vessel_pos (
+       mmsi INTEGER PRIMARY KEY,
+       cog INTEGER,
+       sog REAL,
+       time_stamp TIMESTAMP WITH TIME ZONE DEFAULT now(),
+       nav_status VARCHAR(30) -- convert the code to a string for presentation
+       );
+SELECT AddGeometryColumn('vessel_pos','pos',4326,'POINT',2);
+SELECT AddGeometryColumn('vessel_pos','track',4326,'LINESTRING',2);
+
+-- FIX: Add index on mmsi
+"""
+
+def create_tables(cx, v):
+    cu = cx.cursor()
+    if v: print (sql_create_vessel_name)
+    cu.execute(sql_create_vessel_name)
+    if v: print (sql_create_vessel_pos)
+    cu.execute(sql_create_vessel_pos)
+    cx.commit()
+
+def drop_tables(cx,v):
+    cu = cx.cursor()
+    try:
+        cu.execute('DROP TABLE vessel_name')
+    except:
+        print ('FAILED: DROP TABLE vessel_name')
+    try:
+        cu.execute('DROP TABLE vessel_pos')
+    except:
+        print ('FAILED: DROP TABLE vessel_pos')
+    cx.commit()
+
+def delete_table_entries(cx, v):
+    cu = cx.cursor()
+    cu.execute('DELETE FROM vessel_name')
+    cu.execute('DELETE FROM vessel_pos')
+    cx.commit()
+
+
 def main():
     (options,args) = get_parser().parse_args()
     v = options.verbose
-
    
     match_count = 0
     counters = {}
@@ -552,35 +616,31 @@ def main():
         counters[i] = 0
 
     if v: print ('connecting to db')
-    print (options)
-    print (type(options))
-    options = dict(options)
-    print (type(options))
-    
-    if options.create_database:
-        create
-    #cx_str = "dbname='{database_name}'".format(**dict(options))
-    cx_str = "dbname='"+options.database_name+"' user='"+options.database_user+"' host='"+options.database_host+"'"
-    cx = psycopg2.connect(cx_str)
-    sys.exit('EAR:U')
+    #print (options)
+    #print (type(options))
+    options_dict = vars(options) # Turn options into a real dictionary
+    #print (options)
+    #print (type(options))
 
-    if True:
-        for i in range(5): print ('   *** WARNING ***  - Removing entries from vessel_name for testing')
-        print ()
-        cu = cx.cursor()
-        cu.execute('DELETE FROM vessel_name')
-        cu.execute('DELETE FROM vessel_pos')
-        cx.commit()
-    else:
-        # FIX: load from the database
-        pass
+    if options.drop_database:   drop_database(  options.database_name, v)
+    if options.create_database: create_database(options.database_name, v)
+
+    cx_str = "dbname='{database_name}' user='{database_user}' host='{database_host}'".format(**options_dict)
+    if v: print ('cx_str:',cx_str)
+    cx = psycopg2.connect(cx_str)
+
+    if options.drop_tables: drop_tables(cx, v)
+    if options.create_tables: create_tables(cx, v)
+
+    if options.delete_table_entries: delete_table_entries(cx, v)
+
 
     if v: print ('initilizing caches...')
     
     # Caches
     vessel_names = VesselNames(cx)
     pos_cache = PositionCache(db_cx=cx,
-                              vessel_names = vessel_names,
+                              #vessel_names = vessel_names,
                               verbose=True)
     
     # FIFOs
@@ -588,19 +648,30 @@ def main():
     line_queue = LineQueue()
     norm_queue = NormQueue()
 
-    #dump_file = open('dump_file','w')
-
-    #for line_num, text in enumerate(open('1e6.multi')):
-    #for line_num, line in enumerate(file('/nobackup/dl1/20100505.norm')):
-
-    #infile = '/Users/schwehr/Desktop/DeepwaterHorizon/ais-dl1/uscg-nais-dl1-2010-04-28.norm.dedup'
     for infile in args:
         if v: print ('reading data from ...',infile)
+        last_time = time.time()
+        last_count = 0
+        last_match_count = 0
+        
+        last_ais_msg_cnt = 0 # FULL AIS message decoded
+        ais_msg_cnt = 0
+        
         for line_num, text in enumerate(open(infile)):
-
+            
             #if line_num > 300: break
             #print ()
-            if line_num % 100000 == 0: print ("line: %d   %d" % (line_num,match_count) )
+            if line_num % 10000 == 0:
+                print ("line: %d   %d" % (line_num,match_count),
+                       #'\tupdate_rate:',(match_count - last_match_count) / (time.time() - last_time), '(lines/sec)'
+                       #'\tupdate_rate:',(line_num - last_count) / (time.time() - last_time), '(msgs/sec)'
+                       '\tupdate_rate:',(ais_msg_cnt - last_ais_msg_cnt) / (time.time() - last_time), '(msgs/sec)'
+                       )
+                last_time = time.time()
+                last_count = line_num
+                last_match_count = match_count
+                last_ais_msg_cnt = ais_msg_cnt
+                
             if 'AIVDM' not in text:
                 continue
 
@@ -658,16 +729,9 @@ def main():
 
                     counters[msg['id']] += 1
 
-                    if False:
-                        print ('id:',msg['id'], counters[msg['id']])
+                    if msg['id'] in (1,2,3,5,18,19,24): ais_msg_cnt += 1
 
-                        print ('msg', sys.getrefcount(msg), sys.getrefcount(msg['id']))
-
-                        if msg['id'] == 19:
-                            print (' *** x:',sys.getrefcount(msg['x']), sys.getrefcount(msg['dim_c']))
-                        check_ref_counts(msg)
-
-                    if msg['id'] in (18,): #(1,): #2,3,18,19):
+                    if msg['id'] in (1,2,3,18,19):
                         # for field in ('received_stations', 'rot', 'raim', 'spare','timestamp', 'position_accuracy', 'rot_over_range', 'special_manoeuvre','slot_number',
                         #               'utc_spare', 'utc_min', 'slots_to_allocate', 'slot_increment','commstate_flag', 'mode_flag', 'utc_hour', 'band_flag', 'keep_flag',
                         #               ):
@@ -683,7 +747,7 @@ def main():
                         pos_cache.update(msg)
                         continue
 
-                    continue # FIX for debugging
+                    #continue # FIX for debugging
 
 
                     if msg['id'] == 24:
