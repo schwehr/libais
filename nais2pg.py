@@ -73,10 +73,11 @@ import Queue
 class LineQueue(Queue.Queue):
     'Break input into input lines'
     def __init__(self, separator='\n', maxsize=0, verbose=False):
-        Queue.Queue.__init__(self,maxsize)
         self.input_buf = ''
         self.v = verbose
         self.separator = separator
+        self.lq_maxsize = maxsize
+        Queue.Queue.__init__(self)
 
     def put(self, text):
         self.input_buf += text
@@ -88,12 +89,16 @@ class LineQueue(Queue.Queue):
         elif len(groups[-1]) == 0:
             # last group was properly terminated
             for g in groups[:-1]:
-                Queue.Queue.put(self,g)
+                if self.qsize() > self.lq_maxsize:
+                    continue # FIX: Would be better to add the most recent and drop one from the queue.
+                Queue.Queue.put(self,g) 
             self.input_buf = ''
         else:
             # last part is a fragment
             for g in groups[:-1]:
-                Queue.Queue.put(self,g)
+                if self.qsize() > self.lq_maxsize:
+                    continue # FIX: Would be better to add the most recent and drop one from the queue.
+                Queue.Queue.put(self,g) 
             self.input_buf = groups[-1]
 
 class NormQueue(Queue.Queue):
@@ -107,11 +112,24 @@ class NormQueue(Queue.Queue):
     - assumes each station will send in order messages without duplicates
     '''
     def __init__(self, separator='\n', maxsize=0, verbose=False):
-        Queue.Queue.__init__(self,maxsize)
         self.input_buf = ''
         self.v = verbose
         self.separator = separator
         self.stations = {}
+
+        # For tracking rate of resulting normalized messages
+        self.count = 0
+        self.last_count = 0
+        self.last_time = time.time()
+
+        Queue.Queue.__init__(self,maxsize)
+
+    def get_rate(self):
+        now = time.time()
+        rate = (self.count - self.last_count) / (now - self.last_time)
+        self.last_time = now
+        self.last_count = self.count
+        return rate
 
     def put(self, msg):
         if not isinstance(msg, dict): raise TypeError('Message must be a dictionary')
@@ -124,12 +142,15 @@ class NormQueue(Queue.Queue):
 
         if total == 1:
             Queue.Queue.put(self,msg) # EASY case
+            self.count += 1
             return
 
         seq = int(msg['seq_id'])
         sen_num = int(msg['sen_num'])
 
         if sen_num == 1:
+            # FIX: would be a good place to check the message first letter to see if we can ditch it
+            
             # Flush that station's seq and start it with a new msg component
             self.stations[station][seq] = [msg['body'],] # START
             return
@@ -148,6 +169,7 @@ class NormQueue(Queue.Queue):
             msg['body'] = ''.join(msgs) + msg['body']
             msg['total'] = msg['seq_num'] = 1
             Queue.Queue.put(self,msg)
+            self.count += 1
             return
         
         self.stations[station][seq].append(msg['body']) # not first, not last
@@ -184,13 +206,15 @@ class VesselNames:
     sql_update_tac  = 'UPDATE vessel_name SET type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;'
     sql_update_name = 'UPDATE vessel_name SET name = %(name)s WHERE mmsi = %(mmsi)s;'
 
-    def __init__(self, db_cx, dump_interval=5*60, verbose=False):
+    def __init__(self, db_cx, dump_interval=60*60, verbose=False):
         self.cx = db_cx
         self.cu = self.cx.cursor()
         self.vessels = {}
         self.v = verbose
         self.dump_interval = dump_interval
-        self.last_dump_time = time.time()-200
+        force = (dump_interval -  120) if dump_interval > 120 else 0
+        
+        self.last_dump_time = time.time() - force # Force a quick dump 2 min after start
         # Could do a create and commit here of the table
 
     def dump(self, filename):
@@ -546,10 +570,10 @@ def get_parser():
     from optparse import OptionParser
     parser = OptionParser(usage="%prog [options] [replay_log_file]",version="%prog "+__version__)
 
-#    parser.add_option('-i', '--in-port', dest='inPort', type='int', default=31414,
-#			help='Where the data comes from [default: %default]')
-#    parser.add_option('-I', '--in-host', dest='inHost', type='string', default='localhost',
-#			help='What host to read data from [default: %default]')
+    parser.add_option('-i', '--in-port', type='int', default=31414,
+			help='Where the data comes from [default: %default]')
+    parser.add_option('-I', '--in-host', type='string', default='localhost',
+			help='What host to read data from [default: %default]')
 
     parser.add_option('-d','--database-name',default='test_ais'
                       ,help='Name of database within the postgres server [default: %default]')
@@ -642,6 +666,175 @@ def delete_table_entries(cx, v):
     cu.execute('DELETE FROM vessel_pos')
     cx.commit()
 
+######################################################################
+# Main network handling code - threaded
+######################################################################
+
+import sys, os
+import time
+import socket
+import threading
+import datetime
+import exceptions # For KeyboardInterupt pychecker complaint
+import traceback
+import Queue
+import select
+
+class ListenThread(threading.Thread):
+    def __init__(self, host_name, port_num, line_queue, verbose=True):
+        self.host_name = host_name
+        self.port_num = port_num
+        self.line_queue = line_queue
+        self.v = verbose
+        self.running = True
+
+        threading.Thread.__init__(self)
+
+    def stop(self):
+        self.running = False
+
+    def run(self):
+        print ('ListenThread:',self.host_name, self.port_num)
+
+        connected = False
+
+        while self.running:
+            time.sleep(.25)
+            try:
+                soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                soc.connect((self.host_name, self.port_num))
+            except socket.error, inst:
+                print ('soc connect failed:', str(inst))
+            else:
+                connected = True
+                print ('CONNECT to ',self.host_name, self.port_num)
+
+            count = 0
+            while self.running and connected:
+                count += 1
+                if count % 100 == 0:
+                    #print ('sleeping')
+                    time.sleep(0.001)
+                readersready,outputready,exceptready = select.select([soc,],[],[],0.1)
+                if len(readersready) == 0: continue
+                data = soc.recv(160)
+                if len(data) == 0:
+                    connected = False
+                    print ('DISCONNECT')
+                    break
+                try:
+                    self.line_queue.put(data)
+                except Queue.Full:
+                    print ('QUEUE_FULL dropping data') # Not currently handled the normal queue way
+
+
+class ProcessingThread(threading.Thread):
+    '# FIX: break into more threads if it helps performance'
+    def __init__(self, vessel_names, pos_cache, line_queue, norm_queue, verbose=True):
+        self.v = verbose
+        self.vessel_names = vessel_names
+        self.pos_cache = pos_cache
+        
+        self.line_queue = line_queue
+        self.norm_queue = norm_queue
+        self.running = True
+
+        threading.Thread.__init__(self)
+
+    def stop(self):
+        self.running = False
+
+    def run(self):
+        print ('Started processing thread...')
+
+        while self.running:
+            try:
+                line = self.line_queue.get(True,1) # Block until we have a line
+            except Queue.Empty:
+                continue # just a timeout with no data
+            #print ('line:',line)
+            if len(line) < 15 or '!AIVDM' != line[:6]: continue # try to avoid the regex if possible
+
+            try:
+                match = uscg_ais_nmea_regex.search(line).groupdict()
+            except AttributeError:
+                if 'AIVDM' in line:
+                    print ('BAD_MATCH:',line)
+                continue
+
+            self.norm_queue.put(match)
+
+            # FIX: possibly decouple here
+            while self.norm_queue.qsize()>0:
+
+                try:
+                    result = self.norm_queue.get(False)
+                except Queue.Empty:
+                    continue
+
+                if len(result['body'])<10 or result['body'][0] not in ('1', '2', '3', '5', 'B', 'C', 'H') :
+                    continue
+
+                try:
+                     msg = ais.decode(result['body'])
+                except Exception as e:
+                    if 'not yet handled' in str(e) or 'not known' in str(e): continue
+                    print ('BAD Decode:',result['body'][0]) 
+                    print ('\tE:',Exception)
+                    print ('\te:',e)
+                    continue
+
+                if msg['id'] in (1,2,3,18,19):
+                    msg['time_stamp'] = float(result['time_stamp'])
+                    self.pos_cache.update(msg)
+                    continue
+
+                if msg['id'] == 24:
+                    self.vessel_names.update_partial(msg)
+                    continue
+
+                if msg['id'] in (5,19):
+                    msg['name'] = msg['name'].strip(' @')
+                    if len(msg['name']) == 0: continue # Skip blank names
+                    self.vessel_names.update(msg)
+
+
+
+def run_network_app(host_name, port_num, vessel_names, pos_cache, line_queue, norm_queue, verbose=False):
+
+    print ('Initial threads:',threading.active_count())
+
+    print ('Starting listen thread...',host_name, port_num)
+    listen_thread = ListenThread(host_name, port_num, line_queue)
+    listen_thread.start()
+
+    processing_thread = ProcessingThread(vessel_names, pos_cache, line_queue, norm_queue, verbose)
+    processing_thread.start()
+
+    running = True
+    count = 0
+    while running:
+        count += 1
+        if count % 10 == 0:
+            print ('main:',count)
+            print ('\tline_q_size:',line_queue.qsize())
+            print ('\tnorm_q_size:',norm_queue.qsize(),'\t\t%.1f (msgs/sec)' % norm_queue.get_rate())
+            
+        try:
+            time.sleep(.5)
+        except exceptions.KeyboardInterrupt:
+            running = False
+            print ('shutting down...\nstopping listener...')
+            listen_thread.stop()
+            time.sleep(.2) # Give it time to clear the buffers
+            print ('stopping processing thread...')
+            processing_thread.stop()
+            
+    print ('falling off the end')
+
+
+######################################################################
 
 def main():
     (options,args) = get_parser().parse_args()
@@ -653,11 +846,7 @@ def main():
         counters[i] = 0
 
     if v: print ('connecting to db')
-    #print (options)
-    #print (type(options))
     options_dict = vars(options) # Turn options into a real dictionary
-    #print (options)
-    #print (type(options))
 
     if options.drop_database:   drop_database(  options.database_name, v)
     if options.create_database: create_database(options.database_name, v)
@@ -683,9 +872,26 @@ def main():
 
     # FIFOs
 
-    line_queue = LineQueue()
+    line_queue = LineQueue(maxsize = 1000) # If we have to drop, drop early
     norm_queue = NormQueue()
 
+    if len(args) == 0:
+        print ('GOING_LIVE: no log files specified for reading')
+
+        run_network_app(
+            host_name = options.in_host,
+            port_num = options.in_port,
+            vessel_names = vessel_names,
+            pos_cache = pos_cache,
+            line_queue = line_queue,
+            norm_queue = norm_queue,
+            verbose=v
+            )
+
+        print ('GOODBYE... main thread ending')
+        return
+        
+    print ('USING_LOG_FILES: non-threaded')
     for infile in args:
         if v: print ('reading data from ...',infile)
         last_time = time.time()
