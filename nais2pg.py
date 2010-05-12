@@ -29,6 +29,8 @@ from collections import deque
 import psycopg2 # Bummer... not yet ready for python 3.1
 #import psycopg2.extras
 
+ENABLE_DB = True  # Set to false to run without db commits
+
 
 def print24(msg):
     if msg['part_num'] == 0:
@@ -158,7 +160,7 @@ def insert_or_update(cx, cu, sql_insert, sql_update, values):
     #print 'insert_or_update:',values['mmsi'],values['name'],values['type_and_cargo']
     success = True
     try:
-        cu.execute(sql_insert,values)
+        if ENABLE_DB: cu.execute(sql_insert,values)
     except psycopg2.IntegrityError:
         # psycopg2.IntegrityError: duplicate key value violates unique constraint
         #print ('insert failed')
@@ -168,7 +170,7 @@ def insert_or_update(cx, cu, sql_insert, sql_update, values):
     if success: return
 
     #print (cu.mogrify(sql_update, values))
-    cu.execute(sql_update, values)
+    if ENABLE_DB: cu.execute(sql_update, values)
     cx.commit()
 
 
@@ -176,17 +178,45 @@ def insert_or_update(cx, cu, sql_insert, sql_update, values):
 class VesselNames:
     'Local caching of vessel names for more speed and less DB load'
     sql_insert = 'INSERT INTO vessel_name VALUES (%(mmsi)s,%(name)s,%(type_and_cargo)s);'
+    sql_insert_full = 'INSERT INTO vessel_name VALUES (%(mmsi)s,%(name)s,%(type_and_cargo)s, %(response_class)s);'
     sql_update = 'UPDATE vessel_name SET name = %(name)s, type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;'
 
     sql_update_tac  = 'UPDATE vessel_name SET type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;'
     sql_update_name = 'UPDATE vessel_name SET name = %(name)s WHERE mmsi = %(mmsi)s;'
 
-    def __init__(self, db_cx, verbose=False):
+    def __init__(self, db_cx, dump_interval=5*60, verbose=False):
         self.cx = db_cx
         self.cu = self.cx.cursor()
         self.vessels = {}
         self.v = verbose
+        self.dump_interval = dump_interval
+        self.last_dump_time = time.time()-200
         # Could do a create and commit here of the table
+
+    def dump(self, filename):
+        if self.v: print ('dumping vessel_names to ',filename)
+        o = open(filename,'w')
+        o.write('mmsi,name,type_and_cargo,response_class\n')
+        self.cu.execute('SELECT mmsi,name,type_and_cargo,response_class FROM vessel_name;')
+        for row in self.cu.fetchall():
+            o.write(','.join(['0' if i is None else str(i) for i in row])+'\n')
+        o.close()
+        self.last_dump_time = time.time()
+
+    def preload_db(self,filename):
+        'Load a dump file into the database'
+        if self.v: print ('loading vessel name ',filename)
+        infile = open(filename)
+        infile.readline() # Skip header
+        for line in infile:
+            #try:
+                mmsi,name,type_and_cargo,response_class = line.split(',')
+                mmsi= int(mmsi)
+                type_and_cargo = int(type_and_cargo)
+                response_class = int(response_class)
+                self.cu.execute(self.sql_insert_full,{'mmsi':mmsi, 'type_and_cargo':type_and_cargo, 'name':name, 'response_class':response_class} )
+        self.cx.commit()
+
 
     def update_partial(self, vessel_dict):
         # Only do the name or type_and_cargo... msg 24 class B
@@ -225,7 +255,7 @@ class VesselNames:
             # Have a name - try to insert - FIX: make it insert or update?
             #print ('before',mmsi)
             try:
-                self.cu.execute(self.sql_insert,new_vessel)
+                if ENABLE_DB: self.cu.execute(self.sql_insert,new_vessel)
                 if self.v: print ('ADDED:',name, mmsi)
             except psycopg2.IntegrityError, e:
                 if self.v: print (mmsi,'already in the database', str(e))
@@ -243,7 +273,7 @@ class VesselNames:
                 return
             
             #print ('UPDATING_B:',mmsi,'  ',old_name,old_type_and_cargo,'->',old_name,type_and_cargo)
-            self.cu.execute(self.sql_update_tac, new_vessel)
+            if ENABLE_DB: self.cu.execute(self.sql_update_tac, new_vessel)
             self.cx.commit()
             #print ('\ttac: ',old_name, type_and_cargo)
             self.vessels[mmsi] = (old_name, type_and_cargo)
@@ -257,7 +287,7 @@ class VesselNames:
         if self.v: print ('UPDATING_B:',mmsi,'  ',old_name,'->',name)
         # FIX: what if someone deletes the entry from the db?
 
-        self.cu.execute(self.sql_update_name, new_vessel)
+        if ENABLE_DB: self.cu.execute(self.sql_update_name, new_vessel)
         self.cx.commit()
         #print ('\tname: ',name, old_type_and_cargo)
         self.vessels[mmsi] = (name, old_type_and_cargo)
@@ -265,6 +295,11 @@ class VesselNames:
 
     def update(self, vessel_dict):
         # vessel_dict must have mmsi, name, type_and_cargo
+
+        if self.dump_interval + self.last_dump_time < time.time():
+            self.dump(datetime.datetime.utcnow().strftime('vessel_names-%Y%m%dT%H%M%S.csv'))
+
+
         mmsi = vessel_dict['mmsi']
         #if mmsi in (0,1,1193046):
         if mmsi < 200000000:
@@ -535,6 +570,8 @@ def get_parser():
     parser.add_option('--drop-tables',         default=False, action='store_true', help = 'Remove the tables in the database.  DANGER - destroys data')
     parser.add_option('--delete-table-entries',default=False, action='store_true', help = 'Remove the contents of vessel_ tables in the database.  DANGER - destroys data')
 
+    parser.add_option('--preload-names', default=None, help = 'Load ships from a vessel.csv dump file... mmsi,name,type_and_cargo,response_class')
+
     parser.add_option('-v','--verbose',default=False,action='store_true'
                       ,help='Make program output more verbose info as it runs')
 
@@ -560,9 +597,9 @@ CREATE TABLE vessel_name (
        mmsi INTEGER PRIMARY KEY,
        name VARCHAR(25), -- only need 20
        type_and_cargo INTEGER,
-       erma_class INTEGER -- 0 do not code differently.  1 == response vessel
+       response_class INTEGER -- 0 or Null == do not code differently.  1 == response vessel
 );
--- FIX: Add indexes for mmsi and erma_class
+-- FIX: Add indexes for mmsi and response_class
 """
 
 sql_create_vessel_pos = """
@@ -638,11 +675,12 @@ def main():
     if v: print ('initilizing caches...')
     
     # Caches
-    vessel_names = VesselNames(cx)
-    pos_cache = PositionCache(db_cx=cx,
-                              #vessel_names = vessel_names,
-                              verbose=True)
+    vessel_names = VesselNames(cx, verbose = v)
+    pos_cache = PositionCache(db_cx=cx, verbose=v)
+
+    if options.preload_names is not None: vessel_names.preload_db(options.preload_names)
     
+
     # FIFOs
 
     line_queue = LineQueue()
@@ -730,6 +768,8 @@ def main():
                     counters[msg['id']] += 1
 
                     if msg['id'] in (1,2,3,5,18,19,24): ais_msg_cnt += 1
+
+                    #continue  # Skip all the database stuff
 
                     if msg['id'] in (1,2,3,18,19):
                         # for field in ('received_stations', 'rot', 'raim', 'spare','timestamp', 'position_accuracy', 'rot_over_range', 'special_manoeuvre','slot_number',
