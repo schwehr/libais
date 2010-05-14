@@ -34,7 +34,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 7 and 13
     ////////////////////////////////////////
 
-    if (true) {
+    if (false) {
         // Causes bus error
         // !AIVDM,1,1,,A,74i:pT000000,0*52,b003669977,1273190417
         CHECKPOINT;
@@ -55,6 +55,28 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         }
     }
 
+
+    //////////////////////////////////////////////////////////////////////
+    // 9 - Search and rescue
+    //////////////////////////////////////////////////////////////////////
+
+    if (true) {
+        int i=0;
+        // !AIVDM,1,1,,B,9002=mQq1oIJvt6;2eUn>Sh0040<,0*5D,b003669979,1273709011
+        { 
+            Ais9 msg("9002=mQq1oIJvt6;2eUn>Sh0040<"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 14 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+        // !AIVDM,1,1,,A,9002=mQrAgIK1cd;1m`F@0@00<3w,0*45,b2003669980,1273709054
+        { 
+            Ais9 msg("9002=mQrAgIK1cd;1m`F@0@00<3w"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 14 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+    }
 
     //////////////////////////////////////////////////////////////////////
     // 14 - Safety Broadcast

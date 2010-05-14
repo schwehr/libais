@@ -8,6 +8,7 @@ ais_module = Extension('ais',
                                'ais5.cpp',
                                # ais6
                                'ais7_13.cpp',
+                               'ais9.cpp',
                                'ais14.cpp',
                                'ais18.cpp',
                                'ais19.cpp',
@@ -15,6 +16,6 @@ ais_module = Extension('ais',
                                ])
 
 setup (name = 'ais',
-       version = '0.1',
+       version = '0.4',
        description = ' Automatic Identification System',
        ext_modules = [ais_module])

@@ -29,6 +29,19 @@ from collections import deque
 import psycopg2 # Bummer... not yet ready for python 3.1
 #import psycopg2.extras
 
+
+import sys, os
+import time
+import socket
+import threading
+import datetime
+import exceptions # For KeyboardInterupt pychecker complaint
+import traceback
+import Queue
+import select
+
+
+
 ENABLE_DB = True  # Set to false to run without db commits
 
 
@@ -670,16 +683,6 @@ def delete_table_entries(cx, v):
 # Main network handling code - threaded
 ######################################################################
 
-import sys, os
-import time
-import socket
-import threading
-import datetime
-import exceptions # For KeyboardInterupt pychecker complaint
-import traceback
-import Queue
-import select
-
 class ListenThread(threading.Thread):
     def __init__(self, host_name, port_num, line_queue, verbose=True):
         self.host_name = host_name
@@ -750,6 +753,19 @@ class ProcessingThread(threading.Thread):
 
         while self.running:
             try:
+                self.loop()
+            except Exception, e:
+                print ('ERROR: Top level exception in ProcessingThread')
+                print (str(e))
+                traceback.print_exc(file=sys.stderr)
+                time.sleep(5) # Throttle back so not as to fill up the disk with error mesages
+            
+
+    def loop(self):
+        print ('Started processing thread...')
+
+        while self.running:
+            try:
                 line = self.line_queue.get(True,1) # Block until we have a line
             except Queue.Empty:
                 continue # just a timeout with no data
@@ -786,7 +802,13 @@ class ProcessingThread(threading.Thread):
                     continue
 
                 if msg['id'] in (1,2,3,18,19):
-                    msg['time_stamp'] = float(result['time_stamp'])
+                    try:
+                        msg['time_stamp'] = float(result['time_stamp'])
+                    except TypeError, e:
+                        print ('BAD time_stamp:',str(e))
+                        traceback.print_exc(file=sys.stderr)
+                        continue
+                    
                     self.pos_cache.update(msg)
                     continue
 

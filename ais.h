@@ -200,6 +200,64 @@ public:
 
 std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
 
+
+class Ais9 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    int alt; // m above sea level
+    float sog;
+    int position_accuracy;
+    float x, y; // Long and lat
+    float cog;
+    int timestamp;
+    int alt_sensor;
+    int spare;
+    int dte; // FIX: bool?
+    int spare2;
+    int assigned_mode;
+    bool raim;
+    int commstate_flag;
+
+    // SOTDMA
+    //int sync_state;
+    int slot_timeout;
+    bool slot_timeout_valid;
+
+    // Based on slot_timeout which ones are valid
+    int received_stations;
+    bool received_stations_valid;
+    
+    int slot_number;
+    bool slot_number_valid;
+
+    bool utc_valid;  // Only means that the values are set.  Can still have 
+    int utc_hour;
+    int utc_min;
+    int utc_spare;
+
+    int slot_offset;
+    bool slot_offset_valid;
+
+    // ITDMA
+    int slot_increment;
+    bool slot_increment_valid;
+
+    int slots_to_allocate;      
+    bool slots_to_allocate_valid;
+
+    bool keep_flag;
+    bool keep_flag_valid;
+
+    Ais9(const char *nmea_payload);
+    void print();
+
+};
+std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
+
+
+
 // B - Class B position report
 class Ais18 : public AisMsg {
 public:

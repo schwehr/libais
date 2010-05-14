@@ -88,6 +88,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
         }
     } else {
         //std::cout << "expecting 3: " << message_id << std::endl;
+        // ITDMA
         assert (3 == message_id);
         slot_increment = ubits(bs, 151, 13);
         slot_increment_valid = true;
