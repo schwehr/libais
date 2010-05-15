@@ -19,7 +19,7 @@ CXXFLAGS += -Werror
 SRCS := ais.cpp 
 SRCS += ais1_2_3.cpp ais4_11.cpp ais5.cpp ais7_13.cpp
 #
-SRCS += ais9.cpp
+SRCS += ais9.cpp ais10.cpp ais12.cpp
 SRCS += ais14.cpp
 #
 SRCS += ais18.cpp ais19.cpp

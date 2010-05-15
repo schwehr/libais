@@ -9,6 +9,7 @@ ais_module = Extension('ais',
                                # ais6
                                'ais7_13.cpp',
                                'ais9.cpp',
+                               'ais10.cpp',
                                'ais14.cpp',
                                'ais18.cpp',
                                'ais19.cpp',

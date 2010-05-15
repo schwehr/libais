@@ -4,7 +4,6 @@
 
 Ais9::Ais9(const char *nmea_payload) {
     assert(nmea_payload);
-
     init();
 
     if (strlen(nmea_payload) != 168/6) {

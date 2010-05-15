@@ -186,20 +186,6 @@ public:
 
 std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 
-// Safety broadcast
-class Ais14 : public AisMsg {
-public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
-    std::string text;
-    int expected_num_spare_bits; // The bits in the nmea_payload not used
-    Ais14(const char *nmea_payload);
-    void print();
-};
-
-std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
-
 
 class Ais9 : public AisMsg {
 public:
@@ -256,7 +242,80 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
 
+// 10 - ":" UTC and date inquiry
+class Ais10 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    int spare;
+    int dest_mmsi;
+    int spare2;
 
+    Ais10(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais10 const& msg);
+
+// 11 - See 4_11
+
+// < - Addressd safety related
+class Ais12 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    int seq_num;
+    int dest_mmsi;
+    bool retransmitted;
+    int spare;
+    std::string text;
+
+    Ais12(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
+
+// Safety broadcast
+class Ais14 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    std::string text;
+    int expected_num_spare_bits; // The bits in the nmea_payload not used
+    Ais14(const char *nmea_payload);
+    void print();
+};
+
+std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
+
+
+// ? - Interrogation
+class Ais15 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    int spare;
+    int mmsi_1;
+    int msg_1_1;
+    int slot_offset_1_1;
+
+    int spare2;
+    int dest_msg_1_2;
+    int slot_offset_1_2;
+
+    int spare3;
+    int mmsi_2;
+    int msg_2;
+    int slot_offset_2;
+    int spare4;
+
+    Ais15(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
 
 // B - Class B position report
 class Ais18 : public AisMsg {

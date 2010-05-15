@@ -60,23 +60,86 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 9 - Search and rescue
     //////////////////////////////////////////////////////////////////////
 
-    if (true) {
+    if (false) {
         int i=0;
         // !AIVDM,1,1,,B,9002=mQq1oIJvt6;2eUn>Sh0040<,0*5D,b003669979,1273709011
         { 
             Ais9 msg("9002=mQq1oIJvt6;2eUn>Sh0040<"); i++;
             if (!msg.had_error()) msg.print(); 
-            else std::cout<<"FAILED 14 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            else std::cout<<"FAILED 9 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
         }
         // !AIVDM,1,1,,A,9002=mQrAgIK1cd;1m`F@0@00<3w,0*45,b2003669980,1273709054
         { 
             Ais9 msg("9002=mQrAgIK1cd;1m`F@0@00<3w"); i++;
             if (!msg.had_error()) msg.print(); 
-            else std::cout<<"FAILED 14 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            else std::cout<<"FAILED 9 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
         }
     }
+
+
+    //////////////////////////////////////////////////////////////////////
+    // 10 - ":" UTC and date inquery
+    //////////////////////////////////////////////////////////////////////
+
+    if (false) {
+        int i=0;
+        // !AIVDM,1,1,,B,:5CoIn0kwN0P,0*23,b003669708,1273711619
+        { 
+            Ais10 msg(":5CoIn0kwN0P"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 10 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+        // !AIVDM,1,1,,B,:3PTOn1ifeq0,0*13,d-096,S0215,t005405.00,T05.73646837,r11NTRQ1,1273712049
+        { 
+            Ais10 msg(":3PTOn1ifeq0"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 10 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    // 11 - "" UTC/date response - same as 4
+    //////////////////////////////////////////////////////////////////////
+
+    if (false) {
+        int i=0;
+        // AIVDM,1,1,,A,;4eG>3iuaFP2:r3OiBH7;8i00000,0*65,d-104,S0420,t000211.00,T11.21643139,r09STOL1,1273708934
+        { 
+            Ais4_11 msg(";4eG>3iuaFP2:r3OiBH7;8i00000"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 11 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    // 12 - "<" Addressed Safety message
+    //////////////////////////////////////////////////////////////////////
+
+    if (false) {
+        int i=0;
+        // !AIVDM,1,1,,A,<02:oP0kKcv0@<51C5PB5@?BDPD?P:?2?EB7PDB16693P381>>5<PikP,0*37
+        // From AISHUB via GPSD
+        { 
+            Ais12 msg("<02:oP0kKcv0@<51C5PB5@?BDPD?P:?2?EB7PDB16693P381>>5<PikP"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 12 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+        // !AIVDM,1,1,,B,<3@oGf0kErm0G81Dw0,4*5C,d-115,S9999,r003669930,1273716298
+        { 
+            Ais12 msg("<3@oGf0kErm0G81Dw0"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 12 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+    }
+
+
 
     //////////////////////////////////////////////////////////////////////
     // 14 - Safety Broadcast
@@ -102,6 +165,30 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             std::cout << "\n"; 
         }
     }
+
+    //////////////////////////////////////////////////////////////////////
+    // 15 - ? Interrogation
+    //////////////////////////////////////////////////////////////////////
+
+    if (false) {
+        // From GPSD - !AIVDM,1,1,,A,?5OP=l00052HD00,2*5B
+        { 
+            Ais15 msg("?5OP=l00052HD00"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+        // !AIVDM,1,1,,B,?h3Owpi;EluT000,2*61,b003669703,1273708908
+        { 
+            Ais15 msg("?h3Owpi;EluT000"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+        //!AIVDM,1,1,,B,?h3Ovn1GP<K0<P@59a0,2*04,d-077,S1832,t004248.00,T48.85520485,r07RPAL1,1272415370
+        { 
+            Ais15 msg("?h3Ovn1GP<K0<P@59a0"); 
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
 
     //////////////////////////////////////////////////////////////////////
     // 18 - Class B
@@ -152,7 +239,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 24 - Class B static data msgs A and B
     //////////////////////////////////////////////////////////////////////
 
-    if (true) {
+    if (false) {
         // !AIVDM,1,1,,B,H5NHcTP<51@4TrM>10584@U<D00,2*77,x337805,b003669710,1241895000
         { 
             Ais24 msg("H5NHcTP<51@4TrM>10584@U<D00"); 

@@ -512,7 +512,7 @@ decode(PyObject *self, PyObject *args) {
         PyErr_Format(ais_py_exception, "ais.decode: message 10 (;) not yet handled");
         break;
 
-        // 11 - See 4
+        // ':' 11 - See 4
    
     case '<': // 12 - ASRM
         // result = ais12_to_pydict(nmea_payload);
