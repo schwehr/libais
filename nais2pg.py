@@ -214,6 +214,7 @@ class VesselNames:
     'Local caching of vessel names for more speed and less DB load'
     sql_insert = 'INSERT INTO vessel_name VALUES (%(mmsi)s,%(name)s,%(type_and_cargo)s);'
     sql_insert_full = 'INSERT INTO vessel_name VALUES (%(mmsi)s,%(name)s,%(type_and_cargo)s, %(response_class)s);'
+    sql_update_full = 'UPDATE vessel_name SET name = %(name)s, type_and_cargo=%(type_and_cargo)s, response_class=%(response_class)s WHERE mmsi = %(mmsi)s;'
     sql_update = 'UPDATE vessel_name SET name = %(name)s, type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;'
 
     sql_update_tac  = 'UPDATE vessel_name SET type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;'
@@ -246,13 +247,21 @@ class VesselNames:
         infile = open(filename)
         infile.readline() # Skip header
         for line in infile:
-            #try:
-                mmsi,name,type_and_cargo,response_class = line.split(',')
-                mmsi= int(mmsi)
-                type_and_cargo = int(type_and_cargo)
-                response_class = int(response_class)
-                self.cu.execute(self.sql_insert_full,{'mmsi':mmsi, 'type_and_cargo':type_and_cargo, 'name':name, 'response_class':response_class} )
-        self.cx.commit()
+            if len(line)<5 or line[0] == '#': continue
+            mmsi,name,type_and_cargo,response_class = line.split(',')
+            mmsi= int(mmsi)
+            type_and_cargo = int(type_and_cargo)
+            response_class = int(response_class)
+            insert_or_update(self.cx, self.cu,
+                             self.sql_insert_full,
+                             self.sql_update_full,
+                             {'mmsi':mmsi, 'type_and_cargo':type_and_cargo, 'name':name, 'response_class':response_class}
+                             )
+#            try:
+#                self.cu.execute(self.sql_insert_full,{'mmsi':mmsi, 'type_and_cargo':type_and_cargo, 'name':name, 'response_class':response_class} )
+#            except:
+#                print ('Failed to insert:',mmsi,name)
+#            self.cx.commit()
 
 
     def update_partial(self, vessel_dict):
