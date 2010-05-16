@@ -257,6 +257,7 @@ class VesselNames:
                              self.sql_update_full,
                              {'mmsi':mmsi, 'type_and_cargo':type_and_cargo, 'name':name, 'response_class':response_class}
                              )
+            self.vessels[mmsi] = (name, type_and_cargo)
 #            try:
 #                self.cu.execute(self.sql_insert_full,{'mmsi':mmsi, 'type_and_cargo':type_and_cargo, 'name':name, 'response_class':response_class} )
 #            except:
