@@ -25,3 +25,19 @@ Unsorted initial list:
   the bit stream.
 - Provide example messages, bit streams, and decoded values for people
   to test with.
+- Provide an example database SQL CREATE command for your message.
+  This will force you to think carefully about your data structures.
+  If it has spatial geometry, include both a traditional SQL
+  definition and a PostGIS spatial version.
+- Include a diagram if appropriate!
+- Do not reference paywalled documents (e.g. ITU 1371)
+- Include the lookup tables locally for things that have tables.  Do
+  not just blindly refer to things like the Beaufort scale.  That is
+  not helpful.
+- State all units.  For example, you can *not* just say "Salinity".
+- Use SI units.  Using things like nautical miles or chains for
+  distances is just bad.  Use km or m and let the software
+  presentation interface do the unit conversions to what ever.
+- Just because it is done in ITU 1371 does not mean it is a good
+  idea.  e.g. Message 22 and 23.
+

@@ -560,6 +560,19 @@ public:
     int message_id;
     int repeat_indicator;
     int mmsi;
+
+    int spare;
+    float x1,y1;
+    float x2,y2;
+    int station_type;
+    int type_and_cargo;
+
+    int spare2; // 22 bits of spare here?  what were people thinking?    
+
+    int txrx_mode;
+    int interval_raw; // raw value, not sec
+    // int interval_sec;
+
     Ais23(const char *nmea_payload);
     void print();
 };
