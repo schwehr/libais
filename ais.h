@@ -10,6 +10,9 @@
 
 #include <iostream> // for checkpoint
 
+#define CHECKPOINT std::cerr <<  __FILE__ << ":" << __LINE__ << " checkpoint" << std::endl
+
+
 extern bool nmea_ord_initialized; // If this is false, you need to call build_nmea_lookup.
 
 void build_nmea_lookup();
@@ -317,7 +320,7 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
 
-// @ - Assigned mode command
+// @ - Assigned mode command - FIX: not yet coded
 class Ais16 : public AisMsg {
 public:
     int message_id;
@@ -337,7 +340,7 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais16 const& msg);
 
-// A? - GNSS broacast
+// A? - GNSS broacast - FIX: not yet coded
 class Ais17 : public AisMsg {
 public:
     int message_id;
@@ -353,7 +356,7 @@ public:
     int n;
     int health;
 
-    ////// CONTINUE HERE FIX
+    std::vector<unsigned char> payload; // Up to 29 words... FIX: what should be here?
 
     Ais17(const char *nmea_payload);
     void print();
@@ -448,13 +451,120 @@ public:
     Ais19(const char *nmea_payload);
     void print();
 };
-
 std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
 
-// class Ais20 : public AisMsg {};
-// class Ais21 : public AisMsg {};
-// class Ais22 : public AisMsg {};
-// class Ais23 : public AisMsg {};
+// 'D' - Data link management - FIX: not yet coded
+class Ais20 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    int spare;
+    int offset_1;
+    int num_slots_1;
+    int timeout_1;
+    int incr_1;
+
+    int offset_2;
+    int num_slots_2;
+    int timeout_2;
+    int incr_2;
+    bool group_valid_2;
+
+    int offset_3;
+    int num_slots_3;
+    int timeout_3;
+    int incr_3;
+    bool group_valid_3;
+
+    int offset_4;
+    int num_slots_4;
+    int timeout_4;
+    int incr_4;
+    bool group_valid_4;
+    int spare2;
+
+    Ais20(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais20 const& msg);
+
+// 'E' - Aids to navigation report - FIX: not yet coded
+class Ais21 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+
+    int aton_type;
+    std::string name;
+    int position_accuracy;
+    float x,y;
+    int dim_a;
+    int dim_b;
+    int dim_c;
+    int dim_d;
+    int fix_type;
+    int timestamp;
+    bool off_pos;
+    int status;
+    bool raim;
+    bool virtual_aton;
+    bool assigned_mode;
+    int spare;
+    // Extended name goes on the end of name
+    int spare2;
+
+    Ais21(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais21 const& msg);
+
+// 'F' - Channel Management - FIX: not yet coded
+class Ais22 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+
+    int spare;
+    int chan_a;
+    int chan_b;
+    int txrx_mode;
+    bool power_low;
+
+    // if addressed false, then geographic position
+    bool pos_valid;
+    float x1,y1;
+    float x2,y2;
+
+    // if addressed is true
+    bool dest_valid;
+    int dest_mmsi_1;
+    int dest_mmsi_2;
+
+    int chan_a_bandwidth;
+    int chan_b_bandwidth;
+    int zone_size;
+
+    int spare2; // Lame that they make a huge spare here.  Bad bad bad
+
+    Ais22(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais22 const& msg);
+
+// 'G' - Group Assignment Command - FIX: not yet coded
+class Ais23 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    Ais23(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais23 const& msg);
+
 
 // Class B Static Data report
 class Ais24 : public AisMsg {
@@ -483,8 +593,28 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 
+// 'I' - Single slot binary message - addressed or broadcast - FIX: not yet coded
+class Ais25 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    Ais25(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais25 const& msg);
 
-#define CHECKPOINT std::cerr <<  __FILE__ << ":" << __LINE__ << " checkpoint" << std::endl
+// 'J' - Multi slot binary message with comm state - FIX: not yet coded
+class Ais26 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    Ais26(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais26 const& msg);
+
 
 //////////////////////////////////////////////////////////////////////
 // Support templates for decoding

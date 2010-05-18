@@ -1,0 +1,27 @@
+
+* Introduction
+
+None of the documents out in the wild really do a good job talking
+about the rights and wrongs of AIS message creation. This is my
+attempt to capture best practices. This is based on experience
+implementing pure python and pure C++ decoders of AIS, talking ESR
+through his writing of a pure python decoder and the GPSD C decoder.
+The real solution is to introduce a proper language for describing AIS
+messages, but the majority of the community does not see this as a
+requirement.
+
+Unsorted initial list:
+
+- All messages must be broadcast byte aligned, so make your message
+  clear how it byte aligns.  A variable length spare at the end is a
+  good way to do this.
+- Do not pad more than to then next byte on the end of your message.
+  There is no reason to fill out to the end of a slot.  Extra space
+  only increases the chance that VHF noise will corrupt the message.
+- Avoid defaults or common with lots of 1 bits in them.  This will
+  trigger bit stuffing more often and cause problems.
+- Make sure that values that are needed occur before they are used.
+  Otherwise you are forcing people code to require random access to
+  the bit stream.
+- Provide example messages, bit streams, and decoded values for people
+  to test with.

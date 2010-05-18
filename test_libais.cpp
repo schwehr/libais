@@ -171,24 +171,26 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     //////////////////////////////////////////////////////////////////////
 
     if (false) {
+        int i=0;
         // From GPSD - !AIVDM,1,1,,A,?5OP=l00052HD00,2*5B
         { 
-            Ais15 msg("?5OP=l00052HD00"); 
+            Ais15 msg("?5OP=l00052HD00");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
         }
         // !AIVDM,1,1,,B,?h3Owpi;EluT000,2*61,b003669703,1273708908
         { 
-            Ais15 msg("?h3Owpi;EluT000"); 
+            Ais15 msg("?h3Owpi;EluT000");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
         }
         //!AIVDM,1,1,,B,?h3Ovn1GP<K0<P@59a0,2*04,d-077,S1832,t004248.00,T48.85520485,r07RPAL1,1272415370
         { 
-            Ais15 msg("?h3Ovn1GP<K0<P@59a0"); 
+            Ais15 msg("?h3Ovn1GP<K0<P@59a0");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
         }
+    }
 
     //////////////////////////////////////////////////////////////////////
     // 18 - Class B
