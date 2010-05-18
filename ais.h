@@ -612,6 +612,13 @@ public:
     int message_id;
     int repeat_indicator;
     int mmsi;
+
+    bool addressed; // broadcast if false - destination indicator
+    bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
+
+    int dest_mmsi; // only valid if addressed
+    std::vector<unsigned char> payload; // If unstructured.  Yuck.
+
     Ais25(const char *nmea_payload);
     void print();
 };
@@ -623,6 +630,43 @@ public:
     int message_id;
     int repeat_indicator;
     int mmsi;
+
+    bool addressed; // broadcast if false - destination indicator
+    bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
+  
+    std::vector<unsigned char> payload; // If unstructured.  Yuck.
+
+    int commstate_flag;
+
+    // SOTDMA
+    int sync_state;
+    int slot_timeout;
+
+    // Based on slot_timeout which ones are valid
+    int received_stations;
+    bool received_stations_valid;
+    
+    int slot_number;
+    bool slot_number_valid;
+
+    bool utc_valid;  // Only means that the values are set.  Can still have 
+    int utc_hour;
+    int utc_min;
+    int utc_spare;
+
+    int slot_offset;
+    bool slot_offset_valid;
+
+    // ITDMA
+    int slot_increment;
+    bool slot_increment_valid;
+
+    int slots_to_allocate;      
+    bool slots_to_allocate_valid;
+
+    bool keep_flag;
+    bool keep_flag_valid;
+ 
     Ais26(const char *nmea_payload);
     void print();
 };

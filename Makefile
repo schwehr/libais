@@ -71,7 +71,7 @@ libais.a: ${OBJS}
 	ranlib $@
 
 clean:
-	-rm -rf *.o build *.a
+	-rm -rf *.o build *.a *.pyc
 
 #.cpp.o:
 #	${CXX} -c $< ${CXXFLAGS}

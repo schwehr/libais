@@ -40,4 +40,6 @@ Unsorted initial list:
   presentation interface do the unit conversions to what ever.
 - Just because it is done in ITU 1371 does not mean it is a good
   idea.  e.g. Message 22 and 23.
-
+- On messages 25 and 26, use an DAC/FI pair (aka app id).
+  Unstructured binary without a specification document is just plain
+  bad.  Are we supposed to use the MMSI to id the content?
