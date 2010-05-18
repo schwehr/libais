@@ -317,6 +317,50 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
 
+// @ - Assigned mode command
+class Ais16 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    int spare;
+    int dest_mmsi_a;
+    int offset_a;
+    int inc_a;
+    int dest_mmsi_b;
+    int offset_b;
+    int inc_b;
+    int spare2;
+
+    Ais16(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais16 const& msg);
+
+// A? - GNSS broacast
+class Ais17 : public AisMsg {
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+    int spare;
+    float x, y;
+    int spare2;
+
+    int msg_type;
+    int station_id;
+    int z_cnt;
+    int n;
+    int health;
+
+    ////// CONTINUE HERE FIX
+
+    Ais17(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais17 const& msg);
+
+
 // B - Class B position report
 class Ais18 : public AisMsg {
 public:
