@@ -220,7 +220,7 @@ class VesselNames:
     sql_update_tac  = 'UPDATE vessel_name SET type_and_cargo=%(type_and_cargo)s WHERE mmsi = %(mmsi)s;'
     sql_update_name = 'UPDATE vessel_name SET name = %(name)s WHERE mmsi = %(mmsi)s;'
 
-    def __init__(self, db_cx, dump_interval=60*60, verbose=False):
+    def __init__(self, db_cx, dump_interval=12*60*60, verbose=False):
         self.cx = db_cx
         self.cu = self.cx.cursor()
         self.vessels = {}
@@ -287,7 +287,7 @@ class VesselNames:
             else:
                 #print ('USELESS: mmsi =',mmsi, 'name:',name, 'type_and_cargo:',type_and_cargo)
                 pass
-            return # Drop these... useless
+            #return # Drop these... useless
 
         new_vessel = {'mmsi':mmsi,'name':name,'type_and_cargo':type_and_cargo}
 
@@ -352,7 +352,7 @@ class VesselNames:
         if mmsi < 200000000:
             # These vessels should be reported to the USCG
             if self.v: print ('USELESS: mmsi =',mmsi, 'name:',vessel_dict['name'])
-            return # Drop these... useless
+            #return # Drop these... useless
 
         name = vessel_dict['name'];
         type_and_cargo = vessel_dict['type_and_cargo']
@@ -598,7 +598,7 @@ def get_parser():
     parser.add_option('-I', '--in-host', type='string', default='localhost',
 			help='What host to read data from [default: %default]')
 
-    parser.add_option('-d','--database-name',default='test_ais'
+    parser.add_option('-d','--database-name',default='realtime_ais'
                       ,help='Name of database within the postgres server [default: %default]')
 
     parser.add_option('-D','--database-host',default='localhost'
