@@ -445,7 +445,7 @@ class PositionCache:
 #        track = ST_GeomFromText('%(track)s', 4326),
     def __init__(self, db_cx, min_dist_m=200, min_time_s=5 * 60,
                  #max_tail_count=10, max_tail_time_s = 15*60,
-                 max_tail_count=15, max_tail_time_s = 15*60,
+                 max_tail_count=45, max_tail_time_s = 20*60,
                  #max_age=60*60, # Drop the vessel after this time?
                  verbose=True):
         # 15 minutes is the recommended time?
@@ -711,7 +711,12 @@ class ListenThread(threading.Thread):
 
         connected = False
 
+        count = 0
+        queue_count = 0
         while self.running:
+            count += 1
+            if count % 100 == 0:
+                print ('outer_ListenThread:',count,datetime.datetime.now().strftime('%dT%H:%M:%S'), 'EST\t connected:',connected )
             time.sleep(.25)
             try:
                 soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -723,9 +728,10 @@ class ListenThread(threading.Thread):
                 connected = True
                 print ('CONNECT to ',self.host_name, self.port_num)
 
-            count = 0
             while self.running and connected:
                 count += 1
+                if count % 1000 == 0:
+                    print ('inner_ListenThread:',count,datetime.datetime.now().strftime('%dT%H:%M:%S'), 'EST\tconnected:',connected,'queue_count:',queue_count )
                 if count % 100 == 0:
                     #print ('sleeping')
                     time.sleep(0.001)
@@ -738,6 +744,7 @@ class ListenThread(threading.Thread):
                     break
                 try:
                     self.line_queue.put(data)
+                    queue_count += 1
                 except Queue.Full:
                     print ('QUEUE_FULL dropping data') # Not currently handled the normal queue way
 
@@ -765,7 +772,7 @@ class ProcessingThread(threading.Thread):
             try:
                 self.loop()
             except Exception, e:
-                print ('ERROR: Top level exception in ProcessingThread')
+                print ('\nERROR: Top level exception in ProcessingThread')
                 print (str(e))
                 traceback.print_exc(file=sys.stderr)
                 time.sleep(5) # Throttle back so not as to fill up the disk with error mesages
@@ -848,8 +855,8 @@ def run_network_app(host_name, port_num, vessel_names, pos_cache, line_queue, no
     count = 0
     while running:
         count += 1
-        if count % 10 == 0:
-            print ('main:',count)
+        if count % 20 == 0:
+            print ('main:',count,'\tnow:',datetime.datetime.now().strftime('%dT%H:%M:%S'), ' EST \tthreads:',  threading.active_count() )
             print ('\tline_q_size:',line_queue.qsize())
             print ('\tnorm_q_size:',norm_queue.qsize(),'\t\t%.1f (msgs/sec)' % norm_queue.get_rate())
             
