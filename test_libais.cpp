@@ -57,6 +57,21 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
 
     //////////////////////////////////////////////////////////////////////
+    // 8 - BBM
+    //////////////////////////////////////////////////////////////////////
+
+    if (true) {
+        int i=0;
+        // 1 11 601998 !AIVDM,1,1,4,B,800TgSP0BierU=KHP200OwwwwwwwwwwwwwwPIrOwwww?wowwwgwwwwwwwt0000,4*47,b003669954,1273276903
+        { 
+            Ais8 msg("800TgSP0BierU=KHP200OwwwwwwwwwwwwwwPIrOwwww?wowwwgwwwwwwwt0000"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+
+    }
+    //////////////////////////////////////////////////////////////////////
     // 9 - Search and rescue
     //////////////////////////////////////////////////////////////////////
 

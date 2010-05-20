@@ -189,6 +189,71 @@ public:
 
 std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 
+// 366 34 - Kurt older whale message 2008-2010
+
+// AIS Binary Broadcast message ... parent to many
+class Ais8 : public AisMsg {
+private:
+    static const int MAX_BITS = 1008;
+public:
+    int message_id;
+    int repeat_indicator;
+    int mmsi; // source ID
+    int spare;
+    int dac; // dac+fi = app id
+    int fi;
+    
+    std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
+    
+    Ais8(const char *nmea_payload);
+    bool decode_header8(const std::bitset<MAX_BITS> &bs);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
+
+// IMO met hydro
+class Ais8_1_11 : public Ais8 {
+public:
+    float x, y;
+    int day;
+    int hour;
+    int minute;
+    int ave_wind; // kts
+    int wind_gust; // kts
+    int wind_dir;
+    int wind_gust_dir;
+    float air_temp; // C
+    int rel_humid;
+    float dew_point;
+    float air_pres;
+    int air_pres_trend;
+    float horz_vis; // NM
+    float water_level; // m
+    int water_level_trend;
+    float surf_cur_speed;
+    int surf_cur_dir;
+    float cur_speed_2; // kts
+    int cur_dir_2;
+    int cur_depth_2; // m
+    float cur_speed_3; // kts
+    int cur_dir_3;
+    int cur_depth_3; // m
+    float wave_height; // ,
+    int wave_period;
+    int wave_dir;
+    float swell_height;
+    int swell_period;
+    int swell_dir;
+    int sea_state; // beaufort scale
+    int precip_type;
+    float salinity;
+    int ice; // yes/no/undef/unknown
+    int extended_water_level; //spare;  // OHMEX uses this for extra water level precision
+
+    Ais8_1_11(const char *nmea_payload);
+    void print();
+}
+
 
 class Ais9 : public AisMsg {
 public:
