@@ -349,9 +349,9 @@ class VesselNames:
 
         mmsi = vessel_dict['mmsi']
         #if mmsi in (0,1,1193046):
-        if mmsi < 200000000:
+        #if mmsi < 200000000:
             # These vessels should be reported to the USCG
-            if self.v: print ('USELESS: mmsi =',mmsi, 'name:',vessel_dict['name'])
+            #if self.v: print ('USELESS: mmsi =',mmsi, 'name:',vessel_dict['name'])
             #return # Drop these... useless
 
         name = vessel_dict['name'];
@@ -483,7 +483,22 @@ class PositionCache:
             return
 
         d = self.vessel_tails[mmsi]
-        d.appendleft(new_pos)
+
+        # rough geographical distance is good enough
+        # Only append if the point hasn't jumped too far -- aka multiple ships with the same mmsi
+        # This will not work in polar regions
+        if len(d) == 0:
+            d.appendleft(new_pos)
+        else:
+            geo_dist = dist(new_pos['x'],new_pos['y'], d[0]['x'], d[0]['y'])
+            if geo_dist < 0.5:
+                d.appendleft(new_pos)
+                #print ('.....keep:',geo_dist)
+            #else:
+                #print ('.....tail_test_DROP:',mmsi,geo_dist)
+                
+
+
         #print ('before:',self.vessel_tails[mmsi])
         while len(d) > self.max_tail_count:
             #print ('POPPING: too many',len(d),self.max_tail_count)
