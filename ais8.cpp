@@ -57,3 +57,22 @@ void Ais8::print() {
     std::cout << std::dec << std::nouppercase << std::endl;
     //std::cout << "test: " << 1 << " " << 255 << " " << std::hex << 255 << std::endl;
 }
+
+
+//////////////////////////////////////////////////////////////////////
+
+Ais8::Ais8(const char *nmea_payload) {
+    assert(nmea_payload);
+    init();
+    const int payload_len = strlen(nmea_payload)*6 - 46; // in bits w/o DAC/FI
+    std::cout << "payload_len: " << strlen(nmea_payload) << " " << strlen(nmea_payload)*6 << " " << payload_len << " " << payload_len / 8 << "\n";
+    if (payload_len < 0 or payload_len > 952) {
+        status = AIS_ERR_BAD_BIT_COUNT;
+        return;
+    }
+
+    std::bitset<MAX_BITS> bs;  // FIX: shouldn't this be a max of 1192?
+    status = aivdm_to_bits(bs, nmea_payload);
+    if (had_error()) return;  // checks status
+
+
