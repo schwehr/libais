@@ -12,9 +12,9 @@ requirement.
 
 Unsorted initial list:
 
-- All messages must be broadcast byte aligned, so make your message
-  clear how it byte aligns.  A variable length spare at the end is a
-  good way to do this.
+- All messages must have their overall content broadcast in byte
+  aligned message, so make your message clear how it byte aligns.  A
+  variable length spare at the end is a good way to do this.
 - Do not pad more than to then next byte on the end of your message.
   There is no reason to fill out to the end of a slot.  Extra space
   only increases the chance that VHF noise will corrupt the message.
@@ -24,7 +24,7 @@ Unsorted initial list:
   Otherwise you are forcing people code to require random access to
   the bit stream.
 - Provide example messages, bit streams, and decoded values for people
-  to test with.
+  to test against.
 - Provide an example database SQL CREATE command for your message.
   This will force you to think carefully about your data structures.
   If it has spatial geometry, include both a traditional SQL

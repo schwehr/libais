@@ -25,10 +25,8 @@ import datetime, time
 import math
 from collections import deque
 
-
 import psycopg2 # Bummer... not yet ready for python 3.1
 #import psycopg2.extras
-
 
 import sys, os
 import time
@@ -40,10 +38,7 @@ import traceback
 import Queue
 import select
 
-
-
 ENABLE_DB = True  # Set to false to run without db commits
-
 
 def print24(msg):
     if msg['part_num'] == 0:
@@ -507,9 +502,8 @@ class PositionCache:
 
         # now nuke messages that are too old
         now = msg['time_stamp']
-        # FIX: make sure there is at least 2 items in the tail
-        print 'BUG HERE!!!!'
-        while now - d[-1]['time_stamp'] > self.max_tail_time_s:
+
+        while len(d) > 1 and (now - d[-1]['time_stamp'] > self.max_tail_time_s):
             #print ('POPPING: too old',now - d[-1]['time_stamp'],  self.max_tail_time_s)
             d.pop()
 

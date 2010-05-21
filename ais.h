@@ -252,8 +252,8 @@ public:
 
     Ais8_1_11(const char *nmea_payload);
     void print();
-}
-
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
 
 class Ais9 : public AisMsg {
 public:
