@@ -507,6 +507,8 @@ class PositionCache:
 
         # now nuke messages that are too old
         now = msg['time_stamp']
+        # FIX: make sure there is at least 2 items in the tail
+        print 'BUG HERE!!!!'
         while now - d[-1]['time_stamp'] > self.max_tail_time_s:
             #print ('POPPING: too old',now - d[-1]['time_stamp'],  self.max_tail_time_s)
             d.pop()
