@@ -275,14 +275,14 @@ class VesselNames:
             if self.v: print ('EMPTY NAME:',mmsi)
             return
 
-        if mmsi < 200000000:
-            if name is not None:
-                #print ('USELESS: mmsi =',mmsi, 'name:',name)
-                pass
-            else:
-                #print ('USELESS: mmsi =',mmsi, 'name:',name, 'type_and_cargo:',type_and_cargo)
-                pass
-            #return # Drop these... useless
+        # if mmsi < 200000000:
+        #     if name is not None:
+        #         #print ('USELESS: mmsi =',mmsi, 'name:',name)
+        #         pass
+        #     else:
+        #         #print ('USELESS: mmsi =',mmsi, 'name:',name, 'type_and_cargo:',type_and_cargo)
+        #         pass
+        #     #return # Drop these... useless
 
         new_vessel = {'mmsi':mmsi,'name':name,'type_and_cargo':type_and_cargo}
 
@@ -525,10 +525,10 @@ class PositionCache:
 
 
         #print ('mmsi:',mmsi)
-        if mmsi < 200000000:
+        #if mmsi < 200000000:
             #bad_mmsi.add(mmsi)
             #print ('BAD_MMSI:',mmsi)
-            return
+        #    return
         if msg['x']>180: return # No GPS, so what can we do?
         if 'repeat_indicator' in msg:
             if 0 != msg['repeat_indicator']:
