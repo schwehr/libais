@@ -440,7 +440,7 @@ class PositionCache:
 #        track = ST_GeomFromText('%(track)s', 4326),
     def __init__(self, db_cx, min_dist_m=200, min_time_s=5 * 60,
                  #max_tail_count=10, max_tail_time_s = 15*60,
-                 max_tail_count=45, max_tail_time_s = 20*60,
+                 max_tail_count=100, max_tail_time_s = 30*60,
                  #max_age=60*60, # Drop the vessel after this time?
                  verbose=True):
         # 15 minutes is the recommended time?
@@ -489,8 +489,8 @@ class PositionCache:
             if geo_dist < 0.5:
                 d.appendleft(new_pos)
                 #print ('.....keep:',geo_dist)
-            #else:
-                #print ('.....tail_test_DROP:',mmsi,geo_dist)
+            else:
+                print ('.....tail_test_DROP:',mmsi,'%.3f deg away' % geo_dist)
                 
 
 
