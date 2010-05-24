@@ -43,3 +43,17 @@ Unsorted initial list:
 - On messages 25 and 26, use an DAC/FI pair (aka app id).
   Unstructured binary without a specification document is just plain
   bad.  Are we supposed to use the MMSI to id the content?
+- Always specify longitude (x) first and then specify latitude (y)
+- Specify the reference datum and only use WGS 84 SRID 4326
+- Be very careful with vertical reference datums.  It may not be
+  possible to convert if a different datum is needed on the ship.
+- Always specify dates and times in UTC
+- An integer scaled by a constant is not "floating point".  Reserve
+  that term for things like IEEE Floats
+- If you have a boolean value and want to specify that it can be
+  unknown, call out all the options.  For example "Ice Yes/No", say
+  0==No Ice, 1==Ice Present, 2==Reserved, 3==Information not
+  available.  However, this is a terrible example.  What does it mean
+  to have ice or no ice?  That is a huge question.
+
+

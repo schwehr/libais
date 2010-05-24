@@ -212,13 +212,20 @@ public:
 std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
 
 // IMO met hydro
-class Ais8_1_11 : public Ais8 {
+class Ais8_1_11 : public AisMsg {
 public:
-    float x, y;
+    int message_id;
+    int repeat_indicator;
+    int mmsi; // source ID
+    int spare;
+    int dac; // dac+fi = app id
+    int fi;
+
+    float x, y; // warning... appears in the bit stream as y,x
     int day;
     int hour;
     int minute;
-    int ave_wind; // kts
+    int wind_ave; // kts
     int wind_gust; // kts
     int wind_dir;
     int wind_gust_dir;
@@ -245,6 +252,7 @@ public:
     int swell_period;
     int swell_dir;
     int sea_state; // beaufort scale
+    float water_temp;
     int precip_type;
     float salinity;
     int ice; // yes/no/undef/unknown

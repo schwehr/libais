@@ -27,7 +27,16 @@ const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
     "AIS_ERR_MSG_TOO_LONG",
 };
 
-#ifndef NDEBUG
+
+std::bitset<6> nmea_ord[128];
+bool nmea_ord_initialized = false;
+
+//#ifndef NDEBUG
+#if 0
+#definte VERIFY_ERROR_MESSAGES
+#endif
+
+#ifdef VERIFY_ERROR_MESSAGES
 static void check_error_messages() {
     
     std::cout << "AIS_OK:                       " << AIS_OK << " " << AIS_STATUS_STRINGS[AIS_OK] << std::endl;
@@ -44,8 +53,6 @@ static void check_error_messages() {
 }
 #endif
 
-std::bitset<6> nmea_ord[128];
-bool nmea_ord_initialized = false;
 
 void build_nmea_lookup() {
     //std::cout << "building lut..." << std::endl;
@@ -62,7 +69,7 @@ void build_nmea_lookup() {
     }
     nmea_ord_initialized = true;
 
-#ifndef NDEBUG
+#ifdef VERIFY_ERROR_MESSAGES
     std::cout << "checking error messages..." << std::endl;
     check_error_messages();
 #endif

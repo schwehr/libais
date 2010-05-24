@@ -60,17 +60,31 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 8 - BBM
     //////////////////////////////////////////////////////////////////////
 
-    if (true) {
+    if (false) {
         int i=0;
-        // 1 11 601998 !AIVDM,1,1,4,B,800TgSP0BierU=KHP200OwwwwwwwwwwwwwwPIrOwwww?wowwwgwwwwwwwt0000,4*47,b003669954,1273276903
         { 
-            Ais8 msg("800TgSP0BierU=KHP200OwwwwwwwwwwwwwwPIrOwwww?wowwwgwwwwwwwt0000"); i++;
+            // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
+            Ais8 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P"); i++;
             if (!msg.had_error()) msg.print(); 
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
         }
 
     }
+
+    ///// 1 11 IMO Met Hydro
+    if (true) {
+        int i=0;
+        // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
+        { 
+            Ais8_1_11 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+
+    }
+
     //////////////////////////////////////////////////////////////////////
     // 9 - Search and rescue
     //////////////////////////////////////////////////////////////////////
