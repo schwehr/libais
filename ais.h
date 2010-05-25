@@ -39,6 +39,7 @@ class AisMsg {
 public:
     bool had_error() {return status != AIS_OK;}
     AIS_STATUS get_error() {return status;}
+    AisMsg() {init();}
 protected:
     AIS_STATUS status; // AIS_OK or error code
     void init() {status = AIS_OK;}
@@ -196,6 +197,8 @@ class Ais8 : public AisMsg {
 private:
     static const int MAX_BITS = 1008;
 public:
+    Ais8() {}
+
     int message_id;
     int repeat_indicator;
     int mmsi; // source ID
@@ -212,15 +215,16 @@ public:
 std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
 
 // IMO met hydro
-class Ais8_1_11 : public AisMsg {
+class Ais8_1_11 : public Ais8 {
 public:
+#if 0
     int message_id;
     int repeat_indicator;
     int mmsi; // source ID
     int spare;
     int dac; // dac+fi = app id
     int fi;
-
+#endif
     float x, y; // warning... appears in the bit stream as y,x
     int day;
     int hour;
