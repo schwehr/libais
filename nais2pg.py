@@ -479,20 +479,6 @@ class PositionCache:
 
         d = self.vessel_tails[mmsi]
 
-        # rough geographical distance is good enough
-        # Only append if the point hasn't jumped too far -- aka multiple ships with the same mmsi
-        # This will not work in polar regions
-        if len(d) == 0:
-            d.appendleft(new_pos)
-        else:
-            geo_dist = dist(new_pos['x'],new_pos['y'], d[0]['x'], d[0]['y'])
-            if geo_dist < 0.5:
-                d.appendleft(new_pos)
-                #print ('.....keep:',geo_dist)
-            else:
-                print ('.....tail_test_DROP:',mmsi,'%.3f deg away' % geo_dist)
-                
-
 
         #print ('before:',self.vessel_tails[mmsi])
         while len(d) > self.max_tail_count:
@@ -506,6 +492,21 @@ class PositionCache:
         while len(d) > 1 and (now - d[-1]['time_stamp'] > self.max_tail_time_s):
             #print ('POPPING: too old',now - d[-1]['time_stamp'],  self.max_tail_time_s)
             d.pop()
+
+
+        # rough geographical distance is good enough
+        # Only append if the point hasn't jumped too far -- aka multiple ships with the same mmsi
+        # This will not work in polar regions
+        if len(d) == 0:
+            d.appendleft(new_pos)
+        else:
+            geo_dist = dist(new_pos['x'],new_pos['y'], d[0]['x'], d[0]['y'])
+            if geo_dist < 0.5:
+                d.appendleft(new_pos)
+                #print ('.....keep:',geo_dist)
+            else:
+                print ('.....tail_test_DROP:',mmsi,'%.3f deg away' % geo_dist)
+                
 
         if len(d)<2: return # Too short to make a line
         # Make a WKT line and push it into the db

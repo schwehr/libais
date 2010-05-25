@@ -41,10 +41,20 @@ default:
 	@echo
 	@echo "  python   - build the python module"
 	@echo "  libais.a - build a static archive library"
+	@echo "  test_libais - Simple C++ library test"
+	@echo "  python2 - build the python2.6 module"
+	@echo "  python3 - build the python3.1 module"
+	@echo "  nais2pg - Run the python 2.6 nais2pg.py program"
 	@echo 
 	@echo "Read the README for more information"
 
-all: python libais.a
+all: python2 python3 libais.a test_libais
+	./test_libais
+
+nais2pg:
+	make clean
+	make python2
+	PYTHONPATH=build/lib.macosx-10.6-i386-2.6 ./nais2pg.py -v -I datalogger1.ccom.nh
 
 DIST:=libais-${shell cat VERSION}
 TAR:=${DIST}.tar
@@ -73,7 +83,7 @@ libais.a: ${OBJS}
 	ranlib $@
 
 clean:
-	-rm -rf *.o build *.a *.pyc
+	-rm -rf *.o build *.a *.pyc test_libais
 
 #.cpp.o:
 #	${CXX} -c $< ${CXXFLAGS}
