@@ -1,0 +1,2050 @@
+= AIVDM/AIVDO protocol decoding =
+Eric S. Raymond <esr@thyrsus.com>
+v1.24, May 2010
+
+This document is mastered in asciidoc format.  If you are reading it in HTML,
+you can find the original at http://gpsd.berlios.de/AIVDM.txt[]
+
+== Introduction ==
+
+This is a description of how to decode AIVDM/AIVDO sentences.  It
+collects and integrates information from publicly available sources
+and is intended to assist developers of open-source software for
+interpreting these messages.
+
+AIVDM/AIVDO sentences are emitted by receivers for AIS, the marine
+Automatic Identification System. AIS transmitters are fitted to
+vessels, navigation markers, and ccertain types of shore station. They
+periodically squawk their position and course (if applicable), using
+TDMA (Time Division Multiple Access) technology similar to the way
+cellphones do to avoid mutual interference. AIS receivers make this data
+available for navigation, anti-collision systems, and other uses.
+
+The International Maritime Organization's (IMO) International
+Convention for the Safety of Life at Sea (SOLAS) reqires operating AIS
+transmitters on all international cargo vessels of more than 300 tons
+displacement, all cargo vessels of more than 500 tons displacement,
+and all passenger vessels; see <<SOLAS>> for details.  Individual
+maritime nations may have stricter and more detailed rules: for those
+obtaining in U.S. waters, see <<US-REQUIREMENTS>>.
+
+AIS receivers report ASCII data packets over serial or USB lines,
+using the NMEA 0183 data format and physical network standards. AIS
+packets have the introducer "!AIVDM" or "!AIVDO"; AIVDM packets are
+reports from other ships and AIVDO packets are reports from your own
+ship.
+
+A lengthy description of AIS, focusing on the goals and history of the
+system, but not describing the data protocols in any detail, can be
+found at <<AIS>>.
+
+== Standards ==
+
+Multiple standards bear on the AIVDM/AIVDO format.  This document
+exists because assembling them into a complete picture is both
+technically difficult and impeded by legal barriers.
+
+ITU Recommendation M.1371, "Technical Characteristics for a Universal
+Shipborne Automatic Identification System Using Time Division Multiple
+Access" <<ITU1371>>, issued in 2001, describes the bit-level format of
+AIS radio messages. It is proprietary, expensive, and surrounded by
+attack lawyers.  I have not looked at it.
+
+ITU-R M.1371 is expanded and clarified by "IALA Technical
+Clarifications on Recommendation ITU-R M.1371-1" <<IALA>>, which
+is freely available.
+
+There have been two minor revisions of ITU-R M.1371 since it was
+originally issued.  These add interpretations to packet bitfields that
+were previously marked "spare" and "regional reserved".  I have not
+seen these either, but have been passed information on them.
+
+The ASCII format for AIVDM/AIVDO representations of AIS radio messages
+seems to have been set by IEC-PAS 61162-100, "Maritime navigation and
+radiocommunication equipment and systems" <<IEC-PAS>>. It is
+proprietary and I have not looked at it.  Various public sources
+indicate that it has been "harmonized" with some version of NMEA 0183
+<<NMEA>>, which I also have not looked at because it too is
+proprietary and expensive, and surrounded by even more rapacious
+attack lawyers.
+
+== Information Sources ==
+
+Together, the the IALA Technical Clarifications at <<IALA>> and the
+Coast Guard's AIS pages at <<NAVCEN>> describe AIS message payloads
+almost completely.  The detail information on payload formats in this
+document is mostly derived from these.
+
+Kurt Schwehr is a research scientist at the Center for Coastal and
+Ocean Mapping at the University of New Hamphire. Much of his research
+involves AIS.  His work blog at <<Schwehr>> contains sample messages
+and descriptions of AIS operation in the wild that shed light on
+various obscure corners of the specification.  He has explained the
+otherwise undocumented Repeat Indicator field and USCG extended AIVDM
+to me by email. He also communicated some critical information from
+<<IEC-PAS>>, and supplied information about new messages and fields in
+ITU-1371-3.
+
+Descriptions of messages 25 and 26 are based on AIS transceiver vendor
+documentation forwarded to me by a source wishing to remain anonymous.
+
+Should you set out to write a decoder using this document, you are
+likely to find that one of your challenges is finding enough AIS
+packet data to make an effective regression test -- especially if you
+live out of line of sight of any ship traffic and would get nothing
+from running an AIS receiver.  Fortunately, various AIS sites offer
+live feeds over the Internet that aggregate AIS streams from all over
+the world. Some charge subscriptions; others offer time-delayed access
+for free and charge for a real-time feed. Still others are pool sites;
+you join by contributing your feed and receive all feeds.
+
+AIS Hub (<<<AISHUB>>>) is a free, public AIS feed pool. It provides
+exchange of AIS data in raw NMEA format; all AISHub members share
+their own received AIS data and receive the merged feed from all other
+participating parties.  It is open-source friendly, offering a Linux
+port in source of its software for collecting and forwarding AIS
+data. Peter Stoyanov and the other AIS Hub principals have generously
+donated a live feed to the GPSD project despite the fact that I live
+60 miles inland and cannot send them anything interesting.
+
+Some of what this document explains about the quirks of real-world
+encoders comes from examples provided by Kurt Schwehr. Other such
+information, especially for the less common sentences, comes from
+inspection of sentences forwarded to me from AIS Hub by various
+interested parties, and more recently from AIS Hub itself.
+
+== Improving This Document ==
+
+To avoid copyright difficulties, I rely only on freely redistributable
+public documents and paraphrased reports from people who have seen the
+relevant proprietary standards.  If you are such a person, please help
+by reporting the following to be included in future versions of this
+document:
+
+* Sample sentences of types 16-17, 22-23, and 25-26 together with
+  decoded dumps of the field values.  Please note that sample
+  sentences not accompanied by field dumps are *not* useful; I
+  can get plenty of those.
+
+== Open-Source Implementations ==
+
+The http://gpsd.berlios.de/[GPSD project] ships an AIVDM/AIVDO
+sentence decoder as part of the daemon. This document was developed to
+be the specification for it, and it will decode all sentence type
+described herein.
+
+The source-code repository of the GPSD project holds a conforming
+standalone Python decoder, ais.py, that is not included in shipped
+releases. It may be useful for developers working in that language.
+
+<<Schwehr>> includes links to a collection of Python scripts for
+decoding and analyzing AIVDM sentences.  Kurt Schwehr warns that this
+is research code rather than a production tool.
+
+There is a http://gnuais.sourceforge.net/[GNU AIS] project at
+SourceForge.  It seems intended primarily to work directly
+with AIS radios.
+
+There's a http://rl.se/aivdm[web form] that does sentence decoding.
+It only understands message types 1-4.
+
+== AIVDM/AIVDO Sentence Layer ==
+
+AIVDM/AIVDO is a two-layer protocol.  The outer layer is a variant of
+NMEA 0183, the ancient standard for data interchange in marine
+navigation systems; NMEA 0183 is described at <<NMEA>>.
+
+Here is a typical AIVDM data packet:
+
+--------------------------------------------------------------------
+!AIVDM,1,1,,B,177KQJ5000G?tO`K>RA1wUbN0TKH,0*5C
+--------------------------------------------------------------------
+
+And here is what the fields mean:
+
+Field 1, !AIVDM, identifies this as an AIVDM packet.
+
+Field 2 (1 in this example) is the count of fragments in the currently
+accumulating message.  The payload size of each sentence is limited by
+NMEA 0183's 82-character maximum, so it is sometimes required to split
+a payload over several fragment sentences.
+
+Field 3 (1 in this example) is the fragment number of this
+sentence. It will be one-based.  A sentence with a fragment count of
+1 and a fragment number of 1 is complete in itself.
+
+Field 4 (empty in this example) is a sequential message ID for
+multi-sentence messages.
+
+Field 5 (B in this example) is a radio channel code. AIS uses the high
+side of the duplex from two VHF radio channels: AIS Channel A is
+161.975Mhz (87B); AIS Channel B is 162.025Mhz (88B).
+
+Field 6 (177KQJ5000G?tO`K>RA1wUbN0TKH in this example) is the data
+payload. We'll describe how to decode this in later sections.
+
+Field 7 (0) is the number of fill bits requires to pad the data
+payload to a 6 bit boundary, ranging from 0 to 5.  Equivalently,
+subtracting 5 from this tells how many least significant bits of the
+last 6-bit nibble in the data payload should be ignored. Note that
+this pad byte has a tricky interaction with the <<<ITU-1371>>>
+requirement for byte alignment in over-the-air AIS messages; see the
+detailed discussion of message lengths and alignment in a later
+section.
+
+The \*-separated suffix (\*5C) is the NMEA 0183 data-integrity checksum
+for the sentence, preceded by "*".  It is computed on the entire
+sentence including the AIVDM tag but excluding the leading "!".
+
+For comparison, here is an example of a multifragment sentence with a
+nonempty message ID field:
+
+--------------------------------------------------------------------
+!AIVDM,2,1,3,B,55P5TL01VIaAL@7WKO@mBplU@<PDhh000000001S;AJ::4A80?4i@E53,0*3E
+!AIVDM,2,2,3,B,1@0000000000000,2*55
+--------------------------------------------------------------------
+
+== AIVDM/AIVDO Payload Armoring ==
+
+The data payload is an ASCII-encoded bit vector.  Each character
+represents six bits of data.  To recover the six bits, subtract 48
+from the ASCII character value; if the result is greater than 40
+subtract 8. According to <<IEC-PAS>>, the valid ASCII characters for
+this encoding begin with "0" (64) and end with "w" (87); however, the
+intermediate range "X" (58) to "\_" (95) is not used.  
+
+.ASCII payload armoring
+[width="25%",frame="topbot",options="header"]
+|======================================
+| Char    |ASCII   |Decimal   |Bits
+|"0"      | 48     | 0        |000000
+|"1"      | 49     | 1        |000001
+|"2"      | 50     | 2        |000010
+|"3"      | 51     | 3        |000011
+|"4"      | 52     | 4        |000100
+|"5"      | 53     | 5        |000101
+|"6"      | 54     | 6        |000110
+|"7"      | 55     | 7        |000111
+|"8"      | 56     | 8        |001000
+|"9"      | 57     | 9        |001001
+|":"      | 58     |10        |001010
+|";"      | 59     |11        |001011
+|"<"      | 60     |12        |001100
+|"="      | 61     |13        |001101
+|">"      | 62     |14        |001110
+|"?"      | 63     |15        |001111
+|"@"      | 64     |16        |010000
+|"A"      | 65     |17        |010001
+|"B"      | 66     |18        |010010
+|"C"      | 67     |19        |010011
+|"D"      | 68     |20        |010100
+|"E"      | 69     |21        |010101
+|"F"      | 70     |22        |010110
+|"G"      | 71     |23        |010111
+|"H"      | 72     |24        |011000
+|"I"      | 73     |25        |011001
+|"J"      | 74     |26        |011010
+|"K"      | 75     |27        |011011
+|"L"      | 76     |28        |011100
+|"M"      | 77     |29        |011101
+|"N"      | 78     |30        |011110
+|"O"      | 79     |31        |011111
+|"P"      | 80     |32        |100000
+|"Q"      | 81     |33        |100001
+|"R"      | 82     |34        |100010
+|"S"      | 83     |35        |100011
+|"T"      | 84     |36        |100100
+|"U"      | 85     |37        |100101
+|"V"      | 86     |38        |100110
+|"W"      | 87     |39        |100111
+|"`"      | 96     |40        |101000
+|"a"      | 97     |41        |101001
+|"b"      | 98     |42        |101010
+|"c"      | 99     |43        |101011
+|"d"      |100     |44        |101100
+|"e"      |101     |45        |101101
+|"f"      |102     |46        |101110
+|"g"      |103     |47        |101111
+|"h"      |104     |48        |110000
+|"i"      |105     |49        |110001
+|"j"      |106     |50        |110010
+|"k"      |107     |51        |110011
+|"l"      |108     |52        |110100
+|"m"      |109     |53        |110101
+|"n"      |110     |54        |110110
+|"o"      |111     |55        |110111
+|"p"      |112     |56        |111000
+|"q"      |113     |57        |111001
+|"r"      |114     |58        |111010
+|"s"      |115     |59        |111011
+|"t"      |116     |60        |111100
+|"u"      |117     |61        |111101
+|"v"      |118     |62        |111110
+|"w"      |119     |63        |111111
+|======================================
+
+Concatenate all six-bit quantities found in the payload, MSB first.
+This is the binary payload of the sentence.  
+
+== AIS Payload Data Types ==
+
+Data in AIS message payloads (what you get after undoing the AIVDM/AIVDO
+armoring) is encoded as bitfields in the sentence.  Bitfields may be
+interpreted in one of the following ways:
+
+- Signed or unsigned integer
+- Float (scaled from signed integer)
+- Flag or boolean
+- Index into a controlled vocabulary
+- Reserved bits
+- Spare bits
+- Strings
+
+Numeric bitfields are interpreted as big-endian twos-complement
+integers; when signed, the sign bit is the highest.  
+
+Float fields usually have an associated divisor which should be applied
+to convert to the correct units. In one case, the ROT field in message
+types 1-3, the scaling operation involves a more laborate formula.
+
+Flags are encoded as 1 for true/yes/on, 0 for false/no/off.
+
+Indices into controlled vocabularies are numeric bitfields which
+must be interpreted using per-field string lists specified in the
+standards.
+
+Spare fields generally seem to have been inserted in order to put
+certain field starts on 8-bit boundaries, and should be ignored.  Decoders
+should not, however, assume that spare fields will be all zeroes.
+
+Reserved fields should not be ignored, as they may be assigned for
+extension data in minor revisions of the AIS standard; it is noted in
+the message descriptions where this has already occurred.  It is good
+practice for a decoder to make reserved fields available to client
+applications as uninterpreted bitfields.
+
+Character-string fields within AIS messages are encoded in a
+special way, referred to as "six-bit" in the tables below. Each
+six-bit nibble maps to an ASCII character.  Nibbles 0-31 map to the
+characters "@" ( ASCII 64) through "\_" (ASCII 95) respectively;
+nibbles 32-63 map to characters " " (ASCII 32) though "?"  (ASCII
+63). Lowercase ASCII letters, the backtick, right and left curly
+brackets, pipe bar, tilde and DEL cannot be encoded.
+
+.Sixbit ASCII
+[width="25%",frame="topbot"]
+|==========================================================================================
+|000000 | 0  |"@"    |010000 |16  |"P"            |100000 |32  |" "     |110000 |48  |"0"
+|000001 | 1  |"A"    |010001 |17  |"Q"            |100001 |33  |"!"     |110001 |49  |"1"
+|000010 | 2  |"B"    |010010 |18  |"R"            |100010 |34  |"""     |110010 |50  |"2"
+|000011 | 3  |"C"    |010011 |19  |"S"            |100011 |35  |"\#"    |110011 |51  |"3"
+|000100 | 4  |"D"    |010100 |20  |"T"            |100100 |36  |"$"     |110100 |52  |"4"
+|000101 | 5  |"E"    |010101 |21  |"U"            |100101 |37  |"%"     |110101 |53  |"5"
+|000110 | 6  |"F"    |010110 |22  |"V"            |100110 |38  |"&"     |110110 |54  |"6"
+|000111 | 7  |"G"    |010111 |23  |"W"            |100111 |39  |"\'"    |110111 |55  |"7"
+|001000 | 8  |"H"    |011000 |24  |"X"            |101000 |40  |"("     |111000 |56  |"8"
+|001001 | 9  |"I"    |011001 |25  |"Y"            |101001 |41  |")"     |111001 |56  |"9"
+|001010 |10  |"J"    |011010 |26  |"Z"            |101010 |42  |"\*"    |111010 |58  |":"
+|001011 |11  |"K"    |011011 |27  |"["            |101011 |43  |"\+"    |111011 |59  |";"
+|001100 |12  |"L"    |011100 |28  |"{backslash}"  |101100 |44  |","     |111100 |60  |"<"
+|001101 |13  |"M"    |011101 |29  |"]"            |101101 |45  |"-"     |111101 |61  |"="
+|001110 |14  |"N"    |011110 |30  |"\^"           |101110 |46  |"."     |111110 |62  |">"
+|001111 |15  |"O"    |011111 |31  |"\_"           |101111 |47  |"/"     |111111 |63  |"?"
+|==========================================================================================
+
+According to the standard, trailing unused characters in six-bit
+fields will be represented by "@" (six-bit zero); however, real-world
+encoders are not careful about this and often have nonzero garbage
+after the "@". The terminating "@" should not be considered part of
+the text, and any non-"@" characters after it should be discarded.  It
+is also common to space-fill short fields such as ship and station
+name, so a decoder should strip trailing spaces after stripping
+at-signs and the garbage after them.
+
+Trailing string fields are often specified as "up to" a certain number of bits.
+Decoders should be prepared to handle any field length up to that
+number, including zero.
+
+== AIS Payload Interpretation ==
+
+Note that many sources use 1-origin numbering for the bits.  We'll
+use 0-origin in this document.
+
+The message type names are somewhat variable across different public
+sources. Whatever ITU-1371 says should be considered authoritative,
+but the variations I have seen appear to have no practical consequences.
+
+The first 6 bits of the payload (0-5) are the message type.  Message
+types are as follows:
+
+.Message types
+[width="50%",frame="topbot"]
+|======================================================
+|01 |Position Report Class A
+|02 |Position Report Class A (Assigned schedule)
+|03 |Position Report Class A (Response to interrogation)
+|04 |Base Station Report
+|05 |Ship and Voyage data
+|06 |Addressed Binary Message
+|07 |Binary Acknowledge
+|08 |Binary Broadcast Message
+|09 |Standard SAR Aircraft Position Report
+|10 |UTC and Date Inquiry
+|11 |UTC and Date Response
+|12 |Addressed Safety Related Message
+|13 |Safety Related Acknowledge
+|14 |Safety Related Broadcast Message
+|15 |Interrogation
+|16 |Assigned Mode Command
+|17 |GNSS Binary Broadcast Message
+|18 |Standard Class B CS Position Report
+|19 |Extended Class B Equipment Position Report
+|20 |Data Link Management
+|21 |Aid-to-Navigation Report
+|22 |Channel Management
+|23 |Group Assignment Command
+|24 |Class B CS Static Data Report
+|25 |Binary Message, Single Slot
+|26 |Binary Message, Multiple Slot
+|======================================================
+
+In normal operation, an AIS transceiver will broadcast a position report
+(type 1, 2, or 3) every 2 to 10 seconds depending on the vessel's
+speed while underway, and every 3 minutes while the vessel is at
+anchor and stationary. It will send a type 5 identification every 6
+minutes. (More detail is at <<IALA>>, part 2.3)
+
+Class 6 is used for unencrypted structured extension messages by local
+authorities such as the St. Lawrence Seaway and the U.S Coast Guard's 
+PAWSS.
+
+Class 8 is in common use for private encrypted messages, such as
+location transmission in military exercises. It is also used for
+unencrypted structured extension messages by local authorities 
+such as the St. Lawrence Seaway and PAWSS.
+
+Classes 12 and 14 are used for safety-related text messaging.
+
+In practice, message types other than 1, 3, 4, 5, 18, and 24 are
+unusual or rare; many AIS transmitters never emit them.  As of
+November 2009, an overnight capture of a full feed from <<<AISHUB>>>
+shows no type 25 or type 26 messages at all.
+
+An MMSI is a Mobile Marine Service Identifier, a unique 9-digit ID 
+for the ship's radio(s).  The first three digits convey information
+about the country in which the ID was issued <<ITU-MID>>.
+
+Detailed descriptions of message types 1-24 follow. Message types 1-22
+are derived from <<IALA>>. Message type 23 was decribed to me by Mike
+Greene based on <<IEC62287>>.  Message type 24 was described to me by
+<<Schwehr>>, whose Python toolkit decodes it. Message types 25-26 are
+reported by <<Schwehr>>, who observes they were added in Version 3 of
+<<ITU1371>>.
+
+The "Member" column in these tables is not derived from any of the ITU
+standards or amendments.  I have invented it in order to be able to
+describe a lossless textual encoding of AIS sentences in JSON.  These
+names are also chosen for suitability as structure/object member names
+in computer languages, so that application programming interfaces
+across different languages can have a common and readily intelligible
+set to use.
+
+The field breakdowns in this document have been checked against live
+decoded data rendered by known-good implementations for message types
+1-15, 18-21, and 24.  Described but unchecked are 16-17, 22-23, and 
+25-26.
+
+Bit lengths and length ranges are given because decoders should check
+them against the message type. Messages with correct checksums but the
+wrong payload length for their type occur with about 0.3% frequency on
+AISHub; if you don't reject these, your clients will see spurious
+zeros or garbage.
+
+=== Types 1, 2 and 3: Position Report Class A ===
+
+Type 1, 2 and 3 messages share a common reporting structure for
+navigational information; we'll call it the Common Navigation Block
+(CNB). This is the information most likely to be of interest for
+decoding software. Total of 168 bits, occupying one AIVDM sentence.
+
+.Common Navigation Block
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description              |Member   |Units
+|0-5     | 6  |Message Type             |type     |Unsigned integer: 1-3
+|6-7     | 2  |Repeat Indicator         |repeat   |See below...
+|8-37    |30  |MMSI                     |mmsi     |Unsigned integer: 9 digits
+|38-41   | 4  |Navigation Status        |status   |See table below
+|42-49   | 8  |Rate of Turn (ROT)       |turn     |Signed integer: see below
+|50-59   |10  |Speed Over Ground (SOG)  |speed    |Unsigned integer: see below
+|60-60   | 1  |Position Accuracy        |accuracy |See below
+|61-88   |28  |Longitude                |lon      |Minutes/10000 (see below)
+|89-115  |27  |Latitude                 |lat      |Minutes/10000 (see below)
+|116-127 |12  |Course Over Ground (COG) |course   |Relative to true north,
+|        |    |                         |         |to 0.1 degree precision
+|128-136 | 9  |True Heading (HDG)       |heading  |0 to 359 degrees,
+|        |    |                         |         |511 = not available
+|137-142 | 6  |Time Stamp               |second   |Second of UTC timestamp
+|143-144 | 2  |Maneuver Indicator       |maneuver |See below
+|145-147 | 3  |Spare                    |         |Not used
+|148-148 | 1  |RAIM flag                |raim     |See below
+|149-167 |19  |Radio status             |radio    |See below
+|==============================================================================
+
+The Repeat Indicator is a directive to an AIS transceiver that this
+message should be rebroadcast.  This was intended as a way of getting
+AIS messages around hills and other obstructions in coastal waters,
+but is little used as base station coverage is more effective.  It is
+intended that the bit be incremented on each retransmission, to a
+maximum of three hops. A value of 3 indicates "Do not repeat".
+
+.Navigation status codes
+[width="50%",frame="topbot"]
+|=================================================================
+|0 | Under way using engine
+|1 | At anchor
+|2 | Not under command
+|3 | Restricted manoeuverability
+|4 | Constrained by her draught
+|5 | Moored
+|6 | Aground
+|7 | Engaged in Fishing
+|8 | Under way sailing
+|9 | Reserved for future amendment of Navigational Status for HSC
+|10| Reserved for future amendment of Navigational Status for WIG
+|11| Reserved for future use
+|12| Reserved for future use
+|13| Reserved for future use
+|14| Reserved for future use
+|15| Not defined (default)
+|=================================================================
+
+Turn rate is encoded as follows:
+
+* 0 = not turning
+* 1...126 = turning right at up to 708 degrees per minute or higher
+* 1...-126 = turning left at up to 708 degrees per minute or higher
+* 127 = turning right at more than 5deg/30s (No TI available)
+* -127 = turning left at more than 5deg/30s (No TI available)
+* 128 (80 hex) indicates no turn information available (default)
+
+Values between 0 and 708 degrees/min coded by ROT~AIS~=4.733 *
+SQRT(ROT~sensor~) degrees/min where ROT~sensor~ is the Rate of Turn as
+input by an external Rate of Turn Indicator. ROT~AIS~ is rounded to
+the nearest integer value.  Thus, to decode the field value, square it
+and divide by 4.733. Sign of the field value should be preserved when
+squaring it, otherwise the left/right indication will be lost.
+
+Speed over ground is in 0.1-knot resolution from 0 to 102 knots.
+value 1023 indicates speed is not available, value 1022 indicates
+102.2 knots or higher.
+
+Position accuracy flag indicates the accuracy of the fix.  A value of
+1 indicates a DGPS-quality fix with an accuracy of < 10ms.  0, the
+default, indicates an unaugmented GNSS fix with accuracy > 10m.
+
+Longitude is given in in 1/10000 min; divide by 600000.0 to obtain
+degrees. Values up to plus or minus 180 degrees, East = positive, West
+\= negative.  A value of 181 degrees (0x6791AC0 hex) indicates that
+longitude is not available and is the default.
+
+Latitude is given in in 1/10000 min; divide by 600000.0 to obtain
+degrees. Values up to plus or minus 90 degrees, North = positive,
+South = negative. A value of 91 degrees (0x3412140 hex) indicates
+latitude is not available and is the default.
+
+Course over ground will be 3600 (0xE10) if that data is not available.
+
+Seconds in UTC timestamp should be 0-59, except for these special values:
+
+* 60 if time stamp is not available (default)
+* 61 if positioning system is in manual input mode
+* 62 if Electronic Position Fixing System operates in estimated (dead
+     reckoning) mode,
+* 63 if the positioning system is inoperative.
+
+The Regional Reserved field is intended for use by local maritime
+authorities.  It is not known to be in any actual use up to 2009.
+
+The Maneuver Indicator (143-144) may have these values:
+
+* 0 = Not available (default)
+* 1 = No special maneuver
+* 2 = Special maneuver (such as regional passing arrangement)
+
+The interpretation of bits 143-147 has been a bit unstable. In
+<<IALA>>. and therefore in the original <<ITU1371>>, they were 
+described like this:
+
+[width="50%",frame="topbot",options="header"]
+|=================================
+|Field   |Len |Description
+|143-145 | 3  |Regional Reserved
+|146-147 | 2  |Spare
+|=================================
+
+The interpretation of 143-144 as a special maneuver field is new in
+revision 3 of <<ITU1371>>.
+
+The RAIM flag indicates whether Receiver Autonomous Integrity
+Monitoring is being used to check the performance of the EPFD.
+0 = RAIM not in use(default), 1 = RAIM in use.  See <<RAIM>> for
+a detailed description of this flag.
+
+Bits 149-167 are diagnostic information for the radio system.  Consult
+<<IALA>> for detailed description of the latter.
+
+=== Type 4: Base Station Report ===
+
+This message is to be used by fixed-location base stations to
+periodically report a position and time reference. Total of 168 bits, 
+occupying one AIVDM sentence.
+
+The standard uses "EPFD" to designate any Electronic Position Fixing Device.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len  |Description      |Member   |Units
+|0-5     |  6  |Message Type     |type     |Unsigned integer: 4
+|6-7     |  2  |Repeat Indicator |repeat   |Unknown
+|8-37    | 30  |MMSI             |mmsi     |Unsigned integer: 9 digits
+|38-51   | 14  |Year             |year     |UTC, 1-999, 0 = N/A (default)
+|52-55   |  4  |Month            |month    |1-12; 0 = N/A (default)
+|56-60   |  5  |Day              |day      |1-31; 0 = N/A (default)
+|61-65   |  5  |Hour             |hour     |0-23; 24 = N/A (default)
+|66-71   |  6  |Minute           |minute   |0-59; 60 = N/A (default)
+|72-77   |  6  |Second           |second   |0-59; 60 = N/A (default)
+|78-78   |  1  |Fix quality      |accuracy |As in Common Navigation Block
+|79-106  | 28  |Longitude        |lon      |As in Common Navigation Block
+|107-133 | 27  |Latitude         |lat      |As in Common Navigation Block
+|134-137 |  4  |Type of EPFD     |epfd     |See below
+|138-147 | 10  |Spare            |         |Not used
+|148-148 |  1  |RAIM flag        |raim     |As for common navigation block
+|149-167 | 19  |SOTDMA state     |radio    |As in same bits for Type 1
+|==============================================================================
+
+.EPFD fix type codes
+[width="50%",frame="topbot",options="header"]
+|===================================
+|Code |Position Fix Type
+|0    |Undefined (default)
+|1    |GPS
+|2    |GLONASS
+|3    |Combined GPS/GLONASS
+|4    |Loran-C
+|5    |Chayka
+|6    |Integrated navigation system
+|7    |Surveyed
+|8    |Galileo
+|===================================
+
+Note: though values 9-15 are marked "not used" in <<IALA>>, the EPFD
+type value 15 (all field bits 1) is not uncommon in the wild; it
+appears some receivers emit it as the Undefined value. Decoders should
+be prepared to accept this.
+
+=== Type 5: Ship static and voyage related data ===
+
+Message has a total of 424 bits, occupying two AIVDM sentences.
+
+In practice, the information in these fields (especially ETA and
+destination) is not reliable, as it has to be hand-updated by
+humans rather than gathered automatically from sensors.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description            |Member       |Encoding
+|0-5     |  6 |Message Type           |type         |Unsigned integer: 5
+|6-7     |  2 |Repeat Indicator       |repeat       |Message repeat count
+|8-37    | 30 |MMSI                   |mmsi         |Unsigned integer: 9 digits
+|38-39   |  2 |AIS Version            |ais_version  |0=<<ITU1371>>,
+|        |    |                       |             |1-3 = future editions
+|40-69   | 30 |IMO Number             |imo          |Unsigned IMO ship ID number
+|70-111  | 42 |Call Sign              |callsign     |7 six-bit characters
+|112-231 |120 |Vessel Name            |shipname     |20 six-bit characters
+|232-239 |  8 |Ship Type              |shiptype     |See table below
+|240-248 |  9 |Dimension to Bow       |to_bow       |Unsigned integer: Meters
+|249-257 |  9 |Dimension to Stern     |to_stern     |Unsigned integer: Meters
+|258-263 |  6 |Dimension to Port      |to_port      |Unsigned integer: Meters
+|264-269 |  6 |Dimension to Starboard |to_starboard |Unsigned integer: Meters
+|270-273 |  4 |Position Fix Type      |epfd         |As in Type 4 EPSD codes
+|274-277 |  4 |ETA month              |month        |1-12, 0=N/A (default)
+|278-282 |  5 |ETA day                |day          |1-31, 0=N/A (default)
+|283-287 |  5 |ETA hour               |hour         |0-23, 24=N/A (default)
+|288-293 |  6 |ETA minute             |minute       |0-59, 60=N/A (default)
+|294-301 |  8 |Draught                |draught      |Unsigned integer: Meters/10
+|302-421 |120 |Destination            |destination  |20 6-bit characters
+|422-422 |  1 |DTE                    |dte          |0=Data terminal ready,
+|        |    |                       |             |1=Not ready (default)
+|423-423 |  1 |Spare                  |             |Not used
+|==============================================================================
+
+Ship dimensions will be 0 if not available. For the dimensions to bow
+and stern, the special value 511 indicates 511 meters or greater; for
+the dimensions to port and starboard, the special value 63 indicates
+63 meters or greater.
+
+.Codes for Ship Type
+[width="50%",frame="topbot",options="header"]
+|==============================================================
+|Code   |Ship & Cargo Classification
+|0      |Not available (default)
+|1-19   |Reserved for future use
+|20     |Wing in ground (WIG), all ships of this type
+|21     |Wing in ground (WIG), Hazardous category A
+|22     |Wing in ground (WIG), Hazardous category B
+|23     |Wing in ground (WIG), Hazardous category C
+|24     |Wing in ground (WIG), Hazardous category D
+|25     |Wing in ground (WIG), Reserved for future use
+|26     |Wing in ground (WIG), Reserved for future use
+|27     |Wing in ground (WIG), Reserved for future use
+|28     |Wing in ground (WIG), Reserved for future use
+|29     |Wing in ground (WIG), Reserved for future use
+|30     |Fishing
+|31     |Towing
+|32     |Towing: length exceeds 200m or breadth exceeds 25m
+|33     |Dredging or underwater ops
+|34     |Diving ops
+|35     |Military ops
+|36     |Sailing
+|37     |Pleasure Craft
+|38     |Reserved
+|39     |Reserved
+|40     |High speed craft (HSC), all ships of this type
+|41     |High speed craft (HSC), Hazardous category A
+|42     |High speed craft (HSC), Hazardous category B
+|43     |High speed craft (HSC), Hazardous category C
+|44     |High speed craft (HSC), Hazardous category D
+|45     |High speed craft (HSC), Reserved for future use
+|46     |High speed craft (HSC), Reserved for future use
+|47     |High speed craft (HSC), Reserved for future use
+|48     |High speed craft (HSC), Reserved for future use
+|49     |High speed craft (HSC), No additional information
+|50     |Pilot Vessel
+|51     |Search and Rescue vessel
+|52     |Tug
+|53     |Port Tender
+|54     |Anti-pollution equipment
+|55     |Law Enforcement
+|56     |Spare - Local Vessel
+|57     |Spare - Local Vessel
+|58     |Medical Transport
+|59     |Ship according to RR Resolution No. 18
+|60     |Passenger, all ships of this type
+|61     |Passenger, Hazardous category A
+|62     |Passenger, Hazardous category B
+|63     |Passenger, Hazardous category C
+|64     |Passenger, Hazardous category D
+|65     |Passenger, Reserved for future use
+|66     |Passenger, Reserved for future use
+|67     |Passenger, Reserved for future use
+|68     |Passenger, Reserved for future use
+|69     |Passenger, No additional information
+|70     |Cargo, all ships of this type
+|71     |Cargo, Hazardous category A
+|72     |Cargo, Hazardous category B
+|73     |Cargo, Hazardous category C
+|74     |Cargo, Hazardous category D
+|75     |Cargo, Reserved for future use
+|76     |Cargo, Reserved for future use
+|77     |Cargo, Reserved for future use
+|78     |Cargo, Reserved for future use
+|79     |Cargo, No additional information
+|80     |Tanker, all ships of this type
+|81     |Tanker, Hazardous category A
+|82     |Tanker, Hazardous category B
+|83     |Tanker, Hazardous category C
+|84     |Tanker, Hazardous category D
+|85     |Tanker, Reserved for future use
+|86     |Tanker, Reserved for future use
+|87     |Tanker, Reserved for future use
+|88     |Tanker, Reserved for future use
+|89     |Tanker, No additional information
+|90     |Other Type, all ships of this type
+|91     |Other Type, Hazardous category A
+|92     |Other Type, Hazardous category B
+|93     |Other Type, Hazardous category C
+|94     |Other Type, Hazardous category D
+|95     |Other Type, Reserved for future use
+|96     |Other Type, Reserved for future use
+|97     |Other Type, Reserved for future use
+|98     |Other Type, Reserved for future use
+|99     |Other Type, no additional information
+|==============================================================
+
+Note that garbage values greater than 99 are supposed to be unused,
+but are not uncommon in the wild; AIS transmitters seem prone to put
+garbage in this field when it's not explicitly set.  Decoders should
+treat these like value 0 rather than throwing an exception until and
+unless the controlled vocabulary is extended to include the unknown
+values.
+
+=== Type 6: Addressed Binary Message ===
+
+Message type 6 is an addressed point-to-point message with unspecified
+binary payload.  The St. Lawrence Seaway AIS system and the USG PAWSS
+system use this payload for local extension messages. It is variable
+in length up to a maximum of 1008 bits (up to 5 AIVDM sentence
+payloads).
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description          |Member     |Units
+|0-5     |  6 |Message Type         |type       |Unsigned integer: 6
+|6-7     |  2 |Repeat Indicator     |repeat     |As in Common Navigation Block
+|8-37    | 30 |Source MMSI          |mmsi       |Unsigned integer: 9 digits
+|38-39   |  2 |Sequence Number      |seqno      |Unsigned integer 0-3
+|40-69   | 30 |Destination MMSI     |dest_mmsi  |Unsigned integer: 9 digits
+|70      |  1 |Retransmit flag      |retransmit |0 = no retransmission (default)
+|        |    |                     |           |1 = retransmitted
+|71      |  1 |Spare                |           |Not used
+|72-81   | 10 |Designated Area Code |dac        |Unsigned integer
+|82-87   |  6 |Functional ID        |fid        |Unsigned integer
+|88      |920 |Data                 |data       |Binary data
+|        |    |                     |           |May be shorter than 920 bits.
+|==============================================================================
+
+Interpretation of the binary payload is controlled by:
+
+* The Designated Area Code, which is a jurisdiction code: 366 for the 
+  United States.  It uses the same encoding as the area designator in
+  MMMSIs; see <<ITU-MID>>. 1 designates international (ITU) messages.
+
+* The FID, which is the Functional ID for a message subtype.
+
+The following is a non-exhaustive list of DAC-FID pairs in use for
+type 6:
+
+|==============================================================================
+| DAC |FID | Sub | Source     | Status       | Description     
+|   1 | 23 |     | <<NAV55>>  | Proposed     | Area notice
+|   1 | 28 |     | <<NAV55>>  | Proposed     | Route info addressed
+|   1 | 30 |     | <<NAV55>>  | Proposed     | Text description addressed
+|==============================================================================
+
+DAC/FID pairs are assigned separately per message type.
+
+=== Type 7: Binary Acknowledge ===
+
+Message type 7 is a receipt acknowledgement to the senders of a
+previous messages of type 6.  Total length varies between 72 and 168
+bits by 32-bit increments, depending on the number of destination
+MMSIs included.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description      |Member   |Units
+|0-5     |  6 |Message Type     |type     |Unsigned integer: 7
+|6-7     |  2 |Repeat Indicator |repeat   |As in Common Navigation Block
+|8-37    | 30 |Source MMSI      |mmsi     |Unsigned integer: 9 digits
+|38-39   |  2 |Spare            |         |Not used
+|40-69   | 30 |MMSI number 1    |mmsi1    |Unsigned integer: 9 digits
+|70-71   |  2 |Spare            |         |Not used
+|62-101  | 30 |MMSI number 2    |mmsi2    |Unsigned integer: 9 digits
+|102-103 |  2 |Spare            |         |Not used
+|104-133 | 30 |MMSI number 3    |mmsi3    |Unsigned integer: 9 digits
+|134-135 |  2 |Spare            |         |Not used
+|136-165 | 30 |MMSI number 4    |mmsi4    |Unsigned integer: 9 digits
+|166-167 |  2 |Spare            |         |Not used
+|==============================================================================
+
+=== Type 8: Binary Broadcast Message ===
+
+Message type 8 is a broadcast message with unspecified binary payload.
+The St. Lawrence Seaway AIS system and the USG PAWSS system use this
+payload for local extension messages. It is variable in length up to a
+maximum of 1008 bits (up to 5 AIVDM sentence payloads).
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description          |Member    |Units
+|0-5     |  6 |Message Type         |type      |Unsigned integer: 8
+|6-7     |  2 |Repeat Indicator     |repeat    |As in Common Navigation Block
+|8-37    | 30 |Source MMSI          |mmsi      |Unsigned integer: 9 digits
+|38-39   |  2 |Spare                |          |Not used
+|40-49   | 10 |Designated Area Code |dac       |Unsigned integer
+|50-55   |  6 |Functional ID        |fid       |Unsigned integer
+|56      |952 |Data                 |data      |Binary data
+|        |    |                     |          |May be shorter than 952 bits.
+|==============================================================================
+
+Interpretation of the binary payload is controlled by DAC/FID as in
+message type 6. The following is a non-exhaustive list of DAC-FID
+pairs in use for type 8:
+
+[frame="topbot",options="header"]
+|==============================================================================
+| DAC |FID | Sub | Source     | Status       | Description     
+|   1 | 11 |     | <<IMO236>> | Deprecated   | Meteorological/Hydrological Data
+|   1 | 12 |     | <<IMO236>> | Deprecated   | Dangerous cargo indication
+|   1 | 13 |     | <<IMO236>> | Deprecated   | Fairway closed
+|   1 | 14 |     | <<IMO236>> | Deprecated   | Tidal window
+|   1 | 15 |     | <<IMO236>> | Deprecated   | Extended ship and voyage
+|   1 | 16 |     | <<IMO236>> | In use       | Num persons on board
+|   1 | 17 |     | <<IMO236>> | In use?      | VTS-Generated/Synthetic targets
+|   1 | 18 |     | <<NAV55>>  | Proposed     | Clearance time to enter port
+|   1 | 19 |     | <<NAV55>>  | Proposed     | Marine traffic signals
+|   1 | 20 |     | <<NAV55>>  | Proposed     | Berthing data
+|   1 | 21 |     | <<NAV55>>  | Proposed     | Weather obs from ship
+|   1 | 22 |     | <<NAV55>>  | Proposed     | area notice broadcast
+|   1 | 24 |     | <<NAV55>>  | Proposed     | Extended ship and voyage
+|   1 | 25 |     | <<NAV55>>  | Proposed     | Dangerous cargo
+|   1 | 26 |     | <<NAV55>>  | Proposed     | Environmental
+|   1 | 27 |     | <<NAV55>>  | Proposed     | Route info broadcast
+|   1 | 29 |     | <<NAV55>>  | Proposed     | Text description broadcast
+|   1 | 31 |     | <<NAV55>>  | Proposed     | Meteorological and Hydrological
+|   1 | 32 |     | <<NAV55>>  | Proposed     | Tidal Window
+| 316 |  1 |   2 | <<SEAWAY>> | In use       | Wind
+| 316 |  1 |   1 | <<SEAWAY>> | In use       | Weather station
+| 316 |  1 |   3 | <<SEAWAY>> | In use       | Water level
+| 316 |  1 |   6 | <<SEAWAY>> | In use       | Water flow
+| 316 |  2 |   1 | <<SEAWAY>> | In use       | Lockage Order
+| 316 |  2 |   2 | <<SEAWAY>> | In use       | Est. Lock Times
+| 316 | 32 |   1 | <<SEAWAY>> | In use       | Seaway Version Message
+|   ? |  1 |   4 | <<SEAWAY>> | ?            | PAWS Hydro / Current
+|==============================================================================
+
+DAC/FID pairs are assigned separately per message type.  
+FID types 11-15 are being phased out and are not to be used after 1
+Jan 2013. FID types 16 and 17 are in use; there are a proposed updates 
+for these in <<NAV55>>.
+
+=== Type 9: Standard SAR Aircraft Position Report ===
+
+Tracking information for search-and-rescue aircraft.  Total number of
+bits is 168.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description        |Member     |Encoding
+|0-5     | 6  |Message Type       |type       |Unsigned integer: 9
+|6-7     | 2  |Repeat Indicator   |repeat     |As in Common Navigation Block
+|8-37    |30  |MMSI               |mmsi       |Unsigned integer: 9 digits
+|38-49   |12  |Altitude           |alt        |Unsigned integer: See below
+|50-59   |10  |SOG                |speed      |Unsigned integer: See below
+|60-60   | 1  |Position Accuracy  |accuracy   |See below
+|61-88   |28  |Longitude          |lon        |Minutes/10000 (as in CNB)
+|89-115  |27  |Latitude           |lat        |Minutes/10000 (as in CNB)
+|116-127 |12  |Course Over Ground |course     |Relative to true north to 0.1 degree
+|128-133 | 6  |Time Stamp         |second     |Unsigned integer: UTC second.
+|134-141 | 8  |Regional reserved  |regional
+|
+|142-142 | 1  |DTE                |dte        |0=Data terminal ready,
+|        |    |                   |           |1=Data terminal not ready (default)
+|143-145 | 3  |Spare              |           |Not used
+|146-146 | 1  |Assigned           |assigned   |Assigned-mode flag
+|147-147 | 1  |RAIM flag          |raim       |As for common navigation block
+|148-167 |19  |Radio status       |radio      |See <<IALA>> for details.
+|==============================================================================
+
+Altitude is in meters.  The special value 4095 indicates altitude is
+not available; 4094 indicates 4094 meters or higher.
+
+Speed over ground is in knots, not deciknots as in the common
+navigation block; planes go faster. The special value 1023 indicates
+speed not available, 1022 indicates 1022 knots or higher.
+
+Position Accuracy, Longitude, Latitude, and Course over Ground
+are encoded identically as in the common navigation block and
+are even at the same bit offsets.  Time stamp has the same special
+values as in the common navigation block, but is at a different offset.
+
+=== Type 10: UTC/Date Inquiry ===
+
+Request for UTC/Date information from an AIS base station. Total
+number of bits is 72.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description        |Member     |Encoding
+|0-5     | 6  |Message Type       |type       |Unsigned integer: 9
+|6-7     | 2  |Repeat Indicator   |repeat     |As in Common Navigation Block
+|8-37    |30  |Source MMSI        |mmsi       |Unsigned integer: 9 digits
+|38-39   | 2  |Spare              |           |Not used
+|40-69   |30  |Destination MMSI   |dest_mmsi  |Unsigned integer: 9 digits
+|70-71   | 2  |Spare              |           |Not used
+|==============================================================================
+
+=== Type 11: UTC/Date Response ===
+
+Identical to message 4, with the semantics of a response to inquiry.
+
+=== Type 12: Safety-Related Message ===
+
+This is a point-to-point text message.  The payload is interpreted as
+six-bit text.  This message is variable in length up to a maximum of
+1008 bits (up to 5 AIVDM sentence payloads).
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description        |Member      |Units
+|0-5     |  6 |Message Type       |type        |Unsigned integer: 12
+|6-7     |  2 |Repeat Indicator   |repeat      |As in Common Navigation Block
+|8-37    | 30 |Source MMSI        |mmsi        |Unsigned integer: 9 digits
+|38-39   |  2 |Sequence Number    |seqno       |Unsigned integer 0-3
+|40-69   | 30 |Destination MMSI   |dest_mmsi   |Unsigned integer: 9 digits
+|70      |  1 |Retransmit flag    |retransmit  |0 = no retransmission (default)
+|        |    |                   |            |1 = retransmitted
+|71      |  1 |Spare              |            |Not used
+|72      |936 |Text               |text        |1-156 chars of six-bit text.
+|        |    |                   |            |May be shorter than 936 bits.
+|==============================================================================
+
+Pragmatic note: On <<<AISHUB>>> the actual content of these messages is
+highly variable, ranging from fairly plain English ("PLEASE REPORT TO
+JOBOURG TRAFFIC CHANNEL 13") through snippets of tabular data ("PAX
+589 FG 36 IX 74 MOTO 10 CREW 108+1" through what look like opaque
+commercial codes ("EP285 IX46 FG3 DK8 PL56") to empty strings and
+content that looks like line noise ("]XFD5D/\7`>PA!Q DX0??K?8?>D"). 
+
+Such apparently garbled content does *not* mean there is an error in
+your decoder. It may indicate faulty encoders, operator error, or even
+the use of private encodings for non-ASCII character sets.
+
+=== Type 13: Safety-Related Acknowledge ===
+
+Message type 13 is a receipt acknowledgement to senders of
+previous messages of type 12.  The message layout is identical to
+a type 7 Binary Acknowledge.
+
+=== Type 14: Safety-Related Broadcast Message ===
+
+This is a broadcast text message.  The payload is interpreted as
+six-bit text.  This message is variable in length up to a maximum of
+1008 bits (up to 5 AIVDM sentence payloads).
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description        |Member    |Units
+|0-5     |  6 |Message Type       |type      |Unsigned integer: 14
+|6-7     |  2 |Repeat Indicator   |repeat    |As in Common Navigation Block
+|8-37    | 30 |Source MMSI        |mmsi      |Unsigned integer: 9 digits
+|38-39   |  2 |Spare              |          |Not used
+|40      |968 |Text               |text      |1-161 chars of six-bit text.
+|        |    |                   |          |May be shorter than 968 bits.
+|==============================================================================
+
+Note: 161 * 6 = 966. <<IALA>> specifies 968 because over-the-air
+messages are required to be padded to an 8-bit byte boundary by
+<<<ITU1371>>>.
+
+Also see the pragmatic note on message content attached to type 12; it
+applies to type 14 messages as well.
+
+=== Type 15: Interrogation ===
+
+Message type 15 is used by a base station to query one or two other AIS
+transceivers for status messages of specified types. "Source MMSI" is
+the interrogating station.  88-160 bits depending on the number of queries.
+
+This message is probably not interesting unless you are doing traffic
+analysis of information flow in an AIS station network.  The "slot offset" 
+members are a request for the response to interrogation to occupy
+a particular time division in the TDMA packet layer.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description         |Member    |Units
+|0-5     |  6 |Message Type        |type      |Unsigned integer: 15
+|6-7     |  2 |Repeat Indicator    |repeat    |As in Common Navigation Block
+|8-37    | 30 |Source MMSI         |mmsi      |Unsigned integer: 9 digits
+|38-39   |  2 |Spare               |          |Not used
+|40-69   | 30 |Interrogated MMSI   |mmsi1     |Unsigned integer: 9 digits
+|70-75   |  6 |First message type  |type1_1   |Unsigned integer
+|76-87   | 12 |First slot offset   |offset1_1 |Unsigned integer
+|88-89   |  2 |Spare               |          |Not used
+|90-95   |  6 |Second message type |type1_2   |Unsigned integer
+|96-107  | 12 |Second slot offset  |offset1_2 |Unsigned integer
+|108-109 |  2 |Spare               |          |Not used
+|110-139 | 30 |Interrogated MMSI   |mmsi2     |Unsigned integer: 9 digits
+|140-145 |  6 |First message type  |type2_1   |Unsigned integer
+|146-157 | 12 |First slot offset   |offset2_1 |Unsigned integer
+|158-159 |  2 |Spare               |          |Not used
+|==============================================================================
+
+There are four use cases for this message.  A decoder must dispatch on
+the length of the data packet to determine which it is seeing:
+
+1. One station is interrogated for one message type.  Length is 88 bits.
+
+2. One station is interrogated for two message types, Length is 110
+bits. There is a design error in the standard here; according to the
+<<<ITU1371>>> requirement for padding to 8 bits, this should have been
+112 with a 4-bit trailing spare field, and decoders should be prepared
+to handle that length as well. See the discussion of byte alignment
+elsewhere in this document for context.
+
+3. Two stations are interrogated for one message type each. Length is
+160 bits.  The second message type and second slot offset associated
+with the first queried MMSI should be zeroed.
+
+4. One station is interrogated for two message types, and a second for
+one message type.  Length is 160 bits.
+
+=== Type 16: Assigned Mode Command ===
+
+Message type 16 is used by a base station with control authority to
+configure the scheduling of AIS informational messages from
+subordinate stations, either as a frquency per 10-minute interval or
+by specifying the TDMA slot(s) offset on which those messages should
+be transmitted.  It is probably not of interest unless you are
+studying the internal operation of an AIS base station network.
+Length may be 96 or 144 bits.
+
+[frame="topbot",options="header"]
+|============================================================================
+|Field   |Len |Description         |Member     |Units
+|0-5     |  6 |Message Type        |type       |Unsigned integer: 16
+|6-7     |  2 |Repeat Indicator    |repeat     |As in Common Navigation Block
+|8-37    | 30 |Source MMSI         |mmsi       |Unsigned integer: 9 digits
+|38-39   |  2 |Spare               |           |Not used
+|40-69   | 30 |Destination A MMSI  |mmsi1      |Unsigned integer: 9 digits
+|70-81   | 12 |Offset A            |offset1    |See <<IALA>>
+|82-91   | 10 |Increment A         |increment1 |See <<IALA>>
+|92-121  | 30 |Destination B MMSI  |mmsi2      |Unsigned integer: 9 digits
+|122-133 | 12 |Offset B            |offset2    |See <<IALA>>
+|134-143 | 10 |Increment B         |increment2 |See <<IALA>>
+|=============================================================================
+
+If the message is 96 bits long, it should be interpreted as an
+assignment for a single station (92 bits) followed by 4 bits of
+padding reserved for future use. If the message is 144 bits long it
+should be interpreted as a channel assignment for two stations; no
+padding follows.
+
+When increment is zero, the offset field is interpreted as the
+frequency with which the subordinate station should report per
+10-minute interval. When increment is nonzero, reporting interval
+is specified at the level of TDMA slot numbers; see <<IALA>> for the 
+detailed specification.
+
+Note: While the 96-bit form of Type 16 is not uncommon, the 144-bit
+form is extremely rare. As of March 2010 it has not been observed even
+in long-duration samples from AISHub.
+
+=== Type 17: GNSS Broadcast Binary Message ===
+
+Message type 17 is used to broadcast differential corrections for GPS.
+The data in the payload is intended to be passed directly to GPS
+receivers capable of accepting such corrections. 80 to 816 bits
+depending on payload size.
+
+|==============================================================================
+|Field   |Len |Description         |Member     |Units
+|0-5     |  6 |Message Type        |type       |Unsigned integer: 16
+|6-7     |  2 |Repeat Indicator    |repeat     |As in Common Navigation Block
+|8-37    | 30 |Source MMSI         |mmsi       |Unsigned integer: 9 digits
+|38-39   |  2 |Spare               |           |Not used
+|40-57   | 18 |Longitude           |lon        |Signed: minutes/10
+|58-74   | 17 |Latitude            |lat        |Signed: minutes/10
+|75-79   |  5 |Spare               |           |Not used - reserved
+|80-815  |736 |Payload             |data       |DGNSS correction data
+|==============================================================================
+
+Nore that latitude and longitude are in units of a tenth of a minute;
+sign interpretation and out-of-band values are as in the Common
+Navigation Clock.  (Note, however, that the hex representation of
+the out-of-band values differs; it is 181 \* 60 \* 10 = 0x1a838 for
+longitude, 91 \* 60 \* 10 = 0xd548 for latitude.)
+
+The <<IALA>> description of the payload portion subfields has been
+omitted, as it appears to be tied to the now obsolete RTCM2 protocol.
+
+=== Type 18: Standard Class B CS Position Report ===
+
+A less detailed report than types 1-3 for vessels using Class B
+transmitters.  Omits navigational status and rate of turn.  Fields are
+encoded as in the common navigation block.  168 bits total.
+
+In <<IALA>> (and <<ITU1371>>) bits 141-145 were designated "Spare"; the
+bit-flag semantics given here are from ITU-1371-3 and were
+communicated by Kurt Schwehr.  Kurt warns that "the spec does not do a
+good job of explaining these fields... I don't think that I totally
+understand these fields."
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description        |Member    |Units
+|0-5     | 6  |Message Type       |type      |Unsigned integer: 18
+|6-7     | 2  |Repeat Indicator   |repeat    |As in Common Navigation Block
+|8-37    |30  |MMSI               |mmsi      |Unsigned integer: 9 digits
+|38-45   | 8  |Regional Reserved  |reserved
+|
+|46-55   |10  |Speed Over Ground  |speed     |As in common navigation block
+|56-56   | 1  |Position Accuracy  |accuracy  |See below
+|57-84   |28  |Longitude          |lon       |Minutes/10000 (as in CNB)
+|85-111  |27  |Latitude           |lat       |Minutes/10000 (as in CNB)
+|112-123 |12  |Course Over Ground |course    |Relative to true north to 0.1 degree
+|124-132 | 9  |True Heading       |heading   |0 to 359 degrees, 511 = N/A
+|133-138 | 6  |Time Stamp         |second    |Second of UTC timestamp.
+|139-140 | 2  |Regional reserved  |regional
+|
+|141-141 | 1  |CS Unit            |cs        |0=Class B SOTDMA unit
+|        |    |                   |          |1=Class B CS (Carrier Sense) unit
+|142-142 | 1  |Display flag       |display   |0=No visual display, 1=Has display
+|        |    |                   |          |(Probably not reliable.)
+|143-143 | 1  |DSC Flag           |dsc       |If 1, unit is attached to a VHF
+|        |    |                   |          |voice radio with DSC capability.
+|144-144 | 1  |Band flag          |band      |Base stations can command units
+|        |    |                   |          |to switch frequency.  If this flag
+|        |    |                   |          |is 1, the unit can use any part
+|        |    |                   |          |of the marine channel.
+|145-145 | 1  |Message 22 flag    |msg22     |If 1, unit can accept a channel
+|        |    |                   |          |assignment via Message Type 22.
+|146-146 | 1  |Assigned           |assigned  |Assigned-mode flag
+|147-147 | 1  |RAIM flag          |raim      |As for common navigation block
+|148-167 |20  |Radio status       |radio     |See <<IALA>> for details.
+|==============================================================================
+
+The radio status is 20 bits rather than 19 because an extra first bit
+selects whether it should be interpretred as a SOTDMA or ITDMA state.
+
+=== Type 19: Extended Class B CS Position Report ===
+
+A slightly more detailed report than type 18 for vessels using Class B
+transmitters.  Omits navigational status and rate of turn.  Fields are
+encoded as in the common navigation block and the Type 5 message.
+Note that until just before the reserved field at bit 139 this is
+identical to message 18.  312 bits total.
+
+In practice, the information in the ship name and dimension fields is
+not reliable, as it has to be hand-entered by humans rather than
+gathered automatically from sensors.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field    |Len |Description            |Member       |Units
+|0-5      |  6 |Message Type           |type         |Unsigned integer: 19
+|6-7      |  2 |Repeat Indicator       |repeat       |As in Common Navigation Block
+|8-37     | 30 |MMSI                   |mmsi         |Unsigned integer: 9 digits
+|38-45    |  8 |Regional Reserved      |reserved
+|
+|46-55    | 10 |Speed Over Ground      |speed        |As in Common Navigation Block
+|56-56    |  1 |Position Accuracy      |accuracy     |See below
+|57-84    | 28 |Longitude              |lon          |Minutes/10000 (as in CNB)
+|85-111   | 27 |Latitude               |lat          |Minutes/10000 (as in CNB)
+|112-123  | 12 |Course Over Ground     |course       |Relative to true north,
+|         |    |                       |             |units of 0.1 degrees
+|124-132  |  9 |True Heading           |heading      |0 to 359 degrees,
+|         |    |                       |             |511 = N/A
+|133-138  |  6 |Time Stamp             |second       |Second of UTC timestamp.
+|139-142  |  4 |Regional reserved      |regional
+|
+|143-262  |120 |Name                   |shipname     |20 6-bit characters
+|263-270  |  8 |Type of ship and cargo |shiptype     |As in Message 5
+|271-279  |  9 |Dimension to Bow       |to_bow       |Unsigned integer: Meters
+|280-288  |  9 |Dimension to Stern     |to_stern     |Unsigned integer: Meters
+|289-294  |  6 |Dimension to Port      |to_port      |Unsigned integer: Meters
+|295-300  |  6 |Dimension to Starboard |to_starboard |Unsigned integer: Meters
+|301-304  |  4 |Position Fix Type      |epfd         |As in Type 4 EPFD codes
+|305-305  |  1 |RAIM flag              |raim         |As for Common Navigation Block
+|306-306  |  1 |DTE                    |dte          |0=Data terminal ready,
+|307-307  |  1 |Assigned mode flag     |assigned     |See <<IALA>> for details
+|308-311  |  4 |Spare                  |             |Unused, should be zero
+|==============================================================================
+
+=== Type 20 Data Link Management Message ===
+
+This message is used to pre-allocate TDMA slots within an AIS base
+station network.  It contains no navigational information, and is
+unlikely to be of interest unless you are implementing or studying
+an AIS base station network. Length varies from 72-160 depending on
+the number of slot reservations (1 to 4) in the message.
+
+[frame="topbot",options="header"]
+|===============================================================================
+|Field    |Len |Description       |Member        |Units
+|0-5      | 6  |Message Type      |type          |Unsigned integer: 20
+|6-7      | 2  |Repeat Indicator  |repeat        |As in Common Navigation Block
+|8-37     |30  |MMSI              |mmsi          |Unsigned integer: 9 digits
+|38-39    | 2  |Spare             |              |Not used
+|40-51    |12  |Offset number 1   |offset1       |Reserved offset number
+|52-55    | 4  |Reserved slots    |number1       |Consecutive slots
+|56-58    | 3  |Time-out          |timeout1      |Allocation timeout in minutes
+|59-69    |11  |Increment         |increment1    |Repeat increment
+|70-81    |12  |Offset number 2   |offset2       |Reserved offset number
+|82-85    | 4  |Reserved slots    |number2       |Consecutive slots
+|86-88    | 3  |Time-out          |timeout2      |Allocation timeout in minutes
+|89-99    |11  |Increment         |increment2    |Repeat increment
+|100-111  |12  |Offset number 3   |offset3       |Reserved offset number
+|112-115  | 4  |Reserved slots    |number3       |Consecutive slots
+|116-118  | 3  |Time-out          |timeout3      |Allocation timeout in minutes
+|119-129  |11  |Increment         |increment3    |Repeat increment
+|130-141  |12  |Offset number 4   |offset4       |Reserved offset number
+|142-145  | 4  |Reserved slots    |number4       |Consecutive slots
+|146-148  | 3  |Time-out          |timeout4      |Allocation timeout in minutes
+|149-159  |11  |Increment         |increment4    |Repeat increment
+|===============================================================================
+
+See <<IALA>> for details on the meaning of these fields.
+
+=== Type 21: Aid-to-Navigation Report ===
+
+Identification and location message to be emitted by aids to
+navigation such as buoys and lighthouses.
+
+This message is unusual in that it varies in length depending on the 
+presence and size of the Name Extension field. May vary between 272
+and 360 bits.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field    |Len |Description            |Member       |Units
+|0-5      | 6  |Message Type           |type         |Unsigned integer: 21
+|6-7      | 2  |Repeat Indicator       |repeat       |As in Common Navigation Block
+|8-37     |30  |MMSI                   |mmsi         |Unsigned integer: 9 digits
+|38-42    | 5  |Aid type               |aid_type     |See Below
+|43-162  1|120 |Name                   |name         |Name of the aid to navigation
+|163-163  | 1  |Position Accuracy      |accuracy     |As in Common Navigation Block
+|164-191  |28  |Longitude              |lon          |Minutes/10000 (as in CNB)
+|192-218  |27  |Latitude               |lat          |Minutes/10000 (as in CNB)
+|219-227  | 9  |Dimension to Bow       |to_bow       |Unsigned integer: Meters
+|228-236  | 9  |Dimension to Stern     |to_stern     |Unsigned integer: Meters
+|237-242  | 6  |Dimension to Port      |to_port      |Unsigned integer: Meters
+|243-248  | 6  |Dimension to Starboard |to_starboard |Unsigned integer: Meters
+|249-252  | 4  |Type of EPFD           |epfd         |As in Message Type 4
+|253-258  | 6  |UTC Second             |second       |As in Message Type 5
+|259-259  | 1  |Off-Position Indicator |off_position |See Below
+|260-267  | 8  |Regional reserved      |regional     |
+|268-268  | 1  |RAIM flag              |raim         |As in Common Navigation Block
+|269-269  | 1  |Virtual-aid flag       |virtual_aid  |See Below
+|270-270  | 1  |Assigned-mode flag     |assigned     |See <<IALA>> for details
+|271-271  | 1  |Spare                  |             |Not used
+|272-360  |88  |Name Extension         |             |See Below
+|==============================================================================
+
+According to <<IALA>>, the aid type field has values 1-15 for fixed
+and 16-31 for floating aids to navigation.  The detailed list is as follows:
+
+[frame="topbot",options="header"]
+|====================================================================
+|Code |Definition
+|0    |Default, Type of Aid to Navigation not specified
+|1    |Reference point
+|2    |RACON (radar transponder marking a navigation hazard)
+|3    |Fixed structure off shore, such as oil platforms, wind farms,
+|     |rigs. (Note: This code should identify an obstruction that is
+|     |fitted with an Aid-to-Navigation AIS station.)
+|4    |Spare, Reserved for future use.
+|5    |Light, without sectors
+|6    |Light, with sectors
+|7    |Leading Light Front
+|8    |Leading Light Rear
+|9    |Beacon, Cardinal N
+|10   |Beacon, Cardinal E
+|11   |Beacon, Cardinal S
+|12   |Beacon, Cardinal W
+|13   |Beacon, Port hand
+|14   |Beacon, Starboard hand
+|15   |Beacon, Preferred Channel port hand
+|16   |Beacon, Preferred Channel starboard hand
+|17   |Beacon, Isolated danger
+|18   |Beacon, Safe water
+|19   |Beacon, Special mark
+|20   |Cardinal Mark N
+|21   |Cardinal Mark E
+|22   |Cardinal Mark S
+|23   |Cardinal Mark W
+|24   |Port hand Mark
+|25   |Starboard hand Mark
+|26   |Preferred Channel Port hand
+|27   |Preferred Channel Starboard hand
+|28   |Isolated danger
+|29   |Safe Water
+|30   |Special Mark
+|31   |Light Vessel / LANBY / Rigs
+|====================================================================
+
+The name field is 6-bit ASCII.  If this field is full (has no trailing
+@ characters) the decoder should interpret the Name Extension field
+later in the message (no more than 14 6-bit characters) and
+concatenate it to this one to obtain the full name.
+
+<<IALA>> describes bits 219-248 As "Dimension/Reference for Position",
+implying that it is vessel dimensions as in message type 5.
+
+The Off-Position Indicator is for floating Aids-to-Navigation only: 0
+means on position; 1 means off position. Only valid if UTC second is equal to
+or below 59.
+
+The Virtual Aid flag is interpreted as follows: 0 = default = real Aid
+to Navigation at indicated position; 1 = virtual Aid to
+Navigation simulated by nearby AIS station.
+
+If present, the Name Extension consists of packed six-bit ASCII
+characters followed by 0-6 bits of padding to an 8-bit boundary. The
+<<IALA>> description says "This parameter should be omitted when no
+more than 20 characters for the name of the A-to-N are needed in
+total. Only the required number of characters should be transmitted,
+i.e. no @-character should be used."  A decoder can deduce the bit length
+of the name extension field by subtracting 272 from the total message
+bit length.
+
+=== Type 22: Channel Management ===
+
+This message is broadcast by a competent authority (an AIS network
+control base station) to set VHF parameters for an AIS coverage
+region.  Length is 168 bits.
+
+This message contains no navigational information, and is unlikely to be of
+interest unless you are implementing or studying an AIS base station
+network. 
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field    |Len |Description      |Member    |Units
+|0-5      | 6  |Message Type     |type      |Unsigned integer: 22
+|6-7      | 2  |Repeat Indicator |repeat    |As in Common Navigation Block
+|8-37     |30  |MMSI             |mmsi      |Unsigned integer: 9 digits
+|38-39    | 2  |Spare            |          |Not used
+|40-51    |12  |Channel A        |channel_a |Channel number
+|52-63    |12  |Channel B        |channel_b |Channel number
+|64-67    | 4  |Tx/Rx mode       |txrx      |Transmit/receive mode
+|68-68    | 1  |Power            |power     |Low=0, high=1
+|69-86    |18  |NE Longitude     |ne_lon    |Signed: NE longitude to 0.1 minutes
+|87-103   |17  |NE Latitude      |ne_lat    |Signed: NE latitude to 0.1 minutes
+|104-121  |18  |SW Longitude     |sw_lon    |Signed: SW longitude to 0.1 minutes
+|122-138  |17  |SW Latitude      |sw_lat    |Signed: SW latitude to 0.1 minutes
+|69-98    |30  |MMSI1            |dest1     |Unsigned: MMSI of destination 1
+|104-133  |30  |MMSI2            |dest2     |Unsigned: MMSI of destination 2
+|139-139  | 1  |Addressed        |addressed |0=Broadcast, 1=Addressed
+|140-140  | 1  |Channel A Band   |band_a    |0=Default, 1=12.5kHz
+|141-141  | 1  |Channel B Band   |band_b    |0=Default, 1=12.5kHz
+|142-144  | 3  |Zone size        |zonesize  |Size of transitional zone
+|145-167  |23  |Spare            |          |Reserved for future use
+|==============================================================================
+
+The values of the channel_a and channel_b fields are ITU frequency
+designators for channelas A and B. Normally these will be 2087 and
+2088, the AIS 1 and AIS 2 frequencies of 87B (161.975 MHz) and 88B
+(162.025 MHz) respectively. Regional authorities may set different
+frequencies.
+
+The txrx field encodes the same information as the 2-bit field txrx
+field in message type 23; only the two low bits are used.
+
+The power bit instructs designated receivers which power level to use.
+
+If the message is broadcast (addressed field is 0), the ne_lon,
+ne_lat, sw_lon, and sw_lat fields are the corners of a rectangular
+jurisdiction area over which control parameters are to be set.  If it
+is addressed (addressed field is 1), the same span of data is
+interpreted as two 30-bit MMSIs beginning at at bit offsets 69 and 104
+respectively.
+
+Note that the 'not available' values for longitude and latitudes
+match the short ones used in message 17, not the long ones used in the
+common navigation block and elsewhere. 
+
+The band fields control channel bandwidth for channels A and B, and
+the zonesize field describes the size of the transition zone around the
+control jurisdiction. The semantics of these fields are complicated,
+controlling transmitter behavior as it moves between jurisdictions;
+see <<IALA>> for full details.
+
+=== Type 23: Group Assignment Command ===
+
+This message is intended to be broadcast by a competent authority (an
+AIS network-control base station) to set to set operational parameters
+for all mobile stations in an AIS coverage region. Length is 160 bits.
+
+This message contains no navigational information, and is unlikely to
+be of interest unless you are implementing or studying an AIS base
+station network.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field    |Len |Description      |Member       |Units
+|0-5      | 6  |Message Type     |type         |Unsigned Integer: 23
+|6-7      | 2  |Repeat Indicator |repeat       |As in Common Navigation Block
+|8-37     |30  |MMSI             |mmsi         |Unsigned Integer: 9 digits
+|38-39    | 2  |Spare            |             |Not used
+|40-57    |18  |NE Longitude     |ne_lon       |Same as broadcast type 22
+|58-74    |17  |NE Latitude      |ne_lat       |Same as broadcast type 22
+|75-92    |18  |SW Longitude     |sw_lon       |Same as broadcast type 22
+|93-109   |17  |SW Latitude      |sw_lat       |Same as broadcast type 22
+|110-113  | 4  |Station Type     |station_type |Unsigned Integer, see below
+|114-121  | 8  |Ship Type        |ship_type    |As for Message type 5
+|122-143  |22  |Spare            |             |Not used
+|144-145  | 2  |Tx/Rx Mode       |txrx         |Transmit/receive mode; see below,
+|146-149  | 4  |Report Interval  |interval     |Station report interval; see below
+|150-153  | 4  |Quiet Time       |quiet        |0 = none, 1-15 quiet time in minutes
+|154-159  | 6  |Spare            |             |Not used
+|==============================================================================
+
+The target set of mobile stations is specified by the station-type and
+ship-type fields. An addressed (non-broadcast) message 22 overrides a
+message 23, but a message 23 ovewrrides a broadcast message 22.
+
+Note that the 'not available' values for longitude and latitudes
+match the short ones used in messages 17 and 22, not the long ones
+used in the common navigation block and elsewhere.
+
+The txrx field tells the affected stations which channel or
+channels they may transmit on.  The options refer to the same A and B
+VHF channels as in Message Type 22. The field is interpreted as follows:
+
+.Transmit-Mode Table
+[width="25%",frame="topbot"]
+|===================================
+|0 = |TxA/TxB, RxA/RxB (default)
+|1 = |TxA, RxA/RxB
+|2 = |TxB, RxA/RxB
+|3 = |Reserved for Future Use
+|===================================
+
+.Station Type Table
+[width="50%",frame="topbot"]
+|======================================================
+|0     |All types of mobiles (default)
+|1     |Reserved for future use
+|2     |All types of Class B mobile stations
+|3     |SAR airborne mobile station
+|4     |Aid to Navigation station
+|5     |Class B shipborne mobile station (IEC62287 only)
+|6-9   |Regional use and inland waterways
+|10-15 |Reserved for future use
+|======================================================
+
+Reporting Interval is a 4 bit unsigned integer, how often to report
+while within the area specified by this message. When the dual-channel
+operation is suspended by Tx/Rx mode command 1 or 2, the reporting
+interval is twice the interval given in the table.
+
+.Interval Table
+[width="50%",frame="topbot"]
+|======================================================
+|0     |As given by the autonomous mode
+|1     |10 Minutes
+|2     |6 Minutes
+|3     |3 Minutes
+|4     |1 Minute
+|5     |30 Seconds
+|6     |15 Seconds
+|7     |10 Seconds
+|8     |5 Seconds
+|9     |Next Shorter Reporting Interval
+|10    |Next Longer Reporting Interval
+|11-15 |Reserved for future use
+|======================================================
+
+Quiet Time is a 4 bit unsigned integer specifying how many minutes
+affected stations are to remain silent. If a class B station receives
+a quiet time command, it will continue to schedule nominal
+transmission time periods, but is not to transmit message 18 or 24
+during the quiet period.
+
+=== Type 24: Class B CS Static Data Report  ===
+
+Equivalent of a Type 5 message for ships using Class B equipment.  A
+"Type 24" may be in part A or part B format; either is 168 bits.
+Parts A and B are expected to be broadcast in adjacent pairs.  The
+interpretation of some fields in Type B format changes depending on
+the range of the Type B MMSI field. 160 bits for part A, 168 bits for
+part B.
+
+<<IALA>> does not describe this message type; format information
+is thanks to Kurt Schwehr.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len |Description            | Member         | Units
+|0-5     |  6 | Message Type          | type           | Unsigned integer: 19
+|6-7     |  2 | Repeat Indicator      | repeat         | As in CNB
+|8-37    | 30 | MMSI                  | mmsi           | Unsigned integer: 9 digits
+|38-39   |  2 | Part Number           | partno         | Unsigned integer: 0-1
+|40-159  |120 | Vessel Name           | shipname       | (Part A) 20 six-bit chars
+|160-167 |  8 | Spare                 |                | (Part A) Not used
+|40-47   |  8 | Ship Type             | shiptype       | (Part B) As in Message Type 5
+|48-89   | 42 | Vendor ID             | vendorid       | (Part B) 7 six-bit chars
+|90-131  | 42 | Call Sign             | callsign       | (Part B) As in Message Type 5
+|132-140 |  9 | Dimension to Bow      | to_bow         | (Part B) Unsigned int: Meters
+|141-149 |  9 | Dimension to Stern    | to_stern       | (Part B) Unsigned int: Meters
+|150-155 |  6 | Dimension to Port     | to_port        | (Part B) Unsigned int: Meters
+|156-161 |  6 | Dimension to Starboard| to_starboard   | (Part B) Unsigned int: Meters
+|132-161 | 30 | Mothership MMSI       | mothership_mmsi| (Part B) See below
+|162-167 |  6 | Spare                 |                | (Part B) Not used
+|===============================================================================
+
+If the Part Number field is 0, the rest of the message is interpreted
+as a Part A; if it is 1, the rest of the message is interpreted
+as a Part B; values 2 and 3 are not allowed.
+
+The "Vendor ID" field is the name of the AIS equipment vendor.
+
+Interpretation of the 30 bits 132-162 in Part B is variable. If the
+MMSI at 8-37 is that of an auxiliary craft, the entry is taken to
+refer to a small attached auxiliary vessel and these 30 bits are read
+as the MMSI of the mother ship.  Otherwise the 30 bits describe vessel
+dimensions as in Message Type 5.
+
+According to <<MMSI>>, an MMSI is associated with an auxiliary craft
+when it is of the form 98MIDXXXX where the digits 3, 4 and 5 represent
+the MID and X is any figure from 0 to 9.
+
+=== Type 25: Binary Message, Single Slot  ===
+
+Maximum of 168 bits (a single slots). Fields after the Destination
+MMSI are at variable offsets depending on tht flag and the Destination
+Indicator; they always occur in the same order but some may be omitted.
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len   |Description            | Member      | Units
+|0-5     |  6   | Message Type          | type        | Unsigned integer: 25
+|6-7     |  2   | Repeat Indicator      | repeat      | As in CNB
+|8-37    | 30   | MMSI                  | mmsi        | Unsigned integer: 9 digits
+|38      |  1   | Destination indicator | addressed   | 0=broadcast,1=addressed
+|39      |  1   | Binary data flag      | structured  | See below
+|40      |0/30  | Destination MMSI      | dest_mmsi   | Message destination
+|?       |0/16  | Application ID        | app_id      | Unsigned integer
+|?       |0-128 | Data                  | data        | Binary data
+|===============================================================================
+
+If the 'addressed' flag is on, 30 bits of data at offset 40 are
+interpreted as a destination MMSI.  Otherwise that field span becomes 
+part of the message payload, with the first 16 bits used as an
+Application ID if the 'structured' flag is on.
+
+If the 'structured' flag is on, a 16-bit application identifier is
+extracted; this field is to be interpreted as a 10 bit DAC and 6-bit
+FID as in message types 6 and 8.  Otherwise that field span becomes
+part of the message payload.
+
+The data fields is not, in contrast to message type 26, followed by a
+radio status block.
+
+Note: Type 25 is extremely rare. As of March 2010 it has not been
+observed even in long-duration samples from AISHub.
+
+=== Type 26: Binary Message, Multiple Slot  ===
+
+Takes up 60-1064 bits (up to 5 slots).
+
+[frame="topbot",options="header"]
+|==============================================================================
+|Field   |Len   |Description           | Member      | Units
+|0-5     |  6   | Message Type         | type        | Unsigned integer: 25
+|6-7     |  2   | Repeat Indicator     | repeat      | As in CNB
+|8-37    | 30   | MMSI                 | mmsi        | Unsigned integer: 9 digits
+|38      |  1   | Destination indicator| addressed   | 0=broadcast,1=addressed
+|39      |  1   | Binary data flag     | structured  | See below
+|40      |0/30  | Destination MMSI     | dest_mmsi   | Message destination
+|?       |0/16  | Application ID       | app_id      | Unsigned integer
+|?       |0-1004| Data                 | data        | Binary data
+|?       |20    | Radio status         | radio       | See <<IALA>> for details.
+|===============================================================================
+
+The data field may span up to 5 256-bit slots in addition to the tail
+end of the base slot.  The application_ID field, if present, is to be
+interpreted as a 10 bit DAC and 6-bit FID as in message types 6 and 8.
+Documentation says the data length of each slot is 224 and adds the
+note "Allows for 32 bits of bit-stuffing."
+
+The 20 radio status bits are always present after end-of-data in the
+last slot and are in the format specified by <<IALA>>.  The radio
+status is 20 bits rather than 19 because an extra first bit selects
+whether it should be interpretred as a SOTDMA or ITDMA state.
+
+Note: Type 26 is extremely rare. As of March 2010 it has not been
+observed even in long-duration samples from AISHub.
+
+== Local extensions ==
+
+Some regional authorities extend the AIS message set.
+
+The St. Lawrence Seaway broadcasts hydrological and lock-scheduling
+messages using special encodings of the binary data of message types 6
+and 8 (described in <<SEAWAY>>, freely available), and safety
+information using types 12 and 14.  These message types are listed
+under the descriptions of types 6 and 8.
+
+The U.S. Coast Guard has a system called PAWSS (Port and Water Safety
+System) which uses extended AIS binary formats. <<SEAWAY>> says it's
+intercompatible with the St. Lawrence Seaway system; I have not been
+able to find any message documentation on PAWSS with which to verify
+this, however.
+
+=== U.S. Coast Guard Extended AIVDM ===
+
+You may occasionally see AIVDM packets with additional comma-separated
+fields following the CRC-32 checksum.  This is a semi-obsolescent
+logging format used by the USCG, which has never documented it well
+and plans to replace it with a new one based on NMEA 4.0.
+
+Here's a sample sentence and field breakdown:
+
+-------------------------------------------------------------------------------
+!AIVDM,1,1,,B,15Cjtd0Oj;Jp7ilG7=UkKBoB0<06,0*63,s1234,d-119,T12.34567123,r003669958,1085889680
+-------------------------------------------------------------------------------
+
+Following the "*63" checksum are additional fields delimited by commas.  
+These fields provide additional metadata about the reception of each AIS  
+broadcast.
+
+The field beginning with the lower case "s" is a Relative Signal  
+Strength Indicator (RSSI) measurement from the receiver. This  
+measurement has a range of 0-65535. This is one of the parameters used  
+internally by the AIS receiver to determine the signal strength value as  
+reported in the field beginning with the lower case "d". This field only  
+exists when the AIS receiver provides this data.
+
+The field beginning with a lower case "d" is the signal strength  
+measurement for this broadcast in dBm. This field only exists when the  
+AIS receiver provides this data.
+
+The field beginning with the upper case "T" is the Time of Arrival  
+of the received broadcast in seconds from UTC 0. This field only exists  
+when the AIS receiver provides this data.
+
+Another optional field not shown is one that begins with an upper  
+case "S" and represents the slot number in which the reception occurred.  
+The field would appear after the checksum and before the station  
+identifier field. This field only exists when the AIS receiver provides  
+this data. Example: S0042
+
+The field beginning with the lower case "r" is a station identifier  
+field. This field is always provided, regardless of the type of AIS  
+equipment.  (Occasionally a base station identifier will be prefixed with
+"b" instead.)
+
+The last field is a time tag based on the standard C programming  
+language time function. Both date and time to the nearest second can be  
+derived from this field. This field is always provided, regardless of  
+the type of AIS equipment.
+
+== AIS Payload Byte Alignment, Padding, and Bit Stuffing ==
+
+Warning: Here there be dragons. Read with care. Once you get through
+it, you will at least not encounter anything more confusing in the
+rest of this document.
+
+=== Byte Alignment ===
+
+AIS is a bit-sync protocol.  While some fields within AIS payloads are
+8-bit-byte-aligned with preceding padding, most are not. Furthermore,
+while most message variants have bit lengths that are a multiple of 8,
+some do not.
+
+<<ITU1371>> includes a single sentence, easy to miss, requiring
+over-the-air messages to have trailing padding to a 8-bit boundary.
+In most cases message lengths are a multiple of 8 with trailing spare
+fields added to ensure this; thus, the requirement will not change the
+transmitted bitlength of the message from what's described in the
+standard. There are, however, two exceptions to this rule.
+
+One is an apparent error in the format design.  The type 15 message
+has a variant with 108 data bits and a trailing 2-bit spare field, for
+110. This spare should have been 4 bits to guarantee a byte boundary
+at 112 bits. Decoders need to be prepared to encounter this length
+in case the transmitter has implemented the padding reqirement 
+properly.
+
+The other is messages containing variable-length text packed into
+6-bit nibbles: types 6, 12, and 14.  They may have trailing padding
+after the last nibble to get to an 8-bit boundary.  Decoders should
+be prepared to encounter and ignore this.
+
+The variable-length binary message types 8, 17, 25, and 26 are
+constrained to have data payloads of a size such that the payload ends
+on a byte boundary, but should not require special handling on this
+account. The binary data in message types 8 and 17 is also guaranteed
+to *begin* on a byte boundary, but this is not true of the addressed
+variants of type 25 and 26.
+
+=== Interaction with AIVDM padding ===
+
+AIVDM armoring introduces a second layer of padding, with confusing
+consequences.  The real payload, already padded to a bit length that
+is a multiple of 8 by the AIS radio layer, gets armored as a sequence
+of ASCII characters encoding 6-bit nibbles.  To capture all of it, the
+payload must in effect be padded to the next multiple of 6.
+
+Consider a type 12 message with 5 sixbit characters in it. These will
+become bits 72-102 in the over-the-air message. The AIS radio layer will
+pad that to 104 bits at transmission to get to an 8-bit boundary.  The
+receiver, reporting the data in AIVDM armoring, will pad that to 108
+bits to get to a 6-bit boundary, encode the result, and issue a pad
+character of '4' to indicate that the low 4 bits of the last 6-bit
+nibble should be ignored.
+
+Because these requirements are tricky and poorly documented in the
+official standards, receivers not uncommonly get them wrong.  The most
+common way to get them wrong seems to be by computing the pad
+character incorrectly.  
+
+The most common error observed in the wild on AISHub is reporting a
+pad 2 bits too small, making the message look like it is 2 bits longer
+than it actually is.  This seems for some reason to be most common 
+on Type 5 messages, which then decode as 426 bits rather than 424.
+
+Accordingly, we recommend that when validating fixed-size messages by
+type and bit-length, decoders should accept messages that are up to 5
+bits over their theoretically correct length.
+
+For messages with a variable-length trailing payload (6, 8, 12, 14,
+17, 25, 26) there is no way to detect that the pad character might
+be wrong.  If it is, this will manifest as truncation of rhe last
+nibble or extra trailing zero data.
+
+=== Bit Stuffing ===
+
+The following probably will not effect decoders. Nevertheless we
+document it here because it is just the sort of thing that is (a)
+likely to confuse implementors reading the public portions of the
+standards, and (b) all too likely to become visible if there are
+firmware or software errors in the transmission chain.
+
+There are references to "bit-stuffing" in the <<IALA>> clarifications
+describing certain payload fields.  <<C2>> reveals the following in
+3.2.2.1: "The bitstream is subject to bit stuffing. This means that if
+more than 5 consecutive 1s are found in the output bit stream, a zero
+is inserted. This applies to all bits except the databits of HDLC
+flags."  <<IALA>> clarifies as follows: "On the transmitting side,
+this means that if five (5) consecutive ones (1s) are found in the
+output bit stream, a zero should be inserted after the five (5)
+consecutive ones (1s). This applies to all bits between the HDLC flags
+[...] On the receiving side, the first zero after five (5) consecutive
+ones (1s) should be removed."
+
+It appears that this bit stuffing is meant to be performed by the AIS
+radio link layer at transmission time and undone at reception time,
+and should not be visible in AIVDM payloads reported by the
+receiver.  
+
+== AIS feed sites ==
+
+Most sites that advertise "live" AIS feeds actually give you a map
+display through a browser.  Here are a few from which you can get raw
+sentence data over a TCP/IP port for testing.  Coverage on these is
+not yet very comprehensive; these sites tend to have good coverage in
+Europe, the U.S. and a few ports in Asia but to be spotty elsewhere.
+See their siting maps for details.
+
+- http://aishub.net[AIS Hub]:
+Share alike. You contribute a feed, you get back all feeds.
+
+- http://www.aislive.com/[AIS Live]:
+Subscription access to real-time data. No onger has free access even 
+to delayed data. 
+
+- hd-sf.com:9009
+Free San Francisco Bay Area AIS feed. For non-commercial use only.
+
+== JSON-AIS encoding ==
+
+Here is an application of the JSON metaformat to present AIS data in a
+form more convenient for application use than AIVDM/AIVDO sentences.
+This encoding is implemented by GPSD and its client libraries.  It is
+decribed here because (a) the specification is closely tied to the
+field encodings, and (b) the author wishes to offer it as an
+interoperability standard for other applications.
+
+One previous effort, <<HAM-JSON-AIS>>, has been made to define a
+JSON-based standard for exchange of unpacked, human-readable AIS
+data. The latest version at time of writing, from December 2008,covers
+only a small subset of the most common AIS messages, and many data
+fields in the messages it does dump are omitted.  The member names
+given in the bit-field tables match the attributes used in HAM-JSON-AIS
+when HAM-JSON-AIS includes that field.
+
+The general ground rules for JSON-AIS encoding are as follows:
+
+1. Each sentence is a JSON object.
+
+2. When multiple kinds of JSON objects may occur in a data stream, AIS 
+objects have the attribute "class":"AIS".
+
+3. Collections of fields aggregating to a timestamp are dumped in ISO8601
+format. Messages for which this rule is relevant are type 4 and type 5.
+
+4. There are two variants of the encoding, one scaled and one
+unscaled, which differ in the treatment of float and
+controlled-vocabulary fields. An AIS-JSON object may have the optional
+attribute "scaled":true to signify that the rest of its fields are
+scaled; if this attribute has the value 'false' or is omitted, no
+scaling has been performed.  Message types for which the unscaled and
+scaled dumps will differ are 1-5, 9, 11, 17-19, and 21-24.
+
+5. In unscaled mode, float-valued fields are dumped in their unscaled
+integer form. In scaled mode, division or other specified scaling is
+applied and the value dumped as a float, *except* that certain extreme
+or data-unavailable value as may be dumped as fixed strings; see the
+table below.
+
+6. In unscaled mode, the values of controlled-vocabulary fields are dumped as
+integer indices.  In scaled mode, the values are dumped as strings.
+
+.Special fields
+[frame="topbot",options="header"]
+|===========================================================================
+|Message | Float fields                  | Controlled vocabularies
+| 1-3    | turn, speed, lon, lat         | -
+| 4, 11  | lon, lat                      | epfd
+| 5      | draught                       | shiptype, epfd
+| 9      | alt, speed                    | -
+| 17-18  | lon, lat                      | -
+| 19     | lon, lat                      | shiptype, epfd
+| 21     | lon, lat                      | aid_type, epfd
+| 22-23  | ne_lon,ne_lat, sw_lon, sw_lat | -
+| 24     | -                             | shiptype
+|===========================================================================
+
+.String special values in scaled mode
+[frame="topbot",options="header"]
+|===========================================================================
+|Message | Fieldname | Special values
+| 1-3    | turn      | 
+"nan" = not available, "fastright" = fast right turn (above 127 degrees),
+"fastleft" = fast left turn (above 127 degrees).
+| 1-3    | speed     | "nan" = not available, "fast" = speed >= 102.3 knots
+|  9     | alt       | "nan" = not available, "high" = alt >= 4094 meters 
+|  9     | speed     | "nan" = not available, "fast" = speed >= 1023.0 knots
+|===========================================================================
+
+== References ==
+
+[bibliography]
+- [[[AIS]]] http://en.wikipedia.org/wiki/Automatic_Identification_System[Automatic
+Identification System]
+
+- [[[SOLAS]]]
+  http://www.navcen.uscg.gov/enav/ais/AIS_Regs_SOLAS_MTSA_FR.pdf[SOLAS
+  AIS Regulations]
+
+- [[[US-REQUIREMENTS]]]
+  http://www.navcen.uscg.gov/enav/AIS/AIS_carriage_reqmts.htm[AIS
+  Carriage Requirements]
+
+- [[[ITU1371]]]
+  http://www.itu.int/rec/R-REC-M.1371-2-200603-I/en[ITU-R M.1371:
+  ITU Recommendation on the Technical Characteristics for a Universal
+  Shipborne Automatic Identification System (AIS) using Time Division
+  Multiple Access in the Maritime Mobile Band]. 
+  Reference included for completeness; I have not looked at it.
+
+- [[[IALA]]]  http://www.ialathree.org/iala/pages/AIS/IALATech1.5.pdf[IALA
+  Technical Clarifications on Recommendation ITU-R M.1371-1]
+
+- [[[NAVCEN]]] http://www.navcen.uscg.gov/enav/ais/[NAVCEN AIS pages]
+
+- [[[NMEA]]] http://gpsd.berlios.de/standards/NMEA.txt[NMEA sentences]
+
+- [[[IMO236] http://www.imo.org/includes/blastData.asp/doc_id=4503/236.pdf[IMO
+  Circular 236: Guidance on the Application of AIS Binary Messages (2004)]
+
+- [[[SEAWAY]]] http://www.greatlakes-seaway.com/en/pdf/aisdata.pdf[St. Lawrence
+  Seaway AIS Data Messaging Formats and Specifications]
+
+- [[[NAV55]]]
+  http://vislab-ccom.unh.edu/~schwehr/papers/2009-Nav55-CG-AIX-Report-Annex1.pdf[IMO
+  NAV 55 Report Annex 1: Guidance on the Application of AIS Binary
+  Messages (2009)]
+
+- [[[Schwehr]]] http://schwehr.org/blog/[Kurt Schwehr's weblog]
+
+- [[[IEC-PAS]]] IEC-PAS 61162-100, "Maritime navigation and
+  radiocommunication equipment and systems"  The six-bit encoding
+  is described on page 26 of Annex C, Table C-1. Communicated by 
+  Kurt Schwehr; I have not looked at it.
+
+- [[[IEC 62287]]] "Maritime Navigation and Radiocommunication
+  Equipment and Systems – Class B Shipborne Equipment of the
+  Automatic Identification System (AIS)" Communicated by Mike Greene;
+  I have not looked at it.
+
+- [[[ITU-MID]]] http://www.itu.int/cgi-bin/htsh/glad/cga_mids.sh?lng=E[Table 
+  of Maritime Identification Digits]
+
+- [[[RAIM]]] http://en.wikipedia.org/wiki/RAIM[Receiver Autonomous
+  Integrity Monitoring]
+
+- [[[C2]]] http://www.uais.org/AISspecificationCorrigendum2.pdf[AIS
+  Specification Corrigendum 2]
+
+- [[[MMSI]]] http://www.navcen.uscg.gov/marcomms/gmdss/mmsi.htm#format[MMSI 
+  Format]
+
+- [[[HAM-JSON-AIS]]] http://wiki.ham.fi/JSON_AIS.en[JSON AIS transmission protocol]
+
+- [[[AISHUB]]] http://www.aishub.net/[AIS Hub, the AIS data sharing center]
+
+== Change history ==
+
+Version 1.0 was the initial release covering messages 1-3, 4, and 5.
+
+Version 1.1 adds message breakdowns for 9 and 18, explanation of the
+Repeat Indicator feld, and the explanation of USCG extended AIVDM.
+
+Version 1.2 adds information on the the ITU1371 edition 3 maneuver field,
+and the RAIM flag. It also adds an important clarification about
+six-bit decoding.
+
+Version 1.3 adds information on message types 6, 7, 12, and 13, and
+attempts to demystify bit-stuffing.
+
+Version 1.4 adds explicit decoding tables for ASCII armoring and
+six-bit ASCII.
+
+Version 1.5 corrects the interpretation of field 7 in AIVDM
+ASCII-armored sentences.
+
+Version 1.6 corrects some minor errors in the interpretation of Type
+5 messages.
+
+Version 1.7 adds descriptions for Type 10, 11, 19, 21, and 24
+messages, information about ITU-1371-3 flags in message type 18,
+and the new section on Improving This Document.
+
+Version 1.8 fixes some broken markup and adds information about JSON-AIS.
+
+Version 1.9 adds more information on JSON and the member names.
+
+Version 1.10 fixes a typo in the formula for undoing 6-bit armoring.
+
+Version 1.11 describes message types 15, 16, and 17.
+
+Version 1.12 describes messages 20 and 22, and adds navigation aid
+type codes.
+
+Version 1.13 documents more out-of-band values and treats radio status
+blocks more uniformly.
+
+Version 1.14 documents message 23.
+
+Version 1.15 corrects an incorrect member name in message 5. It didn't
+match my C code, but had no effect on conformance with the standard. I
+corrected it because it confused someone working on a Python decoder.
+
+Version 1.16 incorporated various minor fixes and corrections from
+Neal Arundale.  One 'standard' fieldname changed, in message type 21:
+type -> aid_type.
+
+Version 1.17 clarifies the role of @ as a terminator in 6-bit text.
+
+Version 1.18 notes a possible off-by-two error in the standards'
+description of type 14, and noted that type 25 and 26 have not
+been observed in the wild.  It also adds a more complete description
+of AIS data types and some pragmatics about spare and reserved fields.
+
+Version 1.19 adds a description of AIS Hub.
+
+Version 1.20 adds a list of AIS feed sites - just two, so far.
+
+Version 1.21 describes JSON-AIS more completely.  It adds descriptions
+for AIS messages type 25 and 26, not yet observed in the wild.
+
+Version 1.22 describes the problem with message length checks.
+Notes on EPFD value 15 and shiptype values > 99 are added.  Added
+another AIS feed. Corrections and more details on message 22.
+
+Version 1.23 corrects some typos and numbering errors in the
+description of message 19 (field widths where correct, though).
+Also, AISlive no longer offers free delayed access.
+
+Version 1.24 breaks the Type 6 and 8 application_id field into 
+DAC and FID and adds tables for know DAC/FID pairs and their sources.
+Unspecified fields are noow omitted in JSON dumps.  A new section
+"AIS byte alignment, bit stuffing, and padding", reveals some 
+particularly black magic.
+
