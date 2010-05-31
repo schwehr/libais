@@ -10,7 +10,7 @@
 
 #include <iostream> // for checkpoint
 
-#define CHECKPOINT std::cerr <<  __FILE__ << ":" << __LINE__ << " checkpoint" << std::endl
+#define CHECKPOINT std::cerr <<  __FILE__ << ": line " << __LINE__ << ": checkpoint" << std::endl
 
 
 extern bool nmea_ord_initialized; // If this is false, you need to call build_nmea_lookup.
@@ -37,11 +37,26 @@ extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
 
 class AisMsg {
 public:
-    bool had_error() {return status != AIS_OK;}
+    int message_id;
+    int repeat_indicator;
+    int mmsi;
+
+    bool had_error() {
+        /*
+        std::cout << "in_had_error: " << status << " " << AIS_OK << " "  << (AIS_OK != status)
+                  << " " << false << true << std::endl
+                  << "\t" << AIS_STATUS_STRINGS[AIS_OK] << " "
+                  <<  AIS_STATUS_STRINGS[status] << "\n";
+
+        const bool result = (status != AIS_OK);
+        std::cout << "error_status: " << (result?"HAD_ERROR":"should be okay") << std::endl;
+        return result; */
+        return status != AIS_OK;
+    }
     AIS_STATUS get_error() {return status;}
-    AisMsg() {init();}
-protected:
     AIS_STATUS status; // AIS_OK or error code
+    //AisMsg() {init();}
+protected:
     void init() {status = AIS_OK;}
 };
 
@@ -266,6 +281,23 @@ public:
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
+
+// IMO met hydro
+class Ais8_366_34 : public Ais8 {
+public:
+    int zone_id;
+    int zone_type;
+    int day;
+    int hour;
+    int minute;
+    int dur_min; // duration in minutes
+    
+
+    Ais8_366_34(const char *nmea_payload, const int pad=0);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_366_34 const& msg);
+
 
 class Ais9 : public AisMsg {
 public:
@@ -569,9 +601,6 @@ std::ostream& operator<< (std::ostream& o, Ais20 const& msg);
 // 'E' - Aids to navigation report - FIX: not yet coded
 class Ais21 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
 
     int aton_type;
     std::string name;
@@ -584,7 +613,7 @@ public:
     int fix_type;
     int timestamp;
     bool off_pos;
-    int status;
+    int aton_status;
     bool raim;
     bool virtual_aton;
     bool assigned_mode;
@@ -592,7 +621,7 @@ public:
     // Extended name goes on the end of name
     int spare2;
 
-    Ais21(const char *nmea_payload);
+    Ais21(const char *nmea_payload, const int pad=0);
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais21 const& msg);

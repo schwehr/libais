@@ -7,6 +7,8 @@
 int main(UNUSED int argc, UNUSED char* argv[]) {
     build_nmea_lookup();
 
+    //CHECKPOINT;
+
     ////////////////////////////////////////
     // 1
     ////////////////////////////////////////
@@ -73,7 +75,9 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     }
 
     ///// 1 11 IMO Met Hydro
-    if (true) {
+    
+    if (false) {
+        CHECKPOINT;
         int i=0;
         // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
         { 
@@ -82,8 +86,26 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
         }
+        CHECKPOINT;
 
     }
+
+    ///// 366 34 - Old Zone Messages - Used up to Summer 2010 in Boston
+    // http://schwehr.org/blog/archives/2009-10.html#e2009-10-15T16_52_31.txt
+    if (false) {
+        CHECKPOINT;
+        int i=0;
+        // Whales observed: !AIVDM,1,1,,B,803OvriK`R0FaqT6gOv763PKLT;0,0*25,d-089,S0392,t204010.00,T10.45701635,r003669945,1255466410,cornell,1255466411.9
+        { 
+            Ais8_366_34 msg("803OvriK`R0FaqT6gOv763PKLT;0"); i++;
+            if (!msg.had_error()) msg.print(); 
+            else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+        CHECKPOINT;
+
+    }
+
 
     //////////////////////////////////////////////////////////////////////
     // 9 - Search and rescue
@@ -268,6 +290,35 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         }
 
     }
+
+
+    //////////////////////////////////////////////////////////////////////
+    // 21 - ATON status report
+    //////////////////////////////////////////////////////////////////////
+
+    if (true) {
+        //CHECKPOINT;
+        int i=0;
+        // From OHMEX test at CCOM
+        // !AIVDM,1,1,,A,E52HH<h:W4?Sa2Pb?Q0dgVPa4W0uM`P9<EmvH00000u@20,4*15,1269957000.16
+        if (false) { 
+            CHECKPOINT;
+            Ais21 msg("E52HH<h:W4?Sa2Pb?Q0dgVPa4W0uM`P9<EmvH00000u@20");  i++;
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 21 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+
+        //!AIVDM,2,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q,0*46
+        //!AIVDM,2,2,5,B,:D44QDlp0C1DU00,2*36
+        // Becomes !AIVDM,1,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q:D44QDlp0C1DU00,2*63
+        { 
+            Ais21 msg("E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q:D44QDlp0C1DU00");  i++;
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 21 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+            std::cout << "\n"; 
+        }
+
+    }
+
 
     //////////////////////////////////////////////////////////////////////
     // 24 - Class B static data msgs A and B

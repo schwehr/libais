@@ -25,6 +25,9 @@ SRCS += ais9.cpp ais10.cpp ais12.cpp
 SRCS += ais14.cpp
 #
 SRCS += ais18.cpp ais19.cpp
+#
+SRCS += ais21.cpp
+#
 SRCS += ais24.cpp
 OBJS := ${SRCS:.cpp=.o}
 

@@ -63,12 +63,14 @@ void Ais8::print() {
 Ais8_1_11::Ais8_1_11(const char *nmea_payload) {
     assert(nmea_payload);
     init();
+    //CHECKPOINT;
 
     if (strlen(nmea_payload) != 59) {  status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
     std::bitset<354> bs;  // 352 + 2 spares to be 6 bit aligned
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;  // checks status
+    // CHECKPOINT;
 
     message_id = ubits(bs, 0, 6);
     if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
@@ -79,6 +81,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload) {
     dac = ubits(bs,40,10);
     fi = ubits(bs,50,6);
 
+    //CHECKPOINT;
     // FIX: if dac is not 001, it could still possibly be correct
     if ( 1 != dac || 11 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
     

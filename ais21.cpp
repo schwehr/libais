@@ -3,18 +3,10 @@
 #include "ais.h"
 
 Ais21::Ais21(const char *nmea_payload, const int pad) {
-    //CHECKPOINT;
     assert(nmea_payload);
     init();
-    //CHECKPOINT;
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-    const size_t extra_total_bits = num_bits - 272;
-    const size_t extra_chars = extra_total_bits / 6;
-    const size_t extra_char_bits = extra_chars * 6;
-    const size_t extra_bits = extra_total_bits % 6;
-    //std::cout << "EXTRA: " << num_bits << " " << extra_char_bits << " " << extra_chars << " " << extra_bits << std::endl;
-    // Warning... incoming pad may be wrong!
 
     // 272-360 - FIX: make this more careful
     if (272 > num_bits || num_bits > 360) { status = AIS_ERR_BAD_BIT_COUNT; return; }
@@ -22,7 +14,6 @@ Ais21::Ais21(const char *nmea_payload, const int pad) {
     std::bitset<360> bs; // 360 % 6 == 0 -> 60 NMEA characters exactly
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
-    //CHECKPOINT;
     
     message_id = ubits(bs, 0, 6);
     if (message_id != 21) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
@@ -46,15 +37,14 @@ Ais21::Ais21(const char *nmea_payload, const int pad) {
     assigned_mode = bool(bs[270]);
     spare = bs[271];
 
-    //CHECKPOINT;
+    const size_t extra_total_bits = num_bits - 272;
+    const size_t extra_chars = extra_total_bits / 6;
+    const size_t extra_char_bits = extra_chars * 6;
+    const size_t extra_bits = extra_total_bits % 6;
 
     if (extra_chars > 0) {
         name += ais_str(bs,272,extra_char_bits);
-    } /*else {
-        std::cout << "NO_EXTRA_STR: " << extra_chars << std::endl;
-        }*/
-
-    //CHECKPOINT;
+    }
 
     if (extra_bits > 0) {
         spare2 = ubits(bs,272+extra_char_bits, extra_bits);
