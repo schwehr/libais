@@ -282,7 +282,7 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
 
-// IMO met hydro
+// Old Zone message for SBNMS / Boston right whales
 class Ais8_366_34 : public Ais8 {
 public:
     int zone_id;
