@@ -20,3 +20,13 @@ CREATE TABLE vessel_name (
 
 -- CREATE INDEX vessel_name_pkey ON vessel_name(mmsi); -- created automatically
 CREATE INDEX vessel_name_rc_idx ON vessel_name(response_class);
+
+CREATE  TABLE response_class (
+        class_id INTEGER PRIMARY KEY NOT NULL UNIQUE,
+        class_name VARCHAR(60) NOT NULL UNIQUE
+);
+INSERT INTO response_class VALUES (0,'Generic Vessel');
+INSERT INTO response_class VALUES (1,'Response');
+INSERT INTO response_class VALUES (3,'Research');
+INSERT INTO response_class VALUES (4,'Skimmer');
+INSERT INTO response_class VALUES (5,'Government');
