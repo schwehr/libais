@@ -211,12 +211,15 @@ std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 
 // 366 34 - Kurt older whale message 2008-2010
 
+const size_t AIS8_MAX_BITS = 1192;
+
 // AIS Binary Broadcast message ... parent to many
 class Ais8 : public AisMsg {
-private:
-    static const int MAX_BITS = 1008;
+    //protected:
 public:
     Ais8() {}
+
+    static const int MAX_BITS = AIS8_MAX_BITS; //1192; //1008;
 
     int message_id;
     int repeat_indicator;
@@ -286,7 +289,15 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
 
+
+// New IMO Circ 289 Area notice broadcast is DAC 1, FI 22
+// US will use the RTCM Regional Message.  DAC 366, FI 22
+// Hopefully, the two shall become the same.  -kds 10/2010
+#include "ais8_366_22.h"
+
+
 // Old Zone message for SBNMS / Boston right whales
+#if 0
 class Ais8_366_34 : public Ais8 {
 public:
     int zone_id;
@@ -301,7 +312,7 @@ public:
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_366_34 const& msg);
-
+#endif
 
 class Ais9 : public AisMsg {
 public:
