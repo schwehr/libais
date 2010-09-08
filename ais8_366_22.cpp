@@ -5,6 +5,8 @@
 #include "ais.h"
 #include <cmath>
 
+const char *shape_names[8] = {"Circle/Pt","Rect", "Sector","Polyline","Polygon","Text","Reserved_6","Reserved_7"};
+
 const char *notice_names[AIS8_366_22_NUM_NAMES] = { // 128] = {
    "Caution Area: Marine mammals habitat", // 0
    "Caution Area: Marine mammals in area – reduce speed", // 1
@@ -178,16 +180,29 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload) {
 
 }
 
-void
-Ais8_366_22::print() {
-    std::cout << "Area Notice: " << message_id << "\n"
-              << "\t\tdac: " << dac << "\tfi:" << fi << "\n"
-              << "\t\tArea type: " << notice_type 
-              << " -> [" << notice_names[notice_type] << "]\n";
+Ais8_366_22::~Ais8_366_22() {
+    std::cout << "Ais8_366_22: destructor" << std::endl;
+    for (size_t i=0; i < sub_areas.size(); i++) {
+        delete sub_areas[i];
+    }
+    std::cout << "\n\n";
 }
 
+void
+Ais8_366_22::print() {
+    std::cout << "Area_Notice: " << message_id << "\n"
+              << "\tdac: " << dac << "\tfi:" << fi << "\n"
+              << "\tArea_type: " << notice_type 
+              << " -> [" << notice_names[notice_type] << "]\n";
+    for (size_t i=0; i < sub_areas.size(); i++) {
+        std::cout << "\tSubarea: " << i << std::endl;
+        sub_areas[i]->print();
+    }
+}
 
-int scale_multipliers[4] = {1,10,100,1000};
+// Lookup table for the scale factors to decode the length / distance fields. 
+// The index is the "Scale Factor"
+static int scale_multipliers[4] = {1,10,100,1000};
 
 Ais8_366_22_Circle::Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
@@ -196,17 +211,98 @@ Ais8_366_22_Circle::Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, con
     //precision = ubits(bs,offset+5+28+27,2);  // FIX: should precision
     radius_m  = ubits(bs,offset+5+28+27/*+2*/,12) * scale_multipliers[scale_factor];
     spare     = ubits(bs,offset+5+28+27/*+2*/+12,16);
-    std::cout << "Circle_constructor:"
-              << " " << x << " " << y << " radius_m: " << radius_m
-        //<< " precision FIX(!?!?) " << precision 
-              << std::endl;
 }
 
 void Ais8_366_22_Circle::print() {
-    std::cout << "\t\t\tCircle: " << " " << x << " " << y << " radius_m: " << radius_m
-        //<< " precision FIX(!?!?) " << precision 
+    if (radius_m == 0) 
+        std::cout << "\t\tPoint: " << " " << x << " " << y << "  (Can start a polyline or polygon)" << std::endl;
+    else 
+        std::cout << "\t\tCircle: " << " " << x << " " << y << " radius_m: " << radius_m << std::endl;
+              
+    //<< " precision FIX(!?!?) " << precision 
+}
+
+Ais8_366_22_Rect::Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+    const int scale_factor = ubits(bs,offset+3,2);
+    x          = sbits(bs, offset+5, 28) / 600000.;
+    y          = sbits(bs, offset+5+28, 27) / 600000.;
+    e_dim_m    = ubits(bs, offset+5+28+27, 8) * scale_multipliers[scale_factor];
+    n_dim_m    = ubits(bs, offset+5+28+27+8, 8) * scale_multipliers[scale_factor];
+    orient_deg = ubits(bs, offset+5+28+27+8+8, 9);
+    spare      = ubits(bs, offset+5+28+27+8+8+9, 5);
+}
+
+void Ais8_366_22_Rect::print() {
+    std::cout << "\t\tRectangle: " << " " << x << " " << y 
+              << " e_dim_m: " << e_dim_m << " n_dim_m: " << n_dim_m
+              << " orient_deg: " << orient_deg
               << std::endl;
 }
+
+Ais8_366_22_Sector::Ais8_366_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+    const int scale_factor = ubits(bs,offset+3,2);
+    x          = sbits(bs, offset+5, 28) / 600000.;
+    y          = sbits(bs, offset+5+28, 27) / 600000.;
+    radius_m        = ubits(bs,offset+5+28+27,12) * scale_multipliers[scale_factor];
+    left_bound_deg  = ubits(bs, offset+5+28+27+12, 9);
+    right_bound_deg = ubits(bs, offset+5+28+27+12+9, 9);
+}
+
+void Ais8_366_22_Sector::print() {
+    std::cout << "\t\tSector: " << " " << x << " " << y << " radius_m: " << radius_m
+              << " left_bound_deg: " << left_bound_deg << " right_bound_deg: " << right_bound_deg
+              << std::endl;
+}
+
+
+Ais8_366_22_Polyline::Ais8_366_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+    const int scale_factor = ubits(bs,offset+3,2);
+    for (size_t i=0; i<4; i++) {
+        const int angle = ubits(bs, offset+5+ (i*21), 10);
+        const int dist  = ubits(bs, offset+5+10+ (i*21), 11) * scale_multipliers[scale_factor];
+        if (0==dist) break;
+        angles.push_back(angle);
+        dists_m.push_back(dist);
+    }
+    spare = bs[offset+89];
+}
+
+void Ais8_366_22_Polyline::print() {
+    std::cout << "\t\tPolyline: " << std::endl;
+    for (size_t i=0; i<angles.size(); i++) {
+        std::cout << "\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
+    }
+}
+
+Ais8_366_22_Polygon::Ais8_366_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+    const int scale_factor = ubits(bs,offset+3,2);
+    for (size_t i=0; i<4; i++) {
+        const int angle = ubits(bs, offset+5+ (i*21), 10);
+        const int dist  = ubits(bs, offset+5+10+ (i*21), 11) * scale_multipliers[scale_factor];
+        if (0==dist) break;
+        angles.push_back(angle);
+        dists_m.push_back(dist);
+    }
+    spare = bs[offset+89];
+}
+
+void Ais8_366_22_Polygon::print() {
+    std::cout << "\t\tPolygon: " << std::endl;
+    for (size_t i=0; i<angles.size(); i++) {
+        std::cout << "\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
+    }
+}
+
+Ais8_366_22_Text::Ais8_366_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+    text = std::string(ais_str(bs, offset+3, 84));
+    spare = ubits(bs,offset+87,3);
+}
+
+void Ais8_366_22_Text::print() {
+    std::cout << "\t\tText: [" << text << "]" <<std::endl;
+}
+
+
 
 // Ais8_366_22_AreaShapeEnum getAreaShape(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
 //     // Figure out which shape type or set as an error
@@ -217,37 +313,44 @@ void Ais8_366_22_Circle::print() {
 // Call the appropriate constructor
 Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const Ais8_366_22_AreaShapeEnum area_shape = (Ais8_366_22_AreaShapeEnum)ubits(bs, offset, 3);
+    std::cout << "area_shape: off: " << offset << " shape: "<< area_shape << " [" << shape_names[area_shape] << "]\n";
     if (AIS8_366_22_SHAPE_ERROR == area_shape) {
         std::cerr << "ERROR: Bad area shape!  Bummer" << std::endl;
         return 0;
     }
+    Ais8_366_22_SubArea *area=0;
     switch (area_shape) {
     case AIS8_366_22_SHAPE_CIRCLE:
-        {
-            Ais8_366_22_Circle *area = new Ais8_366_22_Circle(bs, offset);
-            return area;
-        }
-        //break;
-    case AIS8_366_22_SHAPE_RECT:
-        assert(false);
+        std::cout << "Found circle" << std::endl;
+
+        area = new Ais8_366_22_Circle(bs, offset);
         break;
+    case AIS8_366_22_SHAPE_RECT:
+        std::cout << "Found rect" << std::endl;
+        area = new Ais8_366_22_Rect(bs, offset);
+        return area;
     case AIS8_366_22_SHAPE_SECTOR:
-        assert(false);
+        std::cout << "Found sector" << std::endl;
+        area = new Ais8_366_22_Sector(bs, offset);
         break;
     case AIS8_366_22_SHAPE_POLYLINE:
-        assert(false);
+        std::cout << "Found polyline" << std::endl;
+        area = new Ais8_366_22_Polyline(bs, offset);
         break;
     case AIS8_366_22_SHAPE_POLYGON:
-        assert(false);
+        std::cout << "Found polygon" << std::endl;
+        area = new Ais8_366_22_Polygon(bs, offset);
         break;
     case AIS8_366_22_SHAPE_TEXT:
-        assert(false);
+        area = new Ais8_366_22_Text(bs, offset);
         break;
     case AIS8_366_22_SHAPE_RESERVED_6: // FALLTHROUGH
     case AIS8_366_22_SHAPE_RESERVED_7: // FALLTHROUGH
+        std::cerr << "Warning: bad area shape" << std::endl;
+        break;
     case AIS8_366_22_SHAPE_ERROR: // FALLTHROUGH
     default:
         assert(false);
     }
-    return 0; // Should never get here
+    return area; 
 }

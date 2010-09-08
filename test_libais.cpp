@@ -359,14 +359,14 @@ decoded: AreaNotice: type=0  start=2010-07-06 12:00:00  duration=60 m  link_id=1
 original_geojson: {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.0]}, "area_shape_name": "point", "area_shape": 0}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
 decoded_geojson:  {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.0]}, "area_shape_name": "point", "area_shape": 0}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
 #endif
-        {
+        if (false) {
             // Point
             Ais8_366_22 msg("81mg=5AKUP:0>H0007P=P?I0<12h000000");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
 
-        {
+        if (false) {
             //# Circle
             // AreaNotice: type=1  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
             // !ECBBM,1,1,3,A,8,5fF0`2qP000N1n0uT0h7mH3E0000,5*42
@@ -377,6 +377,66 @@ decoded_geojson:  {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas"
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
+
+        if (false) {
+        //if (true) {
+            std::cout << "========== Rectangle =========\n\n";
+            // AreaNotice: type=3  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
+            // {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"n_dim": 1000, "orientation": 0, "geometry": {"type": "Polygon", "coordinates": [[-69.80000000000004, 42.099999999999966], [-69.75162960655275, 42.100327032875335], [-69.7517359921246, 42.10933275886458], [-69.80011323018579, 42.1090056233274], [-69.80000000000004, 42.099999999999966]]}, "area_shape": 1, "e_dim": 4000, "area_shape_name": "rectangle"}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
+            // !ECBBM,1,1,3,A,8,5fF0`6qP000N6n0uT0h;OgU0D000,5*27
+            // !AIVDM,1,1,,A,81mg=5AKUP:1fH0007QeP?I0<2osq@5000,3*07
+            Ais8_366_22 msg("81mg=5AKUP:1fH0007QeP?I0<2osq@5000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+        if (false) {
+            std::cout << "========== Sector =========\n\n";
+            //Sector AreaNotice: type=4  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
+            Ais8_366_22 msg("81mg=5AKUP:2>H0007R=P?I0<3jQwl0:6@");
+            if (!msg.had_error()) msg.print(); else std::cout<<"Sector FAILED\n";
+            std::cout << "\n";
+        }
+
+        if (false) {
+            std::cout << "========== Line =========\n\n";
+            // Line - 1 segment
+            {
+                Ais8_366_22 msg("81mg=5AKUP:5>H0007P=P?I0>CQh000003@D7QJ00;@01J000"); //81mg=5AKUP:2fH0007P=P?I0<4e7p00003@D7QJ00;@");
+                if (!msg.had_error()) msg.print(); else std::cout<<"Line seg FAILED\n";
+            }
+            std::cout << "========== END LINE ==========\n\n";
+        }
+
+        if (false) {
+            std::cout << "========== Polygon =========\n\n";
+            // Polygon - 2 segment - triangle
+            {
+                Ais8_366_22 msg("81mg=5AKUP:3>H0007P=P?I0<5Wep000040DchFWWc@01J000");
+                if (!msg.had_error()) msg.print(); else std::cout<<"Polygon FAILED\n";
+            }
+            std::cout << "========== END POLYGON ==========\n\n";
+        }
+
+        if (false) {
+            std::cout << "========== START TEXT ==========\n\nText should be [EXPLANATION]\n";
+            // Text AreaNotice: type=7  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 2
+            {
+                Ais8_366_22 msg("81mg=5AKUP:3fH0007P=P?I0<6RCp000055H@<1>1D9?>0000");
+                if (!msg.had_error()) msg.print(); else std::cout<<"Text FAILED\n";
+            }
+            std::cout << "========== END TEXT ==========\n\n";
+        }
+
+        if (true) {
+            // one-of-each
+            std::cout << "========== START ONE OF EACH ==========\n\n";
+            Ais8_366_22 msg("81mg=5AKUP:4>H0007P=P?I0<8GOp00000=P?I0<8GOsr0001MPdd0<8GOv@j002MQ9w0<8GOq;0:6@=QWB0<8GOp00003EDG9J00;@01J000=R4U0<8GOp000040DchFWWc@01J005C?=5PD5HD000000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"one of each FAILED\n";
+            std::cout << "\n";
+            std::cout << "========== START ONE OF EACH ==========\n\n";
+        }
+
     }
 
     //////////////////////////////

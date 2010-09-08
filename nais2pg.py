@@ -8,7 +8,7 @@ __author__ = 'Kurt Schwehr'
 __version__ = '$Revision$'.split()[1]
 __revision__  = __version__ # For pylint
 __date__ = '$Date$'.split()[1]
-__copyright__ = '2008'
+__copyright__ = '2010'
 __license__   = 'LGPL v3'
 __contact__   = 'kurt at ccom.unh.edu'
 

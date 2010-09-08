@@ -22,5 +22,12 @@ Ais15::Ais15(const char *nmea_payload) {
     repeat_indicator = ubits(bs,6,2);
     mmsi = ubits(bs,8,30);
 
+    spare = ubits(bs,38,2);
+
+    mmsi_1 = ubits(bs,40,30);  // Destination ID 1
+
+    msg_1_1 = ubits(bs,70,6);
+    slot_offset_1_1 = ubits(bs,76,12);
+
     // FIX: write the rest
 }
