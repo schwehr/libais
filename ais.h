@@ -10,8 +10,10 @@
 
 #include <iostream> // for checkpoint
 
-#define LIBAIS_VERSION_MAJOR @LIBAIS_VERSION_MAJOR@
-#define LIBAIS_VERSION_MINOR @LIBAIS_VERSION_MINOR@
+//#define LIBAIS_VERSION_MAJOR @LIBAIS_VERSION_MAJOR@
+//#define LIBAIS_VERSION_MINOR @LIBAIS_VERSION_MINOR@
+#define LIBAIS_VERSION_MAJOR 0
+#define LIBAIS_VERSION_MINOR 3
 
 
 #define CHECKPOINT std::cerr <<  __FILE__ << ": line " << __LINE__ << ": checkpoint" << std::endl

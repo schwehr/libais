@@ -97,7 +97,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         int i=0;
         // Whales observed: !AIVDM,1,1,,B,803OvriK`R0FaqT6gOv763PKLT;0,0*25,d-089,S0392,t204010.00,T10.45701635,r003669945,1255466410,cornell,1255466411.9
         { 
-            Ais8_366_34 msg("803OvriK`R0FaqT6gOv763PKLT;0"); i++;
+            Ais8_366_22 msg("803OvriK`R0FaqT6gOv763PKLT;0"); i++;
             if (!msg.had_error()) msg.print(); 
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
@@ -296,7 +296,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 21 - ATON status report
     //////////////////////////////////////////////////////////////////////
 
-    if (true) {
+    if (false) {
         //CHECKPOINT;
         int i=0;
         // From OHMEX test at CCOM
@@ -342,8 +342,49 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     }
 
     //////////////////////////////
+    // msg 8 1 22 Zone Broadcast
+    //////////////////////////////
+
+    if (true) {
+        //for (size_t i=0; i < AIS8_1_22_NUM_NAMES; i++) {
+        //    std::cout << i << "\t" << notice_names[i] << "\n";
+        //}
+#if 0
+        //# Point
+AreaNotice: type=0  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
+!ECBBM,1,1,3,A,8,5fF0`0qP000N0n0uT0h4;0000000,5*1A
+!AIVDM,1,1,,A,81mg=5AKUP:0>H0007P=P?I0<12h000000,3*76
+001000000001110101101111001101000101010001011011100101100000001010000000001110011000000000000000000000000111100000001101100000001111011001000000001100000001000010110000000000000000000000000000000000000
+decoded: AreaNotice: type=0  start=2010-07-06 12:00:00  duration=60 m  link_id=10  sub-areas: 1
+original_geojson: {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.0]}, "area_shape_name": "point", "area_shape": 0}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
+decoded_geojson:  {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.0]}, "area_shape_name": "point", "area_shape": 0}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
+#endif
+        {
+            // Point
+            Ais8_366_22 msg("81mg=5AKUP:0>H0007P=P?I0<12h000000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+        {
+            //# Circle
+            // AreaNotice: type=1  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
+            // !ECBBM,1,1,3,A,8,5fF0`2qP000N1n0uT0h7mH3E0000,5*42
+            // !AIVDM,1,1,,A,81mg=5AKUP:0fH0007PMP?I0<1uF0m@000,3*1A
+            // decoded: AreaNotice: type=1  start=2010-07-06 12:00:00  duration=60 m  link_id=10  sub-areas: 1
+            // original_geojson: {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"geometry": {"type": "Polygon", "coordinates": [[-69.74852592241444, 42.050347260650405], ... , [-69.7496029998759, 42.05782539742527], [-69.74881795586683, 42.054106048943325], [-69.74852592241444, 42.050347260650405]]}, "radius": 4260, "area_shape_name": "circle", "area_shape": 0}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
+            Ais8_366_22 msg("81mg=5AKUP:0fH0007PMP?I0<1uF0m@000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+    }
+
+    //////////////////////////////
     // DONE
     //////////////////////////////
+
+
+
 
     return 0;
 

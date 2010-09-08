@@ -1,3 +1,4 @@
+# -*- makefile -*-
 VERSION:=${shell cat VERSION}
 
 CXXFLAGS :=
@@ -18,8 +19,11 @@ CXXFLAGS += -Werror
 
 SRCS := ais.cpp 
 SRCS += ais1_2_3.cpp ais4_11.cpp ais5.cpp ais7_13.cpp
-#
+
 SRCS += ais8.cpp
+# US Specific Messages
+SRCS += ais8_366_22.cpp
+
 #
 SRCS += ais9.cpp ais10.cpp ais12.cpp
 SRCS += ais14.cpp
@@ -53,6 +57,10 @@ default:
 
 all: python2 python3 libais.a test_libais
 	./test_libais
+
+#ais.h: ais.h.in
+#	rm -f ais.h
+#	cmake -G "Unix Makefiles"
 
 nais2pg:
 	make clean
