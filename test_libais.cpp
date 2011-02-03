@@ -361,6 +361,7 @@ decoded_geojson:  {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas"
 #endif
         if (false) {
             // Point
+            std::cout << "Point: ****\n";
             Ais8_366_22 msg("81mg=5AKUP:0>H0007P=P?I0<12h000000");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
@@ -373,6 +374,7 @@ decoded_geojson:  {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas"
             // !AIVDM,1,1,,A,81mg=5AKUP:0fH0007PMP?I0<1uF0m@000,3*1A
             // decoded: AreaNotice: type=1  start=2010-07-06 12:00:00  duration=60 m  link_id=10  sub-areas: 1
             // original_geojson: {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"geometry": {"type": "Polygon", "coordinates": [[-69.74852592241444, 42.050347260650405], ... , [-69.7496029998759, 42.05782539742527], [-69.74881795586683, 42.054106048943325], [-69.74852592241444, 42.050347260650405]]}, "radius": 4260, "area_shape_name": "circle", "area_shape": 0}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
+            std::cout << "\nCircle: ****\n";
             Ais8_366_22 msg("81mg=5AKUP:0fH0007PMP?I0<1uF0m@000");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";

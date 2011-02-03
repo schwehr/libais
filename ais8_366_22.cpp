@@ -304,6 +304,7 @@ void Ais8_366_22_Text::print() {
 
 
 
+
 // Ais8_366_22_AreaShapeEnum getAreaShape(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
 //     // Figure out which shape type or set as an error
 //     const int area_shape_int = ubits(bs,offset,3);
