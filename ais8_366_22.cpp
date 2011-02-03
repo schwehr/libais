@@ -181,9 +181,14 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload) {
 void
 Ais8_366_22::print() {
     std::cout << "Area Notice: " << message_id << "\n"
-              << "\t\tdac: " << dac << "\tfi:" << fi << "\n"
-              << "\t\tArea type: " << notice_type 
+              << "\tdac: " << dac << "\tfi:" << fi << "\n"
+              << "\tArea type: " << notice_type 
               << " -> [" << notice_names[notice_type] << "]\n";
+    std::cout << "\tsub_areas:\n";
+    
+    for(size_t i=0; i < sub_areas.size(); i++) {
+        sub_areas[i]->print();
+    }
 }
 
 
@@ -203,9 +208,16 @@ Ais8_366_22_Circle::Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, con
 }
 
 void Ais8_366_22_Circle::print() {
-    std::cout << "\t\t\tCircle: " << " " << x << " " << y << " radius_m: " << radius_m
+    std::cout << "\t\tCircle: " << " " << x << " " << y << " radius_m: " << radius_m
         //<< " precision FIX(!?!?) " << precision 
               << std::endl;
+}
+
+Ais8_366_22_Rect::Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+    const int scale_factor = ubits(bs,offset+3,2);
+    x         = sbits(bs, offset+5, 28) / 600000.;
+    y         = sbits(bs, offset+5+28, 27) / 600000.;
+    
 }
 
 // Ais8_366_22_AreaShapeEnum getAreaShape(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {

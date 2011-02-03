@@ -99,6 +99,9 @@ clean:
 #.cpp.o:
 #	${CXX} -c $< ${CXXFLAGS}
 
+test: test_libais
+	./test_libais
+
 test_libais: ${OBJS} test_libais.cpp ais.h
 	@echo SRCS: ${SRCS}
 	@echo OBJS: ${OBJS}
