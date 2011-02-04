@@ -323,7 +323,6 @@ Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
     switch (area_shape) {
     case AIS8_366_22_SHAPE_CIRCLE:
         std::cout << "Found circle" << std::endl;
-
         area = new Ais8_366_22_Circle(bs, offset);
         break;
     case AIS8_366_22_SHAPE_RECT:
