@@ -1,6 +1,8 @@
 // -*- c++ -*-
 // Way complicated
 
+// Which spec was I coding to?  Probably the Nav55
+
 
 enum Ais8_366_22_AreaShapeEnum {
     AIS8_366_22_SHAPE_ERROR = -1,
