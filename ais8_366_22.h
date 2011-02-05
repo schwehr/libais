@@ -150,4 +150,4 @@ std::ostream& operator<< (std::ostream& o, Ais8_366_22 const& msg);
 
 // std::vector<std::string> notice_names;
 const size_t AIS8_366_22_NUM_NAMES=128;
-extern const char *notice_names[AIS8_366_22_NUM_NAMES]; //128];
+extern const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES]; //128];

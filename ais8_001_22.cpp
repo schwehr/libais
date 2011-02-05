@@ -6,7 +6,7 @@
 const char *ais8_001_22_shape_names[8] = {"Circle/Pt","Rect", "Sector","Polyline","Polygon","Text","Reserved_6","Reserved_7"};
 
 const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = { // 128] = {
-   "Caution Area: Marine mammals habitat", // 0
+   "Caution Area: Marine mammals habitat (implies whales NOT observed)", // 0 - WARNING: extra text by Kurt
    "Caution Area: Marine mammals in area – reduce speed", // 1
    "Caution Area: Marine mammals in area – stay clear", // 2
    "Caution Area: Marine mammals in area – report sightings", // 3
@@ -165,11 +165,11 @@ Ais8_001_22_Circle::Ais8_001_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, con
 
 void Ais8_001_22_Circle::print() {
     if (radius_m == 0) 
-        std::cout << "\t\tPoint: " << " " << x << " " << y << " prec: " << precision 
-                  << "  (Can start a polyline or polygon)" << std::endl;
+        std::cout << "Point: " << " " << x << " " << y << "    prec: " << precision << std::endl;
+        //<< "  (Can start a polyline or polygon)" << std::endl;
     else 
-        std::cout << "\t\tCircle: " << " " << x << " " << y << " radius_m: " << radius_m 
-                  << " prec: " << precision<< std::endl;
+        std::cout << "Circle: " << " " << x << " " << y << "    radius_m: " << radius_m 
+                  << "    prec: " << precision<< std::endl;
     //<< " precision FIX(!?!?) " << precision 
 }
 
@@ -227,13 +227,13 @@ Ais8_001_22_Polyline::Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs,
         dists_m.push_back(dist);
     }
     spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
-    assert(AIS8_001_22_SUBAREA_SIZE == 5+10+(4*20)+2);
+    assert(AIS8_001_22_SUBAREA_SIZE == 5+(4*20)+2);
 }
 
 void Ais8_001_22_Polyline::print() {
-    std::cout << "\t\tPolyline: " << std::endl;
+    std::cout << "Polyline: " << std::endl;
     for (size_t i=0; i<angles.size(); i++) {
-        std::cout << "\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
+        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
     }
 }
 
@@ -247,13 +247,13 @@ Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, c
         dists_m.push_back(dist);
     }
     spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
-    assert(AIS8_001_22_SUBAREA_SIZE == 5+10+(4*20)+2);
+    assert(AIS8_001_22_SUBAREA_SIZE == 5+(4*20)+2);
 }
 
 void Ais8_001_22_Polygon::print() {
-    std::cout << "\t\tPolygon: " << std::endl;
+    std::cout << "Polygon: " << std::endl;
     for (size_t i=0; i<angles.size(); i++) {
-        std::cout << "\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
+        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
     }
 }
 
@@ -263,7 +263,7 @@ Ais8_001_22_Text::Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const s
 }
 
 void Ais8_001_22_Text::print() {
-    std::cout << "\t\tText: [" << text << "]" <<std::endl;
+    std::cout << "Text: [" << text << "]" <<std::endl;
 }
 
 
@@ -286,23 +286,23 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
     Ais8_001_22_SubArea *area=0;
     switch (area_shape) {
     case AIS8_001_22_SHAPE_CIRCLE:
-        std::cout << "Found circle" << std::endl;
+        //std::cout << "Found circle" << std::endl;
         area = new Ais8_001_22_Circle(bs, offset);
         break;
     case AIS8_001_22_SHAPE_RECT:
-        std::cout << "Found rect" << std::endl;
+        //std::cout << "Found rect" << std::endl;
         area = new Ais8_001_22_Rect(bs, offset);
         return area;
     case AIS8_001_22_SHAPE_SECTOR:
-        std::cout << "Found sector" << std::endl;
+        //std::cout << "Found sector" << std::endl;
         area = new Ais8_001_22_Sector(bs, offset);
         break;
     case AIS8_001_22_SHAPE_POLYLINE:
-        std::cout << "Found polyline" << std::endl;
+        //std::cout << "Found polyline" << std::endl;
         area = new Ais8_001_22_Polyline(bs, offset);
         break;
     case AIS8_001_22_SHAPE_POLYGON:
-        std::cout << "Found polygon" << std::endl;
+        //std::cout << "Found polygon" << std::endl;
         area = new Ais8_001_22_Polygon(bs, offset);
         break;
     case AIS8_001_22_SHAPE_TEXT:
@@ -376,21 +376,45 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload) {
 } // end constructor
 
 Ais8_001_22::~Ais8_001_22() {
-    std::cout << "Ais8_001_22: destructor" << std::endl;
+    std::cout << "Ais8_001_22: destructor.  sub_areas: " << sub_areas.size() << std::endl;
+
+    // FIX: why is the destructor getting called 2x for each sub area?
     for (size_t i=0; i < sub_areas.size(); i++) {
         delete sub_areas[i];  // FIX: leak?
+        //sub_areas[i] = 0;
     }
     std::cout << "\n\n";
 }
 
+#include <iomanip>
+
 void
 Ais8_001_22::print() {
-    std::cout << "Area_Notice: " << message_id << "\n"
-              << "\tdac: " << dac << "\tfi:" << fi << "\n"
-              << "\tArea_type: " << notice_type 
-              << " -> [" << notice_names[notice_type] << "]\n";
+    //std::cout << ;
+
+    std::cout 
+        
+        << "Area_Notice: " << message_id << "\n"
+        << "\tDAC: " << dac << "\tFI:" << fi << "\n";
+    std::cout 
+        << "\tStarting:  ";
+    std::cout << std::setfill('0') << std::setw(2) << month;
+    std::cout << std::setfill(' ') << std::setw(0) << "-";
+    std::cout << std::setfill('2') << std::setw(2) << day;
+    std::cout << std::setfill(' ') << std::setw(0) << "T";
+    std::cout << std::setfill('0') << std::setw(2) << utc_hour;
+    std::cout << ":";
+    std::cout << std::setfill('0') << std::setw(2) << utc_minute;
+    std::cout 
+        << "Z\n"
+        << "\tLink id:   " << link_id << "\n"
+        << "\tDuration:  " << duration_minutes << " min\n"
+        << "\tArea_type: " << notice_type 
+        << " -> [" << ais8_001_22_notice_names[notice_type] << "]\n";
+
     for (size_t i=0; i < sub_areas.size(); i++) {
-        std::cout << "\tSubarea: " << i << std::endl;
+        //std::cout << "\tSubarea: " << i << std::endl;
+        std::cout << "\t\t" << i << ": ";
         sub_areas[i]->print();
     }
 }

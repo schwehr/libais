@@ -7,8 +7,8 @@
 
 const char *shape_names[8] = {"Circle/Pt","Rect", "Sector","Polyline","Polygon","Text","Reserved_6","Reserved_7"};
 
-const char *notice_names[AIS8_366_22_NUM_NAMES] = { // 128] = {
-   "Caution Area: Marine mammals habitat", // 0
+const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = { // 128] = {
+   "Caution Area: Marine mammals habitat (no whales obs)", // 0
    "Caution Area: Marine mammals in area – reduce speed", // 1
    "Caution Area: Marine mammals in area – stay clear", // 2
    "Caution Area: Marine mammals in area – report sightings", // 3
@@ -193,7 +193,7 @@ Ais8_366_22::print() {
     std::cout << "Area_Notice: " << message_id << "\n"
               << "\tdac: " << dac << "\tfi:" << fi << "\n"
               << "\tArea_type: " << notice_type 
-              << " -> [" << notice_names[notice_type] << "]\n";
+              << " -> [" << ais8_366_22_notice_names[notice_type] << "]\n";
     for (size_t i=0; i < sub_areas.size(); i++) {
         std::cout << "\tSubarea: " << i << std::endl;
         sub_areas[i]->print();

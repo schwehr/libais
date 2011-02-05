@@ -1,5 +1,7 @@
 #include "ais.h"
 
+#include "ais8_001_22.h"
+
 //using namespace std;
 
 #define UNUSED __attribute((__unused__))
@@ -342,23 +344,10 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     }
 
     //////////////////////////////
-    // msg 8 1 22 Zone Broadcast
+    // msg 8 366 22 Zone Broadcast - This message is not not good
     //////////////////////////////
 
-    if (true) {
-        //for (size_t i=0; i < AIS8_1_22_NUM_NAMES; i++) {
-        //    std::cout << i << "\t" << notice_names[i] << "\n";
-        //}
-#if 0
-        //# Point
-AreaNotice: type=0  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
-!ECBBM,1,1,3,A,8,5fF0`0qP000N0n0uT0h4;0000000,5*1A
-!AIVDM,1,1,,A,81mg=5AKUP:0>H0007P=P?I0<12h000000,3*76
-001000000001110101101111001101000101010001011011100101100000001010000000001110011000000000000000000000000111100000001101100000001111011001000000001100000001000010110000000000000000000000000000000000000
-decoded: AreaNotice: type=0  start=2010-07-06 12:00:00  duration=60 m  link_id=10  sub-areas: 1
-original_geojson: {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.0]}, "area_shape_name": "point", "area_shape": 0}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
-decoded_geojson:  {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.0]}, "area_shape_name": "point", "area_shape": 0}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
-#endif
+    if (false) {
         if (false) {
             // Point
             std::cout << "Point: ****\n";
@@ -430,7 +419,7 @@ decoded_geojson:  {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas"
             std::cout << "========== END TEXT ==========\n\n";
         }
 
-        if (true) {
+        if (false) {
             // one-of-each
             std::cout << "========== START ONE OF EACH ==========\n\n";
             Ais8_366_22 msg("81mg=5AKUP:4>H0007P=P?I0<8GOp00000=P?I0<8GOsr0001MPdd0<8GOv@j002MQ9w0<8GOq;0:6@=QWB0<8GOp00003EDG9J00;@01J000=R4U0<8GOp000040DchFWWc@01J005C?=5PD5HD000000");
@@ -441,12 +430,206 @@ decoded_geojson:  {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas"
 
     }
 
+
+
+    //////////////////////////////
+    // msg 8 1 22 Zone Broadcast
+    //////////////////////////////
+
+    if (true) {
+        //for (size_t i=0; i < AIS8_001_22_NUM_NAMES; i++) {
+        //    std::cout << i << "\t" << notice_names[i] << "\n";
+        //}
+
+        if (false) {
+            // Point
+            /*
+              AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
+              !AIVDM,1,1,,A,81mg=5@0EP:0>H0007P>0<D1<qp400000,0*1D
+
+              001000000001110101101111001101000101010000000000010101100000001010000000001110011000000000000000000000000111100000001110000000001100010100000001001100111001111000000100000000000000000000000000000000
+
+              decoded: AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
+
+              original_geojson: {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T00:00:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Marine mammal habitat", "stop": "2011-07-06T01:00:00Z", "areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.0]}, "area_shape_name": "point", "area_shape": 0}], "bbm_type": [1, 22], "bbm_name": "area_notice", "area_type": 0}}
+             */
+
+
+            std::cout << "\n\nPoint: ****\n";
+            Ais8_001_22 msg("81mg=5@0EP:0>H0007P>0<D1<qp400000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+        if (false) {
+            // Circle
+            /*
+              AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
+              "mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T00:00:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Marine mammal habitat", "stop": "2011-07-06T01:00:00Z", "areas": [{"geometry": {"type": "Polygon", "coordinates": [[-69.74852592241444, 42.050347260650405],
+              [-69.74852592241444, 42.050347260650405]]}, "center_ll": [-69.8, 42.05], "radius_m": 4260, "area_shape_name": "circle", "area_shape": 0}], "bbm_type": [1, 22], "bbm_name": "area_notice", "area_type": 0}}
+
+              !AIVDM,1,1,,A,81mg=5@0EP:0>H0007PN0<D1<wg46b000,0*28
+             */
+
+            std::cout << "\n\nCircle: ****\n";
+            Ais8_001_22 msg("81mg=5@0EP:0>H0007PN0<D1<wg46b000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+        if (false) {
+            // Rect
+            /*
+AreaNotice: type=3  start=2011-07-06 05:31:00  duration=60 m  link_id=10  sub-areas: 1
+{"mmsi": 123456789, "repeat": 0, "msgtype": 8, 
+   "bbm": {"start": "2011-07-06T05:31:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Marine mammals in area - Report Sightings", "stop": "2011-07-06T06:31:00Z", 
+   "areas": [
+      {"n_dim": 1000, "orientation": 0, "geometry": {"type": "Polygon", "coordinates": [
+         [-69.80000000000004, 42.14999999999998], 
+         [-69.75159155785775, 42.15032733770786], 
+         [-69.75169812451595, 42.15933298502247], 
+         [-69.80011342866348, 42.15900554457626], 
+         [-69.80000000000004, 42.14999999999998]]}, 
+        "area_shape": 1, "e_dim": 4000, "area_shape_name": "rectangle"}
+      ], 
+    "bbm_type": [1, 22], 
+    "bbm_name": "area_notice", 
+    "area_type": 3}}
+!AIVDM,1,1,,A,81mg=5@0EP:1fHcp07Qf0<D1=;Lt:0`00,0*63
+001000000001110101101111001101000101010000000000010101100000001010000001101110011000101011111000000000000111100001101110000000001100010100000001001101001011011100111100001010000000101000000000000000
+             */
+
+            std::cout << "\n\nRect: ****\n";
+            Ais8_001_22 msg("81mg=5@0EP:1fHcp07Qf0<D1=;Lt:0`00");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+        if (false) {
+            /*
+AreaNotice: type=4  start=2011-07-06 12:49:00  duration=60 m  link_id=10  sub-areas: 1
+{"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T12:49:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Protected Habitat - Reduce Speed", "stop": "2011-07-06T13:49:00Z", "areas": [{"geometry": {"type": "Polygon", "coordinates": [[-69.80000000000004, 42.19999999999997], ... [-69.80000000000004, 42.19999999999997]]}, "area_shape": 2, "radius": 4000, "left_bound": 10, "right_bound": 50, "area_shape_name": "sector"}], "bbm_type": [1, 22], "bbm_name": "area_notice", "area_type": 4}}
+!AIVDM,1,1,,A,81mg=5@0EP:2>IV807R>0<D1=ACtvP1@j,0*3D
+001000000001110101101111001101000101010000000000010101100000001010000010001110011001100110001000000000000111100010001110000000001100010100000001001101010001010011111100111110100000000001010000110010
+
+             */
+            std::cout << "\n\nSECTOR: ****\n";
+            Ais8_001_22 msg("81mg=5@0EP:2>IV807R>0<D1=ACtvP1@j");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+        if (false) {
+            /*
+Line - 1 segment
+AreaNotice: type=5  start=2011-07-06 15:01:00  duration=60 m  link_id=10  sub-areas: 1
+{"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T15:01:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Protected Habitat - Stay Clear", "stop": "2011-07-06T16:01:00Z", "areas": [{"geometry": {"type": "LineString", "coordinates": [[-69.80000000000004, 42.249999999999964], [-69.79521587502177, 42.271319707450346]]}, "area_shape_name": "waypoints/polyline", "area_shape": 3}], "bbm_type": [1, 22], "bbm_name": "area_notice", "area_type": 5}}
+!AIVDM,2,1,,A,81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`0,0*2A
+!AIVDM,2,2,,A,1J000,3*6E
+001000000001110101101111001101000101010000000000010101100000001010000010101110011001111000001000000000000111100000001110000000001100010100000001001101010111001010111100000000000000000000000000000000011010000010100001111000010110100000000000000101101000000000000001011010000000000000000
+
+norm: !AIVDM,1,1,,A,81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`01J000,3*61,rUNKNOWN,1296942146
+             */
+            std::cout << "\n\n: ****\n";
+            Ais8_001_22 msg("81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`01J000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+        if (false) {
+            /*
+# Polygon - 2 segment - triangle
+AreaNotice: type=6  start=2011-07-06 20:59:00  duration=60 m  link_id=10  sub-areas: 1
+{"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T20:59:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Protected Habitat - No fishing or anchoring", "stop": "2011-07-06T21:59:00Z", "areas": [{"geometry": {"type": "Polygon", "coordinates": [[-69.80000000000004, 42.299999999999955], [-69.79720758254113, 42.31243643739742], [-69.77354796545391, 42.31259848584068], [-69.80000000000004, 42.299999999999955]]}, "area_shape_name": "polygon", "area_shape": 4}], "bbm_type": [1, 22], "bbm_name": "area_notice", "area_type": 6}}
+!AIVDM,2,1,,A,81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`0,0*3B
+!AIVDM,2,2,,A,1J000,3*6E
+001000000001110101101111001101000101010000000000010101100000001010000011001110011010100111011000000000000111100000001110000000001100010100000001001101011101000001111100000000000000000000000000000000100010000010100001000110000101101000011000011101101000000000000001011010000000000000000
+
+norm: !AIVDM,1,1,,A,81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000,3*70,rUNKNOWN,1296942146
+
+             */
+            std::cout << "\n\n: Polygon - Triangle****\n";
+            Ais8_001_22 msg("81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+        if (true) {
+            /*
+# Text
+AreaNotice: type=7  start=2011-07-06 23:59:00  duration=60 m  link_id=10  sub-areas: 2
+{"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T23:59:00Z", "link_id": 10, "duration_min": 60, "freetext": "EXPLANATION", "area_type_desc": "Caution Area: Derelicts (drifting objects)", "stop": "2011-07-07T00:59:00Z", "areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.34999999999998]}, "area_shape_name": "point", "area_shape": 0}, {"text": "EXPLANATION", "area_shape_name": "freetext", "area_shape": 5}], "bbm_type": [1, 22], "bbm_name": "area_notice", "area_type": 7}}
+!AIVDM,2,1,,A,81mg=5@0EP:3fJwH07P>0<D1=Rpt00000`c21P9h:Q9,0*49
+!AIVDM,2,2,,A,qh000,3*0C
+001000000001110101101111001101000101010000000000010101100000001010000011101110011010111111011000000000000111100000001110000000001100010100000001001101100010111000111100000000000000000000000000000000101000101011000010000001100000001001110000001010100001001001111001110000000000000000000
+
+!AIVDM,1,1,,A,81mg=5@0EP:3fJwH07P>0<D1=Rpt00000`c21P9h:Q9qh000,3*60,rUNKNOWN,1296942146
+
+             */
+            std::cout << "\n\nText: ****\n";
+            Ais8_001_22 msg("81mg=5@0EP:3fJwH07P>0<D1=Rpt00000`c21P9h:Q9qh000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+        if (true) {
+            /*
+
+             */
+            std::cout << "\n\n: ****\n";
+            Ais8_001_22 msg("");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+        if (true) {
+            /*
+
+             */
+            std::cout << "\n\n: ****\n";
+            Ais8_001_22 msg("");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+        if (true) {
+            /*
+
+             */
+            std::cout << "\n\n: ****\n";
+            Ais8_001_22 msg("");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+        if (true) {
+            /*
+
+             */
+            std::cout << "\n\n: ****\n";
+            Ais8_001_22 msg("");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+        }
+
+
+    }
+
+
     //////////////////////////////
     // DONE
     //////////////////////////////
 
-
-
+    std::cerr << "Shutting down" << std::endl;
 
     return 0;
 

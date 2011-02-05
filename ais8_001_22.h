@@ -20,7 +20,7 @@ extern const char *notice_names[AIS8_001_22_NUM_NAMES];
 
 enum Ais8_001_22_AreaShapeEnum {
     AIS8_001_22_SHAPE_ERROR = -1,
-    AIS8_001_22_SHAPE_CIRCLE = 0,
+    AIS8_001_22_SHAPE_CIRCLE = 0, // OR Point
     AIS8_001_22_SHAPE_RECT = 1,
     AIS8_001_22_SHAPE_SECTOR = 2,
     AIS8_001_22_SHAPE_POLYLINE = 3,
@@ -42,7 +42,8 @@ public:
     //Ais8_001_22_AreaShapeEnum area_shape;
     virtual Ais8_001_22_AreaShapeEnum getType()=0;  
     // FIX: make the destructor pure virtual
-    virtual ~Ais8_001_22_SubArea() { std::cout << "Ais8_001_22_Circle: destructor" << std::endl; };
+    virtual ~Ais8_001_22_SubArea() //= 0;
+       { std::cout << "Ais8_001_22_Subarea: destructor" << std::endl; };
     virtual void print()=0;
 };
 
