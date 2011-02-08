@@ -7,7 +7,7 @@ Ais8::Ais8(const char *nmea_payload) {
     assert(nmea_payload);
     init();
     const int payload_len = strlen(nmea_payload)*6 - 46; // in bits w/o DAC/FI
-    std::cout << "payload_len: " << strlen(nmea_payload) << " " << strlen(nmea_payload)*6 << " " << payload_len << " " << payload_len / 8 << "\n";
+    //std::cout << "payload_len: " << strlen(nmea_payload) << " " << strlen(nmea_payload)*6 << " " << payload_len << " " << payload_len / 8 << "\n";
     if (payload_len < 0 or payload_len > 952) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
@@ -26,7 +26,7 @@ Ais8::Ais8(const char *nmea_payload) {
         payload.push_back(ubits(bs,start,8));
     }
     const int remainder = payload_len % 8; // FIX: need to handle spare bits!!
-    std::cout << "remainder: " << remainder << "\n";
+    //std::cout << "remainder: " << remainder << "\n";
     if (remainder > 0) {
         const int start = (payload_len/8) * 8;
         //std::cout << "start: " << start <<"\n";
@@ -110,12 +110,14 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload) {
     cur_speed_3 = ubits(bs,250,8) / 10.;
     cur_dir_3 = ubits(bs,258,9);
     cur_depth_3 = ubits(bs,267,5);
+
     wave_height = ubits(bs,272,8) / 10.;
     wave_period = ubits(bs,280,6);
     wave_dir = ubits(bs,286,9);
     swell_height = ubits(bs,295,8) / 10.;
     swell_period = ubits(bs,303,6);
     swell_dir = ubits(bs,309,9);
+
     sea_state = ubits(bs,318,4);
     water_temp = ubits(bs,322,10) / 10. - 10; // FIX: please be right for -10.0 to +50.0
     precip_type = ubits(bs,332,3);

@@ -1,5 +1,7 @@
 
 #include "ais.h"
+#include "ais8_001_22.h"
+
 
 #include <Python.h>
 #include <cassert>
@@ -56,15 +58,42 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const std::string &val) 
 
 
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
+DictSafeSetItem(PyObject *dict, const std::string &key, const char *val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
-    PyObject *val_obj = PyBool_FromLong(val);
+    PyObject *val_obj = PyUnicode_FromString(val);
     assert(key_obj);
     assert(val_obj);
     PyDict_SetItem(dict, key_obj, val_obj);
     Py_DECREF(key_obj);
     Py_DECREF(val_obj);
 }
+
+
+#if 0
+void
+DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
+    PyObject *key_obj = PyUnicode_FromString(key.c_str());
+    PyObject *val_obj = PyBool_FromLong(val);
+    assert(key_obj);
+    assert(val_obj);
+    //cout << "setting: "<< ( val ? "true":"false") << endl;
+    PyDict_SetItem(dict, key_obj, val_obj);
+    Py_DECREF(key_obj);
+    Py_DECREF(val_obj);
+}
+#else
+void
+DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
+    PyObject *key_obj = PyUnicode_FromString(key.c_str());
+    assert(key_obj);
+    if (val) {
+        PyDict_SetItem(dict, key_obj, Py_True);
+    } else {
+        PyDict_SetItem(dict, key_obj, Py_False);
+    }
+    Py_DECREF(key_obj);
+}
+#endif
 
 // FIX: float -> double?
 void
@@ -78,6 +107,17 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const float val) {
     Py_DECREF(val_obj);
 }
 
+void
+DictSafeSetItem(PyObject *dict, const std::string &key, PyObject *val_obj) {
+    // When we need to add dictionaries and such to a dictionary
+    assert(dict);
+    assert(py_obj);
+    PyObject *key_obj = PyUnicode_FromString(key.c_str());
+    assert(key_obj);
+    PyDict_SetItem(dict, key_obj, val_obj);
+    Py_DECREF(key_obj);
+    //Py_DECREF(val_obj); // FIX: is this a leak?
+}
 
 
 extern "C" {
@@ -264,6 +304,363 @@ ais7_13_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+
+    // FIX: add error checking
+void
+ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict) {
+    Ais8_1_11 msg(nmea_payload);
+    DictSafeSetItem(dict,"x", msg.x);
+    DictSafeSetItem(dict,"y", msg.y);
+
+    DictSafeSetItem(dict,"wind_ave", msg.wind_ave);
+    DictSafeSetItem(dict,"wind_gust", msg.wind_gust);
+    DictSafeSetItem(dict,"wind_dir", msg.wind_dir);
+    DictSafeSetItem(dict,"wind_gust_dir", msg.wind_gust);
+
+    DictSafeSetItem(dict,"air_temp", msg.air_temp);
+    DictSafeSetItem(dict,"rel_humid", msg.rel_humid);
+    DictSafeSetItem(dict,"dew_point", msg.dew_point);
+    DictSafeSetItem(dict,"air_pres", msg.air_pres);
+    DictSafeSetItem(dict,"air_pres_trend", msg.air_pres_trend);
+    DictSafeSetItem(dict,"horz_vis", msg.horz_vis);
+
+    DictSafeSetItem(dict,"water_level", msg.water_level);
+    DictSafeSetItem(dict,"water_level_trend", msg.water_level_trend);
+
+    DictSafeSetItem(dict,"surf_cur_speed", msg.surf_cur_speed);
+    DictSafeSetItem(dict,"surf_cur_dir", msg.surf_cur_dir);
+
+    DictSafeSetItem(dict,"cur_speed_2", msg.cur_speed_2);
+    DictSafeSetItem(dict,"cur_dir_2",   msg.cur_dir_2);
+    DictSafeSetItem(dict,"cur_depth_2", msg.cur_depth_2);
+
+    DictSafeSetItem(dict,"cur_speed_3", msg.cur_speed_3);
+    DictSafeSetItem(dict,"cur_dir_3",   msg.cur_dir_3);
+    DictSafeSetItem(dict,"cur_depth_3", msg.cur_depth_3);
+
+    DictSafeSetItem(dict,"wave_height", msg.wave_height);
+    DictSafeSetItem(dict,"wave_period", msg.wave_period);
+    DictSafeSetItem(dict,"wave_dir", msg.wave_dir);
+
+    DictSafeSetItem(dict,"swell_height", msg.swell_height);
+    DictSafeSetItem(dict,"swell_period", msg.swell_period);
+    DictSafeSetItem(dict,"swell_dir", msg.swell_dir);
+
+    DictSafeSetItem(dict,"sea_state", msg.sea_state);
+    DictSafeSetItem(dict,"water_temp", msg.water_temp);
+    DictSafeSetItem(dict,"precip_type", msg.precip_type);
+    DictSafeSetItem(dict,"ice", msg.ice);  // Grr... ice
+
+    // Or could be spare
+    DictSafeSetItem(dict,"ext_water_level", msg.extended_water_level);
+}
+
+void
+ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict) {
+    Ais8_001_22 msg(nmea_payload);
+
+    // Common header
+
+    DictSafeSetItem(dict,"link_id", msg.link_id);
+    DictSafeSetItem(dict,"notice_type", msg.notice_type);
+    //cout << "notice_type_str(" << msg.notice_type << "): " << ais8_001_22_notice_names[msg.notice_type] << endl;
+    DictSafeSetItem(dict,"notice_type_str", ais8_001_22_notice_names[msg.notice_type]);
+
+    DictSafeSetItem(dict,"month", msg.month); // WARNING: this is UTC!!!   Not local time
+    DictSafeSetItem(dict,"day", msg.day);
+    DictSafeSetItem(dict,"hour", msg.hour);
+    DictSafeSetItem(dict,"minute", msg.minute);
+
+    PyObject *sub_area_list = PyList_New(msg.sub_areas.size()); // Sub Areas list for python
+
+    // Loop over sub_areas
+    for (size_t i=0; i < msg.sub_areas.size(); i++) {
+        switch(msg.sub_areas[i]->getType()) {
+        case AIS8_001_22_SHAPE_CIRCLE: // or point
+            {
+                cout << i << ": POINT or CIRCLE\n";
+                PyObject *sub_area = PyDict_New();
+                //DictSafeSetItem(sub_area,"area_type",msg.sub_areas[i]->getType());
+                // FIX: could easily optimize to have only one copy of each string around at a Python Obj
+                //DictSafeSetItem(sub_area,"area_type_str",ais8_001_22_shape_names[msg.sub_areas[i]->getType()]);
+                Ais8_001_22_Circle *c = (Ais8_001_22_Circle*)msg.sub_areas[i];
+
+                DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_CIRCLE);
+                if (c->radius_m == 0) DictSafeSetItem(sub_area,"sub_area_type_str","point");
+                else DictSafeSetItem(sub_area,"sub_area_type_str","circle");
+
+                DictSafeSetItem(sub_area,"x",c->x);
+                DictSafeSetItem(sub_area,"y",c->y);
+                DictSafeSetItem(sub_area,"precision",c->precision);
+                DictSafeSetItem(sub_area,"radius",c->radius_m);
+                //DictSafeSetItem(sub_area,"spare",c->spare);
+                PyList_SetItem(sub_area_list, i, sub_area);
+            }
+            break;
+        case AIS8_001_22_SHAPE_RECT:
+            cout << i << ": RECT\n";
+            {
+                PyObject *sub_area = PyDict_New();
+                Ais8_001_22_Rect *c = (Ais8_001_22_Rect*)msg.sub_areas[i];
+
+                DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_RECT);
+                DictSafeSetItem(sub_area,"sub_area_type_str","rect");
+
+                DictSafeSetItem(sub_area,"x",c->x);
+                DictSafeSetItem(sub_area,"y",c->y);
+                DictSafeSetItem(sub_area,"precision",c->precision);
+                DictSafeSetItem(sub_area,"e_dim_m",c->e_dim_m);
+                DictSafeSetItem(sub_area,"n_dim_m",c->n_dim_m);
+                DictSafeSetItem(sub_area,"orient_deg",c->orient_deg);
+                //DictSafeSetItem(sub_area,"spare",c->spare);
+                PyList_SetItem(sub_area_list, i, sub_area);
+            }
+            break;
+        case AIS8_001_22_SHAPE_SECTOR:
+            cout << i << ": SECTOR\n";
+            {
+                PyObject *sub_area = PyDict_New();
+                Ais8_001_22_Sector *c = (Ais8_001_22_Sector*)msg.sub_areas[i];
+
+                DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_SECTOR);
+                DictSafeSetItem(sub_area,"sub_area_type_str","sector");
+
+                DictSafeSetItem(sub_area,"x",c->x);
+                DictSafeSetItem(sub_area,"y",c->y);
+                DictSafeSetItem(sub_area,"precision",c->precision);
+                DictSafeSetItem(sub_area,"radius",c->radius_m);
+                DictSafeSetItem(sub_area,"left_bound_deg",c->left_bound_deg);
+                DictSafeSetItem(sub_area,"right_bound_deg",c->right_bound_deg);
+                //DictSafeSetItem(sub_area,"spare",c->spare);
+                PyList_SetItem(sub_area_list, i, sub_area);
+            }
+            break;
+        case AIS8_001_22_SHAPE_POLYLINE:
+            cout << i << ": POLYLINE\n";
+            {
+                PyObject *sub_area = PyDict_New();
+                Ais8_001_22_Polyline *polyline = (Ais8_001_22_Polyline*)msg.sub_areas[i];
+
+                DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_POLYLINE);
+                DictSafeSetItem(sub_area,"sub_area_type_str","polyline");
+                cout << "polyline: " << polyline->angles.size() << " " << polyline->dists_m.size() << endl;
+                assert (polyline->angles.size() == polyline->dists_m.size());
+                PyObject *angle_list = PyList_New(polyline->angles.size());
+                PyObject *dist_list = PyList_New(polyline->angles.size());
+
+                for (size_t pt_num=0; pt_num < polyline->angles.size(); pt_num++) {
+                    // FIX: memory leak with the floats?
+                    PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polyline->angles [pt_num]));
+                    PyList_SetItem(dist_list,  pt_num, PyFloat_FromDouble(polyline->dists_m[pt_num]));
+                }
+
+                DictSafeSetItem(sub_area,"angles", angle_list);
+                DictSafeSetItem(sub_area,"dists_m", dist_list);
+
+                //DictSafeSetItem(sub_area,"spare",c->spare);
+                PyList_SetItem(sub_area_list, i, sub_area);
+            }
+            break;
+        case AIS8_001_22_SHAPE_POLYGON:
+            cout << i << ": POLYGON\n";
+            {
+                PyObject *sub_area = PyDict_New();
+                Ais8_001_22_Polygon *polygon = (Ais8_001_22_Polygon*)msg.sub_areas[i];
+
+                DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_POLYGON);
+                DictSafeSetItem(sub_area,"sub_area_type_str","polygon");
+                cout << "polygon: " << polygon->angles.size() << " " << polygon->dists_m.size() << endl;
+                assert (polygon->angles.size() == polygon->dists_m.size());
+                PyObject *angle_list = PyList_New(polygon->angles.size());
+                PyObject *dist_list = PyList_New(polygon->angles.size());
+
+                for (size_t pt_num=0; pt_num < polygon->angles.size(); pt_num++) {
+                    // FIX: memory leak with the floats?
+                    PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polygon->angles [pt_num]));
+                    PyList_SetItem(dist_list,  pt_num, PyFloat_FromDouble(polygon->dists_m[pt_num]));
+                }
+
+                DictSafeSetItem(sub_area,"angles", angle_list);
+                DictSafeSetItem(sub_area,"dists_m", dist_list);
+
+                //DictSafeSetItem(sub_area,"spare",c->spare);
+                PyList_SetItem(sub_area_list, i, sub_area);
+            }
+            break;
+        case AIS8_001_22_SHAPE_TEXT:
+            cout << i << ": TEXT\n";
+            {
+                PyObject *sub_area = PyDict_New();
+
+                Ais8_001_22_Text *text = (Ais8_001_22_Text*)msg.sub_areas[i];
+                cout << "\ttext: '" << text->text << endl;
+                //PyObject *text_obj = PyUnicode_FromString(text->text.c_str());
+                DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_TEXT);
+                DictSafeSetItem(sub_area,"sub_area_type_str","text");
+
+                DictSafeSetItem(sub_area,"text", text->text);
+                //Py_DECREF(text_obj);
+                PyList_SetItem(sub_area_list, i, sub_area);
+            }
+            break;
+
+        default:
+            cerr << "DANGER! Unknown subarea type: " << msg.sub_areas[i]->getType();
+        }
+    }
+    DictSafeSetItem(dict,"sub_areas",sub_area_list);
+}
+
+
+    // AIS Binary broadcast messages.  There will be a huge number of subtypes
+    // If we don't know how to decode it, just return the dac, fi
+PyObject*
+ais8_to_pydict(const char *nmea_payload) {
+    assert (nmea_payload);
+    Ais8 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais8: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+    
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", 8);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+    DictSafeSetItem(dict,"spare", msg.spare);
+    DictSafeSetItem(dict,"dac", msg.dac);
+    DictSafeSetItem(dict,"fi", msg.fi);
+    //DictSafeSetItem(dict,"parsed",false);
+
+    switch (msg.dac) {
+    case 1:  // IMO
+        //cout << "IMO BBM" << endl;
+        switch (msg.fi) {
+
+            //
+            // ITU-R.M.1371-3 IFM messages.  Annex 5, Section 5.  See IMO Circ 289 for recommended usage
+            //
+
+        //case 0: // Text using 6 bit ascii
+        //    ais8_1_0_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+
+        // 1 is listed in ITU 1371-1 as addressed only.  Not listed in 1371-3
+        // 1 is "Application acknoldegement"
+        // 2 Interrogation for specific FM (ABM).  Addressed only
+        // 3 Capability interrogation.  Addressed only
+        // 4. Capability reply to 3.  Addressed only
+
+
+            //
+            // IMO Circ 289
+            //
+        case 11: // Met/Hydrogrolocal - not to be used after 1 Jan 2013
+            // FIX: add error checking
+            ais8_1_11_append_pydict(nmea_payload, dict);
+            DictSafeSetItem(dict,"parsed",true);
+            break;
+        //case 12: // Dangerous cargo indication - not to be used after 1 Jan 2013
+        //    ais8_1_12_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 13: // Fairway closed - not to be used after 1 Jan 2013
+        //    ais8_1_13_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 14: // Tidal window - not to be used after 1 Jan 2013
+        //    ais8_1_14_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 15: // Extended ship static and voyage related data - not to be used after 1 Jan 2013
+        //    ais8_1_15_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+            // 16 has conflicting definition in the old 1371-1: VTS targets
+        //case 16: // Number of persons on board - not to be used after 1 Jan 2013
+        //    ais8_1_16_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+            // 17 has conflicting definition in 1371-1: IFM 17: Ship waypoints (WP) and/or route plan report
+        //case 17: // VTS-generated/synthetic targets - not to be used after 1 Jan 2013
+        //    ais8_1_17_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+
+            // 1371-1 conflict: IFM 18: Advice of waypoints (AWP) and/or route plan of VTS
+        //case 18: // Clearance type to enter port 
+        //    ais8_1_18_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+
+            // ITU 1371-1 conflict: IFM 19: Extended ship static and voyage related data
+        //case 19: // Marine traffic signal
+        //    ais8_1_19_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 20: // Berthing data
+        //    ais8_1_20_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 21: // Weather obs report from ship
+        //    ais8_1_21_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        case 22: // Area notice
+            ais8_1_22_append_pydict(nmea_payload, dict);
+            DictSafeSetItem(dict,"parsed",true);
+            break;
+
+        // 23 is ADDRESSED ONLY
+
+        //case 24: // 
+        //    ais8_1_24_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 25: // 
+        //    ais8_1_25_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 26: // 
+        //    ais8_1_26_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 27: // 
+        //    ais8_1_27_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 28: // 
+        //    ais8_1_28_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+        //case 29: // 
+        //    ais8_1_29_append_pydict(nmea_payload, dict);
+        //    DictSafeSetItem(dict,"parsed",true);
+        //    break;
+
+
+            // ITU 1371-1 only: 3.10	IFM 40: Number of persons on board
+
+        default:
+            DictSafeSetItem(dict,"parsed",false);
+            break;
+        }
+        break;
+    case 366: // United states
+        DictSafeSetItem(dict,"parsed",false);
+        break;
+    default:
+        DictSafeSetItem(dict,"parsed",false);
+        cout << "Ais8: can't handle dac " << msg.dac << endl;
+    }
+
+
+
+    return dict;
+}
+
+
 PyObject*
 ais14_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
@@ -399,6 +796,40 @@ ais19_to_pydict(const char *nmea_payload) {
 }
 
 PyObject*
+ais21_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais21 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais21: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict,"aton_type", msg.aton_type);
+    DictSafeSetItem(dict,"name", msg.name);
+    DictSafeSetItem(dict,"position_accuracy", msg.position_accuracy);
+    DictSafeSetItem(dict,"x", msg.x);
+    DictSafeSetItem(dict,"y", msg.y);
+    DictSafeSetItem(dict,"dim_a", msg.dim_a);
+    DictSafeSetItem(dict,"dim_b", msg.dim_b);
+    DictSafeSetItem(dict,"dim_c", msg.dim_c);
+    DictSafeSetItem(dict,"dim_c", msg.dim_c);
+    DictSafeSetItem(dict,"fix_type", msg.fix_type);
+    DictSafeSetItem(dict,"timestamp", msg.timestamp);
+    DictSafeSetItem(dict,"off_pos", msg.off_pos);
+    DictSafeSetItem(dict,"aton_status", msg.aton_status);
+    DictSafeSetItem(dict,"raim", msg.raim);
+    DictSafeSetItem(dict,"virtual_aton", msg.virtual_aton);
+    DictSafeSetItem(dict,"assigned_mode", msg.assigned_mode);
+
+    return dict;
+}
+
+PyObject*
 ais24_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
     Ais24 msg(nmea_payload);
@@ -498,8 +929,8 @@ decode(PyObject *self, PyObject *args) {
         break;
         
     case '8': // 8 - Binary broadcast message (BBM)
-        // result = ais8_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 8 not yet handled");
+        result = ais8_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 8 not yet handled");
         break;
         
     case '9': // 9 - SAR Position
@@ -554,8 +985,8 @@ decode(PyObject *self, PyObject *args) {
         break;
         
     case 'E': // 21 - Aids to navigation report
-        // result = ais21_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 21 (E) not yet handled");
+        result = ais21_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 21 (E) not yet handled");
         break;
         
     case 'F': // 22 - Channel Management
@@ -703,7 +1134,8 @@ initais(void)
 
     // Initialize the lookuptable and exception
     build_nmea_lookup();
-    ais_py_exception = PyErr_NewException("ais.decode.error", 0, 0);
+    // FIX: is this cast bad?
+    ais_py_exception = PyErr_NewException((char *)"ais.decode.error", 0, 0);
 
 #if PY_MAJOR_VERSION >= 3
     return module;

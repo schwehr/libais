@@ -5,9 +5,9 @@ from __future__ import print_function
 # Yet another rewrite of my code to put ais data from a nais feed into postgis
 
 __author__ = 'Kurt Schwehr'
-__version__ = '$Revision$'.split()[1]
-__revision__  = __version__ # For pylint
-__date__ = '$Date$'.split()[1]
+#__version__ = '$Revision$'.split()[1]
+#__revision__  = __version__ # For pylint
+#__date__ = '$Date$'.split()[1]
 __copyright__ = '2010'
 __license__   = 'LGPL v3'
 __contact__   = 'kurt at ccom.unh.edu'

@@ -7,12 +7,12 @@ const char *ais8_001_22_shape_names[8] = {"Circle/Pt","Rect", "Sector","Polyline
 
 const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = { // 128] = {
    "Caution Area: Marine mammals habitat (implies whales NOT observed)", // 0 - WARNING: extra text by Kurt
-   "Caution Area: Marine mammals in area – reduce speed", // 1
-   "Caution Area: Marine mammals in area – stay clear", // 2
-   "Caution Area: Marine mammals in area – report sightings", // 3
-   "Caution Area: Protected habitat – reduce speed", // 4
-   "Caution Area: Protected habitat – stay clear", // 5
-   "Caution Area: Protected habitat – no fishing or anchoring", // 6
+   "Caution Area: Marine mammals in area - reduce speed", // 1
+   "Caution Area: Marine mammals in area - stay clear", // 2
+   "Caution Area: Marine mammals in area - report sightings", // 3
+   "Caution Area: Protected habitat - reduce speed", // 4
+   "Caution Area: Protected habitat - stay clear", // 5
+   "Caution Area: Protected habitat - no fishing or anchoring", // 6
    "Caution Area: Derelicts (drifting objects)", // 7
    "Caution Area: Traffic congestion", // 8
    "Caution Area: Marine event", // 9
@@ -22,7 +22,7 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = { // 128] = {
    "Caution Area: Survey operations", // 13
    "Caution Area: Underwater operation", // 14
    "Caution Area: Seaplane operations", // 15
-   "Caution Area: Fishery – nets in water", // 16
+   "Caution Area: Fishery - nets in water", // 16
    "Caution Area: Cluster of fishing vessels", // 17
    "Caution Area: Fairway closed", // 18
    "Caution Area: Harbour closed", // 19
@@ -43,7 +43,7 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = { // 128] = {
    "Restricted Area: Entry approval required prior to transit", // 34
    "Restricted Area: Entry prohibited", // 35
    "Restricted Area: Active military OPAREA", // 36
-   "Restricted Area: Firing – danger area.", // 37
+   "Restricted Area: Firing - danger area.", // 37
    "Restricted Area: Drifting Mines", // 38
    "(reserved for future use)", // 39
    "Anchorage Area: Anchorage open", // 40
@@ -62,9 +62,9 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = { // 128] = {
    "(reserved for future use)", // 53
    "(reserved for future use)", // 54
    "(reserved for future use)", // 55
-   "Security Alert – Level 1", // 56
-   "Security Alert – Level 2", // 57
-   "Security Alert – Level 3", // 58
+   "Security Alert - Level 1", // 56
+   "Security Alert - Level 2", // 57
+   "Security Alert - Level 3", // 58
    "(reserved for future use)", // 59
    "(reserved for future use)", // 60
    "(reserved for future use)", // 61
@@ -90,8 +90,8 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = { // 128] = {
    "Instruction: Contact Port Administration at this point/juncture", // 81
    "Instruction: Do not proceed beyond this point/juncture", // 82
    "Instruction: Await instructions prior to proceeding beyond this point/juncture", // 83
-   "Proceed to this location – await instructions", // 84
-   "Clearance granted – proceed to berth", // 85
+   "Proceed to this location - await instructions", // 84
+   "Clearance granted - proceed to berth", // 85
    "(reserved for future use)", // 86
    "(reserved for future use)", // 87
    "Information: Pilot boarding position", // 88
@@ -120,7 +120,7 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = { // 128] = {
    "(reserved for future use)", // 111
    "Report from ship: Icing info", // 112
    "(reserved for future use)", // 113
-   "Report from ship: Miscellaneous information – define in Associated text field", // 114
+   "Report from ship: Miscellaneous information - define in Associated text field", // 114
    "(reserved for future use)", // 115
    "(reserved for future use)", // 116
    "(reserved for future use)", // 117
@@ -131,8 +131,8 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = { // 128] = {
    "Route: Recommended route through ice", // 122
    "(reserved for future use)", // 123
    "(reserved for future use)", // 124
-   "Other – Define in associated text field", // 125
-   "Cancellation – cancel area as identified by Message Linkage ID", // 126
+   "Other - Define in associated text field", // 125
+   "Cancellation - cancel area as identified by Message Linkage ID", // 126
    "Undefined (default)" //, // 127
 };
 
@@ -278,7 +278,7 @@ void Ais8_001_22_Text::print() {
 // Call the appropriate constructor
 Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const Ais8_001_22_AreaShapeEnum area_shape = (Ais8_001_22_AreaShapeEnum)ubits(bs, offset, 3);
-    std::cout << "area_shape: off: " << offset << " shape: "<< area_shape << " [" << shape_names[area_shape] << "]\n";
+    //std::cout << "area_shape: off: " << offset << " shape: "<< area_shape << " [" << ais8_001_22_shape_names[area_shape] << "]\n";
     if (AIS8_001_22_SHAPE_ERROR == area_shape) {
         std::cerr << "ERROR: Bad area shape!  Bummer" << std::endl;
         return 0;
@@ -325,7 +325,7 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
 //////////////////////////////////////////////////////////////////////
 
 Ais8_001_22::Ais8_001_22(const char *nmea_payload) {
-    std::cerr << "WARNING: Ais8_001_22 is totally untests" << std::endl;
+    //std::cerr << "WARNING: Ais8_001_22 is totally untests" << std::endl;
     assert(nmea_payload);
     assert(strlen(nmea_payload) >= 33);
     init();
@@ -346,19 +346,21 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload) {
     notice_type = ubits(bs,66,7);
     month = ubits(bs,73,4);
     day = ubits(bs,77,5);
-    utc_hour = ubits(bs,82,5);
-    utc_minute = ubits(bs,87,6);
+    hour = ubits(bs,82,5);
+    minute = ubits(bs,87,6);
 
     duration_minutes = ubits(bs,93,18);
     
     // Use floor to be able to ignore any spare bits
     const int num_sub_areas = int( floor( (num_bits - 111)/87.) );
+    /*
     std::cout << "num_sub_areas: " << num_bits << " " << num_bits - 111 
               << " " << (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE)
               << " " << floor( (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE))
               << " -> " << int( floor( (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE)) ) 
               << " " << num_sub_areas
               <<"\n";
+    */
     for (int sub_area_idx=0; sub_area_idx < num_sub_areas; sub_area_idx++) {
         Ais8_001_22_SubArea *sub_area = ais8_001_22_subarea_factory(bs, 111+ AIS8_001_22_SUBAREA_SIZE*sub_area_idx);
         if (sub_area) { 
@@ -376,14 +378,14 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload) {
 } // end constructor
 
 Ais8_001_22::~Ais8_001_22() {
-    std::cout << "Ais8_001_22: destructor.  sub_areas: " << sub_areas.size() << std::endl;
+    //std::cout << "Ais8_001_22: destructor.  sub_areas: " << sub_areas.size() << std::endl;
 
     // FIX: why is the destructor getting called 2x for each sub area?
     for (size_t i=0; i < sub_areas.size(); i++) {
         delete sub_areas[i];  // FIX: leak?
         //sub_areas[i] = 0;
     }
-    std::cout << "\n\n";
+    //std::cout << "\n\n";
 }
 
 #include <iomanip>
@@ -402,9 +404,9 @@ Ais8_001_22::print() {
     std::cout << std::setfill(' ') << std::setw(0) << "-";
     std::cout << std::setfill('2') << std::setw(2) << day;
     std::cout << std::setfill(' ') << std::setw(0) << "T";
-    std::cout << std::setfill('0') << std::setw(2) << utc_hour;
+    std::cout << std::setfill('0') << std::setw(2) << hour;
     std::cout << ":";
-    std::cout << std::setfill('0') << std::setw(2) << utc_minute;
+    std::cout << std::setfill('0') << std::setw(2) << minute;
     std::cout 
         << "Z\n"
         << "\tLink id:   " << link_id << "\n"

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from distutils.core import setup, Extension
 
 ais_module = Extension('ais',
@@ -8,6 +10,8 @@ ais_module = Extension('ais',
                                'ais5.cpp',
                                # ais6
                                'ais7_13.cpp',
+                               'ais8.cpp',
+                               'ais8_001_22.cpp',
                                'ais9.cpp',
                                'ais10.cpp',
                                'ais14.cpp',
