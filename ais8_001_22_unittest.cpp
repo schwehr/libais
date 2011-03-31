@@ -39,14 +39,23 @@ const string nth_field(const string &str, const size_t n, const char c) {
 }
 
 TEST(EmptyTest, Empty) {
-
+    // FIX: test the empty string case.  What should it do?
 }
 
+// This is really not working right.  What is going on?
 TEST(PointTest, Point) {
     // AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
     const string msg_str = "!AIVDM,1,1,,A,81mg=5@0EP:0>H0007P>0<D1<qp400000,0*1D";
     const string body(nth_field(msg_str,5,','));
     cout << "body: " << body << endl;
-    Ais8_001_22 msg("81mg=5@0EP:0>H0007P>0<D1<qp400000");
-
+    Ais8_001_22 msg(body.c_str());
+    cout << "msg8_1_22: " << endl;
+    msg.print();
+    cout << "mid:" << msg.message_id << endl;
+    EXPECT_EQ(msg.message_id,8);
+    EXPECT_EQ(msg.repeat_indicator,0);
+    EXPECT_EQ(msg.mmsi,123456789);
+    EXPECT_EQ(msg.spare,0);
+    EXPECT_EQ(msg.dac,1);
+    EXPECT_EQ(msg.fi,22);
 } // PointTest

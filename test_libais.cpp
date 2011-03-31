@@ -15,7 +15,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 1
     ////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         // !AIVDM,1,1,,B,15Mq4J0P01EREODRv4@74gv00HRq,0*72,b003669970,1272412824
         Ais1_2_3("15Mq4J0P01EREODRv4@74gv00HRq");
         // !AIVDM,1,1,,B,1EN2?oWP00ER5SLRvNPi9gwl0000,0*51,b003669970,1272412824
@@ -38,19 +38,19 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 7 and 13
     ////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         // Causes bus error
         // !AIVDM,1,1,,A,74i:pT000000,0*52,b003669977,1273190417
-        CHECKPOINT;
+        //CHECKPOINT;
         {Ais7_13 msg("74i:pT000000"); msg.print();}
-        CHECKPOINT;
+        //CHECKPOINT;
 
         {Ais7_13 msg("75Mu6d0P17IP?PfGSC29WOvb0<14"); msg.print();}
 
-        CHECKPOINT;
+        //CHECKPOINT;
         { Ais7_13 msg("74eGSe@0owtf"); msg.print(); }
 
-        CHECKPOINT;
+        //CHECKPOINT;
         { 
             Ais7_13 msg("74eGSe@0owt");
             assert(msg.had_error());
@@ -64,7 +64,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 8 - BBM
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         int i=0;
         { 
             // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
@@ -78,8 +78,8 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
     ///// 1 11 IMO Met Hydro
     
-    if (false) {
-        CHECKPOINT;
+    if (true) {
+        //CHECKPOINT;
         int i=0;
         // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
         { 
@@ -88,7 +88,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
         }
-        CHECKPOINT;
+        //CHECKPOINT;
 
     }
 
@@ -104,7 +104,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n"; 
         }
-        CHECKPOINT;
+        //CHECKPOINT;
 
     }
 
@@ -113,7 +113,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 9 - Search and rescue
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         int i=0;
         // !AIVDM,1,1,,B,9002=mQq1oIJvt6;2eUn>Sh0040<,0*5D,b003669979,1273709011
         { 
@@ -136,7 +136,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 10 - ":" UTC and date inquery
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         int i=0;
         // !AIVDM,1,1,,B,:5CoIn0kwN0P,0*23,b003669708,1273711619
         { 
@@ -158,7 +158,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 11 - "" UTC/date response - same as 4
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         int i=0;
         // AIVDM,1,1,,A,;4eG>3iuaFP2:r3OiBH7;8i00000,0*65,d-104,S0420,t000211.00,T11.21643139,r09STOL1,1273708934
         { 
@@ -173,7 +173,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 12 - "<" Addressed Safety message
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         int i=0;
         // !AIVDM,1,1,,A,<02:oP0kKcv0@<51C5PB5@?BDPD?P:?2?EB7PDB16693P381>>5<PikP,0*37
         // From AISHUB via GPSD
@@ -198,7 +198,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 14 - Safety Broadcast
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         // From GPSD - !AIVDM,1,1,,A,>5?Per18=HB1U:1@E=B0m<L,2*51
         { 
             Ais14 msg(">5?Per18=HB1U:1@E=B0m<L"); 
@@ -223,6 +223,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 15 - ? Interrogation
     //////////////////////////////////////////////////////////////////////
 
+    std::cout << "FIX: what is wrong with 15?" << std::endl;
     if (false) {
         int i=0;
         // From GPSD - !AIVDM,1,1,,A,?5OP=l00052HD00,2*5B
@@ -252,7 +253,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 18 - Class B
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         // !AIVDM,1,1,,A,B5N3SRP0FFJFC`4:CQDFKwiP200>,0*75,b003669952,1272413103
         { Ais18 msg("B5N3SRP0FFJFC`4:CQDFKwiP200>"); msg.print(); std::cout << std::endl; }
         // !AIVDM,1,1,,B,B5NGjdP03MkEvV6vJTN`SwuUoP06,0*08,b003669703,1272412832
@@ -276,7 +277,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 19 - Class B equip pos report
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         // !AIVDM,1,1,,B,C5N3SRP0IFJKmE4:v6pBGw`@62PaLELTBJ:V00000000S0D:R220,0*3A,b003669952,1272415462
         { 
             Ais19 msg("C5N3SRP0IFJKmE4:v6pBGw`@62PaLELTBJ:V00000000S0D:R220"); 
@@ -298,12 +299,12 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 21 - ATON status report
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         //CHECKPOINT;
         int i=0;
         // From OHMEX test at CCOM
         // !AIVDM,1,1,,A,E52HH<h:W4?Sa2Pb?Q0dgVPa4W0uM`P9<EmvH00000u@20,4*15,1269957000.16
-        if (false) { 
+        if (true) { 
             CHECKPOINT;
             Ais21 msg("E52HH<h:W4?Sa2Pb?Q0dgVPa4W0uM`P9<EmvH00000u@20");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 21 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
@@ -326,7 +327,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // 24 - Class B static data msgs A and B
     //////////////////////////////////////////////////////////////////////
 
-    if (false) {
+    if (true) {
         // !AIVDM,1,1,,B,H5NHcTP<51@4TrM>10584@U<D00,2*77,x337805,b003669710,1241895000
         { 
             Ais24 msg("H5NHcTP<51@4TrM>10584@U<D00"); 
@@ -344,11 +345,12 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     }
 
     //////////////////////////////
-    // msg 8 366 22 Zone Broadcast - This message is not not good
+    // msg 8 366 22 Zone Broadcast - This message is not good
     //////////////////////////////
+    CHECKPOINT;
 
     if (false) {
-        if (false) {
+        if (true) {
             // Point
             std::cout << "Point: ****\n";
             Ais8_366_22 msg("81mg=5AKUP:0>H0007P=P?I0<12h000000");
@@ -356,7 +358,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             std::cout << "\n";
         }
 
-        if (false) {
+        if (true) {
             //# Circle
             // AreaNotice: type=1  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
             // !ECBBM,1,1,3,A,8,5fF0`2qP000N1n0uT0h7mH3E0000,5*42
@@ -369,7 +371,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             std::cout << "\n";
         }
 
-        if (false) {
+        if (true) {
         //if (true) {
             std::cout << "========== Rectangle =========\n\n";
             // AreaNotice: type=3  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
@@ -381,7 +383,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             std::cout << "\n";
         }
 
-        if (false) {
+        if (true) {
             std::cout << "========== Sector =========\n\n";
             //Sector AreaNotice: type=4  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
             Ais8_366_22 msg("81mg=5AKUP:2>H0007R=P?I0<3jQwl0:6@");
@@ -389,7 +391,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             std::cout << "\n";
         }
 
-        if (false) {
+        if (true) {
             std::cout << "========== Line =========\n\n";
             // Line - 1 segment
             {
@@ -399,7 +401,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             std::cout << "========== END LINE ==========\n\n";
         }
 
-        if (false) {
+        if (true) {
             std::cout << "========== Polygon =========\n\n";
             // Polygon - 2 segment - triangle
             {
@@ -409,7 +411,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             std::cout << "========== END POLYGON ==========\n\n";
         }
 
-        if (false) {
+        if (true) {
             std::cout << "========== START TEXT ==========\n\nText should be [EXPLANATION]\n";
             // Text AreaNotice: type=7  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 2
             {
@@ -419,7 +421,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             std::cout << "========== END TEXT ==========\n\n";
         }
 
-        if (false) {
+        if (true) {
             // one-of-each
             std::cout << "========== START ONE OF EACH ==========\n\n";
             Ais8_366_22 msg("81mg=5AKUP:4>H0007P=P?I0<8GOp00000=P?I0<8GOsr0001MPdd0<8GOv@j002MQ9w0<8GOq;0:6@=QWB0<8GOp00003EDG9J00;@01J000=R4U0<8GOp000040DchFWWc@01J005C?=5PD5HD000000");
@@ -429,7 +431,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         }
 
     }
-
+    CHECKPOINT;
 
 
     //////////////////////////////
@@ -437,11 +439,12 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     //////////////////////////////
 
     if (true) {
+        std::cout << "bbm: 8 1 22" << std::endl;
         //for (size_t i=0; i < AIS8_001_22_NUM_NAMES; i++) {
         //    std::cout << i << "\t" << notice_names[i] << "\n";
         //}
 
-        if (false) {
+        if (true) {
             // Point
             /*
               AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
@@ -462,7 +465,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         }
 
 
-        if (false) {
+        if (true) {
             // Circle
             /*
               AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
@@ -479,7 +482,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         }
 
 
-        if (false) {
+        if (true) {
             // Rect
             /*
 AreaNotice: type=3  start=2011-07-06 05:31:00  duration=60 m  link_id=10  sub-areas: 1
@@ -508,7 +511,7 @@ AreaNotice: type=3  start=2011-07-06 05:31:00  duration=60 m  link_id=10  sub-ar
         }
 
 
-        if (false) {
+        if (true) {
             /*
 AreaNotice: type=4  start=2011-07-06 12:49:00  duration=60 m  link_id=10  sub-areas: 1
 {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T12:49:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Protected Habitat - Reduce Speed", "stop": "2011-07-06T13:49:00Z", "areas": [{"geometry": {"type": "Polygon", "coordinates": [[-69.80000000000004, 42.19999999999997], ... [-69.80000000000004, 42.19999999999997]]}, "area_shape": 2, "radius": 4000, "left_bound": 10, "right_bound": 50, "area_shape_name": "sector"}], "bbm_type": [1, 22], "bbm_name": "area_notice", "area_type": 4}}
@@ -522,7 +525,7 @@ AreaNotice: type=4  start=2011-07-06 12:49:00  duration=60 m  link_id=10  sub-ar
             std::cout << "\n";
         }
 
-        if (false) {
+        if (true) {
             /*
 Line - 1 segment
 AreaNotice: type=5  start=2011-07-06 15:01:00  duration=60 m  link_id=10  sub-areas: 1
@@ -540,7 +543,7 @@ norm: !AIVDM,1,1,,A,81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`01J000,3*61,rUNKNO
         }
 
 
-        if (false) {
+        if (true) {
             /*
 # Polygon - 2 segment - triangle
 AreaNotice: type=6  start=2011-07-06 20:59:00  duration=60 m  link_id=10  sub-areas: 1
@@ -577,6 +580,7 @@ AreaNotice: type=7  start=2011-07-06 23:59:00  duration=60 m  link_id=10  sub-ar
             std::cout << "\n";
         }
 
+#if 0
 
         if (true) {
             /*
@@ -587,39 +591,8 @@ AreaNotice: type=7  start=2011-07-06 23:59:00  duration=60 m  link_id=10  sub-ar
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
+#endif
 
-
-        if (true) {
-            /*
-
-             */
-            std::cout << "\n\n: ****\n";
-            Ais8_001_22 msg("");
-            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n";
-        }
-
-
-        if (true) {
-            /*
-
-             */
-            std::cout << "\n\n: ****\n";
-            Ais8_001_22 msg("");
-            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n";
-        }
-
-
-        if (true) {
-            /*
-
-             */
-            std::cout << "\n\n: ****\n";
-            Ais8_001_22 msg("");
-            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n";
-        }
 
 
     }
