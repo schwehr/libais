@@ -10,6 +10,21 @@
 #include <cmath>
 //using namespace std;
 
+const std::string nth_field(const std::string &str, const size_t n, const char c) {
+    // FIX: handle the off the end case better
+    size_t pos;
+    size_t count;
+    for (pos=0, count=0; count < n and pos != std::string::npos; count+=1) {
+        if (pos>0) pos += 1; // Skip past the current char that matched
+        pos = str.find(c, pos);
+    } 
+    if (std::string::npos == pos) return std::string("");
+   
+    const size_t start = pos;
+    const size_t end = str.find(c, pos+1);
+    if (std::string::npos == end) return str.substr(start);
+    return str.substr(start+1, end-start-1);
+}
 
 // for decoding str bits inside of a binary message
 const std::string bits_to_char_tbl="@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";

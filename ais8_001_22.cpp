@@ -334,8 +334,9 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload) {
     // Spec is not byte aligned.  BAD!  
     //if (198 <= num_bits && num_bits >= 981) { status = AIS_ERR_BAD_BIT_COUNT; return; }
     if (198 < num_bits && num_bits > 984) { status = AIS_ERR_BAD_BIT_COUNT; return; }
-    std::bitset<MAX_BITS> bs;
 
+    assert(nmea_ord_initialized); // Extra careful that we have a lookup table
+    std::bitset<MAX_BITS> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

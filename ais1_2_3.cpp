@@ -8,8 +8,11 @@
 #include <cassert>
 #include <cmath>
 
+using namespace std;
+
 Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     assert(nmea_payload);
+    assert(nmea_ord_initialized); // Make sure we have the lookup table built
     init();
 
     if (strlen(nmea_payload) != 168/6) { status = AIS_ERR_BAD_BIT_COUNT; return; }
@@ -28,9 +31,10 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     mmsi = ubits(bs,8,30);
     nav_status = ubits(bs,38,4);
 
-    const int rot_raw = sbits(bs,42,8);
+    /*const int*/ rot_raw = sbits(bs,42,8);
     rot_over_range = abs(rot_raw) > 126 ? true : false ;
-    rot = 4.733 * sqrt(fabs(rot_raw));
+    //rot = 4.733 * sqrt(fabs(rot_raw));  // FIX: this was wrong... double check
+    rot = pow( (rot_raw/4.733), 2 );
     if (rot_raw < 0) rot = -rot;
 
     sog = ubits(bs,50,10) / 10.;
@@ -50,11 +54,12 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     received_stations = -1;  received_stations_valid = false;
     slot_number = -1; slot_number_valid = false;
     utc_hour = utc_min = -1; utc_valid = false;
+    utc_spare = -1;
     slot_offset = -1; slot_offset_valid = false;
 
     slot_increment = -1; slot_increment_valid = false;
     slots_to_allocate = -1;  slots_to_allocate_valid = false;
-    keep_flag = -1; keep_flag_valid = false;
+    keep_flag = false; keep_flag_valid = false;
    
 
     if ( 1 == message_id || 2 == message_id) {
@@ -103,32 +108,35 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
 }
 
 void 
-Ais1_2_3::print() {
+Ais1_2_3::print(bool verbose/*=false*/) {
     std::cout << "Class A Position: " << message_id 
               << std::endl;
-    //cout << "rot: " << rot_raw << " -> " << (rot_over_range? "greater than": " ") << " " << rot << endl;
-    //cout << "sog: " << sog << endl;
-    //cout << "pos_acc: " << position_accuracy << endl;
-    //cout << "pos_x: " << x << endl;
-    //cout << "pos_y: " << y << endl;
+    if (!verbose) return;
+    cout << "\trow_raw: " << rot_raw << endl;
+    cout << "\trot: " << rot << " -> " << (rot_over_range? "greater than": " ") << " " << rot << endl;
+    cout << "\tsog: " << sog << endl;
+    cout << "\tpos_acc: " << position_accuracy << endl;
+    cout << "\tpos_x: " << x << endl;
+    cout << "\tpos_y: " << y << endl;
     //cout << "cog_raw: " << ubits(bs,116,12) << endl;
-    //cout << "cog: " << cog << endl;
-    //cout << "true_heading:" << true_heading << endl;
-    //cout << "timestamp: " << timestamp << endl;
-    //cout << "special_manoeuvre: " << special_manoeuvre << endl;
-    //cout << "spare: " << spare << endl;
-    //cout << "sync_state: " << sync_state << endl;
+    cout << "\tcog: " << cog << endl;
+    cout << "\ttrue_heading:" << true_heading << endl;
+    cout << "\ttimestamp: " << timestamp << endl;
+    cout << "\tspecial_manoeuvre: " << special_manoeuvre << endl;
+    cout << "\tspare: " << spare << endl;
+    cout << "\tsync_state: " << sync_state << endl;
     if ( 1 == message_id || 2 == message_id) {
-        //cout << "SOTDMA type " << message_id << endl;
-        //cout << "slot_offset: " << slot_offset << endl;
-        //cout << "slot_timeout: " << slot_timeout << endl;
-        //cout << "slot_number: " << slot_number << endl;
-        //cout << "received_stations: " << received_stations << endl;
+        cout << "\tSOTDMA type " << message_id << endl;
+        cout << "\t\tslot_offset: " << slot_offset << endl;
+        cout << "\t\tslot_timeout: " << slot_timeout << endl;
+        cout << "\t\tslot_number: " << slot_number << endl;
+        cout << "\t\treceived_stations: " << received_stations << endl;
     } else {
         assert (3 == message_id);
-        //cout << "ITDMA type" << endl;
-        //        cout << "ITDMA: " << slot_increment << " " << slots_to_allocate << " " 
-        //<< (keep_flag?"keep":"do_not_keep") << endl;
+        cout << "\tITDMA type" << endl;
+        cout << "\t\tslot_increment: " << slot_increment << endl;
+        cout << "\t\tslots_to_allocate: "  << slots_to_allocate << endl;
+        cout << "\t\tkeep_flag: " << (keep_flag?"keep":"do_not_keep") << endl;
     }
 }
 

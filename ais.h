@@ -7,6 +7,7 @@
 #include <cassert>
 #include <vector>
 #include <cstring>
+#include <string>
 
 #include <iostream> // for checkpoint
 
@@ -15,9 +16,14 @@
 #define LIBAIS_VERSION_MAJOR 0
 #define LIBAIS_VERSION_MINOR 3
 
+//////////////////////////////////////////////////////////////////////
+// Helpers
 
 #define CHECKPOINT std::cerr <<  __FILE__ << ": line " << __LINE__ << ": checkpoint" << std::endl
 
+const std::string nth_field(const std::string &str, const size_t n, const char c);
+
+//////////////////////////////////////////////////////////////////////
 
 extern bool nmea_ord_initialized; // If this is false, you need to call build_nmea_lookup.
 
@@ -62,8 +68,15 @@ public:
     AIS_STATUS get_error() {return status;}
     AIS_STATUS status; // AIS_OK or error code
     //AisMsg() {init();}
-protected:
-    void init() {status = AIS_OK;}
+//protected:
+    void init() {
+        //std::cout << "AisMsg_init: setting ok" << std::endl; 
+        status = AIS_OK;
+#ifndef NDEBUG
+        // FIX: should we be setting these?  The individual messages need to do this.
+        message_id = repeat_indicator = mmsi = -666;
+#endif
+    }
 };
 
 class Ais1_2_3 : public AisMsg {
@@ -73,6 +86,7 @@ public:
     int mmsi;
     int nav_status;
     bool rot_over_range;
+    int rot_raw;
     float rot;
     float sog;
     int position_accuracy;
@@ -114,7 +128,7 @@ public:
     bool keep_flag_valid;
 
     Ais1_2_3(const char *nmea_payload);
-    void print();
+    void print(bool verbose=false);
 };
 std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a);
 
