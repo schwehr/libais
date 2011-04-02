@@ -804,7 +804,8 @@ extern std::bitset<6> nmea_ord[128];
 
 template<size_t T>
 AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
-    assert (nmea_payload);
+    assert(nmea_payload);
+    //assert(nmea_ord_initialized);
     if (strlen(nmea_payload) > T/6) {
 #ifndef NDEBUG
         std::cerr << "ERROR: message longer than max allowed size (" << T/6 << "): found " 

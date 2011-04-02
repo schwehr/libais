@@ -10,6 +10,9 @@
 
 using namespace std;
 
+const size_t find_nth(const string &str, const size_t n, const char c);
+const string nth_field(const string &str, const size_t n, const char c);
+
 const size_t find_nth(const string &str, const size_t n, const char c) {
     size_t pos;
     size_t count;
@@ -35,15 +38,25 @@ const string nth_field(const string &str, const size_t n, const char c) {
     const size_t start = pos;
     const size_t end = str.find(c, pos+1);
     if (string::npos == end) return str.substr(start);
-    return str.substr(start+1, end-start);
+    return str.substr(start+1, end-start-1);
 }
 
 TEST(EmptyTest, Empty) {
     // FIX: test the empty string case.  What should it do?
 }
 
+TEST(HelperTest, Helper) {
+    // Does nth_field work right?
+    const string msg_str = "!AIVDM,1,1,,A,81mg=5@0EP:0>H0007P>0<D1<qp400000,0*1D";
+    const string body(nth_field(msg_str,5,','));
+    cout << "body: " << body << endl;
+    ASSERT_STREQ("81mg=5@0EP:0>H0007P>0<D1<qp400000", body.c_str());
+}
+
 // This is really not working right.  What is going on?
 TEST(PointTest, Point) {
+    build_nmea_lookup();
+
     // AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
     const string msg_str = "!AIVDM,1,1,,A,81mg=5@0EP:0>H0007P>0<D1<qp400000,0*1D";
     const string body(nth_field(msg_str,5,','));
