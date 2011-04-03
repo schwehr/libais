@@ -124,7 +124,7 @@ public:
     int slots_to_allocate;      
     bool slots_to_allocate_valid;
 
-    bool keep_flag;
+    bool keep_flag;  // 3.3.7.3.2 Annex 2 ITDMA.  Table 20
     bool keep_flag_valid;
 
     Ais1_2_3(const char *nmea_payload);
