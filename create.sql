@@ -30,3 +30,12 @@ INSERT INTO response_class VALUES (1,'Response');
 INSERT INTO response_class VALUES (3,'Research');
 INSERT INTO response_class VALUES (4,'Skimmer');
 INSERT INTO response_class VALUES (5,'Government');
+
+-- Stripped to the minimum for SQLite
+-- Assumes 1 receive station or that you do not care
+CREATE TABLE pos (
+       mmsi INTEGER,
+       x REAL,
+       y REAL,
+       ts INTEGER
+);

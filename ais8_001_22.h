@@ -40,7 +40,7 @@ extern const char *ais8_001_22_shape_names[8];
 class Ais8_001_22_SubArea {
 public:
     //Ais8_001_22_AreaShapeEnum area_shape;
-    virtual Ais8_001_22_AreaShapeEnum getType()=0;  
+    virtual Ais8_001_22_AreaShapeEnum getType() const = 0;  
     // FIX: make the destructor pure virtual
     virtual ~Ais8_001_22_SubArea() //= 0;
     { /* std::cout << "Ais8_001_22_Subarea: destructor" << std::endl;*/ };
@@ -60,7 +60,7 @@ public:
 
     Ais8_001_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Circle() {/* std::cout << "Ais8_001_22_Circle: destructor" << std::endl; */};
-    Ais8_001_22_AreaShapeEnum getType() {return AIS8_001_22_SHAPE_CIRCLE;}
+    Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_CIRCLE;}
     void print();
 };
 
@@ -75,7 +75,7 @@ public:
 
     Ais8_001_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Rect() { /* std::cout << "Ais8_001_22_Rect: destructor" << std::endl; */};
-    Ais8_001_22_AreaShapeEnum getType() {return AIS8_001_22_SHAPE_RECT;}
+    Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_RECT;}
     void print();
 
 };
@@ -91,7 +91,7 @@ public:
 
     Ais8_001_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Sector() { /* std::cout << "Ais8_001_22_Sector: destructor" << std::endl; */ };
-    Ais8_001_22_AreaShapeEnum getType() {return AIS8_001_22_SHAPE_SECTOR;}
+    Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_SECTOR;}
     void print();
 };
 
@@ -112,7 +112,7 @@ public:
 
     Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polyline() { /* std::cout << "Ais8_001_22_Polyline: destructor" << std::endl; */};
-    Ais8_001_22_AreaShapeEnum getType() {return AIS8_001_22_SHAPE_POLYLINE;}
+    Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYLINE;}
     void print();
 
 };
@@ -133,7 +133,7 @@ public:
 
     Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polygon() { /* std::cout << "Ais8_001_22_Polygon: destructor" << std::endl; */ };
-    Ais8_001_22_AreaShapeEnum getType() {return AIS8_001_22_SHAPE_POLYGON;}
+    Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYGON;}
     void print();
 };
 
@@ -145,7 +145,7 @@ public:
 
     Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Text() { /* std::cout << "Ais8_001_22_Text: destructor" << std::endl; */ };
-    Ais8_001_22_AreaShapeEnum getType() {return AIS8_001_22_SHAPE_TEXT;}
+    Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_TEXT;}
     void print();
 };
 
