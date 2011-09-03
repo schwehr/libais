@@ -30,7 +30,7 @@ Ais5::Ais5(const char *nmea_payload) {
     
     name = ais_str(bs, 112, 120);
     
-    type_and_cargo = ubits(bs, 120, 8);
+    type_and_cargo = ubits(bs, 232, 8);
     dim_a = ubits(bs, 240, 9);
     dim_b = ubits(bs, 249, 9);
     dim_c = ubits(bs, 258, 6);

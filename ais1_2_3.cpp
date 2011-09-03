@@ -7,6 +7,7 @@
 #include <string>
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 
 using namespace std;
 

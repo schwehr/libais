@@ -378,7 +378,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict) {
         switch(msg.sub_areas[i]->getType()) {
         case AIS8_001_22_SHAPE_CIRCLE: // or point
             {
-                cout << i << ": POINT or CIRCLE\n";
+                // cout << i << ": POINT or CIRCLE\n";
                 PyObject *sub_area = PyDict_New();
                 //DictSafeSetItem(sub_area,"area_type",msg.sub_areas[i]->getType());
                 // FIX: could easily optimize to have only one copy of each string around at a Python Obj
@@ -652,7 +652,7 @@ ais8_to_pydict(const char *nmea_payload) {
         break;
     default:
         DictSafeSetItem(dict,"parsed",false);
-        cout << "Ais8: can't handle dac " << msg.dac << endl;
+        // cout << "Ais8: can't handle dac " << msg.dac << endl;
     }
 
 
