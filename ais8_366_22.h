@@ -3,6 +3,8 @@
 
 // Which spec was I coding to?  Probably the Nav55
 
+// FIX: remove cout's and this include will not be needed
+#include <iostream>
 
 enum Ais8_366_22_AreaShapeEnum {
     AIS8_366_22_SHAPE_ERROR = -1,

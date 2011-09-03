@@ -327,7 +327,9 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
 Ais8_001_22::Ais8_001_22(const char *nmea_payload) {
     //std::cerr << "WARNING: Ais8_001_22 is totally untests" << std::endl;
     assert(nmea_payload);
+    assert(nmea_ord_initialized); // Make sure we have the lookup table built
     assert(strlen(nmea_payload) >= 33);
+
     init();
     const int num_bits = (strlen(nmea_payload) * 6);
     // FIX: make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41

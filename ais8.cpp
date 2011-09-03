@@ -5,6 +5,7 @@
 
 Ais8::Ais8(const char *nmea_payload) {
     assert(nmea_payload);
+	assert(nmea_ord_initialized); // Make sure we have the lookup table built
     init();
     const int payload_len = strlen(nmea_payload)*6 - 46; // in bits w/o DAC/FI
     //std::cout << "payload_len: " << strlen(nmea_payload) << " " << strlen(nmea_payload)*6 << " " << payload_len << " " << payload_len / 8 << "\n";
