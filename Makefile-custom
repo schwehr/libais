@@ -90,6 +90,9 @@ default:
 	@echo "  python2 - build the python2.6 module"
 	@echo "  python3 - build the python3.1 module"
 	@echo "  nais2pg - Run the python 2.6 nais2pg.py program"
+	@echo
+	@echo "  pull     - update from github"
+	@echo "  push     - update github with local changes"
 	@echo 
 	@echo "Read the README for more information"
 
@@ -177,3 +180,9 @@ ais8_001_22_unittest: ais8_001_22_unittest.cpp ais8_001_22.cpp ais.cpp ais8.cpp
 ais1_2_3_unittest: ais1_2_3_unittest.cpp ais.cpp ais1_2_3.cpp
 	${CXX} -m32 -g ${WARN} $^ -o $@ ${GTESTFLAGS} -lgtest_main -lpthread
 	./$@
+
+GIT_URL:=git@github.com:schwehr/libais.git
+pull:
+	git pull ${GIT_URL}
+push:
+	git push ${GIT_URL}
