@@ -81,9 +81,6 @@ public:
 
 class Ais1_2_3 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int nav_status;
     bool rot_over_range;
     int rot_raw;
@@ -135,9 +132,6 @@ std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a);
 // 4 bsreport and 11 utc date response
 class Ais4_11 : public AisMsg {
  public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int year;
     int month;
     int day;
@@ -178,9 +172,6 @@ std::ostream& operator<< (std::ostream& o, Ais4_11 const& msg);
 
 class Ais5 : public AisMsg {
  public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int ais_version;
     int imo_num;
     std::string callsign;
@@ -210,10 +201,6 @@ std::ostream& operator<< (std::ostream& o, Ais5 const& msg);
 // msg 6 and 12 ack 
 class Ais7_13 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi; // source ID
-
     int spare;
 
     std::vector<int> dest_mmsi;
@@ -237,9 +224,6 @@ public:
 
     static const int MAX_BITS = AIS8_MAX_BITS; //1192; //1008;
 
-    int message_id;
-    int repeat_indicator;
-    int mmsi; // source ID
     int spare;
     int dac; // dac+fi = app id
     int fi;
@@ -332,9 +316,6 @@ std::ostream& operator<< (std::ostream& o, Ais8_366_34 const& msg);
 
 class Ais9 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int alt; // m above sea level
     float sog;
     int position_accuracy;
@@ -388,9 +369,6 @@ std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
 // 10 - ":" UTC and date inquiry
 class Ais10 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int spare;
     int dest_mmsi;
     int spare2;
@@ -405,9 +383,6 @@ std::ostream& operator<< (std::ostream& o, Ais10 const& msg);
 // < - Addressd safety related
 class Ais12 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int seq_num;
     int dest_mmsi;
     bool retransmitted;
@@ -422,9 +397,6 @@ std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
 // Safety broadcast
 class Ais14 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     std::string text;
     int expected_num_spare_bits; // The bits in the nmea_payload not used
     Ais14(const char *nmea_payload);
@@ -437,9 +409,6 @@ std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
 // ? - Interrogation
 class Ais15 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int spare;
     int mmsi_1;
     int msg_1_1;
@@ -463,9 +432,6 @@ std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
 // @ - Assigned mode command - FIX: not yet coded
 class Ais16 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int spare;
     int dest_mmsi_a;
     int offset_a;
@@ -483,9 +449,6 @@ std::ostream& operator<< (std::ostream& o, Ais16 const& msg);
 // A? - GNSS broacast - FIX: not yet coded
 class Ais17 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int spare;
     float x, y;
     int spare2;
@@ -507,9 +470,6 @@ std::ostream& operator<< (std::ostream& o, Ais17 const& msg);
 // B - Class B position report
 class Ais18 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int spare;
     float sog;
     int position_accuracy;
@@ -565,9 +525,6 @@ std::ostream& operator<< (std::ostream& o, Ais18 const& msg);
 // C - Class B extended ship and position
 class Ais19 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int spare;
     float sog;
     int position_accuracy;
@@ -596,9 +553,6 @@ std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
 // 'D' - Data link management - FIX: not yet coded
 class Ais20 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
     int spare;
     int offset_1;
     int num_slots_1;
@@ -660,10 +614,6 @@ std::ostream& operator<< (std::ostream& o, Ais21 const& msg);
 // 'F' - Channel Management - FIX: not yet coded
 class Ais22 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
-
     int spare;
     int chan_a;
     int chan_b;
@@ -694,10 +644,6 @@ std::ostream& operator<< (std::ostream& o, Ais22 const& msg);
 // 'G' - Group Assignment Command - FIX: not yet coded
 class Ais23 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
-
     int spare;
     float x1,y1;
     float x2,y2;
@@ -719,10 +665,6 @@ std::ostream& operator<< (std::ostream& o, Ais23 const& msg);
 // Class B Static Data report
 class Ais24 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
-
     int part_num;
 
     // Part A
@@ -746,10 +688,6 @@ std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 // 'I' - Single slot binary message - addressed or broadcast - FIX: not yet coded
 class Ais25 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
-
     bool addressed; // broadcast if false - destination indicator
     bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
 
@@ -764,10 +702,6 @@ std::ostream& operator<< (std::ostream& o, Ais25 const& msg);
 // 'J' - Multi slot binary message with comm state - FIX: not yet coded
 class Ais26 : public AisMsg {
 public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
-
     bool addressed; // broadcast if false - destination indicator
     bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
   
