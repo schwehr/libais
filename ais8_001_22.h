@@ -185,4 +185,26 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais8_001_22 const& msg);
 
+/// WGS84 position in degrees.
+struct AisPosition
+{
+    float longitude;
+    float latitude;
+    
+    AisPosition(float lon, float lat):longitude(lon),latitude(lat){}
+    AisPosition(AisPosition const &p):longitude(p.longitude),latitude(p.latitude){}
+
+    bool operator!=(AisPosition const&other) const {return longitude != other.longitude || latitude != other.latitude;}
+    bool operator==(AisPosition const&other) const {return !((*this)!=other);}
+    
+    /// Constructs a position from an inital point along with a 
+    /// range and bearing.
+    /// Vincenty's formula is used to calculate the resulting position
+    /// on the WGS84 ellipsoid.
+    /// http://en.wikipedia.org/wiki/Vincenty%27s_formulae
+    /// Vincenty, T. (April 1975a). "Direct and Inverse Solutions of Geodesics on the Ellipsoid with application of nested equations". Survey Review XXIII (misprinted as XXII) (176): 88–93.
+    AisPosition(AisPosition const &prev, float angle, float range);
+};
+
+std::vector<AisPosition> convertToPositions(Ais8_001_22 const &msg);
 

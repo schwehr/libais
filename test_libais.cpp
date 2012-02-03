@@ -593,6 +593,40 @@ AreaNotice: type=7  start=2011-07-06 23:59:00  duration=60 m  link_id=10  sub-ar
         }
 #endif
 
+        if (true)
+        {
+            AisPosition p1(-70.0,43.0);
+            
+            AisPosition p2(p1,45.0,5000.0);
+            AisPosition p3(-69.956618611,43.03181675);
+            
+            AisPosition p4(p1,0.0,5000.0);
+            AisPosition p5(-70.0,43.045007278);
+            
+            AisPosition p6(p1,90.0,5000.0);
+            AisPosition p7(-69.938681139,42.999983583);
+
+            std::cout << "AisPosition p1(-70.0,43.0): " << p1.longitude << ", " << p1.latitude << std::endl;
+            
+            std::cout << "AisPosition p2(p1,45.0,5000.0): " << p2.longitude << ", " << p2.latitude << std::endl;
+            std::cout << "AisPosition p3(-69.956618611,43.03181675): " << p3.longitude << ", " << p3.latitude << std::endl;
+            
+            std::cout << "AisPosition p4(p1,0.0,5000.0): " << p4.longitude << ", " << p4.latitude << std::endl;
+            std::cout << "AisPosition p5(-70.0,43.045007278): " << p5.longitude << ", " << p5.latitude << std::endl;
+            
+            std::cout << "AisPosition p6(p1,90.0,5000.0): " << p6.longitude << ", " << p6.latitude << std::endl;
+            std::cout << "AisPosition p7(-69.938681139,42.999983583): " << p7.longitude << ", " << p7.latitude << std::endl;
+            
+            std::cout << "p2 == p3? " << (p2 == p3) << " ";
+            if(p2 == p3) std::cout << "PASSED\n"; else std::cout << "FAILED\n";
+
+            std::cout << "p4 == p5? " << (p4 == p5) << " ";
+            if(p4 == p5) std::cout << "PASSED\n"; else std::cout << "FAILED\n";
+            
+            std::cout << "p6 == p7? " << (p6 == p7) << " ";
+            if(p6 == p7) std::cout << "PASSED\n"; else std::cout << "FAILED\n";
+            
+        }
 
 
     }
