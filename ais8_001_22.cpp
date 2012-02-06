@@ -217,45 +217,44 @@ void Ais8_001_22_Sector::print() {
 // Size of one point angle and distance
 static const size_t PT_AD_SIZE=10+10;
 
-Ais8_001_22_Polyline::Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_001_22_Polybase::Ais8_001_22_Polybase(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
     for (size_t i=0; i<4; i++) {
         const int angle = ubits(bs, offset+5+    (i*PT_AD_SIZE), 10);
         const int dist  = ubits(bs, offset+5+10+ (i*PT_AD_SIZE), 10) * scale_multipliers[scale_factor];
         if (0==dist) break;
-        angles.push_back(angle);
+        angles.push_back(angle*0.5);
         dists_m.push_back(dist);
     }
     spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
     assert(AIS8_001_22_SUBAREA_SIZE == 5+(4*20)+2);
+}
+
+void Ais8_001_22_Polybase::print() {
+    for (size_t i=0; i<angles.size(); i++) {
+        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
+    }
+}
+
+Ais8_001_22_Polyline::Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset):Ais8_001_22_Polybase(bs,offset) 
+{
 }
 
 void Ais8_001_22_Polyline::print() {
     std::cout << "Polyline: " << std::endl;
-    for (size_t i=0; i<angles.size(); i++) {
-        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
-    }
+    Ais8_001_22_Polybase::print();
 }
 
-Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs,offset+3,2);
-    for (size_t i=0; i<4; i++) {
-        const int angle = ubits(bs, offset+5+ (i*PT_AD_SIZE), 10);
-        const int dist  = ubits(bs, offset+5+10+ (i*PT_AD_SIZE), 10) * scale_multipliers[scale_factor];
-        if (0==dist) break;
-        angles.push_back(angle);
-        dists_m.push_back(dist);
-    }
-    spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
-    assert(AIS8_001_22_SUBAREA_SIZE == 5+(4*20)+2);
+
+Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset):Ais8_001_22_Polybase(bs, offset)
+{
 }
 
 void Ais8_001_22_Polygon::print() {
     std::cout << "Polygon: " << std::endl;
-    for (size_t i=0; i<angles.size(); i++) {
-        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
-    }
+    Ais8_001_22_Polybase::print();
 }
+
 
 Ais8_001_22_Text::Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     text = std::string(ais_str(bs, offset+3, 84));
@@ -422,6 +421,10 @@ Ais8_001_22::print() {
         std::cout << "\t\t" << i << ": ";
         sub_areas[i]->print();
     }
+    std::vector<AisPosition> positions = convertToPositions(*this);
+    std::cout << "\tpositions:\n";
+    for (std::vector<AisPosition>::const_iterator i = positions.begin(); i != positions.end(); ++i)
+        std::cout << "\t\tlon: " << i->longitude << " lat: " << i->latitude << std::endl;
 }
 
 
@@ -492,24 +495,10 @@ std::vector<AisPosition> convertToPositions(const Ais8_001_22& msg)
                 break;
             }
             case AIS8_001_22_SHAPE_POLYLINE:
-            {
-                assert(!ret.empty());
-                Ais8_001_22_Polyline const *poly = dynamic_cast<Ais8_001_22_Polyline const *>(*sa);
-                
-                assert(poly->angles.size() == poly->dists_m.size());
-                for(int i = 0; i < poly->angles.size(); ++i)
-                {
-                    float a = poly->angles[i];
-                    float d = poly->dists_m[i];
-                    if(d > 0)
-                        ret.push_back(AisPosition(ret.back(),a,d));
-                }
-                break;
-            }
             case AIS8_001_22_SHAPE_POLYGON:
             {
                 assert(!ret.empty());
-                Ais8_001_22_Polygon const *poly = dynamic_cast<Ais8_001_22_Polygon const *>(*sa);
+                Ais8_001_22_Polybase const *poly = dynamic_cast<Ais8_001_22_Polybase const *>(*sa);
                 
                 assert(poly->angles.size() == poly->dists_m.size());
                 for(int i = 0; i < poly->angles.size(); ++i)
@@ -521,7 +510,6 @@ std::vector<AisPosition> convertToPositions(const Ais8_001_22& msg)
                 }
                 break;
             }
-            
         }
     }
     return ret;

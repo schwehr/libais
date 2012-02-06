@@ -561,6 +561,20 @@ norm: !AIVDM,1,1,,A,81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000,3*70,rUNKNO
             std::cout << "\n";
         }
 
+        if (true) {
+            // !AIVDM,2,1,2,A,81mg=5@0EP00TJB8000=vK21=fW400000TFMjP1JL>F,0*0C
+            // !AIVDM,2,2,2,A,sJ000,3*1E
+            // AreaNotice: type=1  start=2012-02-06 18:17:00  duration=0 m  link_id=0  sub-areas: 1
+            // AreaNoticePolygon: (-70.7667,42.4500) 3 points
+            // points: [(89.5, 74100), (0.0, 72300), (270.0, 73300)]
+            // ((-70.766667, 42.45), (-69.866667, 42.45), (-69.866667, 43.1), (-70.766667, 43.1))
+            
+            std::cout << "\n\n: Polygon - Box****\n";
+            Ais8_001_22 msg("81mg=5@0EP00TJB8000=vK21=fW400000TFMjP1JL>FsJ000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+            
+        }
 
         if (true) {
             /*
