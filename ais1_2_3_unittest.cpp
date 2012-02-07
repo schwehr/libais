@@ -6,7 +6,7 @@
 
 using namespace std;
 
-TEST(TestAis1_2_3,AisMsg) {
+TEST(TestAis123,AisMsg) {
     AisMsg a;
     a.init();
     ASSERT_EQ(AIS_OK, a.get_error());
@@ -17,7 +17,7 @@ import binary
 bv = binary.ais6tobitvec('15Mq4J0P01EREODRv4@74gv00HRq')
 print bv
  */
-TEST(TestAis1_2_3, BitDecoding) {
+TEST(TestAis123, BitDecoding) {
     build_nmea_lookup();
     const string m_str("15Mq4J0P01EREODRv4@74gv00HRq");
     const string bits_expected("000001000101011101111001000100011010000000100000000000000001010101100010010101011111010100100010111110000100010000000111000100101111111110000000000000011000100010111001");
@@ -59,7 +59,7 @@ position:
 	slot_offset:                  n/a
 */
 
-TEST(TestAis1_2_3, AisMsg1) {
+TEST(TestAis123, AisMsg1) {
     const string m_str("AIVDM,1,1,,B,15Mq4J0P01EREODRv4@74gv00HRq,0*72,b003669970,1272412824");
     const string body(nth_field(m_str,5,','));
     ASSERT_STREQ("15Mq4J0P01EREODRv4@74gv00HRq",body.c_str());
