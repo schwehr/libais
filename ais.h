@@ -294,7 +294,7 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
 // US will use the RTCM Regional Message.  DAC 366, FI 22
 // Hopefully, the two shall become the same.  -kds 10/2010
 #include "ais8_366_22.h"
-
+#include "ais8_001_22.h"
 
 // Old Zone message for SBNMS / Boston right whales
 #if 0
@@ -824,3 +824,4 @@ const std::string ais_str(const std::bitset<T> &bits, const size_t start, const 
     return result;
 }
 
+AisMsg *decode(std::string const &payload);

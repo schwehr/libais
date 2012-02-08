@@ -1,3 +1,6 @@
+#ifndef AIS8_001_22_H
+#define AIS8_001_22_H
+
 // -*- c++ -*-
 // Way complicated
 // Since 2011-Feb-03
@@ -209,3 +212,4 @@ struct AisPosition
 
 std::vector<AisPosition> convertToPositions(Ais8_001_22 const &msg);
 
+#endif
