@@ -10,6 +10,10 @@
 #include <cmath>
 //using namespace std;
 
+AisMsg::~AisMsg()
+{
+}
+
 const std::string nth_field(const std::string &str, const size_t n, const char c) {
     // FIX: handle the off the end case better
     size_t pos;

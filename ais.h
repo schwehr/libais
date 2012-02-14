@@ -49,6 +49,8 @@ extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
 
 class AisMsg {
 public:
+    virtual ~AisMsg(); // to make it polymorphic
+    
     int message_id;
     int repeat_indicator;
     int mmsi;
