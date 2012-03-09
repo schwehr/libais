@@ -1,3 +1,6 @@
+#ifndef AIS_H
+#define AIS_H
+
 // -*- c++ -*-
 // Since Apr 2010
 // g++ ais_pos.cxx -o ais_pos -g -Wall -O3 -Wimplicit -W -Wredundant-decls -pedantic  -funroll-loops -fexpensive-optimizations 
@@ -823,3 +826,5 @@ const std::string ais_str(const std::bitset<T> &bits, const size_t start, const 
     }
     return result;
 }
+
+#endif
