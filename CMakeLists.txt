@@ -13,6 +13,11 @@ set (LIBAIS_VERSION_MINOR 6)
 
 #include_directories("${PROJECT_BINARY_DIR}")
 
+option(DISABLE_AUTOINIT  "Disable automatic library initialization." OFF)
+if(DISABLE_AUTOINIT)
+    add_definitions(-DAIS_INIT_NOCHECK)
+endif()
+
 set (HEADERS
     ais.h
     ais8_001_22.h

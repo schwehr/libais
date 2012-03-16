@@ -59,7 +59,7 @@ TEST(ais8dac001fi22, Helper) {
 
 // This is really not working right.  What is going on?
 TEST(ais8dac001fi22, Point) {
-    build_nmea_lookup();
+    //build_nmea_lookup();
 
     // AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
     const string msg_str = "!AIVDM,1,1,,A,81mg=5@0EP:0>H0007P>0<D1<qp400000,0*1D";
@@ -77,3 +77,32 @@ TEST(ais8dac001fi22, Point) {
     EXPECT_EQ(msg.dac,1);
     EXPECT_EQ(msg.fi,22);
 } // PointTest
+
+TEST(ais8dac001fi22, Polygon) {
+    {
+        // !AIVDM,2,1,2,A,81mg=5@0EPO0VVbh00P=t<Ra<9;400000TFKVP1vL>>,0*74
+        // !AIVDM,2,2,2,A,?J000,3*52
+        
+        const char * payload = "81mg=5@0EPO0VVbh00P=t<Ra<9;400000TFKVP1vL>>?J000";
+        Ais8_001_22 msg(payload,3);
+        //msg.print();
+        
+        ASSERT_EQ(AIS_OK, msg.get_error());
+        EXPECT_EQ(msg.sub_areas.size(),2);
+        
+        const char * payload2 = "81mg=5@0EPd0VV`800@>2EKI>@uT00000TFNWP1Od>J";
+        Ais8_001_22 msg2(payload2,0);
+        //msg2.print();
+        
+        ASSERT_EQ(AIS_OK, msg2.get_error());
+        
+        
+        // empty polygon
+        const char * payload3 = "81mg=5@0EPD0Vn3PJip1TeD1TeD400000P0000000001J000";
+        Ais8_001_22 msg3(payload3,3);
+        //msg3.print();
+        
+        ASSERT_EQ(AIS_OK, msg3.get_error());
+        
+    }
+}
