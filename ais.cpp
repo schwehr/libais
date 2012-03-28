@@ -8,6 +8,7 @@
 #include <string>
 #include <cassert>
 #include <cmath>
+#include "ais8_200_10.h"
 //using namespace std;
 
 AisMsg::~AisMsg()
@@ -153,6 +154,14 @@ AisMsg *decode(std::string const &nmea_payload)
                         }
                     }
                     break;
+                case 200:
+                    switch(ais8->fi)
+                    {
+                        case 10:
+                        {
+                            result = new Ais8_200_10(nmea_payload.c_str());
+                        }
+                    }
                 case 366:
                     switch(ais8->fi)
                     {

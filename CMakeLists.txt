@@ -18,6 +18,7 @@ set (LIBAIS_VERSION_MINOR 6)
 set (HEADERS
     ais.h
     ais8_001_22.h
+    ais8_200_10.h
     ais8_366_22.h
 )
 
@@ -27,7 +28,7 @@ set (SOURCES
     ais4_11
     ais5
     ais7_13
-    ais8 ais8_001_22 ais8_366_22
+    ais8 ais8_001_22 ais8_200_10 ais8_366_22
     ais9
     ais10
     ais12
@@ -77,6 +78,7 @@ if(BUILD_TESTS)
     set (TEST_SOURCES
         ais1_2_3_unittest
         ais8_001_22_unittest
+        ais8_200_10_unittest
     )
 
     enable_testing()

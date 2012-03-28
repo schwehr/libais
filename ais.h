@@ -303,6 +303,9 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
 #include "ais8_366_22.h"
 #include "ais8_001_22.h"
 
+// inland waterways
+#include "ais8_200_10.h"
+
 // Old Zone message for SBNMS / Boston right whales
 #if 0
 class Ais8_366_34 : public Ais8 {
