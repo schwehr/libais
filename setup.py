@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-from distutils.core import setup, Extension
+
+#from distutils.core import setup, Extension
+from setuptools import setup, find_packages, Extension
 
 ais_module = Extension('ais',
                     sources = ['ais_py.cpp',
@@ -21,7 +23,22 @@ ais_module = Extension('ais',
                                'ais24.cpp',
                                ])
 
-setup (name = 'ais',
+setup (name = 'libais',
        version = '0.4',
-       description = ' Automatic Identification System',
-       ext_modules = [ais_module])
+       description = 'Automatic Identification System decoding - ship tracking',
+       author='Kurt Schwehr',
+       author_email='schwehr@gmail.com',
+       url='https://github.com/schwehr/libais',
+       license='LGPL v3+',
+       ext_modules = [ais_module],
+       classifiers=[
+            'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
+            'Topic :: System :: Networking',
+            'Development Status :: 4 - Beta',
+            'Intended Audience :: Science/Research',
+            'Topic :: Communications',
+            'Topic :: Scientific/Engineering :: Information Analysis',
+            'Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator',
+            'Topic :: Scientific/Engineering :: GIS',
+    ],
+       )
