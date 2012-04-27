@@ -111,7 +111,7 @@ void
 DictSafeSetItem(PyObject *dict, const std::string &key, PyObject *val_obj) {
     // When we need to add dictionaries and such to a dictionary
     assert(dict);
-    assert(py_obj);
+    assert(val_obj);
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     assert(key_obj);
     PyDict_SetItem(dict, key_obj, val_obj);
