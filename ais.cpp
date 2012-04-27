@@ -8,7 +8,12 @@
 #include <string>
 #include <cassert>
 #include <cmath>
+#include "ais8_200_10.h"
 //using namespace std;
+
+AisMsg::~AisMsg()
+{
+}
 
 const std::string nth_field(const std::string &str, const size_t n, const char c) {
     // FIX: handle the off the end case better
@@ -89,4 +94,183 @@ void build_nmea_lookup() {
     check_error_messages();
 #endif
 
+}
+
+
+// decode function "ported" from python bindings
+AisMsg *decode(std::string const &nmea_payload)
+{
+    if (!nmea_ord_initialized) {
+        build_nmea_lookup();
+    }
+
+    AisMsg *result=NULL;
+    switch (nmea_payload[0]) {
+        
+        // Class A Position
+        case '1': // FALLTHROUGH
+        case '2': // FALLTHROUGH
+        case '3':
+            result = new Ais1_2_3(nmea_payload.c_str());
+            break;
+            
+            // 4 - Basestation report
+            // 11 - UTC date response
+        case '4': // FALLTHROUGH 
+        case ';':
+            result = new Ais4_11(nmea_payload.c_str());
+            break;
+            
+        case '5': // 5 - Ship and Cargo
+        result = new Ais5(nmea_payload.c_str());
+        break;
+        
+        case '6': // 6 - Addressed binary message
+        // result = ais6_to_pydict(nmea_payload);
+        // returning NULL in C++ version - PyErr_Format(ais_py_exception, "ais.decode: message 6 not yet handled");
+        break;
+        
+        // 7 - ACK for addressed binary message
+        // 13 - ASRM Ack  (safety message)
+        case '=': // FALLTHROUGH
+        case '7':
+            //std::cerr << "7_or_14: " << nmea_payload << std::endl;
+            result = new Ais7_13(nmea_payload.c_str());
+            break;
+            
+        case '8': // 8 - Binary broadcast message (BBM)
+        {
+            Ais8* ais8 = new Ais8(nmea_payload.c_str());
+            result = ais8;
+            switch(ais8->dac)
+            {
+                case 1:
+                    switch(ais8->fi)
+                    {
+                        case 22:
+                        {
+                            result = new Ais8_001_22(nmea_payload.c_str());
+                            break;
+                        }
+                    }
+                    break;
+                case 200:
+                    switch(ais8->fi)
+                    {
+                        case 10:
+                        {
+                            result = new Ais8_200_10(nmea_payload.c_str());
+                        }
+                    }
+                case 366:
+                    switch(ais8->fi)
+                    {
+                        case 22:
+                        {
+                            result = new Ais8_366_22(nmea_payload.c_str());
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+        break;
+        
+        case '9': // 9 - SAR Position
+        result = new Ais9(nmea_payload.c_str());
+        // result = ais9_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 9 not yet handled");
+        break;
+        
+        case ':': // 10 - UTC Query
+        result = new Ais10(nmea_payload.c_str());
+        //result = ais10_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 10 (;) not yet handled");
+        break;
+        
+        // ':' 11 - See 4
+        
+        case '<': // 12 - ASRM
+        result = new Ais12(nmea_payload.c_str());
+        // result = ais12_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 12 (<) not yet handled");
+        break;
+        
+        // 13 - See 7
+        
+        case '>': // 14 - SRBM - Safety broadcast
+        result = new Ais14(nmea_payload.c_str());
+        break;
+        
+        case '?': // 15 - Interrogation
+        result = new Ais15(nmea_payload.c_str());
+        // result = ais15_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 15 (?) not yet handled");
+        break;
+        
+        case '@': // 16 - Assigned mode command
+        // result = ais16_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 16 (@) not yet handled");
+        break;
+        
+        case 'A': // 17 - GNSS broadcast
+        // result = ais17_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 17 (A) not yet handled");
+        break;
+        
+        case 'B': // 18 - Position, Class B
+        result = new Ais18(nmea_payload.c_str());
+        break;
+        
+        case 'C': // 19 - Position and ship, Class B
+        result = new Ais19(nmea_payload.c_str());
+        break;
+        
+        case 'D': // 20 - Data link management
+        // result = ais20_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 20 (D) not yet handled");
+        break;
+        
+        case 'E': // 21 - Aids to navigation report
+        result = new Ais21(nmea_payload.c_str());
+        //PyErr_Format(ais_py_exception, "ais.decode: message 21 (E) not yet handled");
+        break;
+        
+        case 'F': // 22 - Channel Management
+        // result = ais22_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 22 (F) not yet handled");
+        break;
+        
+        case 'G': // 23 - Group Assignment Command
+        // result = ais23_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 23 (G) not yet handled");
+        break;
+        
+        case 'H': // 24 - Static data report
+        result = new Ais24(nmea_payload.c_str());
+        break;
+        
+        case 'I': // 25 - Single slot binary message - addressed or broadcast
+        // result = ais25_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 25 (I) not yet handled");
+        break;
+        
+        case 'J': // 26 - Multi slot binary message with comm state
+        // result = ais26_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 26 (J) not yet handled");
+        break;
+        
+        // 27 - K
+        // 28 - L
+        
+        default:
+            result = NULL;
+            //assert (false);
+            //std::cout << "Unknown message type: '" << nmea_payload[0] << "'\n"
+            //          << "\tline: " << nmea_payload << std::endl;
+            //PyErr_Format(ais_py_exception, "ais.decode: message %c not known", nmea_payload[0]);
+            
+    }
+    
+    return result;
 }

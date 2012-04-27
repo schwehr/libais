@@ -1,3 +1,6 @@
+#ifndef AIS_H
+#define AIS_H
+
 // -*- c++ -*-
 // Since Apr 2010
 // g++ ais_pos.cxx -o ais_pos -g -Wall -O3 -Wimplicit -W -Wredundant-decls -pedantic  -funroll-loops -fexpensive-optimizations 
@@ -49,6 +52,8 @@ extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
 
 class AisMsg {
 public:
+    virtual ~AisMsg(); // to make it polymorphic
+    
     int message_id;
     int repeat_indicator;
     int mmsi;
@@ -71,6 +76,8 @@ public:
 //protected:
     void init() {
         //std::cout << "AisMsg_init: setting ok" << std::endl; 
+        if(!nmea_ord_initialized)
+            build_nmea_lookup();
         status = AIS_OK;
 #ifndef NDEBUG
         // FIX: should we be setting these?  The individual messages need to do this.
@@ -294,7 +301,10 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
 // US will use the RTCM Regional Message.  DAC 366, FI 22
 // Hopefully, the two shall become the same.  -kds 10/2010
 #include "ais8_366_22.h"
+#include "ais8_001_22.h"
 
+// inland waterways
+#include "ais8_200_10.h"
 
 // Old Zone message for SBNMS / Boston right whales
 #if 0
@@ -824,3 +834,6 @@ const std::string ais_str(const std::bitset<T> &bits, const size_t start, const 
     return result;
 }
 
+AisMsg *decode(std::string const &payload);
+
+#endif

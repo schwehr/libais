@@ -217,45 +217,44 @@ void Ais8_001_22_Sector::print() {
 // Size of one point angle and distance
 static const size_t PT_AD_SIZE=10+10;
 
-Ais8_001_22_Polyline::Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_001_22_Polybase::Ais8_001_22_Polybase(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
     for (size_t i=0; i<4; i++) {
         const int angle = ubits(bs, offset+5+    (i*PT_AD_SIZE), 10);
         const int dist  = ubits(bs, offset+5+10+ (i*PT_AD_SIZE), 10) * scale_multipliers[scale_factor];
         if (0==dist) break;
-        angles.push_back(angle);
+        angles.push_back(angle*0.5);
         dists_m.push_back(dist);
     }
     spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
     assert(AIS8_001_22_SUBAREA_SIZE == 5+(4*20)+2);
+}
+
+void Ais8_001_22_Polybase::print() {
+    for (size_t i=0; i<angles.size(); i++) {
+        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
+    }
+}
+
+Ais8_001_22_Polyline::Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset):Ais8_001_22_Polybase(bs,offset) 
+{
 }
 
 void Ais8_001_22_Polyline::print() {
     std::cout << "Polyline: " << std::endl;
-    for (size_t i=0; i<angles.size(); i++) {
-        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
-    }
+    Ais8_001_22_Polybase::print();
 }
 
-Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs,offset+3,2);
-    for (size_t i=0; i<4; i++) {
-        const int angle = ubits(bs, offset+5+ (i*PT_AD_SIZE), 10);
-        const int dist  = ubits(bs, offset+5+10+ (i*PT_AD_SIZE), 10) * scale_multipliers[scale_factor];
-        if (0==dist) break;
-        angles.push_back(angle);
-        dists_m.push_back(dist);
-    }
-    spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
-    assert(AIS8_001_22_SUBAREA_SIZE == 5+(4*20)+2);
+
+Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset):Ais8_001_22_Polybase(bs, offset)
+{
 }
 
 void Ais8_001_22_Polygon::print() {
     std::cout << "Polygon: " << std::endl;
-    for (size_t i=0; i<angles.size(); i++) {
-        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
-    }
+    Ais8_001_22_Polybase::print();
 }
+
 
 Ais8_001_22_Text::Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     text = std::string(ais_str(bs, offset+3, 84));
@@ -327,10 +326,12 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
 Ais8_001_22::Ais8_001_22(const char *nmea_payload) {
     //std::cerr << "WARNING: Ais8_001_22 is totally untests" << std::endl;
     assert(nmea_payload);
-    assert(nmea_ord_initialized); // Make sure we have the lookup table built
+    
     assert(strlen(nmea_payload) >= 33);
 
     init();
+    assert(nmea_ord_initialized); // Make sure we have the lookup table built
+    
     const int num_bits = (strlen(nmea_payload) * 6);
     // FIX: make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
     // Spec is not byte aligned.  BAD!  
@@ -422,4 +423,96 @@ Ais8_001_22::print() {
         std::cout << "\t\t" << i << ": ";
         sub_areas[i]->print();
     }
+    std::vector<AisPosition> positions = convertToPositions(*this);
+    std::cout << "\tpositions:\n";
+    for (std::vector<AisPosition>::const_iterator i = positions.begin(); i != positions.end(); ++i)
+        std::cout << "\t\tlon: " << i->longitude << " lat: " << i->latitude << std::endl;
+}
+
+
+AisPosition::AisPosition(const AisPosition& prev, float angle, float range)
+{
+    double lat1 = M_PI*prev.latitude/180.0;
+    double lon1 = M_PI*prev.longitude/180.0;
+    double alpha1 = 2.0*M_PI*angle/360.0;
+    
+    const double a = 6378137.0;        ///< length of major axis of the ellipsoid (radius at equator in meters)
+    const double b =  6356752.314245;        ///< length of minor axis of the ellipsoid (radius at the poles)
+    const double f = 1/298.257223563;  ///< flattening of the ellipsoid
+    
+    const double epsilon = 1e-12;
+    
+    // U is 'reduced latitude'
+    double tanU1 = (1.0-f)*tan(lat1);
+    double cosU1 = 1/sqrt(1+tanU1*tanU1);
+    double sinU1 = tanU1*cosU1;
+    
+    double cosAlpha1 = cos(alpha1); 
+    double sinAlpha1 = sin(alpha1);
+    
+    
+    double sigma1 = atan2(tanU1, cosAlpha1); ///< angular distance on sphere from equator to P1 along geodesic
+    double sinAlpha = cosU1*sinAlpha1;
+    double cos2Alpha = 1.0-sinAlpha*sinAlpha;
+    
+    double u2 = cos2Alpha*(a*a-b*b)/(b*b);
+    
+    double k1 = (sqrt(1.0+u2)-1.0)/(sqrt(1.0+u2)+1.0);
+    double A = (1.0+k1*k1/4.0)/(1.0-k1);
+    double B = k1*(1.0-3.0*k1*k1/8.0);
+
+    double sigma = range/(b*A);
+    double cos2Sigmam;
+    double last_sigma;
+    do
+    {
+        cos2Sigmam = cos(2.0*sigma1+sigma);
+        double deltaSigma = B*sin(sigma)*(cos2Sigmam+.25*B*(cos(sigma)*(-1.0+2.0*cos2Sigmam*cos2Sigmam)-(B/6.0)*cos2Sigmam*(-3.0+4.0*sin(sigma)*sin(sigma))*(-3.0+4.0*cos2Sigmam*cos2Sigmam)));
+        last_sigma = sigma;
+        sigma = (range/(b*A))+deltaSigma;
+    }
+    while(fabs(last_sigma-sigma)>epsilon);
+    
+    double lat2 = atan2(sinU1*cos(sigma)+cosU1*sin(sigma)*cosAlpha1,(1-f)*sqrt(sinAlpha*sinAlpha+pow(sinU1*sin(sigma)-cosU1*cos(sigma)*cosAlpha1,2)));
+    double lambda = atan2(sin(sigma)*sinAlpha1,cosU1*cos(sigma)-sinU1*sin(sigma)*cosAlpha1);
+    double C = (f/16.0)*cos2Alpha*(4.0+f*(4.0-3.0*cos2Alpha));
+    double L = lambda-(1.0-C)*f*sinAlpha*(sigma+C*sin(sigma)*(cos2Sigmam+C*cos(sigma)*(-1+2.0*cos2Sigmam*cos2Sigmam)));
+    
+    latitude = 360.0*lat2/(2.0*M_PI);
+    longitude = prev.longitude + 360.0*L/(2.0*M_PI);
+}
+
+
+std::vector<AisPosition> convertToPositions(const Ais8_001_22& msg)
+{
+    std::vector<AisPosition> ret;
+    for(std::vector<Ais8_001_22_SubArea *>::const_iterator sa = msg.sub_areas.begin(); sa != msg.sub_areas.end(); ++sa)
+    {
+        switch((*sa)->getType())
+        {
+            case AIS8_001_22_SHAPE_CIRCLE:
+            {
+                Ais8_001_22_Circle const *circle = dynamic_cast<Ais8_001_22_Circle const*>(*sa);
+                ret.push_back(AisPosition(circle->x,circle->y));
+                break;
+            }
+            case AIS8_001_22_SHAPE_POLYLINE:
+            case AIS8_001_22_SHAPE_POLYGON:
+            {
+                assert(!ret.empty());
+                Ais8_001_22_Polybase const *poly = dynamic_cast<Ais8_001_22_Polybase const *>(*sa);
+                
+                assert(poly->angles.size() == poly->dists_m.size());
+                for(int i = 0; i < poly->angles.size(); ++i)
+                {
+                    float a = poly->angles[i];
+                    float d = poly->dists_m[i];
+                    if(d > 0)
+                        ret.push_back(AisPosition(ret.back(),a,d));
+                }
+                break;
+            }
+        }
+    }
+    return ret;
 }

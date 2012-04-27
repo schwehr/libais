@@ -1,3 +1,6 @@
+#ifndef AIS8_001_22_H
+#define AIS8_001_22_H
+
 // -*- c++ -*-
 // Way complicated
 // Since 2011-Feb-03
@@ -95,42 +98,43 @@ public:
     void print();
 };
 
-// Or Waypoint
-// Must have a point before on the VDL
-// FIX: do I bring in the prior point x,y, precision?
-class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
-public:
 
+
+// FIX: do I bring in the prior point x,y, precision?
+// And do we fold the sub area data
+// into one polygon if there are more than one?
+struct Ais8_001_22_Polybase : public Ais8_001_22_SubArea {
+public:
+    
     // x, y, and precision sent as separate Point before the waypoint start
     //float x,y; // longitude and latitude
     //int precision; // How many decimal places for x and y.  FIX: in IMO
-
+    
     // Up to 4 points
     std::vector<float> angles;
     std::vector<float> dists_m;
     unsigned int spare; // 2 bit
+    
+    Ais8_001_22_Polybase(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    void print();
+};
 
+
+// Or Waypoint
+// Must have a point before on the VDL
+// FIX: do I bring in the prior point x,y, precision?
+class Ais8_001_22_Polyline : public Ais8_001_22_Polybase {
+public:
     Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polyline() { /* std::cout << "Ais8_001_22_Polyline: destructor" << std::endl; */};
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYLINE;}
     void print();
-
 };
 
 // FIX: brin in the prior point?  And do we fold the sub area data
 // into one polygon if there are more than one?
-class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
+class Ais8_001_22_Polygon : public Ais8_001_22_Polybase {
 public:
-
-    // x, y, and precision sent as separate Point before the waypoint start
-    //float x,y; // longitude and latitude
-    //int precision; // How many decimal places for x and y.  FIX: in IMO  
-
-    // Up to 4 points in a first message, but aggregated if multiple sub areas
-    std::vector<float> angles;
-    std::vector<float> dists_m;
-    unsigned int spare; // 2 bit
-
     Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polygon() { /* std::cout << "Ais8_001_22_Polygon: destructor" << std::endl; */ };
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYGON;}
@@ -185,4 +189,27 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais8_001_22 const& msg);
 
+/// WGS84 position in degrees.
+struct AisPosition
+{
+    float longitude;
+    float latitude;
+    
+    AisPosition(float lon, float lat):longitude(lon),latitude(lat){}
+    AisPosition(AisPosition const &p):longitude(p.longitude),latitude(p.latitude){}
 
+    bool operator!=(AisPosition const&other) const {return longitude != other.longitude || latitude != other.latitude;}
+    bool operator==(AisPosition const&other) const {return !((*this)!=other);}
+    
+    /// Constructs a position from an inital point along with a 
+    /// range and bearing.
+    /// Vincenty's formula is used to calculate the resulting position
+    /// on the WGS84 ellipsoid.
+    /// http://en.wikipedia.org/wiki/Vincenty%27s_formulae
+    /// Vincenty, T. (April 1975a). "Direct and Inverse Solutions of Geodesics on the Ellipsoid with application of nested equations". Survey Review XXIII (misprinted as XXII) (176): 88–93.
+    AisPosition(AisPosition const &prev, float angle, float range);
+};
+
+std::vector<AisPosition> convertToPositions(Ais8_001_22 const &msg);
+
+#endif

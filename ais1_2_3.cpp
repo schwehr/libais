@@ -13,8 +13,9 @@ using namespace std;
 
 Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     assert(nmea_payload);
-    assert(nmea_ord_initialized); // Make sure we have the lookup table built
     init();
+    assert(nmea_ord_initialized); // Make sure we have the lookup table built
+    
 
     if (strlen(nmea_payload) != 168/6) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 

@@ -561,6 +561,20 @@ norm: !AIVDM,1,1,,A,81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000,3*70,rUNKNO
             std::cout << "\n";
         }
 
+        if (true) {
+            // !AIVDM,2,1,2,A,81mg=5@0EP00TJB8000=vK21=fW400000TFMjP1JL>F,0*0C
+            // !AIVDM,2,2,2,A,sJ000,3*1E
+            // AreaNotice: type=1  start=2012-02-06 18:17:00  duration=0 m  link_id=0  sub-areas: 1
+            // AreaNoticePolygon: (-70.7667,42.4500) 3 points
+            // points: [(89.5, 74100), (0.0, 72300), (270.0, 73300)]
+            // ((-70.766667, 42.45), (-69.866667, 42.45), (-69.866667, 43.1), (-70.766667, 43.1))
+            
+            std::cout << "\n\n: Polygon - Box****\n";
+            Ais8_001_22 msg("81mg=5@0EP00TJB8000=vK21=fW400000TFMjP1JL>FsJ000");
+            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
+            std::cout << "\n";
+            
+        }
 
         if (true) {
             /*
@@ -593,6 +607,40 @@ AreaNotice: type=7  start=2011-07-06 23:59:00  duration=60 m  link_id=10  sub-ar
         }
 #endif
 
+        if (true)
+        {
+            AisPosition p1(-70.0,43.0);
+            
+            AisPosition p2(p1,45.0,5000.0);
+            AisPosition p3(-69.956618611,43.03181675);
+            
+            AisPosition p4(p1,0.0,5000.0);
+            AisPosition p5(-70.0,43.045007278);
+            
+            AisPosition p6(p1,90.0,5000.0);
+            AisPosition p7(-69.938681139,42.999983583);
+
+            std::cout << "AisPosition p1(-70.0,43.0): " << p1.longitude << ", " << p1.latitude << std::endl;
+            
+            std::cout << "AisPosition p2(p1,45.0,5000.0): " << p2.longitude << ", " << p2.latitude << std::endl;
+            std::cout << "AisPosition p3(-69.956618611,43.03181675): " << p3.longitude << ", " << p3.latitude << std::endl;
+            
+            std::cout << "AisPosition p4(p1,0.0,5000.0): " << p4.longitude << ", " << p4.latitude << std::endl;
+            std::cout << "AisPosition p5(-70.0,43.045007278): " << p5.longitude << ", " << p5.latitude << std::endl;
+            
+            std::cout << "AisPosition p6(p1,90.0,5000.0): " << p6.longitude << ", " << p6.latitude << std::endl;
+            std::cout << "AisPosition p7(-69.938681139,42.999983583): " << p7.longitude << ", " << p7.latitude << std::endl;
+            
+            std::cout << "p2 == p3? " << (p2 == p3) << " ";
+            if(p2 == p3) std::cout << "PASSED\n"; else std::cout << "FAILED\n";
+
+            std::cout << "p4 == p5? " << (p4 == p5) << " ";
+            if(p4 == p5) std::cout << "PASSED\n"; else std::cout << "FAILED\n";
+            
+            std::cout << "p6 == p7? " << (p6 == p7) << " ";
+            if(p6 == p7) std::cout << "PASSED\n"; else std::cout << "FAILED\n";
+            
+        }
 
 
     }
