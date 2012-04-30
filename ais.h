@@ -14,7 +14,7 @@
 //#define LIBAIS_VERSION_MAJOR @LIBAIS_VERSION_MAJOR@
 //#define LIBAIS_VERSION_MINOR @LIBAIS_VERSION_MINOR@
 #define LIBAIS_VERSION_MAJOR 0
-#define LIBAIS_VERSION_MINOR 3
+#define LIBAIS_VERSION_MINOR 7
 
 //////////////////////////////////////////////////////////////////////
 // Helpers
@@ -28,7 +28,7 @@ const std::string nth_field(const std::string &str, const size_t n, const char c
 extern bool nmea_ord_initialized; // If this is false, you need to call build_nmea_lookup.
 
 void build_nmea_lookup();
- 
+
 //void aivdm_to_bits(bitset<168> &bits, const char *nmea_payload);
 
 enum AIS_STATUS {
@@ -823,4 +823,3 @@ const std::string ais_str(const std::bitset<T> &bits, const size_t start, const 
     }
     return result;
 }
-

@@ -21,7 +21,7 @@ WARN += -Wunknown-pragmas
 WARN += -Wunused
 WARN += -Wunused
 WARN += -Wendif-labels
-WARN += -Wnewline-eof
+#WARN += -Wnewline-eof
 WARN += -Wno-sign-compare
 WARN += -Wshadow
 # Requires -O
@@ -122,12 +122,12 @@ tar:
 
 # Remove the NDEBUG that python tries to use
 python2:
-	CFLAGS="-m32 -O3 -funroll-loops -fexpensive-optimizations -ffast-math" /sw/bin/python2.7 setup.py build
+	CFLAGS="-O3 -funroll-loops -fexpensive-optimizations -ffast-math" python setup.py build
 #	CFLAGS="-m32 -O0 -g -UNDEBUG" /sw/bin/python2.6 setup.py build
 
 # -D_GLIBCXX_DEBUG  This option does not seem to work for g++ versions 4.[0-2]
 python3:
-	CFLAGS="-m32 -O0 -g -UNDEBUG" /sw/bin/python3 setup.py build
+	CFLAGS="-O0 -g -UNDEBUG" python3 setup.py build
 
 libais.a: ${OBJS}
 	ls ${OBJS}

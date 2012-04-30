@@ -1,0 +1,16 @@
+include docs
+include *test*
+include ais6.cpp
+include ais.h ais8_001_22.h ais8_366_22.h
+include ais8_001_22.cpp ais8_366_22.cpp ais12.cpp
+include AUTHOR.txt
+include ChangeLog.html
+include CMakeLists.txt
+include COPYING.LESSER
+include create.sql LICENSE.txt
+include Makefile-custom
+include TODO.org
+include test_libais.cpp
+include maritime_id_codes.py
+include nais2pg.py
+include ais_decode_normed.cpp

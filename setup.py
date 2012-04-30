@@ -24,7 +24,7 @@ ais_module = Extension('ais',
                                ])
 
 setup (name = 'libais',
-       version = '0.4',
+       version = '0.7',
        description = 'Automatic Identification System decoding - ship tracking',
        author='Kurt Schwehr',
        author_email='schwehr@gmail.com',
