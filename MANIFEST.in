@@ -4,12 +4,11 @@ include CMakeLists.txt
 include COPYING.LESSER
 include LICENSE.txt
 include Makefile-custom
-include VERSION
 include TODO.org
+include VERSION
 include docs
-include *test*
-include ais6.cpp
 include ais.h ais8_001_22.h ais8_366_22.h
+include ais6.cpp
 include ais15.cpp
 include ais8_001_22.cpp ais8_366_22.cpp ais12.cpp
 include ais_decode_normed.cpp
@@ -17,4 +16,4 @@ include ais_lut.py
 include create.sql
 include maritime_id_codes.py
 include nais2pg.py
-include test_libais.cpp
+include *test*
