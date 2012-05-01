@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-
-#from distutils.core import setup, Extension
 from setuptools import setup, find_packages, Extension
+
+version = file('VERSION').readline().strip()
 
 ais_module = Extension('ais',
                     sources = ['ais_py.cpp',
@@ -10,7 +10,7 @@ ais_module = Extension('ais',
                                'ais1_2_3.cpp',
                                'ais4_11.cpp',
                                'ais5.cpp',
-                               # ais6
+                               #'ais6.cpp',
                                'ais7_13.cpp',
                                'ais8.cpp',
                                'ais8_001_22.cpp',
@@ -24,7 +24,7 @@ ais_module = Extension('ais',
                                ])
 
 setup (name = 'libais',
-       version = '0.7',
+       version = version,
        description = 'Automatic Identification System decoding - ship tracking',
        author='Kurt Schwehr',
        author_email='schwehr@gmail.com',
