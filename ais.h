@@ -17,7 +17,7 @@
 //#define LIBAIS_VERSION_MAJOR @LIBAIS_VERSION_MAJOR@
 //#define LIBAIS_VERSION_MINOR @LIBAIS_VERSION_MINOR@
 #define LIBAIS_VERSION_MAJOR 0
-#define LIBAIS_VERSION_MINOR 7
+#define LIBAIS_VERSION_MINOR 8
 
 //////////////////////////////////////////////////////////////////////
 // Helpers
