@@ -252,6 +252,7 @@ ais5_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"fix_type", msg.fix_type);
     DictSafeSetItem(dict,"eta_month", msg.eta_month);
     DictSafeSetItem(dict,"eta_day", msg.eta_day);
+    DictSafeSetItem(dict,"eta_hour", msg.eta_hour);
     DictSafeSetItem(dict,"eta_minute", msg.eta_minute);
     DictSafeSetItem(dict,"draught", msg.draught);
     DictSafeSetItem(dict,"destination", msg.destination);
