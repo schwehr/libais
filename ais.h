@@ -3,7 +3,7 @@
 
 // -*- c++ -*-
 // Since Apr 2010
-// g++ ais_pos.cxx -o ais_pos -g -Wall -O3 -Wimplicit -W -Wredundant-decls -pedantic  -funroll-loops -fexpensive-optimizations 
+// g++ ais_pos.cxx -o ais_pos -g -Wall -O3 -Wimplicit -W -Wredundant-decls -pedantic  -funroll-loops -fexpensive-optimizations
 
 #include <bitset>
 #include <string>
@@ -73,7 +73,7 @@ public:
     //AisMsg() {init();}
 //protected:
     void init() {
-        //std::cout << "AisMsg_init: setting ok" << std::endl; 
+        //std::cout << "AisMsg_init: setting ok" << std::endl;
         status = AIS_OK;
 #ifndef NDEBUG
         // FIX: should we be setting these?  The individual messages need to do this.
@@ -105,11 +105,11 @@ public:
     // Based on slot_timeout which ones are valid
     int received_stations;
     bool received_stations_valid;
-    
+
     int slot_number;
     bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have 
+    bool utc_valid;  // Only means that the values are set.  Can still have
     int utc_hour;
     int utc_min;
     int utc_spare;
@@ -121,7 +121,7 @@ public:
     int slot_increment;
     bool slot_increment_valid;
 
-    int slots_to_allocate;      
+    int slots_to_allocate;
     bool slots_to_allocate_valid;
 
     bool keep_flag;  // 3.3.7.3.2 Annex 2 ITDMA.  Table 20
@@ -154,11 +154,11 @@ class Ais4_11 : public AisMsg {
     // Based on slot_timeout which ones are valid
     int received_stations;
     bool received_stations_valid;
-    
+
     int slot_number;
     bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have 
+    bool utc_valid;  // Only means that the values are set.  Can still have
     int utc_hour;
     int utc_min;
     int utc_spare;
@@ -200,8 +200,9 @@ class Ais5 : public AisMsg {
 std::ostream& operator<< (std::ostream& o, Ais5 const& msg);
 
 // FIX: figure out how to handle Ais6
+// Addessed binary message (ABM)
 
-// msg 6 and 12 ack 
+// 7 and 13 are ACKs for msg 6 and 12
 class Ais7_13 : public AisMsg {
 public:
     int spare;
@@ -230,9 +231,9 @@ public:
     int spare;
     int dac; // dac+fi = app id
     int fi;
-    
+
     std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
-    
+
     Ais8(const char *nmea_payload);
     bool decode_header8(const std::bitset<MAX_BITS> &bs);
     void print();
@@ -309,7 +310,6 @@ public:
     int hour;
     int minute;
     int dur_min; // duration in minutes
-    
 
     Ais8_366_34(const char *nmea_payload, const int pad=0);
     void print();
@@ -341,11 +341,11 @@ public:
     // Based on slot_timeout which ones are valid
     int received_stations;
     bool received_stations_valid;
-    
+
     int slot_number;
     bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have 
+    bool utc_valid;  // Only means that the values are set.  Can still have
     int utc_hour;
     int utc_min;
     int utc_spare;
@@ -653,11 +653,12 @@ public:
     int station_type;
     int type_and_cargo;
 
-    int spare2; // 22 bits of spare here?  what were people thinking?    
+    int spare2; // 22 bits of spare here?  what were people thinking?
 
     int txrx_mode;
     int interval_raw; // raw value, not sec
     // int interval_sec;
+    // spare3
 
     Ais23(const char *nmea_payload);
     void print();
@@ -707,7 +708,7 @@ class Ais26 : public AisMsg {
 public:
     bool addressed; // broadcast if false - destination indicator
     bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
-  
+    // int dest_mmsi;
     std::vector<unsigned char> payload; // If unstructured.  Yuck.
 
     int commstate_flag;
@@ -719,11 +720,11 @@ public:
     // Based on slot_timeout which ones are valid
     int received_stations;
     bool received_stations_valid;
-    
+
     int slot_number;
     bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have 
+    bool utc_valid;  // Only means that the values are set.  Can still have
     int utc_hour;
     int utc_min;
     int utc_spare;
@@ -735,17 +736,35 @@ public:
     int slot_increment;
     bool slot_increment_valid;
 
-    int slots_to_allocate;      
+    int slots_to_allocate;
     bool slots_to_allocate_valid;
 
     bool keep_flag;
     bool keep_flag_valid;
- 
+
     Ais26(const char *nmea_payload);
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais26 const& msg);
 
+#if 0
+// TODO: Implement message 27
+class Ais27 : public AisMsg {
+public:
+    int position_accuracy;
+    bool raim ;
+    int nav_status;
+    float x, y;
+    int sog;
+    int cog;
+    bool gnss;  // warning: bits in AIS are flipped sense
+    int spare;
+
+    Ais27(const char *nmea_payload);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais27 const& a);
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Support templates for decoding
@@ -759,8 +778,8 @@ AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
     //assert(nmea_ord_initialized);
     if (strlen(nmea_payload) > T/6) {
 #ifndef NDEBUG
-        std::cerr << "ERROR: message longer than max allowed size (" << T/6 << "): found " 
-                  << strlen(nmea_payload) << " characters in " 
+        std::cerr << "ERROR: message longer than max allowed size (" << T/6 << "): found "
+                  << strlen(nmea_payload) << " characters in "
                   << nmea_payload << std::endl;
 #endif
         return AIS_ERR_MSG_TOO_LONG;
@@ -781,7 +800,7 @@ AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
 }
 
 template<size_t T>
-int ubits(const std::bitset<T> &bits, const size_t start, const size_t len) 
+int ubits(const std::bitset<T> &bits, const size_t start, const size_t len)
 {
     assert (len <= 32);
     assert (start+len <= T);
