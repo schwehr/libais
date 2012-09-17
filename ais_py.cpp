@@ -829,7 +829,7 @@ ais21_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"dim_a", msg.dim_a);
     DictSafeSetItem(dict,"dim_b", msg.dim_b);
     DictSafeSetItem(dict,"dim_c", msg.dim_c);
-    DictSafeSetItem(dict,"dim_c", msg.dim_c);
+    DictSafeSetItem(dict,"dim_d", msg.dim_d);
     DictSafeSetItem(dict,"fix_type", msg.fix_type);
     DictSafeSetItem(dict,"timestamp", msg.timestamp);
     DictSafeSetItem(dict,"off_pos", msg.off_pos);
