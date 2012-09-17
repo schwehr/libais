@@ -357,7 +357,7 @@ public:
     int slot_increment;
     bool slot_increment_valid;
 
-    int slots_to_allocate;      
+    int slots_to_allocate;
     bool slots_to_allocate_valid;
 
     bool keep_flag;
@@ -365,7 +365,6 @@ public:
 
     Ais9(const char *nmea_payload);
     void print();
-
 };
 std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
 
