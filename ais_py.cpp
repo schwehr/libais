@@ -263,12 +263,12 @@ ais5_to_pydict(const char *nmea_payload) {
 }
 
     /*
-PyObject* 
+PyObject*
 ais6_to_pydict(const char *nmea_payload) {
     assert(false);
     }*/
 
-PyObject* 
+PyObject*
 ais7_13_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
     //const size_t num_bits = strlen(nmea_payload) * 6;
@@ -279,7 +279,7 @@ ais7_13_to_pydict(const char *nmea_payload) {
         PyErr_Format(ais_py_exception, "Ais7_13: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
     }
-    
+
     PyObject *dict = PyDict_New();
     DictSafeSetItem(dict,"id", msg.message_id);
     DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
@@ -294,7 +294,7 @@ ais7_13_to_pydict(const char *nmea_payload) {
         //TupleSafeSetItem(tuple, 0, msg.dest_mmsi[i]);
         //TupleSafeSetItem(tuple, 1, msg.seq_num[i]);
 
-        PyList_SetItem(list,i, tuple); // Steals ref
+        PyList_SetItem(list, i, tuple); // Steals ref
         //Py_DECREF(list);
     }
     // FIX: probably a memory leak with list
