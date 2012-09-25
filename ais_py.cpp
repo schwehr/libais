@@ -151,19 +151,28 @@ ais1_2_3_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"spare", msg.spare);
     DictSafeSetItem(dict,"raim", msg.raim);
 
-    if (msg.received_stations_valid)
-        DictSafeSetItem(dict,"received_stations", msg.received_stations);
-    if (msg.slot_number_valid)
-        DictSafeSetItem(dict,"slot_number", msg.slot_number);
-    if (msg.utc_valid) {
-        DictSafeSetItem(dict,"utc_hour", msg.utc_hour);
-        DictSafeSetItem(dict,"utc_min", msg.utc_min);
-        DictSafeSetItem(dict,"utc_spare", msg.utc_spare);
+    // COMM States
+    DictSafeSetItem(dict,"sync_state", msg.sync_state); // In both SOTDMA and ITDMA
+
+    // SOTDMA
+    if (msg.message_id == 1 || msg.message_id == 2) {
+        DictSafeSetItem(dict,"slot_timeout", msg.slot_timeout);
+
+        if (msg.received_stations_valid)
+            DictSafeSetItem(dict,"received_stations", msg.received_stations);
+        if (msg.slot_number_valid)
+            DictSafeSetItem(dict,"slot_number", msg.slot_number);
+        if (msg.utc_valid) {
+            DictSafeSetItem(dict,"utc_hour", msg.utc_hour);
+            DictSafeSetItem(dict,"utc_min", msg.utc_min);
+            DictSafeSetItem(dict,"utc_spare", msg.utc_spare);
+        }
+
+        if (msg.slot_offset_valid)
+            DictSafeSetItem(dict,"slot_offset", msg.slot_offset);
     }
 
-    if (msg.slot_offset_valid)
-        DictSafeSetItem(dict,"slot_offset", msg.slot_offset);
-
+    // ITDMA
     if (msg.slot_increment_valid) {
         DictSafeSetItem(dict,"slot_increment", msg.slot_increment);
         DictSafeSetItem(dict,"slots_to_allocate", msg.slots_to_allocate);
