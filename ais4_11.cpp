@@ -40,7 +40,6 @@ Ais4_11::Ais4_11(const char *nmea_payload) {
     fix_type = ubits(bs,134,4);
     spare = ubits(bs,138,10);
 
-
     //
     // SOTDMA commstate
     //
@@ -51,6 +50,7 @@ Ais4_11::Ais4_11(const char *nmea_payload) {
     utc_hour = utc_min = -1; utc_valid = false;
     slot_offset = -1; slot_offset_valid = false;
 
+    sync_state = ubits(bs, 149, 2);
     slot_timeout = ubits(bs,151,3);
 
     //std::cout << "slot_timeout:" << slot_timeout << std::endl;

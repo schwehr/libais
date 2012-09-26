@@ -214,6 +214,9 @@ ais4_11_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"spare", msg.spare);
     DictSafeSetItem(dict,"raim", msg.raim);
 
+    // SOTDMA
+    DictSafeSetItem(dict,"sync_state", msg.sync_state);
+    DictSafeSetItem(dict,"slot_timeout", msg.slot_timeout);
 
     if (msg.received_stations_valid)
         DictSafeSetItem(dict,"received_stations", msg.received_stations);
