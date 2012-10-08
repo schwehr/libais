@@ -99,8 +99,9 @@ public:
     bool raim;
 
     // COMM state SOTDMA msgs 1 and 2
-    int sync_state;
+    int sync_state;  // SOTDMA and ITDMA
     int slot_timeout;
+    bool slot_timeout_valid;
 
     // Based on slot_timeout which ones are valid
     int received_stations;
@@ -356,8 +357,9 @@ public:
     bool raim;
     int commstate_flag;
 
+    int sync_state; // In both SOTDMA and ITDMA
+
     // SOTDMA
-    //int sync_state;
     int slot_timeout;
     bool slot_timeout_valid;
 

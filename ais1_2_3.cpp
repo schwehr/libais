@@ -61,10 +61,10 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     slot_increment = -1; slot_increment_valid = false;
     slots_to_allocate = -1;  slots_to_allocate_valid = false;
     keep_flag = false; keep_flag_valid = false;
-   
 
     if ( 1 == message_id || 2 == message_id) {
         slot_timeout = ubits(bs,151,3);
+        slot_timeout_valid = true;
 
         switch (slot_timeout) {
         case 0:
@@ -72,7 +72,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
             slot_offset_valid = true;
             break;
         case 1:
-            utc_hour = ubits(bs, 154, 5); 
+            utc_hour = ubits(bs, 154, 5);
             utc_min = ubits(bs, 159, 7);
             utc_spare = ubits(bs, 166, 2);
             utc_valid = true;
@@ -93,7 +93,6 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
             assert (false);
         }
     } else {
-        //std::cout << "expecting 3: " << message_id << std::endl;
         // ITDMA
         assert (3 == message_id);
         slot_increment = ubits(bs, 151, 13);
@@ -108,7 +107,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     }
 }
 
-void 
+void
 Ais1_2_3::print(bool verbose/*=false*/) {
     std::cout << "Class A Position: " << message_id 
               << std::endl;
@@ -145,4 +144,3 @@ std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a)
 {
     return o << a.message_id << ": " << a.mmsi ;
 }
-
