@@ -53,4 +53,3 @@ if __name__=='__main__':
     codes = mmsi_codes('mid.html')
     for code in codes:
         print ('%s,"%s"' % (code,codes[code]))
-               

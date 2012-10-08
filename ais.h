@@ -521,11 +521,11 @@ public:
     // Based on slot_timeout which ones are valid
     int received_stations;
     bool received_stations_valid;
-    
+
     int slot_number;
     bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have 
+    bool utc_valid;  // Only means that the values are set.  Can still have
     int utc_hour;
     int utc_min;
     int utc_spare;
@@ -537,7 +537,7 @@ public:
     int slot_increment;
     bool slot_increment_valid;
 
-    int slots_to_allocate;      
+    int slots_to_allocate;
     bool slots_to_allocate_valid;
 
     bool keep_flag;

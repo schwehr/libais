@@ -99,4 +99,4 @@ type_and_cargo_table = {
     97: 'other type, Reserved',
     98: 'other type, Reserved',
     99: 'other type, No additional information',
-    } 
+    }

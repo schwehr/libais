@@ -112,7 +112,7 @@ void Ais9::print() {
     if (utc_valid) std::cout <<"\t\tUTC: " << utc_hour << ":"<<utc_min << " spare:" << utc_spare << "\n";
     if (slot_number_valid) std::cout << "\t\tslot_number: " << slot_number << "\n;";
     if (received_stations_valid) std::cout << "\t\treceived_stations: " << received_stations << "\n";
-    
+
     // ITDMA
     if (slot_increment_valid) std::cout << "\t\tslot_increment: " << slot_increment << "\n";
     if (slots_to_allocate_valid) std::cout << "\t\tslots_to_allocate: " << slots_to_allocate << "\n";

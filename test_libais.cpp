@@ -51,7 +51,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         { Ais7_13 msg("74eGSe@0owtf"); msg.print(); }
 
         //CHECKPOINT;
-        { 
+        {
             Ais7_13 msg("74eGSe@0owt");
             assert(msg.had_error());
             std::cout << "expect error " << AIS_ERR_BAD_BIT_COUNT << ": " << msg.get_error() << std::endl;
@@ -66,27 +66,27 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
     if (true) {
         int i=0;
-        { 
+        {
             // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
             Ais8 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
 
     }
 
     ///// 1 11 IMO Met Hydro
-    
+
     if (true) {
         //CHECKPOINT;
         int i=0;
         // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
-        { 
+        {
             Ais8_1_11 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         //CHECKPOINT;
 
@@ -98,11 +98,11 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         CHECKPOINT;
         int i=0;
         // Whales observed: !AIVDM,1,1,,B,803OvriK`R0FaqT6gOv763PKLT;0,0*25,d-089,S0392,t204010.00,T10.45701635,r003669945,1255466410,cornell,1255466411.9
-        { 
+        {
             Ais8_366_22 msg("803OvriK`R0FaqT6gOv763PKLT;0"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         //CHECKPOINT;
 
@@ -116,18 +116,18 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     if (true) {
         int i=0;
         // !AIVDM,1,1,,B,9002=mQq1oIJvt6;2eUn>Sh0040<,0*5D,b003669979,1273709011
-        { 
+        {
             Ais9 msg("9002=mQq1oIJvt6;2eUn>Sh0040<"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 9 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         // !AIVDM,1,1,,A,9002=mQrAgIK1cd;1m`F@0@00<3w,0*45,b2003669980,1273709054
-        { 
+        {
             Ais9 msg("9002=mQrAgIK1cd;1m`F@0@00<3w"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 9 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
     }
 
@@ -139,18 +139,18 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     if (true) {
         int i=0;
         // !AIVDM,1,1,,B,:5CoIn0kwN0P,0*23,b003669708,1273711619
-        { 
+        {
             Ais10 msg(":5CoIn0kwN0P"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 10 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         // !AIVDM,1,1,,B,:3PTOn1ifeq0,0*13,d-096,S0215,t005405.00,T05.73646837,r11NTRQ1,1273712049
-        { 
+        {
             Ais10 msg(":3PTOn1ifeq0"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 10 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
     }
 
@@ -161,11 +161,11 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     if (true) {
         int i=0;
         // AIVDM,1,1,,A,;4eG>3iuaFP2:r3OiBH7;8i00000,0*65,d-104,S0420,t000211.00,T11.21643139,r09STOL1,1273708934
-        { 
+        {
             Ais4_11 msg(";4eG>3iuaFP2:r3OiBH7;8i00000"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 11 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
     }
 
@@ -177,18 +177,18 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         int i=0;
         // !AIVDM,1,1,,A,<02:oP0kKcv0@<51C5PB5@?BDPD?P:?2?EB7PDB16693P381>>5<PikP,0*37
         // From AISHUB via GPSD
-        { 
+        {
             Ais12 msg("<02:oP0kKcv0@<51C5PB5@?BDPD?P:?2?EB7PDB16693P381>>5<PikP"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 12 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         // !AIVDM,1,1,,B,<3@oGf0kErm0G81Dw0,4*5C,d-115,S9999,r003669930,1273716298
-        { 
+        {
             Ais12 msg("<3@oGf0kErm0G81Dw0"); i++;
-            if (!msg.had_error()) msg.print(); 
+            if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 12 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
     }
 
@@ -200,22 +200,22 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
     if (true) {
         // From GPSD - !AIVDM,1,1,,A,>5?Per18=HB1U:1@E=B0m<L,2*51
-        { 
-            Ais14 msg(">5?Per18=HB1U:1@E=B0m<L"); 
+        {
+            Ais14 msg(">5?Per18=HB1U:1@E=B0m<L");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 14 1\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         // From GPSD - !AIVDM,1,1,,A,>3R1p10E3;;R0USCR0HO>0@gN10kGJp,2*7F
-        { 
-            Ais14 msg(">3R1p10E3;;R0USCR0HO>0@gN10kGJp"); 
+        {
+            Ais14 msg(">3R1p10E3;;R0USCR0HO>0@gN10kGJp");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         // From GPSD - !AIVDM,1,1,,A,>4aDT81@E=@,2*2E
-        { 
-            Ais14 msg(">4aDT81@E=@"); 
+        {
+            Ais14 msg(">4aDT81@E=@");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
     }
 
@@ -227,22 +227,22 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     if (false) {
         int i=0;
         // From GPSD - !AIVDM,1,1,,A,?5OP=l00052HD00,2*5B
-        { 
+        {
             Ais15 msg("?5OP=l00052HD00");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         // !AIVDM,1,1,,B,?h3Owpi;EluT000,2*61,b003669703,1273708908
-        { 
+        {
             Ais15 msg("?h3Owpi;EluT000");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         //!AIVDM,1,1,,B,?h3Ovn1GP<K0<P@59a0,2*04,d-077,S1832,t004248.00,T48.85520485,r07RPAL1,1272415370
-        { 
+        {
             Ais15 msg("?h3Ovn1GP<K0<P@59a0");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
     }
 
@@ -262,7 +262,6 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         { Ais18 msg("B5MtL4P00FK?Pa4I98`G`uS0200>"); msg.print(); std::cout << std::endl; }
         // !AIVDM,1,1,,B,B5MtL4P00FK?Pa4I98`G`uS0200>,0*61,d-079,S0269,t000007.00,T07.17528574,r08RROB1,1272412808
         { Ais18 msg(""); msg.print(); }
-   
 
         // !AIVDM,1,1,,B,Bov9gKvWbf;juI`NN@CeG1DF;3Gs,0*6D,d-126,S2121,t101756.00,T56.56587008,r09SMRQ1,1272449876
         { Ais18 msg("Bov9gKvWbf;juI`NN@CeG1DF;3Gs"); msg.print(); std::cout << std::endl; }
@@ -279,17 +278,17 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
     if (true) {
         // !AIVDM,1,1,,B,C5N3SRP0IFJKmE4:v6pBGw`@62PaLELTBJ:V00000000S0D:R220,0*3A,b003669952,1272415462
-        { 
-            Ais19 msg("C5N3SRP0IFJKmE4:v6pBGw`@62PaLELTBJ:V00000000S0D:R220"); 
+        {
+            Ais19 msg("C5N3SRP0IFJKmE4:v6pBGw`@62PaLELTBJ:V00000000S0D:R220");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
 
         // !AIVDM,1,1,2,B,C5MtL4al06K?Pa4I99@G`us>@2fF0000000000000000?P000020,0*73,d-080,S2043,t013454.00,T54.48188603,r08RROB1,1272418496
-        { 
-            Ais19 msg("C5MtL4al06K?Pa4I99@G`us>@2fF0000000000000000?P000020"); 
+        {
+            Ais19 msg("C5MtL4al06K?Pa4I99@G`us>@2fF0000000000000000?P000020");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
 
     }
@@ -304,20 +303,20 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         int i=0;
         // From OHMEX test at CCOM
         // !AIVDM,1,1,,A,E52HH<h:W4?Sa2Pb?Q0dgVPa4W0uM`P9<EmvH00000u@20,4*15,1269957000.16
-        if (true) { 
+        if (true) {
             CHECKPOINT;
             Ais21 msg("E52HH<h:W4?Sa2Pb?Q0dgVPa4W0uM`P9<EmvH00000u@20");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 21 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
 
         //!AIVDM,2,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q,0*46
         //!AIVDM,2,2,5,B,:D44QDlp0C1DU00,2*36
         // Becomes !AIVDM,1,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q:D44QDlp0C1DU00,2*63
-        { 
+        {
             Ais21 msg("E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q:D44QDlp0C1DU00");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 21 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
 
     }
@@ -329,16 +328,16 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
     if (true) {
         // !AIVDM,1,1,,B,H5NHcTP<51@4TrM>10584@U<D00,2*77,x337805,b003669710,1241895000
-        { 
-            Ais24 msg("H5NHcTP<51@4TrM>10584@U<D00"); 
+        {
+            Ais24 msg("H5NHcTP<51@4TrM>10584@U<D00");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
         // !AIVDM,1,1,,B,HU2K5NTn13BijklG44oppk103210,0*06,s23294,d-114,T44.21624911,x731910,r13RSMT1,1241894986
-        { 
-            Ais24 msg("HU2K5NTn13BijklG44oppk103210"); 
+        {
+            Ais24 msg("HU2K5NTn13BijklG44oppk103210");
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n"; 
+            std::cout << "\n";
         }
 
 
@@ -486,19 +485,19 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             // Rect
             /*
 AreaNotice: type=3  start=2011-07-06 05:31:00  duration=60 m  link_id=10  sub-areas: 1
-{"mmsi": 123456789, "repeat": 0, "msgtype": 8, 
-   "bbm": {"start": "2011-07-06T05:31:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Marine mammals in area - Report Sightings", "stop": "2011-07-06T06:31:00Z", 
+{"mmsi": 123456789, "repeat": 0, "msgtype": 8,
+   "bbm": {"start": "2011-07-06T05:31:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Marine mammals in area - Report Sightings", "stop": "2011-07-06T06:31:00Z",
    "areas": [
       {"n_dim": 1000, "orientation": 0, "geometry": {"type": "Polygon", "coordinates": [
-         [-69.80000000000004, 42.14999999999998], 
-         [-69.75159155785775, 42.15032733770786], 
-         [-69.75169812451595, 42.15933298502247], 
-         [-69.80011342866348, 42.15900554457626], 
-         [-69.80000000000004, 42.14999999999998]]}, 
+         [-69.80000000000004, 42.14999999999998],
+         [-69.75159155785775, 42.15032733770786],
+         [-69.75169812451595, 42.15933298502247],
+         [-69.80011342866348, 42.15900554457626],
+         [-69.80000000000004, 42.14999999999998]]},
         "area_shape": 1, "e_dim": 4000, "area_shape_name": "rectangle"}
-      ], 
-    "bbm_type": [1, 22], 
-    "bbm_name": "area_notice", 
+      ],
+    "bbm_type": [1, 22],
+    "bbm_name": "area_notice",
     "area_type": 3}}
 !AIVDM,1,1,,A,81mg=5@0EP:1fHcp07Qf0<D1=;Lt:0`00,0*63
 001000000001110101101111001101000101010000000000010101100000001010000001101110011000101011111000000000000111100001101110000000001100010100000001001101001011011100111100001010000000101000000000000000

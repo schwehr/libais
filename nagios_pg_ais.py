@@ -68,7 +68,7 @@ def main():
     except:
         print ('Unknow error with the database')
         sys.exit(3)
-        
+
     print ('{count} vessels received in the last 10 minutes'.format(count=count))
     if count < 100: sys.exit(2)
     if count < 1000: sys.exit(1)

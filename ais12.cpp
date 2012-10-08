@@ -12,7 +12,7 @@ Ais12::Ais12(const char *nmea_payload) {
     std::bitset<1192> bs; // Spec says 1008
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
-    
+
     message_id = ubits(bs, 0, 6);
     if (12 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
     repeat_indicator = ubits(bs,6,2);

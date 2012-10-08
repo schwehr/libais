@@ -62,7 +62,7 @@ uscg_ais_nmea_regex_str = r'''^!(?P<talker>AI)(?P<string_type>VD[MO])
 ,(?P<chan>[AB])
 ,(?P<body>[;:=@a-zA-Z0-9<>\?\'\`]*)
 ,(?P<fill_bits>\d)\*(?P<checksum>[0-9A-F][0-9A-F])
-(  
+(
   (,S(?P<slot>\d*))
   | (,s(?P<s_rssi>\d*))
   | (,d(?P<signal_strength>[-0-9]*))
@@ -99,14 +99,14 @@ class LineQueue(Queue.Queue):
             for g in groups[:-1]:
                 if self.qsize() > self.lq_maxsize:
                     continue # FIX: Would be better to add the most recent and drop one from the queue.
-                Queue.Queue.put(self,g) 
+                Queue.Queue.put(self,g)
             self.input_buf = ''
         else:
             # last part is a fragment
             for g in groups[:-1]:
                 if self.qsize() > self.lq_maxsize:
                     continue # FIX: Would be better to add the most recent and drop one from the queue.
-                Queue.Queue.put(self,g) 
+                Queue.Queue.put(self,g)
             self.input_buf = groups[-1]
 
 class NormQueue(Queue.Queue):
@@ -158,7 +158,7 @@ class NormQueue(Queue.Queue):
 
         if sen_num == 1:
             # FIX: would be a good place to check the message first letter to see if we can ditch it
-            
+
             # Flush that station's seq and start it with a new msg component
             self.stations[station][seq] = [msg['body'],] # START
             return
@@ -166,7 +166,7 @@ class NormQueue(Queue.Queue):
         if sen_num != len(self.stations[station][seq]) + 1:
             self.stations[station][seq] = [ ] # DROP and flush... bad seq
             return
-        
+
         if sen_num == total:
             msgs = self.stations[station][seq]
             self.stations[station][seq] = [ ] # FLUSH
@@ -179,7 +179,7 @@ class NormQueue(Queue.Queue):
             Queue.Queue.put(self,msg)
             self.count += 1
             return
-        
+
         self.stations[station][seq].append(msg['body']) # not first, not last
 
 
@@ -222,7 +222,7 @@ class VesselNames:
         self.v = verbose
         self.dump_interval = dump_interval
         force = (dump_interval -  120) if dump_interval > 120 else 0
-        
+
         self.last_dump_time = time.time() - force # Force a quick dump 2 min after start
         # Could do a create and commit here of the table
 
@@ -313,7 +313,7 @@ class VesselNames:
             if type_and_cargo == old_type_and_cargo or old_name == None:
                 #print ('NO_CHANGE_TO_CARGO:',mmsi)
                 return
-            
+
             #print ('UPDATING_B:',mmsi,'  ',old_name,old_type_and_cargo,'->',old_name,type_and_cargo)
             if ENABLE_DB: self.cu.execute(self.sql_update_tac, new_vessel)
             self.cx.commit()
@@ -333,7 +333,7 @@ class VesselNames:
         self.cx.commit()
         #print ('\tname: ',name, old_type_and_cargo)
         self.vessels[mmsi] = (name, old_type_and_cargo)
-        
+
 
     def update(self, vessel_dict):
         # vessel_dict must have mmsi, name, type_and_cargo
@@ -351,7 +351,7 @@ class VesselNames:
 
         name = vessel_dict['name'];
         type_and_cargo = vessel_dict['type_and_cargo']
-        
+
         if mmsi not in self.vessels:
             #print ('NEW: mmsi =',mmsi)
             insert_or_update(self.cx, self.cu, self.sql_insert, self.sql_update, vessel_dict)
@@ -405,20 +405,20 @@ def dist_utm_m (lon1, lat1, lon2, lat2):
 
 def wkt_line(series_of_xy):
     assert(len(series_of_xy) > 1)
-    
+
     segments = ["%.8f %.8f" % (pt['x'],pt['y']) for pt in series_of_xy]
-    
+
     return 'LINESTRING(' + ','.join(segments) + ')'
 
 class PositionCache:
 
     sql_insert = """
     INSERT INTO vessel_pos (mmsi, cog, sog, time_stamp, nav_status, pos)
-    VALUES (%(mmsi)s, %(cog)s, %(sog)s, %(datetime)s, %(nav_status)s, 
+    VALUES (%(mmsi)s, %(cog)s, %(sog)s, %(datetime)s, %(nav_status)s,
     ST_GeomFromText('POINT(%(x)s %(y)s)',4326)
     );"""
     sql_update_without_track = """
-    UPDATE vessel_pos SET 
+    UPDATE vessel_pos SET
        cog = %(cog)s,
        sog = %(sog)s,
        time_stamp = %(datetime)s,
@@ -427,7 +427,7 @@ class PositionCache:
        track = NULL
     WHERE mmsi = %(mmsi)s;"""
     sql_update_with_track = """
-    UPDATE vessel_pos SET 
+    UPDATE vessel_pos SET
        cog = %(cog)s,
        sog = %(sog)s,
        time_stamp = %(datetime)s,
@@ -436,7 +436,7 @@ class PositionCache:
        track = ST_GeomFromText(%(track)s, 4326)
     WHERE mmsi = %(mmsi)s;"""
 
-    
+
 #        track = ST_GeomFromText('%(track)s', 4326),
     def __init__(self, db_cx, min_dist_m=200, min_time_s=5 * 60,
                  #max_tail_count=10, max_tail_time_s = 15*60,
@@ -506,7 +506,7 @@ class PositionCache:
                 #print ('.....keep:',geo_dist)
             else:
                 print ('.....tail_test_DROP:',mmsi,'%.3f deg away' % geo_dist)
-                
+
 
         if len(d)<2: return # Too short to make a line
         # Make a WKT line and push it into the db
@@ -557,7 +557,7 @@ class PositionCache:
                 new_pos[field] = msg[field]
             except:
                 new_pos[field] = None
-        
+
         if new_pos['nav_status'] is not None:
             new_pos['nav_status'] = ais_lut.nav_status_table[new_pos['nav_status']]
         else:
@@ -574,7 +574,7 @@ class PositionCache:
 
         last = self.vessels[mmsi]
         #print ('last:',last)
-        
+
         # FIX: move into if when working for speed to try to avoid the distance calc
         dt = msg['time_stamp'] - last['time_stamp']
 
@@ -767,7 +767,7 @@ class ProcessingThread(threading.Thread):
         self.v = verbose
         self.vessel_names = vessel_names
         self.pos_cache = pos_cache
-        
+
         self.line_queue = line_queue
         self.norm_queue = norm_queue
         self.running = True
@@ -788,7 +788,7 @@ class ProcessingThread(threading.Thread):
                 print (str(e))
                 traceback.print_exc(file=sys.stderr)
                 time.sleep(5) # Throttle back so not as to fill up the disk with error mesages
-            
+
 
     def loop(self):
         print ('Started processing thread...')
@@ -825,7 +825,7 @@ class ProcessingThread(threading.Thread):
                      msg = ais.decode(result['body'])
                 except Exception as e:
                     if 'not yet handled' in str(e) or 'not known' in str(e): continue
-                    print ('BAD Decode:',result['body'][0]) 
+                    print ('BAD Decode:',result['body'][0])
                     print ('\tE:',Exception)
                     print ('\te:',e)
                     continue
@@ -837,7 +837,7 @@ class ProcessingThread(threading.Thread):
                         print ('BAD time_stamp:',str(e))
                         traceback.print_exc(file=sys.stderr)
                         continue
-                    
+
                     self.pos_cache.update(msg)
                     continue
 
@@ -871,7 +871,7 @@ def run_network_app(host_name, port_num, vessel_names, pos_cache, line_queue, no
             print ('main:',count,'\tnow:',datetime.datetime.now().strftime('%dT%H:%M:%S'), ' EST \tthreads:',  threading.active_count() )
             print ('\tline_q_size:',line_queue.qsize())
             print ('\tnorm_q_size:',norm_queue.qsize(),'\t\t%.1f (msgs/sec)' % norm_queue.get_rate())
-            
+
         try:
             time.sleep(.5)
         except exceptions.KeyboardInterrupt:
@@ -881,7 +881,7 @@ def run_network_app(host_name, port_num, vessel_names, pos_cache, line_queue, no
             time.sleep(.2) # Give it time to clear the buffers
             print ('stopping processing thread...')
             processing_thread.stop()
-            
+
     print ('falling off the end')
 
 
@@ -890,7 +890,7 @@ def run_network_app(host_name, port_num, vessel_names, pos_cache, line_queue, no
 def main():
     (options,args) = get_parser().parse_args()
     v = options.verbose
-   
+
     match_count = 0
     counters = {}
     for i in range(30):
@@ -913,13 +913,13 @@ def main():
 
 
     if v: print ('initilizing caches...')
-    
+
     # Caches
     vessel_names = VesselNames(cx, verbose = v)
     pos_cache = PositionCache(db_cx=cx, verbose=v)
 
     if options.preload_names is not None: vessel_names.preload_db(options.preload_names)
-    
+
 
     # FIFOs
 
@@ -941,19 +941,19 @@ def main():
 
         print ('GOODBYE... main thread ending')
         return
-        
+
     print ('USING_LOG_FILES: non-threaded')
     for infile in args:
         if v: print ('reading data from ...',infile)
         last_time = time.time()
         last_count = 0
         last_match_count = 0
-        
+
         last_ais_msg_cnt = 0 # FULL AIS message decoded
         ais_msg_cnt = 0
-        
+
         for line_num, text in enumerate(open(infile)):
-            
+
             #if line_num > 300: break
             #print ()
             if line_num % 10000 == 0:
@@ -966,7 +966,7 @@ def main():
                 last_count = line_num
                 last_match_count = match_count
                 last_ais_msg_cnt = ais_msg_cnt
-                
+
             if 'AIVDM' not in text:
                 continue
 
@@ -1062,7 +1062,7 @@ def main():
                         #    print (' CHECK:', msg['mmsi'], msg['name'])
                         vessel_names.update(msg)
                         #print ()
-                        
+
     print ('match_count:',match_count)
     #print (counters)
     for key in counters:

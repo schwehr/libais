@@ -109,7 +109,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
 
 void
 Ais1_2_3::print(bool verbose/*=false*/) {
-    std::cout << "Class A Position: " << message_id 
+    std::cout << "Class A Position: " << message_id
               << std::endl;
     if (!verbose) return;
     cout << "\trow_raw: " << rot_raw << endl;

@@ -14,7 +14,7 @@ Ais21::Ais21(const char *nmea_payload, const int pad) {
     std::bitset<360> bs; // 360 % 6 == 0 -> 60 NMEA characters exactly
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
-    
+
     message_id = ubits(bs, 0, 6);
     if (message_id != 21) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
     repeat_indicator = ubits(bs,6,2);
@@ -51,7 +51,7 @@ Ais21::Ais21(const char *nmea_payload, const int pad) {
     } else {
         spare2 = 0;
     }
-    
+
 }
 
 

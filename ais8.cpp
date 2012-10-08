@@ -49,7 +49,7 @@ bool Ais8::decode_header8(const std::bitset<MAX_BITS> &bs) {
 }
 
 void Ais8::print() {
-    std::cout << "AIS_broadcast_binary_message: " << message_id 
+    std::cout << "AIS_broadcast_binary_message: " << message_id
               << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
     std::cout << "\tpayload: "; // << std::hex << std::uppercase; // << std::setfill('0') << std::setw(2) << "\n";
     for (std::vector<unsigned char>::iterator i = payload.begin(); i != payload.end(); i++) {
@@ -85,7 +85,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload) {
     //CHECKPOINT;
     // FIX: if dac is not 001, it could still possibly be correct
     if ( 1 != dac || 11 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    
+
     y = sbits(bs,56,24) / 60000.; // YES, lat is first
     x = sbits(bs,80,25) / 60000.;
     day = ubits(bs,105,5);
@@ -128,7 +128,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload) {
 }
 
 void Ais8_1_11::print() {
-    std::cout << "BBM_imo_1_11_met_hydro: " << message_id 
+    std::cout << "BBM_imo_1_11_met_hydro: " << message_id
               << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
 
     std::cout << "\tspare:" << spare << "\n"
@@ -140,12 +140,12 @@ void Ais8_1_11::print() {
               << "\tdew_point:" <<  dew_point << "\tair_pres:" <<  air_pres << " trend: " << air_pres_trend << "\n"
               << "\twater_level:" <<  water_level << " trend: " << water_level_trend << "\n"
               << "\tcurrent:" <<  surf_cur_speed << " kts dir: " << surf_cur_dir << "\n"
-              << "\tcurr2:" <<  cur_speed_2 << " kts dir: " << cur_dir_2 << "\t " <<  cur_depth_2 << " m deep\n" 
-              << "\tcurr3:" <<  cur_speed_3 << " kts dir: " << cur_dir_3 << "\t " <<  cur_depth_3 << " m deep\n" 
+              << "\tcurr2:" <<  cur_speed_2 << " kts dir: " << cur_dir_2 << "\t " <<  cur_depth_2 << " m deep\n"
+              << "\tcurr3:" <<  cur_speed_3 << " kts dir: " << cur_dir_3 << "\t " <<  cur_depth_3 << " m deep\n"
               << "\twaves:" <<  wave_height << " " << wave_period << " " <<  wave_dir << "\n"
               << "\tswell:" <<  swell_height << " " <<  swell_period << " " <<  swell_dir << "\n"
               << "\tsea_state:" <<  sea_state << "\twater_temp:" <<  water_temp << "\n"
               << "\tprecip_type:" <<  precip_type << "\tsalinity:" <<  salinity << "\n"
-              << "\tice:" <<  ice << "\n" 
+              << "\tice:" <<  ice << "\n"
               << "\tspare_or_extended_wl:" <<  extended_water_level << std::endl;
 }

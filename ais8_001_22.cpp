@@ -164,13 +164,13 @@ Ais8_001_22_Circle::Ais8_001_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, con
 }
 
 void Ais8_001_22_Circle::print() {
-    if (radius_m == 0) 
+    if (radius_m == 0)
         std::cout << "Point: " << " " << x << " " << y << "    prec: " << precision << std::endl;
         //<< "  (Can start a polyline or polygon)" << std::endl;
-    else 
-        std::cout << "Circle: " << " " << x << " " << y << "    radius_m: " << radius_m 
+    else
+        std::cout << "Circle: " << " " << x << " " << y << "    radius_m: " << radius_m
                   << "    prec: " << precision<< std::endl;
-    //<< " precision FIX(!?!?) " << precision 
+    //<< " precision FIX(!?!?) " << precision
 }
 
 Ais8_001_22_Rect::Ais8_001_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
@@ -188,7 +188,7 @@ Ais8_001_22_Rect::Ais8_001_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const s
 }
 
 void Ais8_001_22_Rect::print() {
-    std::cout << "\t\tRectangle: " << " " << x << " " << y << " prec: " << precision 
+    std::cout << "\t\tRectangle: " << " " << x << " " << y << " prec: " << precision
               << " e_dim_m: " << e_dim_m << " n_dim_m: " << n_dim_m
               << " orient_deg: " << orient_deg
               << std::endl;
@@ -272,7 +272,6 @@ void Ais8_001_22_Text::print() {
 // Ais8_001_22_AreaShapeEnum getAreaShape(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
 //     // Figure out which shape type or set as an error
 //     const int area_shape_int = ubits(bs,offset,3);
-    
 // }
 
 // Call the appropriate constructor
@@ -316,7 +315,7 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
     default:
         assert(false);
     }
-    return area; 
+    return area;
 }
 
 
@@ -333,7 +332,7 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload) {
     init();
     const int num_bits = (strlen(nmea_payload) * 6);
     // FIX: make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
-    // Spec is not byte aligned.  BAD!  
+    // Spec is not byte aligned.  BAD!
     //if (198 <= num_bits && num_bits >= 981) { status = AIS_ERR_BAD_BIT_COUNT; return; }
     if (198 < num_bits && num_bits > 984) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
@@ -353,26 +352,26 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload) {
     minute = ubits(bs,87,6);
 
     duration_minutes = ubits(bs,93,18);
-    
+
     // Use floor to be able to ignore any spare bits
     const int num_sub_areas = int( floor( (num_bits - 111)/87.) );
     /*
-    std::cout << "num_sub_areas: " << num_bits << " " << num_bits - 111 
+    std::cout << "num_sub_areas: " << num_bits << " " << num_bits - 111
               << " " << (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE)
               << " " << floor( (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE))
-              << " -> " << int( floor( (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE)) ) 
+              << " -> " << int( floor( (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE)) )
               << " " << num_sub_areas
               <<"\n";
     */
     for (int sub_area_idx=0; sub_area_idx < num_sub_areas; sub_area_idx++) {
         Ais8_001_22_SubArea *sub_area = ais8_001_22_subarea_factory(bs, 111+ AIS8_001_22_SUBAREA_SIZE*sub_area_idx);
-        if (sub_area) { 
-            sub_areas.push_back(sub_area); 
+        if (sub_area) {
+            sub_areas.push_back(sub_area);
         } else {
             std::cout << "ERROR: bad sub area " << sub_area_idx << std::endl;
         }
     }
-    /* FIX: inspect the subareas to make sure the are sane.  
+    /* FIX: inspect the subareas to make sure the are sane.
        - polyline/polygon have a point first
        - text has geometry to go through it all
     */
@@ -397,11 +396,10 @@ void
 Ais8_001_22::print() {
     //std::cout << ;
 
-    std::cout 
-        
+    std::cout
         << "Area_Notice: " << message_id << "\n"
         << "\tDAC: " << dac << "\tFI:" << fi << "\n";
-    std::cout 
+    std::cout
         << "\tStarting:  ";
     std::cout << std::setfill('0') << std::setw(2) << month;
     std::cout << std::setfill(' ') << std::setw(0) << "-";
@@ -410,11 +408,11 @@ Ais8_001_22::print() {
     std::cout << std::setfill('0') << std::setw(2) << hour;
     std::cout << ":";
     std::cout << std::setfill('0') << std::setw(2) << minute;
-    std::cout 
+    std::cout
         << "Z\n"
         << "\tLink id:   " << link_id << "\n"
         << "\tDuration:  " << duration_minutes << " min\n"
-        << "\tArea_type: " << notice_type 
+        << "\tArea_type: " << notice_type
         << " -> [" << ais8_001_22_notice_names[notice_type] << "]\n";
 
     for (size_t i=0; i < sub_areas.size(); i++) {

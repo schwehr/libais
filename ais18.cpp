@@ -69,7 +69,7 @@ Ais18::Ais18(const char *nmea_payload) {
                 slot_offset_valid = true;
                 break;
             case 1:
-                utc_hour = ubits(bs, 154, 5); 
+                utc_hour = ubits(bs, 154, 5);
                 utc_min = ubits(bs, 159, 7);
                 utc_spare = ubits(bs, 166, 2);
                 utc_valid = true;
@@ -113,16 +113,16 @@ Ais18::print() {
               << "\tx: " << x << "  y: " << y << "\n"
               << "\tcog: " << cog << " true_heading: " << true_heading << "\n"
               << "\ttimestamp: " << timestamp << " spare2: " << spare2 << "\n"
-              << "\tflags: cs: " << unit_flag << " disp: " << display_flag 
-              << " dsc: " << dsc_flag << " band: " << band_flag 
+              << "\tflags: cs: " << unit_flag << " disp: " << display_flag
+              << " dsc: " << dsc_flag << " band: " << band_flag
               << " m22: " << m22_flag << " csf: " << commstate_flag << "\n"
               << "\traim: " << raim <<  "\n"
-        ;        
+        ;
     if (1 == unit_flag) {
         std::cout << "\tCS unit flag set, so comstate is fixed as 1100000000000000110." << std::endl;
     } else {
         if (0 == commstate_flag) {
-            std::cout << "\tSOTDMA:\n" 
+            std::cout << "\tSOTDMA:\n"
                       << "\t\tslot_timeout" << slot_timeout<< "\n";
             switch (slot_timeout) {
             case 0: std::cout << "\t\tslot_offset: " << slot_offset << "\n"; break;
@@ -136,7 +136,7 @@ Ais18::print() {
             default: assert(false);
             } // switch
         } else {
-            std::cout << "\tITDMA:\n" 
+            std::cout << "\tITDMA:\n"
                       << "\t\tslot_increment: " <<slot_increment << "\n"
                       << "\t\tslots_to_allocate: " << slots_to_allocate << "\n"
                       << "\t\tkeep_flag: " << keep_flag << "\n"

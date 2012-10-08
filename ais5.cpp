@@ -18,7 +18,7 @@ Ais5::Ais5(const char *nmea_payload) {
     std::bitset<426> bs; // 424 + 2 spare bits => 71 characters
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
-    
+
     message_id = ubits(bs, 0, 6);
     if (5 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
     repeat_indicator = ubits(bs,6,2);
@@ -27,9 +27,9 @@ Ais5::Ais5(const char *nmea_payload) {
     ais_version = ubits(bs, 38, 2);
     imo_num = ubits(bs, 40, 30);
     callsign = ais_str(bs, 70, 42);
-    
+
     name = ais_str(bs, 112, 120);
-    
+
     type_and_cargo = ubits(bs, 232, 8);
     dim_a = ubits(bs, 240, 9);
     dim_b = ubits(bs, 249, 9);
@@ -64,8 +64,7 @@ void Ais5::print() {
 
 std::ostream& operator<< (std::ostream& o, Ais5 const& a)
 {
-    return o << 5 << ": " << a.mmsi << " \"" << a.name << "\" " << a.type_and_cargo 
-             << " " << a.dim_a + a.dim_b << "x" << a.dim_c + a.dim_d << "x" << a.draught << "m" 
+    return o << 5 << ": " << a.mmsi << " \"" << a.name << "\" " << a.type_and_cargo
+             << " " << a.dim_a + a.dim_b << "x" << a.dim_c + a.dim_d << "x" << a.draught << "m"
         ;
 }
-

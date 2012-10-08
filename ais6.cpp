@@ -52,7 +52,7 @@ bool Ais6::decode_header6(const std::bitset<MAX_BITS> &bs) {
 
 
 void Ais6::print() {
-    std::cout << "AIS_addressed_binary_message: " << message_id 
+    std::cout << "AIS_addressed_binary_message: " << message_id
               << "\tmmsi: " << mmsi << "\n"
               << "\tseq: " << seq << "\n"
               << "\tmmsi_dest" << mmsi_dest << "\n"

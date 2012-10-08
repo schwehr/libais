@@ -28,7 +28,7 @@ extern const char *shape_names[8];
 class Ais8_366_22_SubArea {
 public:
     //Ais8_366_22_AreaShapeEnum area_shape;
-    virtual Ais8_366_22_AreaShapeEnum getType()=0;  
+    virtual Ais8_366_22_AreaShapeEnum getType()=0;
     // FIX: make the destructor pure virtual
     virtual ~Ais8_366_22_SubArea() { std::cout << "Ais8_366_22_Circle: destructor" << std::endl; };
     virtual void print()=0;
@@ -108,7 +108,7 @@ public:
 
     // x, y, and precision sent as separate Point before the waypoint start
     float x,y; // longitude and latitude
-    //int precision; // How many decimal places for x and y.  FIX: in IMO  
+    //int precision; // How many decimal places for x and y.  FIX: in IMO
 
     // Up to 4 points in a first message, but aggregated if multiple sub areas
     std::vector<float> angles;
@@ -142,7 +142,6 @@ public:
     int utc_hour;
     int utc_minute;
     int duration_minutes; // Time from the start until the notice expires
-    
     // 1 or more sub messages
 
     std::vector<Ais8_366_22_SubArea *> sub_areas;

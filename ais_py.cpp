@@ -183,7 +183,7 @@ ais1_2_3_to_pydict(const char *nmea_payload) {
 }
 
 
-PyObject * 
+PyObject *
 ais4_11_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
     //assert(168/6 == strlen(nmea_payload));  // Should be checked inside the class
@@ -230,13 +230,13 @@ ais4_11_to_pydict(const char *nmea_payload) {
 
     if (msg.slot_offset_valid)
         DictSafeSetItem(dict,"slot_offset", msg.slot_offset);
-    
+
     return dict;
 }
 
 
 
-PyObject * 
+PyObject *
 ais5_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
     //assert((424+2)/6 == strlen(nmea_payload));  Check inside the class
@@ -1131,7 +1131,7 @@ static PyMethodDef ais_methods[] = {
 
 #if 0
 PyMODINIT_FUNC
-initais(void) 
+initais(void)
 {
     PyObject *mod;
     mod = Py_InitModule("ais", ais_methods);

@@ -161,12 +161,12 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload) {
     utc_minute = ubits(bs,87,6);
 
     duration_minutes = ubits(bs,93,18);
-    
+
     const int num_sub_areas = int( floor( (num_bits - 111)/90.) );
-    std::cout << "num_sub_areas: " << num_bits << " " << num_bits - 111 
+    std::cout << "num_sub_areas: " << num_bits << " " << num_bits - 111
          << " " << (num_bits - 111)/90.
          << " " << floor( (num_bits - 111)/90.)
-         << " -> " << int( floor( (num_bits - 111)/90.) ) 
+         << " -> " << int( floor( (num_bits - 111)/90.) )
               << " " << num_sub_areas
               <<"\n";
     for (int sub_area_idx=0; sub_area_idx < num_sub_areas; sub_area_idx++) {
@@ -192,7 +192,7 @@ void
 Ais8_366_22::print() {
     std::cout << "Area_Notice: " << message_id << "\n"
               << "\tdac: " << dac << "\tfi:" << fi << "\n"
-              << "\tArea_type: " << notice_type 
+              << "\tArea_type: " << notice_type
               << " -> [" << ais8_366_22_notice_names[notice_type] << "]\n";
     for (size_t i=0; i < sub_areas.size(); i++) {
         std::cout << "\tSubarea: " << i << std::endl;
@@ -200,7 +200,7 @@ Ais8_366_22::print() {
     }
 }
 
-// Lookup table for the scale factors to decode the length / distance fields. 
+// Lookup table for the scale factors to decode the length / distance fields.
 // The index is the "Scale Factor"
 static int scale_multipliers[4] = {1,10,100,1000};
 
@@ -214,12 +214,12 @@ Ais8_366_22_Circle::Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, con
 }
 
 void Ais8_366_22_Circle::print() {
-    if (radius_m == 0) 
+    if (radius_m == 0)
         std::cout << "\t\tPoint: " << " " << x << " " << y << "  (Can start a polyline or polygon)" << std::endl;
-    else 
+    else
         std::cout << "\t\tCircle: " << " " << x << " " << y << " radius_m: " << radius_m << std::endl;
-              
-    //<< " precision FIX(!?!?) " << precision 
+
+    //<< " precision FIX(!?!?) " << precision
 }
 
 Ais8_366_22_Rect::Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
@@ -233,7 +233,7 @@ Ais8_366_22_Rect::Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const s
 }
 
 void Ais8_366_22_Rect::print() {
-    std::cout << "\t\tRectangle: " << " " << x << " " << y 
+    std::cout << "\t\tRectangle: " << " " << x << " " << y
               << " e_dim_m: " << e_dim_m << " n_dim_m: " << n_dim_m
               << " orient_deg: " << orient_deg
               << std::endl;
@@ -308,7 +308,6 @@ void Ais8_366_22_Text::print() {
 // Ais8_366_22_AreaShapeEnum getAreaShape(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
 //     // Figure out which shape type or set as an error
 //     const int area_shape_int = ubits(bs,offset,3);
-    
 // }
 
 // Call the appropriate constructor
@@ -352,5 +351,5 @@ Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
     default:
         assert(false);
     }
-    return area; 
+    return area;
 }

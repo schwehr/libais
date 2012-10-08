@@ -40,7 +40,7 @@ extern const char *ais8_001_22_shape_names[8];
 class Ais8_001_22_SubArea {
 public:
     //Ais8_001_22_AreaShapeEnum area_shape;
-    virtual Ais8_001_22_AreaShapeEnum getType() const = 0;  
+    virtual Ais8_001_22_AreaShapeEnum getType() const = 0;
     // FIX: make the destructor pure virtual
     virtual ~Ais8_001_22_SubArea() //= 0;
     { /* std::cout << "Ais8_001_22_Subarea: destructor" << std::endl;*/ };
@@ -124,7 +124,7 @@ public:
 
     // x, y, and precision sent as separate Point before the waypoint start
     //float x,y; // longitude and latitude
-    //int precision; // How many decimal places for x and y.  FIX: in IMO  
+    //int precision; // How many decimal places for x and y.  FIX: in IMO
 
     // Up to 4 points in a first message, but aggregated if multiple sub areas
     std::vector<float> angles;
@@ -164,7 +164,7 @@ public:
     int hour;  // UTC!
     int minute;
     int duration_minutes; // Time from the start until the notice expires
-    
+
     // 1 or more sub messages
 
     std::vector<Ais8_001_22_SubArea *> sub_areas;
@@ -173,7 +173,7 @@ public:
     ~Ais8_001_22();
     void print();
 
-    /* 
+    /*
        FIX: need some sort of higher level accessors and checks
        - return interpreted geometry and associated agreegated text
          - What formats to return?  GeoJSON, WKT, etc?
@@ -184,5 +184,3 @@ public:
 
 };
 std::ostream& operator<< (std::ostream& o, Ais8_001_22 const& msg);
-
-
