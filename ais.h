@@ -199,8 +199,32 @@ class Ais5 : public AisMsg {
 };
 std::ostream& operator<< (std::ostream& o, Ais5 const& msg);
 
-// FIX: figure out how to handle Ais6
 // Addessed binary message (ABM)
+const size_t AIS6_MAX_BITS = 1192;
+
+// AIS Binary Broadcast message ... parent to many
+class Ais6 : public AisMsg {
+    //protected:
+public:
+    Ais6() {}
+
+    static const int MAX_BITS = AIS6_MAX_BITS;
+
+    int seq; // sequence number
+    int mmsi_dest;
+    bool retransmit;
+    int spare;
+    int dac; // dac+fi = app id
+    int fi;
+
+    std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
+
+    Ais6(const char *nmea_payload);
+    bool decode_header6(const std::bitset<MAX_BITS> &bs);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6 const& msg);
+
 
 // 7 and 13 are ACKs for msg 6 and 12
 class Ais7_13 : public AisMsg {
@@ -213,7 +237,6 @@ public:
     Ais7_13(const char *nmea_payload);
     void print();
 };
-
 std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 
 // 366 34 - Kurt older whale message 2008-2010

@@ -274,11 +274,32 @@ ais5_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
-    /*
+
 PyObject*
 ais6_to_pydict(const char *nmea_payload) {
-    assert(false);
-    }*/
+    assert (nmea_payload);
+    Ais6 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais6: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", 6);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+    DictSafeSetItem(dict,"seq", msg.seq);
+    DictSafeSetItem(dict,"mmsi_dest", msg.mmsi_dest);
+    DictSafeSetItem(dict,"retransmit", msg.retransmit);
+    DictSafeSetItem(dict,"spare", msg.spare);
+    DictSafeSetItem(dict,"dac", msg.dac);
+    DictSafeSetItem(dict,"fi", msg.fi);
+
+    // TODO: manage all the submessage types
+    DictSafeSetItem(dict,"parsed",false);
+    return dict;
+}
+
 
 PyObject*
 ais7_13_to_pydict(const char *nmea_payload) {
@@ -943,8 +964,8 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case '6': // 6 - Addressed binary message
-        // result = ais6_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 6 not yet handled");
+        result = ais6_to_pydict(nmea_payload);
+        //PyErr_Format(ais_py_exception, "ais.decode: message 6 not yet handled");
         break;
 
         // 7 - ACK for addressed binary message
