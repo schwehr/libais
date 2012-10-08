@@ -689,7 +689,59 @@ ais8_to_pydict(const char *nmea_payload) {
         // cout << "Ais8: can't handle dac " << msg.dac << endl;
     }
 
+    return dict;
+}
 
+PyObject*
+ais9_to_pydict(const char *nmea_payload) {
+    assert (nmea_payload);
+    Ais9 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais9: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", 6);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict,"alt", msg.alt);
+    DictSafeSetItem(dict, "sog", msg.sog);
+
+    DictSafeSetItem(dict, "position_accuracy", msg.position_accuracy);
+    DictSafeSetItem(dict, "x", msg.x);
+    DictSafeSetItem(dict, "y", msg.y);
+
+    DictSafeSetItem(dict, "cog", msg.cog);
+    DictSafeSetItem(dict, "timestamp", msg.timestamp);
+    DictSafeSetItem(dict, "alt_sensor", msg.alt_sensor);
+    DictSafeSetItem(dict, "spare", msg.spare);
+    DictSafeSetItem(dict, "dte", msg.dte);
+    DictSafeSetItem(dict, "spare2", msg.spare2);
+    DictSafeSetItem(dict, "raim", msg.raim);
+
+    if (msg.commstate_flag) {
+        // SOTMDA
+      DictSafeSetItem(dict,"slot_timeout", msg.slot_timeout);
+
+      if (msg.received_stations_valid)
+          DictSafeSetItem(dict,"received_stations", msg.received_stations);
+      if (msg.slot_number_valid)
+          DictSafeSetItem(dict,"slot_number", msg.slot_number);
+      if (msg.utc_valid) {
+          DictSafeSetItem(dict,"utc_hour", msg.utc_hour);
+          DictSafeSetItem(dict,"utc_min", msg.utc_min);
+          DictSafeSetItem(dict,"utc_spare", msg.utc_spare);
+      }
+      if (msg.slot_offset_valid)
+          DictSafeSetItem(dict,"slot_offset", msg.slot_offset);
+    } else {
+        // ITDMA
+        DictSafeSetItem(dict,"slot_increment", msg.slot_increment);
+        DictSafeSetItem(dict,"slots_to_allocate", msg.slots_to_allocate);
+        DictSafeSetItem(dict,"keep_flag", msg.keep_flag);
+    }
 
     return dict;
 }
@@ -978,12 +1030,10 @@ decode(PyObject *self, PyObject *args) {
 
     case '8': // 8 - Binary broadcast message (BBM)
         result = ais8_to_pydict(nmea_payload);
-        //PyErr_Format(ais_py_exception, "ais.decode: message 8 not yet handled");
         break;
 
     case '9': // 9 - SAR Position
-        // result = ais9_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 9 not yet handled");
+        result = ais9_to_pydict(nmea_payload);
         break;
 
     case ':': // 10 - UTC Query

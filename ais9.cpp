@@ -28,25 +28,28 @@ Ais9::Ais9(const char *nmea_payload) {
 
     cog = ubits(bs, 116, 12) / 10.;
     timestamp = ubits(bs, 128, 6);
-    alt_sensor = int(bs[129]); // ubits(bs, 129, 1);
-    spare = ubits(bs, 136, 7);
-    dte = int(bs[143]);//ubits(bs, 143, 1);
-    spare2 = ubits(bs, 146, 3);
+    alt_sensor = int(bs[134]);
+    spare = ubits(bs, 135, 7);
+    dte = int(bs[142]);
+    spare2 = ubits(bs, 143, 3);
+    assigned_mode = int(bs[146]);
     raim = bool(bs[147]);
     commstate_flag = bs[148];  // 0 SOTDMA, 1 ITDMA
+
+    sync_state = ubits(bs, 149, 2);
 
 #ifndef NDEBUG
     slot_timeout = -1;
     received_stations = slot_number = utc_hour = utc_min = utc_spare -1;
     slot_offset = slot_increment = slots_to_allocate = -1;
     keep_flag = false;
-#endif    
+#endif
+
     slot_timeout_valid = false;
     received_stations_valid = slot_number_valid = utc_valid = false;
     slot_offset_valid = slot_increment_valid = slots_to_allocate_valid = keep_flag_valid = 0;
 
-    if (0 == commstate_flag) {//unit_flag) {
-
+    if (0 == commstate_flag) {
         // SOTDMA
         slot_timeout = ubits(bs,151,3);
         slot_timeout_valid = true;
@@ -57,7 +60,7 @@ Ais9::Ais9(const char *nmea_payload) {
             slot_offset_valid = true;
             break;
         case 1:
-            utc_hour = ubits(bs, 154, 5); 
+            utc_hour = ubits(bs, 154, 5);
             utc_min = ubits(bs, 159, 7);
             utc_spare = ubits(bs, 166, 2);
             utc_valid = true;
@@ -101,7 +104,7 @@ void Ais9::print() {
               << "\ttimestamp: " << timestamp << "spare: " << spare << "\n"
               << "\tdte: " << dte << "spare2: " << spare2 << "\n"
               << "\traim: " << (raim?"true":"false") << "\n"
-              << "\tcommstate_flag: " << commstate_flag 
+              << "\tcommstate_flag: " << commstate_flag
               << std::endl;
     // SOTDMA
     if (slot_timeout_valid) std::cout << "\t\tslot_timeout: " << slot_timeout << "\n";
