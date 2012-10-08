@@ -3,6 +3,8 @@
 
 #include "ais.h"
 
+#include <iomanip>
+
 Ais8::Ais8(const char *nmea_payload) {
     assert(nmea_payload);
 	assert(nmea_ord_initialized); // Make sure we have the lookup table built
@@ -45,8 +47,6 @@ bool Ais8::decode_header8(const std::bitset<MAX_BITS> &bs) {
     fi = ubits(bs,50,6);
     return true;
 }
-
-#include <iomanip>
 
 void Ais8::print() {
     std::cout << "AIS_broadcast_binary_message: " << message_id 
