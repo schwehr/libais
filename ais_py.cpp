@@ -702,7 +702,7 @@ ais9_to_pydict(const char *nmea_payload) {
     }
 
     PyObject *dict = PyDict_New();
-    DictSafeSetItem(dict,"id", 6);
+    DictSafeSetItem(dict,"id", 9);
     DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
     DictSafeSetItem(dict,"mmsi", msg.mmsi);
 
@@ -746,8 +746,27 @@ ais9_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
-// TODO: msg 9
-// TODO: msg 10
+// :
+PyObject*
+ais10_to_pydict(const char *nmea_payload) {
+    assert (nmea_payload);
+    Ais10 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais9: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", 10);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict, "spare", msg.spare);
+    DictSafeSetItem(dict, "dest_mmsi", msg.dest_mmsi);
+    DictSafeSetItem(dict, "spare2", msg.spare2);
+
+    return dict;
+}
 // msg 11 - See msg 4
 // TODO: msg 12
 // msg 13 - See msg 7
@@ -1037,8 +1056,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case ':': // 10 - UTC Query
-        //result = ais10_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 10 (;) not yet handled");
+        result = ais10_to_pydict(nmea_payload);
         break;
 
         // ':' 11 - See 4

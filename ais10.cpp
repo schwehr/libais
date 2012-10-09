@@ -7,7 +7,7 @@ Ais10::Ais10(const char *nmea_payload) {
     init();
 
     if (strlen(nmea_payload) != 72/6) {
-        std::cout << "WHAT? " << strlen(nmea_payload) << 72/6 << std::endl;
+      //std::cout << "WHAT? " << strlen(nmea_payload) << 72/6 << std::endl;
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
     }
