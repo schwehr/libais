@@ -767,10 +767,39 @@ ais10_to_pydict(const char *nmea_payload) {
 
     return dict;
 }
-// msg 11 - See msg 4
-// TODO: msg 12
+
+// msg 11 ';' - See msg 4
+
+// 12 - '<'
+PyObject*
+ais12_to_pydict(const char *nmea_payload) {
+    assert (nmea_payload);
+    Ais12 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais9: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", 12);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict, "seq_num", msg.seq_num);
+    DictSafeSetItem(dict, "dest_mmsi", msg.dest_mmsi);
+    DictSafeSetItem(dict, "retransmitted", msg.retransmitted);
+
+    DictSafeSetItem(dict, "spare", msg.spare);
+    DictSafeSetItem(dict, "text", msg.text);
+
+    return dict;
+}
+
+
 // msg 13 - See msg 7
 
+
+// 14 - '>'
 PyObject*
 ais14_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
@@ -785,6 +814,8 @@ ais14_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"id", msg.message_id);
     DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
     DictSafeSetItem(dict,"mmsi", msg.mmsi);
+    DictSafeSetItem(dict, "spare", msg.spare);
+
     DictSafeSetItem(dict,"text", msg.text);
 
     return dict;
@@ -1062,8 +1093,7 @@ decode(PyObject *self, PyObject *args) {
         // ':' 11 - See 4
 
     case '<': // 12 - ASRM
-        // result = ais12_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 12 (<) not yet handled");
+        result = ais12_to_pydict(nmea_payload);
         break;
 
         // 13 - See 7

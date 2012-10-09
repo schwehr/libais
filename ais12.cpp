@@ -23,7 +23,6 @@ Ais12::Ais12(const char *nmea_payload) {
     retransmitted = bool(bs[70]);
     spare = bool(bs[71]);
     int num_txt_bits = 6 * ((num_char * 6 - 72) / 6);
-    std::cout << "FIX: num_txt_bits: " << num_txt_bits <<  std::endl;
     text = ais_str(bs,72,num_txt_bits);
 }
 

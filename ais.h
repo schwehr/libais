@@ -393,7 +393,7 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
 
-// 10 - ":" UTC and date inquiry
+// 10 ":" - UTC and date inquiry
 class Ais10 : public AisMsg {
 public:
     int spare;
@@ -405,9 +405,9 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais10 const& msg);
 
-// 11 - See 4_11
+// 11 ';' - See 4_11
 
-// < - Addressd safety related
+// '<' - Addressd safety related
 class Ais12 : public AisMsg {
 public:
     int seq_num;
@@ -421,9 +421,12 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
 
-// Safety broadcast
+// 13 '=' - See 7
+
+// '>' - Safety broadcast
 class Ais14 : public AisMsg {
 public:
+    int spare;
     std::string text;
     int expected_num_spare_bits; // The bits in the nmea_payload not used
     Ais14(const char *nmea_payload);

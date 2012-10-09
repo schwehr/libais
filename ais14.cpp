@@ -31,6 +31,7 @@ Ais14::Ais14
     repeat_indicator = ubits(bs,6,2);
     mmsi = ubits(bs,8,30);
 
+    spare = ubits(bs, 38, 2);
     const int num_char = ( num_bits - 40 ) / 6;
 
     text = ais_str(bs, 40, num_char * 6);
