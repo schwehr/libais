@@ -821,7 +821,40 @@ ais14_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
-// TODO: msg 15
+// '?'
+PyObject*
+ais15_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais15 msg(nmea_payload);
+
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais15: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict,"spare", msg.spare);
+    DictSafeSetItem(dict,"mmsi_1", msg.mmsi_1);
+    DictSafeSetItem(dict,"msg_1_1", msg.msg_1_1);
+    DictSafeSetItem(dict,"slot_offset_1_1", msg.slot_offset_1_1);
+
+    DictSafeSetItem(dict,"spare2", msg.spare2);
+    DictSafeSetItem(dict,"dest_msg_1_2", msg.dest_msg_1_2);
+    DictSafeSetItem(dict,"slot_offset_1_2", msg.slot_offset_1_2);
+
+    DictSafeSetItem(dict,"spare3", msg.spare3);
+    DictSafeSetItem(dict,"mmsi_2", msg.mmsi_2);
+    DictSafeSetItem(dict,"msg_2", msg.msg_2);
+    DictSafeSetItem(dict,"slot_offset_2", msg.slot_offset_2);
+    DictSafeSetItem(dict,"spare4", msg.spare4);
+
+    return dict;
+}
+
 // TODO: msg 16
 // TODO: msg 17
 
@@ -1103,8 +1136,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case '?': // 15 - Interrogation
-        // result = ais15_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 15 (?) not yet handled");
+        result = ais15_to_pydict(nmea_payload);
         break;
 
     case '@': // 16 - Assigned mode command

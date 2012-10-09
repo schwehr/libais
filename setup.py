@@ -15,13 +15,23 @@ ais_module = Extension('ais',
                                'ais8.cpp',
                                'ais8_001_22.cpp',
                                'ais9.cpp',
-                               'ais10.cpp',
-                               'ais12.cpp',
-                               'ais14.cpp',
+                               'ais10.cpp', # :
+                               # 11 See 4 - ;
+                               'ais12.cpp', # <
+                               # 13 See 7 - =
+                               'ais14.cpp', # >
+                               'ais15.cpp', # ?
+                               # 16
+                               # 17
                                'ais18.cpp',
                                'ais19.cpp',
+                               # 20
                                'ais21.cpp',
+                               # 22
+                               # 23
                                'ais24.cpp',
+                               # 25
+                               # 26
                                ])
 
 setup (name = 'libais',
