@@ -886,7 +886,29 @@ ais16_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
-// TODO: msg 17
+// 'A' - TODO: incomplete
+PyObject*
+ais17_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais17 msg(nmea_payload);
+
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais17: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict,"spare", msg.spare);
+    DictSafeSetItem(dict,"x", msg.x);
+    DictSafeSetItem(dict,"y", msg.y);
+    DictSafeSetItem(dict,"spare2", msg.spare2);
+
+    return dict;
+}
 
 PyObject*
 ais18_to_pydict(const char *nmea_payload) {
@@ -1174,8 +1196,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'A': // 17 - GNSS broadcast
-        // result = ais17_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 17 (A) not yet handled");
+        result = ais17_to_pydict(nmea_payload);
         break;
 
     case 'B': // 18 - Position, Class B

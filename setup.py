@@ -22,7 +22,7 @@ ais_module = Extension('ais',
                                'ais14.cpp', # >
                                'ais15.cpp', # ?
                                'ais16.cpp', # @
-                               # 'ais17.cpp', #
+                               'ais17.cpp', #
                                'ais18.cpp',
                                'ais19.cpp',
                                # 'ais20.cpp', #

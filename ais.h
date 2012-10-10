@@ -476,20 +476,35 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais16 const& msg);
 
-// A? - GNSS broacast - FIX: not yet coded
+// ITU-R M.823  http://www.itu.int/rec/R-REC-M.823/en
+struct GnssCorrection17 {
+    int msg_type;
+    int station_id;
+    int z_cnt;
+    //int n;
+    int health;
+  // TODO: DGNSS data word - what is their word size?
+};
+
+// A - GNSS broacast - FIX: only partially coded
 class Ais17 : public AisMsg {
 public:
     int spare;
     float x, y;
     int spare2;
 
+  // TODO: These should be lists for each payload?  Use a struct?
+#if 0
     int msg_type;
     int station_id;
     int z_cnt;
     int n;
     int health;
+#endif
+  // std::vector<GnssCorrection17> corrections;
 
-    std::vector<unsigned char> payload; // Up to 29 words... FIX: what should be here?
+    // Anyfield below here is subject to change
+  //std::vector<unsigned char> payload; // Up to 29 words... FIX: what should be here?
 
     Ais17(const char *nmea_payload);
     void print();
