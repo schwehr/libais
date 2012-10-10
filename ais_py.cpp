@@ -855,7 +855,37 @@ ais15_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
-// TODO: msg 16
+// '@'
+PyObject*
+ais16_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais16 msg(nmea_payload);
+
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais16: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict,"spare", msg.spare);
+    DictSafeSetItem(dict,"dest_mmsi_a", msg.dest_mmsi_a);
+    DictSafeSetItem(dict,"offset_a", msg.offset_a);
+    DictSafeSetItem(dict,"inc_a", msg.inc_a);
+
+    if (-1 != msg.spare2) DictSafeSetItem(dict,"spare2", msg.spare2);
+    if (-1 != msg.dest_mmsi_b) {
+      DictSafeSetItem(dict,"dest_mmsi_b", msg.dest_mmsi_b);
+      DictSafeSetItem(dict,"offset_b", msg.offset_b);
+      DictSafeSetItem(dict,"inc_b", msg.inc_b);
+    }
+
+    return dict;
+}
+
 // TODO: msg 17
 
 PyObject*
@@ -1140,8 +1170,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case '@': // 16 - Assigned mode command
-        // result = ais16_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 16 (@) not yet handled");
+        result = ais16_to_pydict(nmea_payload);
         break;
 
     case 'A': // 17 - GNSS broadcast

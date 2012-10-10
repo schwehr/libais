@@ -30,12 +30,14 @@ Ais15::Ais15(const char *nmea_payload) {
     msg_1_1 = ubits(bs,70,6);
     slot_offset_1_1 = ubits(bs,76,12);
 
+    // TODO: set remaining fields to -1
     if (num_char <= 15) return;
 
     spare2 = ubits(bs,88,2);
     dest_msg_1_2 = ubits(bs,90,6);
     slot_offset_1_2 = ubits(bs,96,12);
 
+    // TODO: set remaining fields to -1
     if (num_char <= 18) return;
 
     spare3 = ubits(bs,108,2);

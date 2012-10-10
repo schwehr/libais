@@ -459,7 +459,7 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
 
-// @ - Assigned mode command - FIX: not yet coded
+// @ - Assigned mode command
 class Ais16 : public AisMsg {
 public:
     int spare;
