@@ -1099,6 +1099,8 @@ ais20_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+
+// E - ATON Aid to Navigation
 PyObject*
 ais21_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
