@@ -910,6 +910,8 @@ ais17_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+
+// 'B'
 PyObject*
 ais18_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
@@ -924,6 +926,7 @@ ais18_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
     DictSafeSetItem(dict,"mmsi", msg.mmsi);
 
+    DictSafeSetItem(dict,"spare", msg.spare);
     DictSafeSetItem(dict,"sog", msg.sog);
     DictSafeSetItem(dict,"position_accuracy", msg.position_accuracy);
     DictSafeSetItem(dict,"x", msg.x);
@@ -984,6 +987,7 @@ ais18_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+// 'C'
 PyObject*
 ais19_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
@@ -998,6 +1002,7 @@ ais19_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
     DictSafeSetItem(dict,"mmsi", msg.mmsi);
 
+    DictSafeSetItem(dict,"spare", msg.spare);
     DictSafeSetItem(dict,"sog", msg.sog);
     DictSafeSetItem(dict,"position_accuracy", msg.position_accuracy);
     DictSafeSetItem(dict,"x", msg.x);
@@ -1025,7 +1030,54 @@ ais19_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
-// TODO: msg 20 - data link management
+// TODO: 'D' - data link management
+PyObject*
+ais20_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais20 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais20: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict,"spare", msg.spare);
+
+    // TODO: make a list of dicts or something else more sane
+
+    DictSafeSetItem(dict,"offset_1", msg.offset_1);
+    DictSafeSetItem(dict,"num_slots_1", msg.num_slots_1);
+    DictSafeSetItem(dict,"timeout_1", msg.timeout_1);
+    DictSafeSetItem(dict,"incr_1", msg.incr_1);
+
+    if (msg.group_valid_2) {
+      DictSafeSetItem(dict,"offset_2", msg.offset_2);
+      DictSafeSetItem(dict,"num_slots_2", msg.num_slots_2);
+      DictSafeSetItem(dict,"timeout_2", msg.timeout_2);
+      DictSafeSetItem(dict,"incr_2", msg.incr_2);
+    }
+
+    if (msg.group_valid_3) {
+      DictSafeSetItem(dict,"offset_3", msg.offset_3);
+      DictSafeSetItem(dict,"num_slots_3", msg.num_slots_3);
+      DictSafeSetItem(dict,"timeout_3", msg.timeout_3);
+      DictSafeSetItem(dict,"incr_3", msg.incr_3);
+    }
+
+    if (msg.group_valid_4) {
+      DictSafeSetItem(dict,"offset_4", msg.offset_4);
+      DictSafeSetItem(dict,"num_slots_4", msg.num_slots_4);
+      DictSafeSetItem(dict,"timeout_4", msg.timeout_4);
+      DictSafeSetItem(dict,"incr_4", msg.incr_4);
+    }
+
+
+    return dict;
+}
 
 PyObject*
 ais21_to_pydict(const char *nmea_payload) {
@@ -1040,6 +1092,7 @@ ais21_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"id", msg.message_id);
     DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
     DictSafeSetItem(dict,"mmsi", msg.mmsi);
+    DictSafeSetItem(dict,"spare", msg.spare);
 
     DictSafeSetItem(dict,"aton_type", msg.aton_type);
     DictSafeSetItem(dict,"name", msg.name);
@@ -1208,8 +1261,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'D': // 20 - Data link management
-        // result = ais20_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 20 (D) not yet handled");
+        result = ais20_to_pydict(nmea_payload);
         break;
 
     case 'E': // 21 - Aids to navigation report

@@ -22,16 +22,16 @@ ais_module = Extension('ais',
                                'ais14.cpp', # >
                                'ais15.cpp', # ?
                                'ais16.cpp', # @
-                               'ais17.cpp', #
-                               'ais18.cpp',
-                               'ais19.cpp',
-                               # 'ais20.cpp', #
-                               'ais21.cpp',
-                               # 'ais22.cpp', #
-                               # 'ais23.cpp', #
-                               'ais24.cpp',
-                               # 'ais25.cpp', #
-                               # 'ais26.cpp', #
+                               'ais17.cpp', # A
+                               'ais18.cpp', # B
+                               'ais19.cpp', # C
+                               'ais20.cpp', # D
+                               'ais21.cpp', # E
+                               # 'ais22.cpp', # F
+                               # 'ais23.cpp', # G
+                               'ais24.cpp', # H
+                               # 'ais25.cpp', # I
+                               # 'ais26.cpp', # J
                                ])
 
 setup (name = 'libais',
