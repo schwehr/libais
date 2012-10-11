@@ -1049,32 +1049,51 @@ ais20_to_pydict(const char *nmea_payload) {
 
     // TODO: make a list of dicts or something else more sane
 
-    DictSafeSetItem(dict,"offset_1", msg.offset_1);
-    DictSafeSetItem(dict,"num_slots_1", msg.num_slots_1);
-    DictSafeSetItem(dict,"timeout_1", msg.timeout_1);
-    DictSafeSetItem(dict,"incr_1", msg.incr_1);
+    int list_size = 1;
+    if (msg.group_valid_4) list_size = 4;
+    else if (msg.group_valid_3) list_size = 3;
+    else if (msg.group_valid_2) list_size = 2;
+
+
+    PyObject *list = PyList_New(list_size);
+
+    {
+      PyObject *reservation = PyDict_New();
+      DictSafeSetItem(reservation,"offset", msg.offset_1);
+      DictSafeSetItem(reservation,"num_slots", msg.num_slots_1);
+      DictSafeSetItem(reservation,"timeout", msg.timeout_1);
+      DictSafeSetItem(reservation,"incr", msg.incr_1);
+      PyList_SetItem(list, 0, reservation);
+    }
 
     if (msg.group_valid_2) {
-      DictSafeSetItem(dict,"offset_2", msg.offset_2);
-      DictSafeSetItem(dict,"num_slots_2", msg.num_slots_2);
-      DictSafeSetItem(dict,"timeout_2", msg.timeout_2);
-      DictSafeSetItem(dict,"incr_2", msg.incr_2);
+      PyObject *reservation = PyDict_New();
+      DictSafeSetItem(reservation,"offset", msg.offset_2);
+      DictSafeSetItem(reservation,"num_slots", msg.num_slots_2);
+      DictSafeSetItem(reservation,"timeout", msg.timeout_2);
+      DictSafeSetItem(reservation,"incr", msg.incr_2);
+      PyList_SetItem(list, 1, reservation);
     }
 
     if (msg.group_valid_3) {
-      DictSafeSetItem(dict,"offset_3", msg.offset_3);
-      DictSafeSetItem(dict,"num_slots_3", msg.num_slots_3);
-      DictSafeSetItem(dict,"timeout_3", msg.timeout_3);
-      DictSafeSetItem(dict,"incr_3", msg.incr_3);
+      PyObject *reservation = PyDict_New();
+      DictSafeSetItem(reservation,"offset", msg.offset_3);
+      DictSafeSetItem(reservation,"num_slots", msg.num_slots_3);
+      DictSafeSetItem(reservation,"timeout", msg.timeout_3);
+      DictSafeSetItem(reservation,"incr", msg.incr_3);
+      PyList_SetItem(list, 2, reservation);
     }
 
     if (msg.group_valid_4) {
-      DictSafeSetItem(dict,"offset_4", msg.offset_4);
-      DictSafeSetItem(dict,"num_slots_4", msg.num_slots_4);
-      DictSafeSetItem(dict,"timeout_4", msg.timeout_4);
-      DictSafeSetItem(dict,"incr_4", msg.incr_4);
-    }
+      PyObject *reservation = PyDict_New();
+      DictSafeSetItem(reservation,"offset", msg.offset_4);
+      DictSafeSetItem(reservation,"num_slots", msg.num_slots_4);
+      DictSafeSetItem(reservation,"timeout", msg.timeout_4);
+      DictSafeSetItem(reservation,"incr", msg.incr_4);
+      PyList_SetItem(list, 3, reservation);
 
+    }
+    PyDict_SetItem(dict, PyUnicode_FromString("reservations"), list);
 
     return dict;
 }
