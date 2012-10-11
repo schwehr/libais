@@ -145,6 +145,7 @@ class Ais4_11 : public AisMsg {
     int position_accuracy;
     float x, y; // longitude, latitude
     int fix_type;
+    int transmission_ctl;
     int spare;
     bool raim;
 

@@ -211,6 +211,7 @@ ais4_11_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"y", msg.y);
 
     DictSafeSetItem(dict,"fix_type", msg.fix_type);
+    DictSafeSetItem(dict,"transmission_ctl", msg.transmission_ctl);
     DictSafeSetItem(dict,"spare", msg.spare);
     DictSafeSetItem(dict,"raim", msg.raim);
 
