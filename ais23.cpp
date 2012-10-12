@@ -1,4 +1,4 @@
-// Msg 22 - F - Channel Management
+// Msg 23 - G - Channel Management
 #include "ais.h"
 
 Ais23::Ais23(const char *nmea_payload) {
