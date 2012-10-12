@@ -103,7 +103,6 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
 
         keep_flag = bool(bs[167]);
         keep_flag_valid = true;
-
     }
 }
 
