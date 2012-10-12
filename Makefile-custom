@@ -52,29 +52,37 @@ CXXFLAGS += ${WARN}
 #CFLAGS := ${CXXFLAGS}
 
 SRCS := ais.cpp 
-SRCS += ais1_2_3.cpp ais4_11.cpp ais5.cpp 
-
+SRCS += ais1_2_3.cpp
+SRCS += ais4_11.cpp
+SRCS += ais5.cpp 
 SRCS += ais6.cpp
-
 SRCS += ais7_13.cpp
-
 SRCS += ais8.cpp
 
 # IMO Messages - Circ 289
 SRCS += ais8_001_22.cpp # Area notice
-
 # US Specific Messages
 SRCS += ais8_366_22.cpp
 
-#
-SRCS += ais9.cpp ais10.cpp ais12.cpp
+SRCS += ais9.cpp
+SRCS += ais10.cpp
+# See 4 for 11
+SRCS += ais12.cpp
+# See 7 for 13
 SRCS += ais14.cpp
-#
-SRCS += ais18.cpp ais19.cpp
-#
+SRCS += ais15.cpp
+SRCS += ais16.cpp
+SRCS += ais17.cpp
+SRCS += ais18.cpp
+SRCS += ais19.cpp
+SRCS += ais20.cpp
 SRCS += ais21.cpp
-#
+SRCS += ais22.cpp
+SRCS += ais23.cpp
 SRCS += ais24.cpp
+# SRCS += ais24.cpp
+# SRCS += ais25.cpp
+# SRCS += ais26.cpp
 OBJS := ${SRCS:.cpp=.o}
 
 default:
@@ -126,12 +134,12 @@ tar:
 
 # Remove the NDEBUG that python tries to use
 python2:
-	CFLAGS="-O3 -funroll-loops -fexpensive-optimizations -ffast-math" python setup.py build
+	CFLAGS="-O3 -funroll-loops -fexpensive-optimizations -ffast-math" setup.py build
 #	CFLAGS="-m32 -O0 -g -UNDEBUG" /sw/bin/python2.6 setup.py build
 
 # -D_GLIBCXX_DEBUG  This option does not seem to work for g++ versions 4.[0-2]
 python3:
-	CFLAGS="-O0 -g -UNDEBUG" python3 setup.py build
+	CFLAGS="-m32 -O0 -g -UNDEBUG" /sw/bin/python3 setup.py build
 
 libais.a: ${OBJS}
 	ls ${OBJS}
@@ -163,11 +171,25 @@ ais.o: ais.h
 ais123.o: ais.h
 ais4_11.o: ais.h
 ais5.o: ais.h
+ais6.o: ais.h
 ais7_13.o: ais.h
 ais8_001_22.o: ais.h 
+ais9.o: ais.h
+ais10.o: ais.h
+ais12.o: ais.h
 ais14.o: ais.h
+ais15.o: ais.h
+ais16.o: ais.h
+#ais17.o: ais.h
 ais18.o: ais.h
 ais19.o: ais.h
+#ais20.o: ais.h
+ais21.o: ais.h
+#ais22.o: ais.h
+#ais23.o: ais.h
+ais24.o: ais.h
+#ais25.o: ais.h
+#ais26.o: ais.h
 ais_py.o: ais.h
 test_libais.o: ais.h
 
