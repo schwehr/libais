@@ -39,7 +39,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     if (rot_raw < 0) rot = -rot;
 
     sog = ubits(bs,50,10) / 10.;
-    position_accuracy = ubits(bs,60,1);
+    position_accuracy = bs[60];
     x = sbits(bs, 61, 28) / 600000.;
     y = sbits(bs, 89, 27) / 600000.;
     cog = ubits(bs, 116, 12) / 10.;
