@@ -1177,7 +1177,38 @@ ais22_to_pydict(const char *nmea_payload) {
 }
 
 
-// TODO: msg 23 - group assignment command
+// F - group assignment command
+PyObject*
+ais23_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais23 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais23: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+    DictSafeSetItem(dict,"spare", msg.spare);
+
+    DictSafeSetItem(dict,"x1", msg.x1);
+    DictSafeSetItem(dict,"y1", msg.y1);
+    DictSafeSetItem(dict,"x2", msg.x2);
+    DictSafeSetItem(dict,"y2", msg.y2);
+
+    DictSafeSetItem(dict,"station_type", msg.station_type);
+    DictSafeSetItem(dict,"type_and_cargo", msg.type_and_cargo);
+    DictSafeSetItem(dict,"spare2", msg.spare2);
+
+    DictSafeSetItem(dict,"txrx_mode", msg.txrx_mode);
+    DictSafeSetItem(dict,"interval_raw", msg.interval_raw);
+    DictSafeSetItem(dict,"quiet", msg.quiet);
+    DictSafeSetItem(dict,"spare3", msg.spare3);
+
+    return dict;
+}
 
 PyObject*
 ais24_to_pydict(const char *nmea_payload) {
@@ -1335,8 +1366,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'G': // 23 - Group Assignment Command
-        // result = ais23_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 23 (G) not yet handled");
+        result = ais23_to_pydict(nmea_payload);
         break;
 
     case 'H': // 24 - Static data report

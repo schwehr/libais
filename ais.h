@@ -700,8 +700,8 @@ public:
 
     int txrx_mode;
     int interval_raw; // raw value, not sec
-    // int interval_sec;
-    // spare3
+    int quiet;
+    int spare3;
 
     Ais23(const char *nmea_payload);
     void print();
