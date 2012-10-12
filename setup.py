@@ -7,13 +7,13 @@ version = file('VERSION').readline().strip()
 ais_module = Extension('ais',
                     sources = ['ais_py.cpp',
                                'ais.cpp',
-                               'ais1_2_3.cpp',
-                               'ais4_11.cpp',
-                               'ais5.cpp',
-                               'ais6.cpp',
+                               'ais1_2_3.cpp', # Class A position
+                               'ais4_11.cpp', # Basestation report, '=' - UTC time response
+                               'ais5.cpp', # Static data report / ship name
+                               'ais6.cpp', # Addressed binary message (ABM)
                                'ais7_13.cpp',
-                               'ais8.cpp',
-                               'ais8_001_22.cpp',
+                               'ais8.cpp', # Broadcast binary message (BBM)
+                               'ais8_001_22.cpp', # Area notice
                                'ais9.cpp',
                                'ais10.cpp', # :
                                # 11 See 4 - ;
@@ -30,8 +30,8 @@ ais_module = Extension('ais',
                                'ais22.cpp', # F
                                'ais23.cpp', # G
                                'ais24.cpp', # H
-                               'ais25.cpp', # I
-                               # 'ais26.cpp', # J
+                               'ais25.cpp', # I - single slot binary message
+                               'ais26.cpp', # J - Multi-slot binary message with comm-state
                                # 'ais27.cpp', # K
                                ])
 

@@ -1,7 +1,5 @@
-
 #include "ais.h"
 #include "ais8_001_22.h"
-
 
 #include <Python.h>
 #include <cassert>
@@ -675,7 +673,7 @@ ais8_to_pydict(const char *nmea_payload) {
         //    break;
 
 
-            // ITU 1371-1 only: 3.10	IFM 40: Number of persons on board
+            // ITU 1371-1 only: 3.10 - IFM 40: Number of persons on board
 
         default:
             DictSafeSetItem(dict,"parsed",false);
@@ -1102,9 +1100,9 @@ ais20_to_pydict(const char *nmea_payload) {
 
 // E - ATON Aid to Navigation
 PyObject*
-ais21_to_pydict(const char *nmea_payload) {
+ais21_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais21 msg(nmea_payload);
+    Ais21 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais21: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -1283,22 +1281,69 @@ ais25_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+// J - multi-slot binary message with commstate
+PyObject*
+ais26_to_pydict(const char *nmea_payload, const size_t pad) {
+  Ais26 msg(nmea_payload, pad);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais26: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    if (msg.dest_mmsi_valid) DictSafeSetItem(dict,"dest_mmsi", msg.dest_mmsi);
+    if (msg.use_app_id) {
+      DictSafeSetItem(dict,"dac", msg.dac);
+      DictSafeSetItem(dict,"fi", msg.fi);
+    }
+
+    // TODO: handle payload
+
+    DictSafeSetItem(dict,"sync_state", msg.sync_state);
+    if (!msg.commstate_flag) {
+      // SOTDMA
+      if (msg.received_stations_valid)
+        DictSafeSetItem(dict,"received_stations", msg.received_stations);
+      if (msg.slot_number_valid)
+        DictSafeSetItem(dict,"slot_number", msg.slot_number);
+      if (msg.utc_valid) {
+        DictSafeSetItem(dict,"utc_hour", msg.utc_hour);
+        DictSafeSetItem(dict,"utc_min", msg.utc_min);
+        DictSafeSetItem(dict,"utc_spare", msg.utc_spare);
+      }
+      if (msg.slot_offset_valid)
+        DictSafeSetItem(dict,"slot_offset", msg.slot_offset);
+    } else {
+      // ITDMA
+      DictSafeSetItem(dict,"slot_increment", msg.slot_increment);
+      DictSafeSetItem(dict,"slots_to_allocate", msg.slots_to_allocate);
+      DictSafeSetItem(dict,"keep_flag", msg.keep_flag);
+    }
+    return dict;
+}
+
 
 
 static PyObject *
 decode(PyObject *self, PyObject *args) {
-
     if (!nmea_ord_initialized) {
         std::cout << "Calling build_nmea_lut from decode" << endl;
         build_nmea_lookup();
     }
 
+    int _pad;
     const char *nmea_payload;
-    if (!PyArg_ParseTuple(args, "s", &nmea_payload)) {
+    if (!PyArg_ParseTuple(args, "si", &nmea_payload, &_pad)) {
         PyErr_Format(ais_py_exception, "ais.decode: expected string argument");
         return 0;
     }
-    //cout << "nmea_payload: " << nmea_payload << endl;
+    const size_t pad = _pad;
+
+    cerr << "ppad: " << pad << " " << _pad << "\n";
 
     PyObject *result=0;
 
@@ -1314,10 +1359,8 @@ decode(PyObject *self, PyObject *args) {
         result = ais1_2_3_to_pydict(nmea_payload);
         break;
 
-        // 4 - Basestation report
-        // 11 - UTC date response
-    case '4': // FALLTHROUGH
-    case ';':
+    case '4': // FALLTHROUGH - 4 - Basestation report
+    case ';': //  11 - UTC date response
         result = ais4_11_to_pydict(nmea_payload);
         break;
 
@@ -1326,20 +1369,22 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case '6': // 6 - Addressed binary message
-        result = ais6_to_pydict(nmea_payload);
-        //PyErr_Format(ais_py_exception, "ais.decode: message 6 not yet handled");
+        {
+          //const size_t pad = 0; // TODO: must pass in the correct pad
+          result = ais6_to_pydict(nmea_payload);  // TODO: handle payloads
+        }
         break;
 
-        // 7 - ACK for addressed binary message
-        // 13 - ASRM Ack  (safety message)
-    case '=': // FALLTHROUGH
-    case '7':
-        //std::cerr << "7_or_14: " << nmea_payload << std::endl;
+    case '7': // FALLTHROUGH - 7 - ACK for addressed binary message
+    case '=': // 13 - ASRM Ack  (safety message)
         result = ais7_13_to_pydict(nmea_payload);
         break;
 
     case '8': // 8 - Binary broadcast message (BBM)
-        result = ais8_to_pydict(nmea_payload);
+        {
+          //const size_t pad = 0; // TODO: must pass in the correct pad
+          result = ais8_to_pydict(nmea_payload);  // TODO: handle more payloads
+        }
         break;
 
     case '9': // 9 - SAR Position
@@ -1350,13 +1395,13 @@ decode(PyObject *self, PyObject *args) {
         result = ais10_to_pydict(nmea_payload);
         break;
 
-        // ':' 11 - See 4
+    // ':' 11 - See 4
 
     case '<': // 12 - ASRM
         result = ais12_to_pydict(nmea_payload);
         break;
 
-        // 13 - See 7
+    // 13 - See 7
 
     case '>': // 14 - SRBM - Safety broadcast
         result = ais14_to_pydict(nmea_payload);
@@ -1387,7 +1432,10 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'E': // 21 - Aids to navigation report
-        result = ais21_to_pydict(nmea_payload);
+        {
+          //const size_t pad = 0; // TODO: must pass in the correct pad
+          result = ais21_to_pydict(nmea_payload, pad);
+        }
         break;
 
     case 'F': // 22 - Channel Management
@@ -1403,23 +1451,28 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'I': // 25 - Single slot binary message - addressed or broadcast
-      result = ais25_to_pydict(nmea_payload);  // TODO: payload not yet decoded
+        result = ais25_to_pydict(nmea_payload);    // TODO: handle payloads
         break;
 
     case 'J': // 26 - Multi slot binary message with comm state
-        // result = ais26_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 26 (J) not yet handled");
+        {
+          //const size_t pad = 0; // TODO: must pass in the correct pad
+          result = ais26_to_pydict(nmea_payload, pad);  // TODO: handle payloads
+        }
         break;
 
-        // 27 - K
-        // 28 - L
+    case 'K': // 27 - Long-range AIS broadcast message
+        //result = ais27_to_pydict(nmea_payload);
+        PyErr_Format(ais_py_exception, "ais.decode: message 27 (K) not yet handled");
+        break;
+
+    case 'L': // 28 - UNKNOWN
+        //result = ais28_to_pydict(nmea_payload);
+        PyErr_Format(ais_py_exception, "ais.decode: message 28 (L) not yet handled");
+        break;
 
     default:
-        //assert (false);
-        //std::cout << "Unknown message type: '" << nmea_payload[0] << "'\n"
-        //          << "\tline: " << nmea_payload << std::endl;
         PyErr_Format(ais_py_exception, "ais.decode: message %c not known", nmea_payload[0]);
-
     }
 
     return result;

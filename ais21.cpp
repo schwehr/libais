@@ -2,7 +2,7 @@
 // Msg 21 - ATON status
 #include "ais.h"
 
-Ais21::Ais21(const char *nmea_payload, const int pad) {
+Ais21::Ais21(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
     init();
 

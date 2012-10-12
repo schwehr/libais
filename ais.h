@@ -336,7 +336,7 @@ public:
     int minute;
     int dur_min; // duration in minutes
 
-    Ais8_366_34(const char *nmea_payload, const int pad=0);
+    Ais8_366_34(const char *nmea_payload, const size_t pad=0);
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_366_34 const& msg);
@@ -652,7 +652,7 @@ public:
     // Extended name goes on the end of name
     int spare2;
 
-    Ais21(const char *nmea_payload, const int pad=0);
+    Ais21(const char *nmea_payload, const size_t pad=0);
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais21 const& msg);
@@ -732,7 +732,7 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 
-// 'I' - Single slot binary message - addressed or broadcast - FIX: not yet coded
+// 'I' - Single slot binary message - addressed or broadcast - TODO: handle payload
 class Ais25 : public AisMsg {
 public:
   //bool addressed; // broadcast if false - destination indicator
@@ -740,9 +740,9 @@ public:
 
     bool dest_mmsi_valid;
     int dest_mmsi; // only valid if addressed
-    std::vector<unsigned char> payload; // If unstructured.  Yuck.
+    //std::vector<unsigned char> payload; // If unstructured.  Yuck.
 
-    int dac;
+    int dac; // valid it use_app_id
     int fi;
 
     Ais25(const char *nmea_payload);
@@ -750,19 +750,26 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais25 const& msg);
 
-// 'J' - Multi slot binary message with comm state - FIX: not yet coded
+// 'J' - Multi slot binary message with comm state - TODO: handle payload
 class Ais26 : public AisMsg {
 public:
-    bool addressed; // broadcast if false - destination indicator
+  //bool addressed; // broadcast if false - destination indicator
     bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
-    // int dest_mmsi;
-    std::vector<unsigned char> payload; // If unstructured.  Yuck.
 
-    int commstate_flag;
+    bool dest_mmsi_valid;
+    int dest_mmsi; // only valid if addressed
+
+    int dac; // valid it use_app_id
+    int fi;
+
+    //std::vector<unsigned char> payload; // If unstructured.  Yuck.
+
+    int commstate_flag; // 0 - SOTDMA, 1 - TDMA
 
     // SOTDMA
     int sync_state;
     int slot_timeout;
+    bool slot_timeout_valid;
 
     // Based on slot_timeout which ones are valid
     int received_stations;
@@ -789,7 +796,7 @@ public:
     bool keep_flag;
     bool keep_flag_valid;
 
-    Ais26(const char *nmea_payload);
+    Ais26(const char *nmea_payload, const size_t pad=0);
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais26 const& msg);
