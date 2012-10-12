@@ -657,7 +657,7 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais21 const& msg);
 
-// 'F' - Channel Management - FIX: not yet coded
+// 'F' - Channel Management
 class Ais22 : public AisMsg {
 public:
     int spare;

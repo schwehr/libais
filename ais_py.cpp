@@ -1136,7 +1136,47 @@ ais21_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
-// TODO: msg 22 - channel mangement
+
+// F - channel mangement
+PyObject*
+ais22_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais22 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais22: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+    DictSafeSetItem(dict,"spare", msg.spare);
+
+    DictSafeSetItem(dict,"chan_a", msg.chan_a);
+    DictSafeSetItem(dict,"chan_b", msg.chan_b);
+    DictSafeSetItem(dict,"txrx_mode", msg.txrx_mode);
+    DictSafeSetItem(dict,"power_low", msg.power_low);
+
+    if (msg.pos_valid) {
+      DictSafeSetItem(dict,"x1", msg.x1);
+      DictSafeSetItem(dict,"y1", msg.y1);
+      DictSafeSetItem(dict,"x2", msg.x2);
+      DictSafeSetItem(dict,"y2", msg.y2);
+    } else {
+      DictSafeSetItem(dict,"dest_mmsi_1", msg.dest_mmsi_1);
+      DictSafeSetItem(dict,"dest_mmsi_2", msg.dest_mmsi_2);
+    }
+
+    DictSafeSetItem(dict,"chan_a_bandwidth", msg.chan_a_bandwidth);
+    DictSafeSetItem(dict,"chan_b_bandwidth", msg.chan_b_bandwidth);
+    DictSafeSetItem(dict,"zone_size", msg.zone_size);
+    DictSafeSetItem(dict,"spare2", msg.spare2);
+
+    return dict;
+}
+
+
 // TODO: msg 23 - group assignment command
 
 PyObject*
@@ -1291,8 +1331,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'F': // 22 - Channel Management
-        // result = ais22_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 22 (F) not yet handled");
+        result = ais22_to_pydict(nmea_payload);
         break;
 
     case 'G': // 23 - Group Assignment Command
