@@ -32,7 +32,8 @@ ais_module = Extension('ais',
                                'ais24.cpp', # H
                                'ais25.cpp', # I - single slot binary message
                                'ais26.cpp', # J - Multi-slot binary message with comm-state
-                               # 'ais27.cpp', # K
+                               'ais27.cpp', # K - Long-range position
+                               # 'ais28.cpp', # L - Not yet defined
                                ])
 
 setup (name = 'libais',

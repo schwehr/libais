@@ -813,7 +813,7 @@ public:
     bool gnss;  // warning: bits in AIS are flipped sense
     int spare;
 
-    Ais27(const char *nmea_payload);
+    Ais27(const char *nmea_payload, const size_t pad=0);
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais27 const& a);

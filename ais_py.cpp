@@ -1327,6 +1327,32 @@ ais26_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 
+// J - multi-slot binary message with commstate
+PyObject*
+ais27_to_pydict(const char *nmea_payload, const size_t pad) {
+  Ais27 msg(nmea_payload, pad);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais26: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    DictSafeSetItem(dict,"position_accuracy", msg.position_accuracy );
+    DictSafeSetItem(dict,"raim", msg.raim);
+    DictSafeSetItem(dict,"nav_status", msg.nav_status);
+    DictSafeSetItem(dict,"x", msg.x);
+    DictSafeSetItem(dict,"y", msg.y);
+    DictSafeSetItem(dict,"sog", msg.sog);
+    DictSafeSetItem(dict,"cog", msg.cog);
+    DictSafeSetItem(dict,"gnss", msg.gnss);
+    DictSafeSetItem(dict,"spare", msg.spare);
+    return dict;
+}
+
 
 static PyObject *
 decode(PyObject *self, PyObject *args) {
@@ -1342,8 +1368,7 @@ decode(PyObject *self, PyObject *args) {
         return 0;
     }
     const size_t pad = _pad;
-
-    cerr << "ppad: " << pad << " " << _pad << "\n";
+    //cerr << "ppad: " << pad << " " << _pad << "\n";
 
     PyObject *result=0;
 
@@ -1432,10 +1457,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'E': // 21 - Aids to navigation report
-        {
-          //const size_t pad = 0; // TODO: must pass in the correct pad
-          result = ais21_to_pydict(nmea_payload, pad);
-        }
+        result = ais21_to_pydict(nmea_payload, pad);
         break;
 
     case 'F': // 22 - Channel Management
@@ -1455,15 +1477,11 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'J': // 26 - Multi slot binary message with comm state
-        {
-          //const size_t pad = 0; // TODO: must pass in the correct pad
-          result = ais26_to_pydict(nmea_payload, pad);  // TODO: handle payloads
-        }
+        result = ais26_to_pydict(nmea_payload, pad);  // TODO: handle payloads
         break;
 
     case 'K': // 27 - Long-range AIS broadcast message
-        //result = ais27_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 27 (K) not yet handled");
+      result = ais27_to_pydict(nmea_payload, pad);
         break;
 
     case 'L': // 28 - UNKNOWN
