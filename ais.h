@@ -801,8 +801,7 @@ public:
 };
 std::ostream& operator<< (std::ostream& o, Ais26 const& msg);
 
-#if 0
-// TODO: Implement message 27
+// K - Long-range position report - e.g. for satellite receivers
 class Ais27 : public AisMsg {
 public:
     int position_accuracy;
@@ -818,7 +817,6 @@ public:
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais27 const& a);
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Support templates for decoding

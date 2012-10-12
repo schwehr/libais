@@ -13,7 +13,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
 
     if (52 < num_bits || num_bits> 1064) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<168> bs;
+    std::bitset<1064> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
