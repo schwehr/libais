@@ -735,11 +735,15 @@ std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 // 'I' - Single slot binary message - addressed or broadcast - FIX: not yet coded
 class Ais25 : public AisMsg {
 public:
-    bool addressed; // broadcast if false - destination indicator
+  //bool addressed; // broadcast if false - destination indicator
     bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
 
+    bool dest_mmsi_valid;
     int dest_mmsi; // only valid if addressed
     std::vector<unsigned char> payload; // If unstructured.  Yuck.
+
+    int dac;
+    int fi;
 
     Ais25(const char *nmea_payload);
     void print();

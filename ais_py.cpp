@@ -1210,6 +1210,7 @@ ais23_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+// H - Static data report
 PyObject*
 ais24_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
@@ -1251,9 +1252,37 @@ ais24_to_pydict(const char *nmea_payload) {
         return 0;
     }
 
+    return dict;
+}
+
+
+// I - single slot binary message
+PyObject*
+ais25_to_pydict(const char *nmea_payload) {
+    assert(nmea_payload);
+    Ais25 msg(nmea_payload);
+    if (msg.had_error()) {
+        PyErr_Format(ais_py_exception, "Ais25: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        return 0;
+    }
+
+    PyObject *dict = PyDict_New();
+    DictSafeSetItem(dict,"id", msg.message_id);
+    DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
+    DictSafeSetItem(dict,"mmsi", msg.mmsi);
+
+    //DictSafeSetItem(dict,"use_app_id", msg.use_app_id);
+    if (msg.dest_mmsi_valid) DictSafeSetItem(dict,"dest_mmsi", msg.dest_mmsi);
+    if (msg.use_app_id) {
+      DictSafeSetItem(dict,"dac", msg.dac);
+      DictSafeSetItem(dict,"fi", msg.fi);
+    }
+
+    // TODO: handle payload
 
     return dict;
 }
+
 
 
 static PyObject *
@@ -1374,8 +1403,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'I': // 25 - Single slot binary message - addressed or broadcast
-        // result = ais25_to_pydict(nmea_payload);
-        PyErr_Format(ais_py_exception, "ais.decode: message 25 (I) not yet handled");
+      result = ais25_to_pydict(nmea_payload);  // TODO: payload not yet decoded
         break;
 
     case 'J': // 26 - Multi slot binary message with comm state
