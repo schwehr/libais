@@ -50,6 +50,10 @@ enum AIS_STATUS {
 
 extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
 
+struct AisPoint {
+  float x,y;
+};
+
 class AisMsg {
 public:
     int message_id;
@@ -222,11 +226,192 @@ public:
     std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
 
     Ais6(const char *nmea_payload);
-    bool decode_header6(const std::bitset<MAX_BITS> &bs);
+  //bool decode_header6(const std::bitset<MAX_BITS> &bs);
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6 const& msg);
 
+#if 0
+template<size_t T>
+bool decode_header6(std::bitset<T> &bs, Ais6 &msg) {
+  msg.message_id = ubits(bs, 0, 6);
+  if (6 != msg.message_id) { msg.status = AIS_ERR_WRONG_MSG_TYPE; return false; }
+  msg.repeat_indicator = ubits(bs,6,2);
+  msg.mmsi = ubits(bs,8,30);
+  msg.seq = ubits(bs,38,2);
+  msg.mmsi_dest = ubits(bs, 40, 30);
+  msg.retransmit = !bool(bs[70]);
+  msg.spare = bs[71];
+  msg.dac = ubits(bs,72,10);
+  msg.fi = ubits(bs,82,6);
+}
+#endif
+
+// IMO Circ 236 Dangerous cargo indication - Not to be transmitted after 2012-Jan-01
+class Ais6_1_12 : public Ais6 {
+ public:
+  std::string last_port;
+  int utc_month_dep; // actual time of departure
+  int utc_day_dep, utc_hour_dep, utc_min_dep;
+  std::string next_port;
+  int utc_month_next; // estimated arrival
+  int utc_day_next, utc_hour_next, utc_min_next;
+  std::string main_danger;
+  std::string imo_cat;
+  int un;
+  int value; // UNIT???
+  int value_unit;
+  int spare2;
+
+  Ais6_1_12(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_12 const& msg);
+
+
+struct Ais6_1_14_Window {
+  float y, x;  // yes, bits are lat, lon
+  int utc_hour_from, utc_min_from;
+  int utc_hour_to, utc_min_to;
+  int cur_dir;
+  float cur_speed;
+};
+
+
+// IMO Circ 236 Tidal window - Not to be transmitted after 2012-Jan-01
+class Ais6_1_14 : public Ais6 {
+ public:
+  int utc_month, utc_day;
+  std::vector<Ais6_1_14_Window> windows;
+
+  Ais6_1_14(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_14 const& msg);
+
+
+// IMO Circ 289 Clearance time to enter port
+class Ais6_1_18 : public Ais6 {
+ public:
+  int link_id;
+  int utc_month, utc_day, utc_hour, utc_min;
+  std::string port_berth, dest;
+  float x, y;
+  int spare2[2]; // 32 bits per spare
+
+  Ais6_1_18(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_18 const& msg);
+
+
+// IMO Circ 289 Berthing data
+class Ais6_1_20 : public Ais6 {
+ public:
+  int link_id;
+  int length;
+  float depth;
+  int position;
+  int utc_month, utc_day, utc_hour, utc_min;
+  bool services_known;
+  // TODO: enum of service types
+  int services[26];
+  std::string name;
+  float x, y;
+  //int spare;  No bits?  WTF
+
+  Ais6_1_20(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_20 const& msg);
+
+
+struct Ais6_1_25_Cargo {
+  int code_type;
+  bool imdg_valid; // also set with BC
+  int imdg;
+  bool spare_valid;
+  int spare; // imdg or dc or marpols
+  bool un_valid;
+  int un;
+  bool bc_valid;
+  int bc;
+  bool marpol_oil_valid;
+  int marpol_oil;
+  bool marpol_cat_valid;
+  int marpol_cat;
+};
+
+
+// IMO Circ 289 Dangerous cargo indication 2
+// Replaces 8_1_12?
+class Ais6_1_25 : public Ais6 {
+ public:
+  int amount_unit;
+  int amount;
+
+  std::vector<Ais6_1_25_Cargo> cargos;  // 0 to 17 cargo entries
+
+  Ais6_1_25(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_25 const& msg);
+
+
+
+// IMO Circ 289 Route information
+class Ais6_1_28 : public Ais6 {
+ public:
+  int link_id;
+  int sender_type, route_type;
+  int utc_month_start, utc_day_start, utc_hour_start, utc_min_start;
+  int duration;
+  std::vector<AisPoint> waypoints;
+
+  Ais6_1_28(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_28 const& msg);
+
+
+// IMO Circ 289 Text description
+class Ais6_1_30 : public Ais6 {
+ public:
+  int link_id;
+  std::string text;
+
+  Ais6_1_30(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_30 const& msg);
+
+
+// IMO Circ 289
+// could use the same struct for for 8_1_14, but x and y are bit wise different.
+// two structs hints that things are not the same bitwise.
+struct Ais6_1_32_Window {
+  float x,y;
+  int from_utc_hour, from_utc_min;
+  int to_utc_hour, to_utc_min;
+  int cur_dir;
+  float cur_speed; // knots
+};
+
+// IMO Circ 289 Tidal window
+class Ais6_1_32 : public Ais6 {
+ public:
+  int utc_month;
+  int utc_day;
+
+  std::vector<Ais6_1_32_Window> windows;
+
+  Ais6_1_32(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_32 const& msg);
+
+
+//////////////////////////////////////////////////////////////////////
 
 // 7 and 13 are ACKs for msg 6 and 12
 class Ais7_13 : public AisMsg {
@@ -247,35 +432,29 @@ const size_t AIS8_MAX_BITS = 1192;
 
 // AIS Binary Broadcast message ... parent to many
 class Ais8 : public AisMsg {
-    //protected:
 public:
-    Ais8() {}
+  Ais8() {}
 
-    static const int MAX_BITS = AIS8_MAX_BITS; //1192; //1008;
+  static const int MAX_BITS = AIS8_MAX_BITS; //1192; //1008;
 
-    int spare;
-    int dac; // dac+fi = app id
-    int fi;
+  int spare;
+  //int seq; // ITU M.R. 1371-3 Anex 2 5.3.1
+  int dac; // dac+fi = app id
+  int fi;
 
-    std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
+  std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
 
-    Ais8(const char *nmea_payload);
-    bool decode_header8(const std::bitset<MAX_BITS> &bs);
-    void print();
+  Ais8(const char *nmea_payload);
+  bool decode_header8(const std::bitset<MAX_BITS> &bs);
+  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
 
-// IMO met hydro
+
+// IMO Circ 289 met hydro - Not to be transmitted after 2013-Jan-01
+// See also IMO Circ 236
 class Ais8_1_11 : public Ais8 {
 public:
-#if 0
-    int message_id;
-    int repeat_indicator;
-    int mmsi; // source ID
-    int spare;
-    int dac; // dac+fi = app id
-    int fi;
-#endif
     float x, y; // warning... appears in the bit stream as y,x
     int day;
     int hour;
@@ -300,7 +479,7 @@ public:
     float cur_speed_3; // kts
     int cur_dir_3;
     int cur_depth_3; // m
-    float wave_height; // ,
+    float wave_height; // m
     int wave_period;
     int wave_dir;
     float swell_height;
@@ -317,6 +496,502 @@ public:
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
+
+
+// IMO Circ 236 Fairway closed - Not to be transmitted after 2012-Jan-01
+class Ais8_1_13 : public Ais8 {
+ public:
+  std::string reason, location_from, location_to;
+  int radius;
+  int units;
+  // utc?  warning: day/month out of order
+  int day_from, month_from, hour_from, minute_from;
+  int day_to, month_to, hour_to, minute_to;
+  int spare2;
+
+  Ais8_1_13(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_13 const& msg);
+
+
+// IMO Circ 236 Extended ship static and voyage data - Not to be transmitted after 2012-Jan-01
+class Ais8_1_15 : public Ais8 {
+ public:
+  float air_draught;
+  int spare2;
+
+  Ais8_1_15(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_15 const& msg);
+
+
+// IMO Circ 236 Number of persons on board
+class Ais8_1_16 : public Ais8 {
+ public:
+  int persons;
+  int spare2;
+
+  Ais8_1_16(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_16 const& msg);
+
+
+struct Ais8_1_17_Target {
+  int type;
+  std::string id;
+  int spare;
+  float x,y; // bits are lat, lon
+  int cog;
+  int timestamp;
+  int sog;
+};
+
+// IMO Circ 236 VTS Generated/synthetic targets
+class Ais8_1_17 : public Ais8 {
+ public:
+  std::vector<Ais8_1_17_Target> targets;
+
+  Ais8_1_17(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_17 const& msg);
+
+
+// No 8_1_18
+
+
+// IMO Circ 289 Marine traffic signal
+class Ais8_1_19 : public Ais8 {
+ public:
+  int link_id;
+  std::string name;
+  float x, y;  // funny bit count
+  int status;
+  int signal;
+  int utc_hour_next, utc_min_next;
+  int next_signal;
+  int spare2[4];  // Arrrrrr.  102 wasted bits that could be corrupted.
+
+  Ais8_1_19(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_19 const& msg);
+
+// No message 8_1_20
+
+// IMO Circ 289 Weather observation report from ship
+class Ais8_1_21 : public Ais8 {
+ public:
+  int type_wx_report;
+
+  // TYPE 0
+  std::string location;
+  float x, y; // 25, 24 bits
+  int utc_day, utc_hour, utc_min;
+  //int wx;
+  float horz_viz; // nautical miles
+  int humidity;  // %
+  int wind_speed;  // ave knots
+  int wind_dir;
+  float pressure; // hPa - float needed for type 1
+  int pressure_tendency;
+  float air_temp; // C
+  float water_temp; // C
+  int wave_period; // s
+  float wave_height;
+  int wave_dir;
+  float swell_height; // m
+  int swell_dir;
+  int swell_period; // s
+  int spare2;
+
+  // TYPE 1 - !@#$!!!!!
+  // x,y
+  int utc_month;
+  // utc_day, hour, min
+  int cog;
+  float sog;
+  int heading;  // Assume this is true degrees????
+  //int pressure;
+  float rel_pressure;  // 3 hour hPa
+  // pressure_tendency
+  //int wind_dir;
+  float wind_speed_ms; // m/s
+  int wind_dir_rel;
+  float wind_speed_rel; // m/s
+  float wind_gust_speed; // m/s
+  int wind_gust_dir;
+  int air_temp_raw;  // Seriously?  I'm not saving air temperature in fracking kelvin.
+  // humid
+  // sea_temp_k
+  int water_temp_raw;  // TODO fix this
+  // hor_viz
+  int wx[3]; // current, past 1, past 2
+  int cloud_total;
+  int cloud_low;
+  int cloud_low_type;
+  int cloud_middle_type;
+  int cloud_high_type;
+  float alt_lowest_cloud_base;
+  // wave_period
+  // wave_height
+  // swell_dir
+  // swell_period
+  // swell_height
+  int swell_dir_2, swell_period_2, swell_height_2;
+  float ice_thickness; // network is cm, storing m
+  int ice_accretion;
+  int ice_accretion_cause;
+  int sea_ice_concentration;
+  int amt_type_ice;
+  int ice_situation;
+  int ice_devel;
+  int bearing_ice_edge;
+
+  Ais8_1_21(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_21 const& msg);
+
+
+// SEE ais8_001_22.h for Area notice
+
+
+// No message 8_1_23
+
+
+// IMO Circ 289 Extended ship static and voyage-related
+class Ais8_1_24 : public Ais8 {
+ public:
+  int link_id;
+  float air_draught;  // m
+  std::string last_port, next_ports[2];
+
+  // TODO enum list of param types
+  int solas_status[26]; // 0 NA, 1 operational, 2 SNAFU, 3 no data
+  int ice_class;
+  int shaft_power; // horses
+  int vhf;
+  std::string lloyds_ship_type;
+  int gross_tonnage;
+  int laden_ballast;
+  int heavy_oil, light_oil, diesel;
+  int bunker_oil;  // tonnes
+  int persons;
+  int spare2;
+
+  Ais8_1_24(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_24 const& msg);
+
+
+// No message 8_1_15
+
+
+enum Ais8_1_26_SensorEnum {
+  AIS8_1_26_SENSOR_ERROR = -1,
+  AIS8_1_26_SENSOR_LOCATION = 0,
+  AIS8_1_26_SENSOR_STATION = 1,
+  AIS8_1_26_SENSOR_WIND = 2,
+  AIS8_1_26_SENSOR_WATER_LEVEL = 3,
+  AIS8_1_26_SENSOR_CURR_2D = 4,
+  AIS8_1_26_SENSOR_CURR_3D = 5,
+  AIS8_1_26_SENSOR_HORZ_FLOW = 6,
+  AIS8_1_26_SENSOR_SEA_STATE = 7,
+  AIS8_1_26_SENSOR_SALINITY = 8,
+  AIS8_1_26_SENSOR_WX = 9,
+  AIS8_1_26_SENSOR_AIR_DRAUGHT = 10,
+  AIS8_1_26_SENSOR_RESERVED_11 = 11,
+  AIS8_1_26_SENSOR_RESERVED_12 = 12,
+  AIS8_1_26_SENSOR_RESERVED_13 = 13,
+  AIS8_1_26_SENSOR_RESERVED_14 = 14,
+  AIS8_1_26_SENSOR_RESERVED_15 = 15,
+};
+
+class Ais8_1_26_SensorReport {
+ public:
+  virtual Ais8_1_26_SensorEnum getType() const = 0;
+  virtual ~Ais8_1_26_SensorReport()
+  { };
+  virtual void print()=0;
+#if 1
+  int report_type;
+  int utc_day, utc_hr, utc_min;
+  int site_id;  // aka link_id
+#endif
+};
+
+// TODO: need pad?
+Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+
+class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
+ public:
+  float x, y, z;  // lon, lat, alt in m from MSL
+  int owner, timeout;
+  int spare;
+
+  Ais8_1_26_Location(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Location() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_LOCATION;}
+  void print();
+};
+
+class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
+ public:
+  std::string name;
+  int spare;
+
+  Ais8_1_26_Station(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Station() {/* */};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_STATION;}
+};
+
+class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
+ public:
+  int wind_speed, wind_gust ; // knots
+  int wind_dir, wind_gust_dir;
+  int sensor_type;
+  int wind_forcast, wind_gust_forcast; // knots
+  int wind_dir_forcast;
+  int utc_day_forcast, utc_hour_forcast, utc_min_forcast;
+  int spare;
+
+  Ais8_1_26_Wind(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Wind() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WIND;}
+};
+
+class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
+ public:
+  int type;
+  float level; // m.  assuming it is being stored at 0.01 m inc.
+  int trend;
+  int vdatum;
+  int sensor_type;
+  int forcast_type;
+  float level_forcast;
+  int utc_day_forcast;
+  int utc_hour_forcast;
+  int utc_min_forcast;
+  int duration; // minutes
+  int spare;
+  Ais8_1_26_WaterLevel(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_WaterLevel() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WATER_LEVEL;}
+};
+
+struct Ais8_1_26_Curr2D_Current {
+  float speed; // knots
+  int dir;
+  int depth; // m
+};
+
+class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
+ public:
+  std::vector<Ais8_1_26_Curr2D_Current> currents;
+  int type;
+  int spare;
+
+  Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Curr2D() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_2D;}
+};
+
+struct Ais8_1_26_Curr3D_Current {
+  float north, east, up;
+  int depth; // m
+};
+
+class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
+ public:
+  std::vector<Ais8_1_26_Curr3D_Current> currents;
+  int type;
+  int spare;
+
+  Ais8_1_26_Curr3D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Curr3D() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_3D;}
+};
+
+struct Ais8_1_26_HorzFlow_Current {
+  int bearing, dist; // deg, m
+  float speed; // knots
+  int dir, level; // deg, m
+};
+
+class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
+ public:
+  std::vector<Ais8_1_26_HorzFlow_Current> currents;
+  int spare;
+
+  Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_HorzFlow() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_HORZ_FLOW;}
+};
+
+class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
+ public:
+  float swell_height;
+  int swell_period, swell_dir; // s, deg
+  int sea_state;
+  int swell_sensor_type;
+  float water_temp, water_temp_depth; // C, m
+  int water_sensor_type;
+  float wave_height;
+  int wave_period, wave_dir; // s, deg
+  int wave_sensor_type;
+  float salinity;
+
+  Ais8_1_26_SeaState(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_SeaState() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SEA_STATE;}
+};
+
+class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
+ public:
+  float water_temp; // C
+  float conductivity; // siemens/m
+  float pressure; // decibars
+  float salinity; // 0/00 ppt
+  int salinity_type;
+  int sensor_type;
+  int spare;
+
+  Ais8_1_26_Salinity(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Salinity() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SALINITY;}
+};
+
+class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
+ public:
+  float air_temp; // C
+  int air_temp_sensor_type;
+  int precip;
+  float horz_vis; // nm
+  float dew_point; // C
+  int dew_point_type;
+  int air_pressure; // hPa
+  int air_pressure_trend;
+  int air_pressor_type;
+  float salinity; // 0/00 ppt
+  int spare;
+
+  Ais8_1_26_Wx(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Wx() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WX;}
+};
+
+class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
+ public:
+  float draught, gap, forcast_gap;
+  int trend;
+  int utc_day_forcast, utc_hour_forcast, utc_min_forcast;
+  int spare;
+  Ais8_1_26_AirDraught(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_AirDraught() {};
+  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_AIR_DRAUGHT;}
+};
+
+// IMO Circ 289 Environmental
+class Ais8_1_26 : public Ais8 {
+ public:
+  std::vector<Ais8_1_26_SensorReport> reports;
+
+  Ais8_1_26(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_26 const& msg);
+
+
+// IMO Circ 289 Route information
+class Ais8_1_27 : public Ais8 {
+ public:
+  int link_id;
+  int sender_type, route_type;
+  int utc_month, utc_day, utc_hour, utc_min;
+  int duration;
+  std::vector<AisPoint> waypoints;
+
+  Ais8_1_27(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_27 const& msg);
+
+
+//  No message 8_1_28
+
+
+// IMO Circ 289 Text description
+class Ais8_1_29 : public Ais8 {
+ public:
+  int link_id;
+  std::string text;
+
+  Ais8_1_29(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_29 const& msg);
+
+
+// No message 8_1_30
+
+// IMO Circ 289 Meteorological and Hydrographic data
+// Section 1, Table 1.1
+// TODO: is this exactly the same as 8_1_11 or has anything changed?
+//       x,y swapped.
+class Ais8_1_31 : public Ais8 {
+ public:
+  float x, y;  // Opposite the bit order of 8_1_11
+  int position_accuracy;  // New field
+  int utc_day;
+  int utc_hour;
+  int utc_min;
+  int wind_ave; // kts
+  int wind_gust; // kts
+  int wind_dir;
+  int wind_gust_dir;
+  float air_temp; // C
+  int rel_humid;
+  float dew_point;
+  int air_pres;
+  int air_pres_trend;
+  float horz_vis; // NM
+  float water_level; // m
+  int water_level_trend;
+
+  float surf_cur_speed;
+  int surf_cur_dir;
+  float cur_speed_2; // kts
+  int cur_dir_2;
+  int cur_depth_2; // m
+  float cur_speed_3; // kts
+  int cur_dir_3;
+  int cur_depth_3; // m
+
+  float wave_height; // m
+  int wave_period;
+  int wave_dir;
+  float swell_height; // m
+  int swell_period;
+  int swell_dir;
+  int sea_state; // beaufort scale - Table 1.2
+  float water_temp;
+  int precip_type;
+  float salinity;
+  int ice; // yes/no/undef/unknown
+  int spare;
+
+  Ais8_1_31(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_31 const& msg);
+
+
+
 
 
 // New IMO Circ 289 Area notice broadcast is DAC 1, FI 22

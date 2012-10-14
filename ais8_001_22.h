@@ -47,6 +47,7 @@ public:
     virtual void print()=0;
 };
 
+// TODO: need pad?
 Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
 
 // or Point if radius is 0
