@@ -210,7 +210,6 @@ const size_t AIS6_MAX_BITS = 1192;
 
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
-    //protected:
 public:
     Ais6() {}
 
@@ -492,7 +491,7 @@ public:
     int ice; // yes/no/undef/unknown
     int extended_water_level; //spare;  // OHMEX uses this for extra water level precision
 
-    Ais8_1_11(const char *nmea_payload);
+  Ais8_1_11(const char *nmea_payload, size_t pad);
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
@@ -989,9 +988,6 @@ class Ais8_1_31 : public Ais8 {
   void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_31 const& msg);
-
-
-
 
 
 // New IMO Circ 289 Area notice broadcast is DAC 1, FI 22

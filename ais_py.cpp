@@ -274,8 +274,86 @@ ais5_to_pydict(const char *nmea_payload) {
 }
 
 
+#if 0
+// PyObject
+void
+ais6_1__to_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+    assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+    Ais6_1_ msg(nmea_payload, pad);  // TODO: check for error
+    // TODO - implement
+    assert(false);
+}
+    //return dict;
+#endif
+
+
+void
+ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+    assert(nmea_payload); assert(0 <= pad && pad <= 7); // TODO: check for error
+    Ais6_1_12 msg(nmea_payload, pad);
+    //assert(false);
+    std::cerr << "TODO: implment" << std::endl;
+}
+
+  // 13
+
+void
+ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+    assert(nmea_payload); assert(0 <= pad && pad <= 7);
+    Ais6_1_14 msg(nmea_payload, pad); // TODO: check for error
+    // TODO - implement
+    std::cerr << "TODO: implment" << std::endl;
+}
+
+void
+ais6_1_18_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+    assert(nmea_payload); assert(0 <= pad && pad <= 7);
+    Ais6_1_18 msg(nmea_payload, pad);  // TODO: check for error
+    // TODO - implement
+    std::cerr << "TODO: implment" << std::endl;
+}
+
+  // 6_1_19
+
+void
+ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+    assert(nmea_payload); assert(0 <= pad && pad <= 7);
+    Ais6_1_20 msg(nmea_payload, pad);  // TODO: check for error
+    // TODO - implement
+    std::cerr << "TODO: implment" << std::endl;
+}
+
+  // 6_1_21
+  // 6_1_22
+  // 6_1_23
+  // 6_1_24
+
+void
+ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+    assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+    Ais6_1_25 msg(nmea_payload, pad);  // TODO: check for error
+    // TODO - implement
+    std::cerr << "TODO: implment" << std::endl;
+}
+
+  // 6_1_26
+  // 6_1_27
+  // 6_1_28
+  // 6_1_29
+  // 6_1_30
+  // 6_1_31
+
+void
+ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+    assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+    Ais6_1_32 msg(nmea_payload, pad);  // TODO: check for error
+    // TODO - implement
+    std::cerr << "TODO: implment" << std::endl;
+}
+
+
 PyObject*
-ais6_to_pydict(const char *nmea_payload) {
+ais6_to_pydict(const char *nmea_payload, const size_t pad) {
     assert (nmea_payload);
     Ais6 msg(nmea_payload);
     if (msg.had_error()) {
@@ -295,7 +373,50 @@ ais6_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"fi", msg.fi);
 
     // TODO: manage all the submessage types
-    DictSafeSetItem(dict,"parsed",false);
+    //DictSafeSetItem(dict,"parsed",false);
+
+    switch (msg.dac) {
+    case 1:  // IMO
+      switch (msg.fi) {
+        // 11
+        case 12: // Dangerous cargo indication - not to be used after 1 Jan 2013
+          ais6_1_12_append_pydict(nmea_payload, dict, pad);
+          break;
+        // 13
+        case 14: // Tidal window - not to be used after 1 Jan 2013
+          ais6_1_14_append_pydict(nmea_payload, dict, pad);
+          break;
+        // 15
+        // 16
+        // 17
+        case 18: //
+          ais6_1_18_append_pydict(nmea_payload, dict, pad);
+          break;
+        // 19
+        case 20: //
+          ais6_1_20_append_pydict(nmea_payload, dict, pad);
+          break;
+        // 2
+        // 2
+        // 2
+        // 2
+        case 25: //
+          ais6_1_25_append_pydict(nmea_payload, dict, pad);
+          break;
+        // 2
+        // 2
+        // 2
+        // 2
+        // 30
+        // 31
+        case 32: //
+          ais6_1_32_append_pydict(nmea_payload, dict, pad);
+          break;
+        }
+      default:
+        //DictSafeSetItem(dict,"parsed",false);
+        ;
+    }
     return dict;
 }
 
@@ -340,8 +461,9 @@ ais7_13_to_pydict(const char *nmea_payload) {
 
     // FIX: add error checking
 void
-ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict) {
-    Ais8_1_11 msg(nmea_payload);
+ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0<= pad && pad <= 7); // 7 should be 5, right?
+  Ais8_1_11 msg(nmea_payload, pad);
     DictSafeSetItem(dict,"x", msg.x);
     DictSafeSetItem(dict,"y", msg.y);
 
@@ -388,15 +510,81 @@ ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict) {
     DictSafeSetItem(dict,"ext_water_level", msg.extended_water_level);
 }
 
+#if 0
 void
-ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict) {
-    Ais8_001_22 msg(nmea_payload);
+ais8_1__append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_ msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+#endif
 
-    // Common header
+
+  // 12 is addressed
+
+void
+ais8_1_13_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_13 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+  // 14 is addressed
+
+void
+ais8_1_15_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_15 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+void
+ais8_1_16_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_16 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+
+void
+ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_17 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+  // 18 is addressed
+
+void
+ais8_1_19_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_19 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+  // 20 is addressed
+
+void
+ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_21 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+
+void
+ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+    Ais8_001_22 msg(nmea_payload, pad);  // TODO: check for errors
 
     DictSafeSetItem(dict,"link_id", msg.link_id);
     DictSafeSetItem(dict,"notice_type", msg.notice_type);
-    //cout << "notice_type_str(" << msg.notice_type << "): " << ais8_001_22_notice_names[msg.notice_type] << endl;
     DictSafeSetItem(dict,"notice_type_str", ais8_001_22_notice_names[msg.notice_type]);
 
     DictSafeSetItem(dict,"month", msg.month); // WARNING: this is UTC!!!   Not local time
@@ -545,11 +733,64 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict) {
 }
 
 
+  // no 23 broadcast
+
+void
+ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_24 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+  // no 25 broadcast
+
+void
+ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_26 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+void
+ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_27 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+  // no 28 broadcast
+
+void
+ais8_1_29_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_29 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+
+  // no 30 broadcast
+
+void
+ais8_1_31_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_1_31 msg(nmea_payload, pad);  // TODO: check for errors
+  // TODO: implement
+  std::cerr << "TODO: implment" << std::endl;
+}
+
+  // no 32 broadcast
+
     // AIS Binary broadcast messages.  There will be a huge number of subtypes
     // If we don't know how to decode it, just return the dac, fi
 PyObject*
-ais8_to_pydict(const char *nmea_payload) {
+ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     assert (nmea_payload);
+
+    // TODO: only decode dac/fi and push the header dict sets into the messages to avoid duplication.
     Ais8 msg(nmea_payload);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais8: %s", AIS_STATUS_STRINGS[msg.get_error()]);
@@ -567,7 +808,6 @@ ais8_to_pydict(const char *nmea_payload) {
 
     switch (msg.dac) {
     case 1:  // IMO
-        //cout << "IMO BBM" << endl;
         switch (msg.fi) {
 
             //
@@ -575,7 +815,7 @@ ais8_to_pydict(const char *nmea_payload) {
             //
 
         //case 0: // Text using 6 bit ascii
-        //    ais8_1_0_append_pydict(nmea_payload, dict);
+        //    ais8_1_0_append_pydict(nmea_payload, dict, pad);
         //    DictSafeSetItem(dict,"parsed",true);
         //    break;
 
@@ -585,92 +825,85 @@ ais8_to_pydict(const char *nmea_payload) {
         // 3 Capability interrogation.  Addressed only
         // 4. Capability reply to 3.  Addressed only
 
-
             //
             // IMO Circ 289
             //
+            // TODO: error checking
         case 11: // Met/Hydrogrolocal - not to be used after 1 Jan 2013
-            // FIX: add error checking
-            ais8_1_11_append_pydict(nmea_payload, dict);
+          ais8_1_11_append_pydict(nmea_payload, dict, pad);
             DictSafeSetItem(dict,"parsed",true);
             break;
-        //case 12: // Dangerous cargo indication - not to be used after 1 Jan 2013
-        //    ais8_1_12_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
-        //case 13: // Fairway closed - not to be used after 1 Jan 2013
-        //    ais8_1_13_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
-        //case 14: // Tidal window - not to be used after 1 Jan 2013
-        //    ais8_1_14_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
-        //case 15: // Extended ship static and voyage related data - not to be used after 1 Jan 2013
-        //    ais8_1_15_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+            // 12 is an ABM
+        case 13: // Fairway closed - not to be used after 1 Jan 2013
+          ais8_1_13_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
+          // No 14
+        case 15: // Extended ship static and voyage related data - not to be used after 1 Jan 2013
+          ais8_1_15_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
             // 16 has conflicting definition in the old 1371-1: VTS targets
-        //case 16: // Number of persons on board - not to be used after 1 Jan 2013
-        //    ais8_1_16_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+        case 16: // Number of persons on board - not to be used after 1 Jan 2013
+          ais8_1_16_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
             // 17 has conflicting definition in 1371-1: IFM 17: Ship waypoints (WP) and/or route plan report
-        //case 17: // VTS-generated/synthetic targets - not to be used after 1 Jan 2013
-        //    ais8_1_17_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+        case 17: // VTS-generated/synthetic targets - not to be used after 1 Jan 2013
+          ais8_1_17_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
 
-            // 1371-1 conflict: IFM 18: Advice of waypoints (AWP) and/or route plan of VTS
-        //case 18: // Clearance type to enter port
-        //    ais8_1_18_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+          // No 18
 
             // ITU 1371-1 conflict: IFM 19: Extended ship static and voyage related data
-        //case 19: // Marine traffic signal
-        //    ais8_1_19_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+        case 19: // Marine traffic signal
+          ais8_1_19_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
         //case 20: // Berthing data
-        //    ais8_1_20_append_pydict(nmea_payload, dict);
+        //    ais8_1_20_append_pydict(nmea_payload, dict, pad);
         //    DictSafeSetItem(dict,"parsed",true);
         //    break;
-        //case 21: // Weather obs report from ship
-        //    ais8_1_21_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+        case 21: // Weather obs report from ship
+          ais8_1_21_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
         case 22: // Area notice
-            ais8_1_22_append_pydict(nmea_payload, dict);
+            ais8_1_22_append_pydict(nmea_payload, dict, pad);
             DictSafeSetItem(dict,"parsed",true);
             break;
 
         // 23 is ADDRESSED ONLY
 
-        //case 24: //
-        //    ais8_1_24_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+        case 24: // Extended ship static and voyage-related
+          ais8_1_24_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
         //case 25: //
-        //    ais8_1_25_append_pydict(nmea_payload, dict);
+        //    ais8_1_25_append_pydict(nmea_payload, dict, pad);
         //    DictSafeSetItem(dict,"parsed",true);
         //    break;
-        //case 26: //
-        //    ais8_1_26_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
-        //case 27: //
-        //    ais8_1_27_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+        //case 26: // Env Sensor Report
+        //  ais8_1_26_append_pydict(nmea_payload, dict, pad);
+        //  DictSafeSetItem(dict,"parsed",true);
+        //  break;
+        case 27: //
+          ais8_1_27_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
         //case 28: //
-        //    ais8_1_28_append_pydict(nmea_payload, dict);
+        //    ais8_1_28_append_pydict(nmea_payload, dict, pad);
         //    DictSafeSetItem(dict,"parsed",true);
         //    break;
-        //case 29: //
-        //    ais8_1_29_append_pydict(nmea_payload, dict);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+        case 29: // IMO Circ 289 Text description
+          ais8_1_29_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
+        case 31: // IMO Circ 289 Meteorological and Hydrographic data
+          ais8_1_31_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
 
 
             // ITU 1371-1 only: 3.10 - IFM 40: Number of persons on board
@@ -687,7 +920,7 @@ ais8_to_pydict(const char *nmea_payload) {
         DictSafeSetItem(dict,"parsed",false);
         // cout << "Ais8: can't handle dac " << msg.dac << endl;
     }
-
+    // TODO: cehck for error here?
     return dict;
 }
 
@@ -1394,10 +1627,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case '6': // 6 - Addressed binary message
-        {
-          //const size_t pad = 0; // TODO: must pass in the correct pad
-          result = ais6_to_pydict(nmea_payload);  // TODO: handle payloads
-        }
+        result = ais6_to_pydict(nmea_payload, pad);
         break;
 
     case '7': // FALLTHROUGH - 7 - ACK for addressed binary message
@@ -1406,10 +1636,7 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case '8': // 8 - Binary broadcast message (BBM)
-        {
-          //const size_t pad = 0; // TODO: must pass in the correct pad
-          result = ais8_to_pydict(nmea_payload);  // TODO: handle more payloads
-        }
+        result = ais8_to_pydict(nmea_payload, pad);
         break;
 
     case '9': // 9 - SAR Position

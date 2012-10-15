@@ -62,8 +62,8 @@ void Ais8::print() {
 
 
 //////////////////////////////////////////////////////////////////////
-Ais8_1_11::Ais8_1_11(const char *nmea_payload) {
-    assert(nmea_payload);
+Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) {
+    assert(nmea_payload);  assert(0 <= pad && pad <= 7);
     init();
     //CHECKPOINT;
 

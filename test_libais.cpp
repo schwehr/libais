@@ -83,7 +83,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         int i=0;
         // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
         {
-            Ais8_1_11 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P"); i++;
+          Ais8_1_11 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P", 2); i++;
             if (!msg.had_error()) msg.print();
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n";
@@ -458,7 +458,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
 
             std::cout << "\n\nPoint: ****\n";
-            Ais8_001_22 msg("81mg=5@0EP:0>H0007P>0<D1<qp400000");
+            Ais8_001_22 msg("81mg=5@0EP:0>H0007P>0<D1<qp400000", 0);
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
@@ -475,7 +475,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
              */
 
             std::cout << "\n\nCircle: ****\n";
-            Ais8_001_22 msg("81mg=5@0EP:0>H0007PN0<D1<wg46b000");
+            Ais8_001_22 msg("81mg=5@0EP:0>H0007PN0<D1<wg46b000", 0);
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
@@ -504,7 +504,7 @@ AreaNotice: type=3  start=2011-07-06 05:31:00  duration=60 m  link_id=10  sub-ar
              */
 
             std::cout << "\n\nRect: ****\n";
-            Ais8_001_22 msg("81mg=5@0EP:1fHcp07Qf0<D1=;Lt:0`00");
+          Ais8_001_22 msg("81mg=5@0EP:1fHcp07Qf0<D1=;Lt:0`00", 0);
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
@@ -519,7 +519,7 @@ AreaNotice: type=4  start=2011-07-06 12:49:00  duration=60 m  link_id=10  sub-ar
 
              */
             std::cout << "\n\nSECTOR: ****\n";
-            Ais8_001_22 msg("81mg=5@0EP:2>IV807R>0<D1=ACtvP1@j");
+          Ais8_001_22 msg("81mg=5@0EP:2>IV807R>0<D1=ACtvP1@j", 0);
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
@@ -536,7 +536,7 @@ AreaNotice: type=5  start=2011-07-06 15:01:00  duration=60 m  link_id=10  sub-ar
 norm: !AIVDM,1,1,,A,81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`01J000,3*61,rUNKNOWN,1296942146
              */
             std::cout << "\n\n: ****\n";
-            Ais8_001_22 msg("81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`01J000");
+          Ais8_001_22 msg("81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`01J000", 3);
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
@@ -555,7 +555,7 @@ norm: !AIVDM,1,1,,A,81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000,3*70,rUNKNO
 
              */
             std::cout << "\n\n: Polygon - Triangle****\n";
-            Ais8_001_22 msg("81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000");
+          Ais8_001_22 msg("81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000", 3);
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
@@ -574,7 +574,7 @@ AreaNotice: type=7  start=2011-07-06 23:59:00  duration=60 m  link_id=10  sub-ar
 
              */
             std::cout << "\n\nText: ****\n";
-            Ais8_001_22 msg("81mg=5@0EP:3fJwH07P>0<D1=Rpt00000`c21P9h:Q9qh000");
+          Ais8_001_22 msg("81mg=5@0EP:3fJwH07P>0<D1=Rpt00000`c21P9h:Q9qh000", 3);
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
