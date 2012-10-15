@@ -82,7 +82,7 @@ SRCS += ais23.cpp
 SRCS += ais24.cpp
 SRCS += ais25.cpp
 SRCS += ais26.cpp
-#SRCS += ais27.cpp
+SRCS += ais27.cpp
 #SRCS += ais28.cpp
 OBJS := ${SRCS:.cpp=.o}
 
