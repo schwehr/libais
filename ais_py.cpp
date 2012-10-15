@@ -495,25 +495,29 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
         case 20: //
           ais6_1_20_append_pydict(nmea_payload, dict, pad);
           break;
-        // 2
-        // 2
-        // 2
-        // 2
+        // 21
+        // 22
+        // 23
+        // 24
         case 25: //
           ais6_1_25_append_pydict(nmea_payload, dict, pad);
           break;
-        // 2
-        // 2
-        // 2
-        // 2
-        // 30
+        // 26
+        // 27
+        // case 28: // Route Addressed
+        //   ais6_1_28_append_pydict(nmea_payload, dict, pad);
+        //   break;
+        // 29
+        // case 30: // TODO: Text Addressed
+        //   ais6_1_30_append_pydict(nmea_payload, dict, pad);
+        //   break;
         // 31
         case 32: //
           ais6_1_32_append_pydict(nmea_payload, dict, pad);
           break;
         }
       default:
-        //DictSafeSetItem(dict,"parsed",false);
+        DictSafeSetItem(dict,"not_parsed", true);
         ;
     }
     return dict;
@@ -626,8 +630,20 @@ void
 ais8_1_13_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_13 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+  DictSafeSetItem(dict, "reason", msg.reason);
+  DictSafeSetItem(dict, "location_from", msg.location_from);
+  DictSafeSetItem(dict, "location_to", msg.location_to);
+  DictSafeSetItem(dict, "radius", msg.radius);
+  DictSafeSetItem(dict, "units", msg.units);
+  DictSafeSetItem(dict, "day_from", msg.day_from);
+  DictSafeSetItem(dict, "month_from", msg.month_from);
+  DictSafeSetItem(dict, "hour_from", msg.hour_from);
+  DictSafeSetItem(dict, "minute_from", msg.minute_from);
+  DictSafeSetItem(dict, "day_to", msg.day_to);
+  DictSafeSetItem(dict, "month_to", msg.month_to);
+  DictSafeSetItem(dict, "hour_to", msg.hour_to);
+  DictSafeSetItem(dict, "minute_to", msg.minute_to);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
 }
 
   // 14 is addressed
@@ -636,16 +652,16 @@ void
 ais8_1_15_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_15 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+  DictSafeSetItem(dict, "air_draught", msg.air_draught);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
 }
 
 void
 ais8_1_16_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_16 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+  DictSafeSetItem(dict, "persons", msg.persons);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
 }
 
 
@@ -653,8 +669,22 @@ void
 ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_17 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+  // std::vector<Ais8_1_17_Target> targets;
+  PyObject *target_list = PyList_New(msg.targets.size());
+  for (size_t target_num=0; target_num < msg.targets.size(); target_num++) {
+    PyObject *target = PyDict_New();
+    DictSafeSetItem(target, "type", msg.targets[target_num].type);
+    DictSafeSetItem(target, "id", msg.targets[target_num].id);
+    DictSafeSetItem(target, "spare", msg.targets[target_num].spare);
+    DictSafeSetItem(target, "x", msg.targets[target_num].x);
+    DictSafeSetItem(target, "y", msg.targets[target_num].y);
+    DictSafeSetItem(target, "cog", msg.targets[target_num].cog);
+    DictSafeSetItem(target, "timestamp", msg.targets[target_num].timestamp);
+    DictSafeSetItem(target, "sog", msg.targets[target_num].sog);
+    PyList_SetItem(target_list, target_num, target);
+  }
+  PyDict_SetItem(dict, PyUnicode_FromString("targets"), target_list);
+
 }
 
   // 18 is addressed
@@ -663,8 +693,19 @@ void
 ais8_1_19_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_19 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+  DictSafeSetItem(dict, "link_id", msg.link_id);
+  DictSafeSetItem(dict, "name", msg.name);
+  DictSafeSetItem(dict, "x", msg.x);
+  DictSafeSetItem(dict, "y", msg.y);
+  DictSafeSetItem(dict, "status", msg.status);
+  DictSafeSetItem(dict, "signal", msg.signal);
+  DictSafeSetItem(dict, "utc_hour_next", msg.utc_hour_next);
+  DictSafeSetItem(dict, "utc_min_next", msg.utc_min_next);
+  DictSafeSetItem(dict, "next_signal", msg.next_signal);
+  DictSafeSetItem(dict, "spare2_0", msg.spare2[0]);
+  DictSafeSetItem(dict, "spare2_1", msg.spare2[1]);
+  DictSafeSetItem(dict, "spare2_2", msg.spare2[2]);
+  DictSafeSetItem(dict, "spare2_3", msg.spare2[3]);
 }
 
   // 20 is addressed
@@ -673,8 +714,79 @@ void
 ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_21 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+
+  DictSafeSetItem(dict, "x", msg.x);
+  DictSafeSetItem(dict, "y", msg.y);
+  DictSafeSetItem(dict, "utc_month", msg.utc_month);
+  DictSafeSetItem(dict, "utc_day", msg.utc_day);
+  DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
+  DictSafeSetItem(dict, "utc_min", msg.utc_min);
+
+  if (0==msg.type_wx_report) {
+    // WX obs from ship
+    DictSafeSetItem(dict, "location", msg.location);
+    DictSafeSetItem(dict, "wx", msg.wx[0]); // TODO Rename present?
+    DictSafeSetItem(dict, "horz_viz", msg.horz_viz);
+    DictSafeSetItem(dict, "humidity", msg.humidity);
+    DictSafeSetItem(dict, "wind_speed", msg.wind_speed);
+    DictSafeSetItem(dict, "wind_dir", msg.wind_dir);
+    DictSafeSetItem(dict, "pressure", msg.pressure);
+    DictSafeSetItem(dict, "pressure_tendency", msg.pressure_tendency);
+    DictSafeSetItem(dict, "air_temp", msg.air_temp);
+    DictSafeSetItem(dict, "water_temp", msg.water_temp);
+    DictSafeSetItem(dict, "wave_period", msg.wave_period);
+    DictSafeSetItem(dict, "wave_height", msg.wave_height);
+    DictSafeSetItem(dict, "wave_dir", msg.wave_dir);
+    DictSafeSetItem(dict, "swell_height", msg.swell_height);
+    DictSafeSetItem(dict, "swell_dir", msg.swell_dir);
+    DictSafeSetItem(dict, "swell_period", msg.swell_period);
+    DictSafeSetItem(dict, "spare2", msg.spare2);
+  } else {
+    // type == 1
+    // PAIN IN THE ASS WMO OBS from ship
+    DictSafeSetItem(dict, "cog", msg.cog);
+    DictSafeSetItem(dict, "sog", msg.sog);
+    DictSafeSetItem(dict, "heading", msg.heading);
+    DictSafeSetItem(dict, "pressure", msg.pressure);
+    DictSafeSetItem(dict, "rel_pressure", msg.rel_pressure);
+    DictSafeSetItem(dict, "pressure_tendency", msg.pressure_tendency);
+    DictSafeSetItem(dict, "wind_dir", msg.wind_dir);
+    DictSafeSetItem(dict, "wind_speed_ms", msg.wind_speed_ms);
+    DictSafeSetItem(dict, "wind_dir_rel", msg.wind_dir_rel);
+    DictSafeSetItem(dict, "wind_speed_rel", msg.wind_speed_rel);
+    DictSafeSetItem(dict, "wind_gust_speed", msg.wind_gust_speed);
+    DictSafeSetItem(dict, "wind_gust_dir", msg.wind_gust_dir);
+    DictSafeSetItem(dict, "air_temp_raw", msg.air_temp_raw);
+    DictSafeSetItem(dict, "humidity", msg.humidity);
+    DictSafeSetItem(dict, "water_temp_raw", msg.water_temp_raw);
+    DictSafeSetItem(dict, "horz_viz", msg.horz_viz);
+    DictSafeSetItem(dict, "wx", msg.wx[0]);
+    DictSafeSetItem(dict, "wx_next1", msg.wx[1]);
+    DictSafeSetItem(dict, "wx_next2", msg.wx[2]);
+    DictSafeSetItem(dict, "cloud_total", msg.cloud_total);
+    DictSafeSetItem(dict, "cloud_low", msg.cloud_low);
+    DictSafeSetItem(dict, "cloud_low_type", msg.cloud_low_type);
+    DictSafeSetItem(dict, "cloud_middle_type", msg.cloud_middle_type);
+    DictSafeSetItem(dict, "cloud_high_type", msg.cloud_high_type);
+    DictSafeSetItem(dict, "alt_lowest_cloud_base", msg.alt_lowest_cloud_base);
+    DictSafeSetItem(dict, "wave_period", msg.wave_period);
+    DictSafeSetItem(dict, "wave_height", msg.wave_height);
+    DictSafeSetItem(dict, "swell_dir", msg.swell_dir);
+    DictSafeSetItem(dict, "swell_period", msg.swell_period);
+    DictSafeSetItem(dict, "swell_height", msg.swell_height);
+    DictSafeSetItem(dict, "swell_dir_2", msg.swell_dir_2);
+    DictSafeSetItem(dict, "swell_period_2", msg.swell_period_2);
+    DictSafeSetItem(dict, "swell_height_2", msg.swell_height_2);
+    DictSafeSetItem(dict, "ice_thickness", msg.ice_thickness);
+    DictSafeSetItem(dict, "ice_accretion", msg.ice_accretion);
+    DictSafeSetItem(dict, "ice_accretion_cause", msg.ice_accretion_cause);
+    DictSafeSetItem(dict, "sea_ice_concentration", msg.sea_ice_concentration);
+    DictSafeSetItem(dict, "amt_type_ice", msg.amt_type_ice);
+    DictSafeSetItem(dict, "ice_situation", msg.ice_situation);
+    DictSafeSetItem(dict, "ice_devel", msg.ice_devel);
+    DictSafeSetItem(dict, "bearing_ice_edge", msg.bearing_ice_edge);
+  }
+
 }
 
 
@@ -838,8 +950,36 @@ void
 ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_24 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+  DictSafeSetItem(dict, "link_id", msg.link_id);
+  DictSafeSetItem(dict, "air_draught", msg.air_draught);
+  DictSafeSetItem(dict, "last_port", msg.last_port);
+
+  PyObject *port_list = PyList_New(2);
+  PyObject *port0=PyUnicode_FromString(msg.next_ports[0].c_str());
+  PyObject *port1=PyUnicode_FromString(msg.next_ports[0].c_str());
+  // TODO: Make sure this is correct reference counts
+  PyList_SetItem(port_list, 0, port0); Py_DECREF(port0);
+  PyList_SetItem(port_list, 1, port1); Py_DECREF(port1);
+
+  //int solas_status[26];
+  PyObject *solas_list = PyList_New(26);
+  for(size_t solas_num=0; solas_num<26; solas_num++) {
+    PyObject *solas = PyInt_FromLong(msg.solas_status[solas_num]);
+    PyList_SetItem(solas_list, solas_num, solas);
+  }
+  DictSafeSetItem(dict, "solas", solas_list);
+  DictSafeSetItem(dict, "'ice_class", msg.ice_class);
+  DictSafeSetItem(dict, "shaft_power", msg.shaft_power);
+  DictSafeSetItem(dict, "vhf", msg.vhf);
+  DictSafeSetItem(dict, "lloyds_ship_type", msg.lloyds_ship_type);
+  DictSafeSetItem(dict, "gross_tonnage", msg.gross_tonnage);
+  DictSafeSetItem(dict, "laden_ballast", msg.laden_ballast);
+  DictSafeSetItem(dict, "heavy_oil", msg.heavy_oil);
+  DictSafeSetItem(dict, "light_oil", msg.light_oil);
+  DictSafeSetItem(dict, "diesel", msg.diesel);
+  DictSafeSetItem(dict, "bunker_oil", msg.bunker_oil);
+  DictSafeSetItem(dict, "persons", msg.persons);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
 }
 
   // no 25 broadcast
@@ -848,16 +988,34 @@ void
 ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_26 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+
+  //std::vector<Ais8_1_26_SensorReport> reports;
+
+  std::cerr << "TODO: Implement the huge 8_1_26 env message";
 }
 
 void
 ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_27 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+  DictSafeSetItem(dict, "link_id", msg.link_id);
+  DictSafeSetItem(dict, "sender_type", msg.sender_type);
+  DictSafeSetItem(dict, "route_type", msg.route_type);
+  DictSafeSetItem(dict, "utc_month", msg.utc_month);
+  DictSafeSetItem(dict, "utc_day", msg.utc_day);
+  DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
+  DictSafeSetItem(dict, "utc_min", msg.utc_min);
+  DictSafeSetItem(dict, "duration", msg.duration);
+
+  PyObject *waypoint_list = PyList_New(msg.waypoints.size());
+  for(size_t waypoint_num=0; waypoint_num < msg.waypoints.size(); waypoint_num++ ) {
+    PyObject *waypoint = PyList_New(2);
+    PyList_SetItem(waypoint, 0, PyFloat_FromDouble(msg.waypoints[waypoint_num].x)); // TODO: Py_DECREF(); ?
+    PyList_SetItem(waypoint, 1, PyFloat_FromDouble(msg.waypoints[waypoint_num].y)); // TODO: Py_DECREF(); ?
+    PyList_SetItem(waypoint_list, waypoint_num, waypoint);
+  }
+  PyDict_SetItem(dict, PyUnicode_FromString("waypoints"), waypoint_list);
+
 }
 
   // no 28 broadcast
@@ -866,10 +1024,10 @@ void
 ais8_1_29_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_29 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
-}
 
+  DictSafeSetItem(dict, "link_id", msg.link_id);
+  DictSafeSetItem(dict, "text", msg.text);
+}
 
   // no 30 broadcast
 
@@ -877,8 +1035,48 @@ void
 ais8_1_31_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_31 msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
+
+  DictSafeSetItem(dict, "x", msg.x);
+  DictSafeSetItem(dict, "y", msg.y);
+  DictSafeSetItem(dict, "position_accuracy", msg.position_accuracy);
+  DictSafeSetItem(dict, "utc_day", msg.utc_day);
+  DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
+  DictSafeSetItem(dict, "utc_min", msg.utc_min);
+  DictSafeSetItem(dict, "wind_ave", msg.wind_ave);
+  DictSafeSetItem(dict, "wind_gust", msg.wind_gust);
+  DictSafeSetItem(dict, "wind_dir", msg.wind_dir);
+  DictSafeSetItem(dict, "wind_gust_dir", msg.wind_gust_dir);
+  DictSafeSetItem(dict, "air_temp", msg.air_temp);
+  DictSafeSetItem(dict, "rel_humid", msg.rel_humid);
+  DictSafeSetItem(dict, "dew_point", msg.dew_point);
+  DictSafeSetItem(dict, "air_pres", msg.air_pres);
+  DictSafeSetItem(dict, "air_pres_trend", msg.air_pres_trend);
+  DictSafeSetItem(dict, "horz_vis", msg.horz_vis);
+  DictSafeSetItem(dict, "water_level", msg.water_level);
+  DictSafeSetItem(dict, "water_level_trend", msg.water_level_trend);
+
+  // TODO: make this a list of dicts
+  DictSafeSetItem(dict, "surf_cur_speed", msg.surf_cur_speed);
+  DictSafeSetItem(dict, "surf_cur_dir", msg.surf_cur_dir);
+  DictSafeSetItem(dict, "cur_speed_2", msg.cur_speed_2);
+  DictSafeSetItem(dict, "cur_dir_2", msg.cur_dir_2);
+  DictSafeSetItem(dict, "cur_depth_2", msg.cur_depth_2);
+  DictSafeSetItem(dict, "cur_speed_3", msg.cur_speed_3);
+  DictSafeSetItem(dict, "cur_dir_3", msg.cur_dir_3);
+  DictSafeSetItem(dict, "cur_depth_3", msg.cur_depth_3);
+
+  DictSafeSetItem(dict, "wave_height", msg.wave_height);
+  DictSafeSetItem(dict, "wave_period", msg.wave_period);
+  DictSafeSetItem(dict, "wave_dir", msg.wave_dir);
+  DictSafeSetItem(dict, "swell_height", msg.swell_height);
+  DictSafeSetItem(dict, "swell_period", msg.swell_period);
+  DictSafeSetItem(dict, "swell_dir", msg.swell_dir);
+  DictSafeSetItem(dict, "sea_state", msg.sea_state);
+  DictSafeSetItem(dict, "water_temp", msg.water_temp);
+  DictSafeSetItem(dict, "precip_type", msg.precip_type);
+  DictSafeSetItem(dict, "salinity", msg.salinity);
+  DictSafeSetItem(dict, "ice", msg.ice);
+
 }
 
   // no 32 broadcast
