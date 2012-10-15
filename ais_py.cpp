@@ -289,38 +289,104 @@ ais6_1__to_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
 
 void
 ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-    assert(nmea_payload); assert(0 <= pad && pad <= 7); // TODO: check for error
-    Ais6_1_12 msg(nmea_payload, pad);
-    //assert(false);
-    std::cerr << "TODO: implment" << std::endl;
+  assert(nmea_payload); assert(0 <= pad && pad <= 7); // TODO: check for error
+  Ais6_1_12 msg(nmea_payload, pad);
+  DictSafeSetItem(dict, "last_port", msg.last_port);
+  DictSafeSetItem(dict, "utc_month_dep", msg.utc_month_dep); // actual time of departure
+  DictSafeSetItem(dict, "utc_day_dep", msg.utc_day_dep);
+  DictSafeSetItem(dict, "utc_hour_dep", msg.utc_hour_dep);
+  DictSafeSetItem(dict, "utc_min_dep", msg.utc_min_dep);
+  DictSafeSetItem(dict, "next_port", msg.next_port);
+  DictSafeSetItem(dict, "utc_month_next", msg.utc_month_next); // estimated arrival
+  DictSafeSetItem(dict, "utc_day_next", msg.utc_day_next);
+  DictSafeSetItem(dict, "utc_hour_next", msg.utc_hour_next);
+  DictSafeSetItem(dict, "utc_min_next", msg.utc_min_next);
+  DictSafeSetItem(dict, "main_danger", msg.main_danger);
+  DictSafeSetItem(dict, "imo_cat", msg.imo_cat);
+  DictSafeSetItem(dict, "un", msg.un);
+  DictSafeSetItem(dict, "value", msg.value); // UNIT???
+  DictSafeSetItem(dict, "value_unit", msg.value_unit);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
 }
 
-  // 13
+// 6_1_13
 
 void
 ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-    assert(nmea_payload); assert(0 <= pad && pad <= 7);
-    Ais6_1_14 msg(nmea_payload, pad); // TODO: check for error
-    // TODO - implement
-    std::cerr << "TODO: implment" << std::endl;
+  assert(nmea_payload); assert(0 <= pad && pad <= 7);
+  Ais6_1_14 msg(nmea_payload, pad); // TODO: check for error
+
+  DictSafeSetItem(dict, "utc_month", msg.utc_month);
+  DictSafeSetItem(dict, "utc_day", msg.utc_day);
+
+  if (!msg.windows.size()) return;  // TODO: is this an error?
+
+  PyObject *window_list = PyList_New(msg.windows.size());
+  for(size_t w_num=0; w_num < msg.windows.size(); w_num++) {
+    PyObject *window = PyDict_New();
+    DictSafeSetItem(window, "y", msg.windows[w_num].x);
+    DictSafeSetItem(window, "x", msg.windows[w_num].y);  // yes, bits are lat, lon
+    DictSafeSetItem(window, "utc_hour_from", msg.windows[w_num].utc_hour_from);
+    DictSafeSetItem(window, "utc_min_from", msg.windows[w_num].utc_min_from);
+    DictSafeSetItem(window, "utc_hour_to", msg.windows[w_num].utc_hour_to);
+    DictSafeSetItem(window, "utc_min_to", msg.windows[w_num].utc_min_to);
+    DictSafeSetItem(window, "cur_dir", msg.windows[w_num].cur_dir);
+    DictSafeSetItem(window, "cur_speed", msg.windows[w_num].cur_speed);
+    PyList_SetItem(window_list, w_num, window);
+  }
+  PyDict_SetItem(dict, PyUnicode_FromString("windows"), window_list);
+
 }
+
+// 6_1_15
+// 6_1_16
+// 6_1_17
+
 
 void
 ais6_1_18_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-    assert(nmea_payload); assert(0 <= pad && pad <= 7);
-    Ais6_1_18 msg(nmea_payload, pad);  // TODO: check for error
-    // TODO - implement
-    std::cerr << "TODO: implment" << std::endl;
+  assert(nmea_payload); assert(0 <= pad && pad <= 7);
+  Ais6_1_18 msg(nmea_payload, pad);  // TODO: check for error
+
+  DictSafeSetItem(dict, "link_id", msg.link_id);
+  DictSafeSetItem(dict, "utc_month", msg.utc_month);
+  DictSafeSetItem(dict, "utc_day", msg.utc_day);
+  DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
+  DictSafeSetItem(dict, "utc_min", msg.utc_min);
+  DictSafeSetItem(dict, "port_berth", msg.port_berth);
+  DictSafeSetItem(dict, "dest", msg.dest);
+  DictSafeSetItem(dict, "x", msg.x);
+  DictSafeSetItem(dict, "y", msg.y);
+  DictSafeSetItem(dict, "spare2_0", msg.spare2[0]);
+  DictSafeSetItem(dict, "spare2_1", msg.spare2[1]);
 }
 
   // 6_1_19
 
 void
 ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-    assert(nmea_payload); assert(0 <= pad && pad <= 7);
-    Ais6_1_20 msg(nmea_payload, pad);  // TODO: check for error
-    // TODO - implement
-    std::cerr << "TODO: implment" << std::endl;
+  assert(nmea_payload); assert(0 <= pad && pad <= 7);
+  Ais6_1_20 msg(nmea_payload, pad);  // TODO: check for error
+
+  DictSafeSetItem(dict, "link_id", msg.link_id);
+  DictSafeSetItem(dict, "length", msg.length);
+  DictSafeSetItem(dict, "depth", msg.depth);
+  DictSafeSetItem(dict, "position", msg.position);
+  DictSafeSetItem(dict, "utc_month", msg.utc_month);
+  DictSafeSetItem(dict, "utc_day", msg.utc_day);
+  DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
+  DictSafeSetItem(dict, "utc_min", msg.utc_min);
+  if (msg.services_known) {
+    PyObject *serv_list = PyList_New(26);
+    for(size_t serv_num=0; serv_num<26; serv_num++) {
+      PyObject *serv = PyInt_FromLong(msg.services[serv_num]);
+      PyList_SetItem(serv_list, serv_num, serv);
+    }
+    DictSafeSetItem(dict, "services", serv_list);
+  }
+  DictSafeSetItem(dict, "name", msg.name);
+  DictSafeSetItem(dict, "x", msg.x);
+  DictSafeSetItem(dict, "y", msg.y);
 }
 
   // 6_1_21
@@ -330,25 +396,58 @@ ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 void
 ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-    assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-    Ais6_1_25 msg(nmea_payload, pad);  // TODO: check for error
-    // TODO - implement
-    std::cerr << "TODO: implment" << std::endl;
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais6_1_25 msg(nmea_payload, pad);  // TODO: check for error
+  DictSafeSetItem(dict, "amount_unit", msg.amount_unit);
+  DictSafeSetItem(dict, "amount", msg.amount);
+
+  if (0==msg.cargos.size()) return; // TODO: is this an error?
+
+  PyObject *cargo_list = PyList_New(msg.cargos.size());
+  for(size_t cargo_num=0; cargo_num < msg.cargos.size(); cargo_num++ ) {
+    PyObject *cargo_dict = PyDict_New();
+    if (msg.cargos[cargo_num].imdg_valid) DictSafeSetItem(cargo_dict, "imdg", msg.cargos[cargo_num].imdg);
+    if (msg.cargos[cargo_num].spare_valid) DictSafeSetItem(cargo_dict, "spare", msg.cargos[cargo_num].spare);
+    if (msg.cargos[cargo_num].un_valid) DictSafeSetItem(cargo_dict, "un", msg.cargos[cargo_num].un);
+    if (msg.cargos[cargo_num].bc_valid) DictSafeSetItem(cargo_dict, "bc", msg.cargos[cargo_num].bc);
+    if (msg.cargos[cargo_num].marpol_oil_valid) DictSafeSetItem(cargo_dict, "marpol_oil", msg.cargos[cargo_num].marpol_oil);
+    if (msg.cargos[cargo_num].marpol_cat_valid) DictSafeSetItem(cargo_dict, "marpol_cat", msg.cargos[cargo_num].marpol_cat);
+    PyList_SetItem(cargo_list, cargo_num, cargo_dict);
+  }
+  PyDict_SetItem(dict, PyUnicode_FromString("cargos"), cargo_list);
 }
 
   // 6_1_26
   // 6_1_27
-  // 6_1_28
+  // 6_1_28 - TODO: Route Addressed - clone from 8_1_27
   // 6_1_29
-  // 6_1_30
+  // 6_1_30 - TODO: Text Addressed
   // 6_1_31
 
 void
 ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-    assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-    Ais6_1_32 msg(nmea_payload, pad);  // TODO: check for error
-    // TODO - implement
-    std::cerr << "TODO: implment" << std::endl;
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais6_1_32 msg(nmea_payload, pad);  // TODO: check for error
+
+  DictSafeSetItem(dict, "utc_month", msg.utc_month);
+  DictSafeSetItem(dict, "utc_day", msg.utc_day);
+
+  //std::vector<Ais6_1_32_Window> windows;
+  PyObject *window_list = PyList_New(msg.windows.size());
+  for(size_t window_num=0; window_num < msg.windows.size(); window_num++ ) {
+    PyObject *window_dict = PyDict_New();
+    DictSafeSetItem(window_dict, "x", msg.windows[window_num].x);
+    DictSafeSetItem(window_dict, "y", msg.windows[window_num].y);
+    DictSafeSetItem(window_dict, "from_utc_hour", msg.windows[window_num].from_utc_hour);
+    DictSafeSetItem(window_dict, "from_utc_min", msg.windows[window_num].from_utc_min);
+    DictSafeSetItem(window_dict, "to_utc_hour", msg.windows[window_num].to_utc_hour);
+    DictSafeSetItem(window_dict, "to_utc_min", msg.windows[window_num].to_utc_min);
+    DictSafeSetItem(window_dict, "cur_dir", msg.windows[window_num].cur_dir);
+    DictSafeSetItem(window_dict, "cur_speed", msg.windows[window_num].cur_speed);
+    PyList_SetItem(window_list, window_num, window_dict);
+  }
+  PyDict_SetItem(dict, PyUnicode_FromString("windows"), window_list);
+
 }
 
 
