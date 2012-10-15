@@ -453,7 +453,7 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad=0) {
     swell_height = ubits(bs, 334, 8) / 10.; // m
     swell_dir = ubits(bs, 342, 9);
     swell_period = ubits(bs, 351, 6); // s
-    spare = ubits(bs, 357, 3);
+    spare2 = ubits(bs, 357, 3);
   } else {
     // type == 1
     // PAIN IN THE ASS WMO OBS from ship
