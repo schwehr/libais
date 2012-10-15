@@ -8,7 +8,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
     const size_t comm_flag_offset = num_bits - 20;
-    const int num_char = std::strlen(nmea_payload);
+    // const int num_char = std::strlen(nmea_payload);
 
     if (52 < num_bits || num_bits> 1064) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
