@@ -170,7 +170,8 @@ public:
 
     std::vector<Ais8_001_22_SubArea *> sub_areas;
 
-  Ais8_001_22(const char *nmea_payload, const size_t pad);
+    /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
+    Ais8_001_22(const char *nmea_payload, const size_t pad);
     ~Ais8_001_22();
     void print();
 
