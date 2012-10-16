@@ -77,7 +77,10 @@ public:
     //AisMsg() {init();}
 //protected:
     void init() {
-        //std::cout << "AisMsg_init: setting ok" << std::endl;
+#ifndef AIS_INIT_NOCHECK
+        if(!nmea_ord_initialized)
+            build_nmea_lookup();
+#endif
         status = AIS_OK;
 #ifndef NDEBUG
         // FIX: should we be setting these?  The individual messages need to do this.
