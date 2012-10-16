@@ -45,11 +45,11 @@ const string nth_field(const string &str, const size_t n, const char c) {
 }
 #endif
 
-TEST(EmptyTest, Empty) {
+TEST(ais8dac001fi22, Empty) {
     // FIX: test the empty string case.  What should it do?
 }
 
-TEST(HelperTest, Helper) {
+TEST(ais8dac001fi22, Helper) {
     // Does nth_field work right?
     const string msg_str = "!AIVDM,1,1,,A,81mg=5@0EP:0>H0007P>0<D1<qp400000,0*1D";
     const string body(nth_field(msg_str,5,','));
@@ -58,14 +58,14 @@ TEST(HelperTest, Helper) {
 }
 
 // This is really not working right.  What is going on?
-TEST(PointTest, Point) {
+TEST(ais8dac001fi22, Point) {
     build_nmea_lookup();
 
     // AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
     const string msg_str = "!AIVDM,1,1,,A,81mg=5@0EP:0>H0007P>0<D1<qp400000,0*1D";
     const string body(nth_field(msg_str,5,','));
     //cout << "body: " << body << endl;
-    Ais8_001_22 msg(body.c_str());
+    Ais8_001_22 msg(body.c_str(),0);
     ASSERT_EQ(AIS_OK, msg.get_error());
     //cout << "msg8_1_22: " << endl;
     //msg.print();
