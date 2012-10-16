@@ -262,6 +262,7 @@ class Ais6_1_12 : public Ais6 {
   int value_unit;
   int spare2;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais6_1_12(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -283,6 +284,7 @@ class Ais6_1_14 : public Ais6 {
   int utc_month, utc_day;
   std::vector<Ais6_1_14_Window> windows;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais6_1_14(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -298,6 +300,7 @@ class Ais6_1_18 : public Ais6 {
   float x, y;
   int spare2[2]; // 32 bits per spare
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais6_1_18(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -319,6 +322,7 @@ class Ais6_1_20 : public Ais6 {
   float x, y;
   //int spare;  No bits?  WTF
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais6_1_20(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -351,6 +355,7 @@ class Ais6_1_25 : public Ais6 {
 
   std::vector<Ais6_1_25_Cargo> cargos;  // 0 to 17 cargo entries
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais6_1_25(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -367,6 +372,7 @@ class Ais6_1_28 : public Ais6 {
   int duration;
   std::vector<AisPoint> waypoints;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais6_1_28(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -379,6 +385,7 @@ class Ais6_1_30 : public Ais6 {
   int link_id;
   std::string text;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais6_1_30(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -404,6 +411,7 @@ class Ais6_1_32 : public Ais6 {
 
   std::vector<Ais6_1_32_Window> windows;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais6_1_32(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -508,6 +516,7 @@ class Ais8_1_13 : public Ais8 {
   int day_to, month_to, hour_to, minute_to;
   int spare2;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais8_1_13(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -532,6 +541,7 @@ class Ais8_1_16 : public Ais8 {
   int persons;
   int spare2;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais8_1_16(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -553,6 +563,7 @@ class Ais8_1_17 : public Ais8 {
  public:
   std::vector<Ais8_1_17_Target> targets;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais8_1_17(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -574,6 +585,7 @@ class Ais8_1_19 : public Ais8 {
   int next_signal;
   int spare2[4];  // Arrrrrr.  102 wasted bits that could be corrupted.
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais8_1_19(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -682,6 +694,7 @@ class Ais8_1_24 : public Ais8 {
   int persons;
   int spare2;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais8_1_24(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -900,6 +913,7 @@ class Ais8_1_26 : public Ais8 {
  public:
   std::vector<Ais8_1_26_SensorReport> reports;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais8_1_26(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -915,6 +929,7 @@ class Ais8_1_27 : public Ais8 {
   int duration;
   std::vector<AisPoint> waypoints;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais8_1_27(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -930,6 +945,7 @@ class Ais8_1_29 : public Ais8 {
   int link_id;
   std::string text;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais8_1_29(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -984,6 +1000,7 @@ class Ais8_1_31 : public Ais8 {
   int ice; // yes/no/undef/unknown
   int spare;
 
+  /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
   Ais8_1_31(const char *nmea_payload, const size_t pad);
   void print();
 };
@@ -1323,6 +1340,7 @@ public:
     // Extended name goes on the end of name
     int spare2;
 
+    /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
     Ais21(const char *nmea_payload, const size_t pad=0);
     void print();
 };
@@ -1467,6 +1485,7 @@ public:
     bool keep_flag;
     bool keep_flag_valid;
 
+    /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
     Ais26(const char *nmea_payload, const size_t pad=0);
     void print();
 };
@@ -1484,6 +1503,7 @@ public:
     bool gnss;  // warning: bits in AIS are flipped sense
     int spare;
 
+    /// @arg pad Padding bits, this is the last value before the checksum in the NMEA string.
     Ais27(const char *nmea_payload, const size_t pad=0);
     void print();
 };
