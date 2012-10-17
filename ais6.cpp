@@ -521,7 +521,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad=0) {
   // TODO: make sure the bits are a multiple of the size of cargos + header or padded to a slot boundary
   // Allowing a message with no payloads
   // TODO: (num_bits-100) % 17 != 0) is okay
-  if (100 < num_bits || num_bits > 576) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+  if (100 > num_bits || num_bits > 576) { status = AIS_ERR_BAD_BIT_COUNT; return; }
   if ( (num_bits - 100) % 17 != 0) { std::cerr << "6_1_25 not 17 aligned;";status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<576> bs;
