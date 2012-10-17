@@ -199,7 +199,7 @@ test2: ais1_2_3_unittest ais8_001_22_unittest
 
 FINK:=/sw32
 #LDFLAGS:=-L${FINK}/lib
-GTESTFLAGS := ${shell gtest-config --cppflags --cxxflags --ldflags --libs}
+#GTESTFLAGS := ${shell gtest-config --cppflags --cxxflags --ldflags --libs}
 ais8_001_22_unittest: ais8_001_22_unittest.cpp ais8_001_22.cpp ais.cpp ais8.cpp
 	${CXX} -m32 -g ${WARN} $^ -o $@ ${GTESTFLAGS} -lgtest_main -lpthread
 	./$@
