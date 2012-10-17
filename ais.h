@@ -1042,6 +1042,7 @@ class Ais8_1_29 : public Ais8 {
  public:
   int link_id;
   std::string text;
+  int spare2;
 
   Ais8_1_29(const char *nmea_payload, const size_t pad);
   void print();

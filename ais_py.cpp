@@ -648,6 +648,19 @@ ais7_13_to_pydict(const char *nmea_payload) {
     return dict;
 }
 
+
+void
+ais8_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+    assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+    Ais8_1_0 msg(nmea_payload, pad);
+    if (msg.had_error()) {std::cerr << "ais8_1_0 had an error\n"; return;} // TODO: better error handling
+    DictSafeSetItem(dict,"ack_required",  msg.ack_required);
+    DictSafeSetItem(dict,"msg_seq",  msg.msg_seq);
+    DictSafeSetItem(dict,"text", msg.text);
+    DictSafeSetItem(dict,"spare2", msg.spare2);
+}
+
+
 // 1 to 10 do not exist
 
     // FIX: add error checking
@@ -699,6 +712,7 @@ ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
     // Or could be spare
     DictSafeSetItem(dict,"ext_water_level", msg.extended_water_level);
+    DictSafeSetItem(dict,"spare2", msg.extended_water_level);
 }
 
 #if 0
@@ -847,6 +861,7 @@ ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
     DictSafeSetItem(dict, "humidity", msg.humidity);
     DictSafeSetItem(dict, "water_temp_raw", msg.water_temp_raw);
     DictSafeSetItem(dict, "horz_viz", msg.horz_viz);
+    // TODO: list?
     DictSafeSetItem(dict, "wx", msg.wx[0]);
     DictSafeSetItem(dict, "wx_next1", msg.wx[1]);
     DictSafeSetItem(dict, "wx_next2", msg.wx[2]);
@@ -1033,6 +1048,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
   // no 23 broadcast
 
+// IMO Circ 289 - Extended ship static and voyage-related
 void
 ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
@@ -1055,7 +1071,7 @@ ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
     PyList_SetItem(solas_list, solas_num, solas);
   }
   DictSafeSetItem(dict, "solas", solas_list);
-  DictSafeSetItem(dict, "'ice_class", msg.ice_class);
+  DictSafeSetItem(dict, "ice_class", msg.ice_class);
   DictSafeSetItem(dict, "shaft_power", msg.shaft_power);
   DictSafeSetItem(dict, "vhf", msg.vhf);
   DictSafeSetItem(dict, "lloyds_ship_type", msg.lloyds_ship_type);
@@ -1071,6 +1087,7 @@ ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
   // no 25 broadcast
 
+// IMO Circ 289 - Environmental
 void
 ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
@@ -1081,6 +1098,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   std::cerr << "TODO: Implement the huge 8_1_26 env message";
 }
 
+// IMO Circ 289 - Route information
 void
 ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
@@ -1107,6 +1125,7 @@ ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
   // no 28 broadcast
 
+// IMO Circ 289 - Text description
 void
 ais8_1_29_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
@@ -1190,6 +1209,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     DictSafeSetItem(dict,"fi", msg.fi);
     //DictSafeSetItem(dict,"parsed",false);
 
+    // TODO: better error handling
     switch (msg.dac) {
     case 1:  // IMO
         switch (msg.fi) {
@@ -1198,10 +1218,10 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
             // ITU-R.M.1371-3 IFM messages.  Annex 5, Section 5.  See IMO Circ 289 for recommended usage
             //
 
-        //case 0: // Text using 6 bit ascii
-        //    ais8_1_0_append_pydict(nmea_payload, dict, pad);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+        case 0: // Text using 6 bit ascii
+          ais8_1_0_append_pydict(nmea_payload, dict, pad);
+          DictSafeSetItem(dict,"parsed",true);
+          break;
 
         // 1 is listed in ITU 1371-1 as addressed only.  Not listed in 1371-3
         // 1 is "Application acknoldegement"
@@ -1219,11 +1239,13 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
             break;
             // 12 is an ABM
         case 13: // Fairway closed - not to be used after 1 Jan 2013
+          // TODO: untested - no messages found
           ais8_1_13_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict,"parsed",true);
           break;
           // No 14
         case 15: // Extended ship static and voyage related data - not to be used after 1 Jan 2013
+          // TODO: untested - no messages found
           ais8_1_15_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict,"parsed",true);
           break;
@@ -1234,6 +1256,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
           break;
             // 17 has conflicting definition in 1371-1: IFM 17: Ship waypoints (WP) and/or route plan report
         case 17: // VTS-generated/synthetic targets - not to be used after 1 Jan 2013
+          // TODO: untested - no messages found
           ais8_1_17_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict,"parsed",true);
           break;
@@ -1242,6 +1265,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
 
             // ITU 1371-1 conflict: IFM 19: Extended ship static and voyage related data
         case 19: // Marine traffic signal
+          // TODO: untested - no messages found
           ais8_1_19_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict,"parsed",true);
           break;
@@ -1250,6 +1274,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
         //    DictSafeSetItem(dict,"parsed",true);
         //    break;
         case 21: // Weather obs report from ship
+          // TODO: untested - no messages found
           ais8_1_21_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict,"parsed",true);
           break;
