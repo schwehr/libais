@@ -224,7 +224,7 @@ public:
 
     std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
 
-    Ais6(const char *nmea_payload);
+  Ais6(const char *nmea_payload, const size_t pad);
   //bool decode_header6(const std::bitset<MAX_BITS> &bs);
     void print();
 };
@@ -245,6 +245,82 @@ bool decode_header6(std::bitset<T> &bs, Ais6 &msg) {
   msg.fi = ubits(bs,82,6);
 }
 #endif
+
+// Text message - ITU 1371-1 - this is OLD
+class Ais6_1_0 : public Ais6 {
+ public:
+  bool ack_required;
+  int msg_seq;
+  std::string text;
+  int spare2;
+
+  Ais6_1_0(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_0 const& msg);
+
+// ITU 1371-1 - this is OLD
+class Ais6_1_1 : public Ais6 {
+ public:
+  int ack_dac;
+  int msg_seq;
+  int spare2;
+
+  Ais6_1_1(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_1 const& msg);
+
+
+// ITU 1371-1 - this is OLD
+class Ais6_1_2 : public Ais6 {
+ public:
+  int req_dac;
+  int req_fi;
+  //int spare2;
+
+  Ais6_1_2(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_2 const& msg);
+
+
+// capability interogation - ITU 1371-1 - this is OLD
+class Ais6_1_3 : public Ais6 {
+ public:
+  int req_dac;
+  int spare2;
+
+  Ais6_1_3(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_3 const& msg);
+
+
+// Capability interogation reply - ITU 1371-1 - this is OLD
+class Ais6_1_4 : public Ais6 {
+ public:
+  int ack_dac;
+  int capabilities[64];
+  int cap_reserved[64];
+  int spare2;
+
+  Ais6_1_4(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_4 const& msg);
+
+// Number of Persons ITU 1371-1 - this is OLD
+class Ais6_1_40 : public Ais6 {
+ public:
+  int persons;
+  int spare2;
+
+  Ais6_1_40(const char *nmea_payload, const size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais6_1_40 const& msg);
+
 
 // IMO Circ 236 Dangerous cargo indication - Not to be transmitted after 2012-Jan-01
 class Ais6_1_12 : public Ais6 {
@@ -448,6 +524,43 @@ public:
   void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
+
+// Text telegram ITU 1371-1 - this is OLD
+class Ais8_1_0 : public Ais8 {
+public:
+  bool ack_required;
+  int msg_seq;
+  std::string text;
+  int spare2;
+
+  Ais8_1_0(const char *nmea_payload, size_t pad);
+  void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_0 const& msg);
+
+// 8_1_1 No message
+// 8_1_2 No message
+// 8_1_3 No message
+// 8_1_4 No message
+
+// ITU 1371-1 - this is OLD
+// class Ais8_1_ : public Ais8 {
+// public:
+
+//   Ais8_1_(const char *nmea_payload, size_t pad);
+//     void print();
+// };
+// std::ostream& operator<< (std::ostream& o, Ais8_1_ const& msg);
+
+// Persons on board ITU 1371-1 - this is OLD
+class Ais8_1_40 : public Ais8 {
+public:
+  int persons;
+  int spare2;
+  Ais8_1_40(const char *nmea_payload, size_t pad);
+    void print();
+};
+std::ostream& operator<< (std::ostream& o, Ais8_1_40 const& msg);
 
 
 // IMO Circ 289 met hydro - Not to be transmitted after 2013-Jan-01
