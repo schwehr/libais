@@ -602,7 +602,8 @@ public:
     int precip_type;
     float salinity;
     int ice; // yes/no/undef/unknown
-    int extended_water_level; //spare;  // OHMEX uses this for extra water level precision
+    int spare2;
+  int extended_water_level; //spare;  // OHMEX uses this for extra water level precision
 
   Ais8_1_11(const char *nmea_payload, size_t pad);
     void print();
@@ -1096,12 +1097,93 @@ class Ais8_1_31 : public Ais8 {
   int precip_type;
   float salinity;
   int ice; // yes/no/undef/unknown
-  int spare;
+  int spare2;
 
   Ais8_1_31(const char *nmea_payload, const size_t pad);
   void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_31 const& msg);
+
+
+// ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+// Inland ship static and voyage related data
+class Ais8_200_10 : public Ais8 {
+ public:
+  std::string eu_id;  // European Vessel ID - 8 characters
+  float length, beam; // m
+  int ship_type;
+  int haz_cargo;
+  float draught;
+  int loaded;
+  int speed_qual, course_qual, heading_qual; // sensor quality;
+  int spare2;
+  Ais8_200_10(const char *nmea_payload, const size_t pad);
+  // void print();
+};
+// std::ostream& operator<< (std::ostream& o, Ais8_200_10 const& msg);
+
+  // 21 and 22 do not exist
+
+// ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+class Ais8_200_23 : public Ais8 {
+ public:
+  int utc_year_start, utc_month_start, utc_day_start;
+  int utc_year_end, utc_month_end, utc_day_end;
+  int utc_hour_start, utc_min_start;
+  int utc_hour_end, utc_min_end;
+  float x1,y1;
+  float x2,y2;
+  int type;
+  int min;
+  int max;
+  int classification;
+  int wind_dir; // EMMA CODE
+  int spare2;
+
+  Ais8_200_23(const char *nmea_payload, const size_t pad);
+  // void print();
+};
+// std::ostream& operator<< (std::ostream& o, Ais8_200_23 const& msg);
+
+// ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+// Water Level
+class Ais8_200_24 : public Ais8 {
+ public:
+  std::string country;
+  int guage_ids[4];
+  float levels[4]; // m
+  Ais8_200_24(const char *nmea_payload, const size_t pad);
+  // void print();
+};
+// std::ostream& operator<< (std::ostream& o, Ais8_200_24 const& msg);
+
+// ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+class Ais8_200_40 : public Ais8 {
+ public:
+  float x,y;
+  int form;
+  int dir; // degrees
+  int stream_dir;
+  int status_raw;
+  //int status[9];  // WTF is the encoding for this?
+  int spare2;
+  Ais8_200_40(const char *nmea_payload, const size_t pad);
+  // void print();
+};
+// std::ostream& operator<< (std::ostream& o, Ais8_200_40 const& msg);
+
+// ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+class Ais8_200_55 : public Ais8 {
+ public:
+  int crew;
+  int passengers;
+  int yet_more_personnel; // WTF?  Like a maid or waiter?
+  int spare2[3]; // JERKS... why 51 spare bits?
+  Ais8_200_55(const char *nmea_payload, const size_t pad);
+  // void print();
+};
+// std::ostream& operator<< (std::ostream& o, Ais8_200_55 const& msg);
+
 
 
 // New IMO Circ 289 Area notice broadcast is DAC 1, FI 22

@@ -107,7 +107,7 @@ void Ais8_1_0::print() {
 
 //////////////////////////////////////////////////////////////////////
 Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) {
-    assert(nmea_payload);  assert(0 <= pad && pad <= 7);
+    assert(nmea_payload);  assert(pad <= 7);
     init();
     //CHECKPOINT;
 
@@ -170,6 +170,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) {
     precip_type = ubits(bs,332,3);
     salinity = ubits(bs,335,9);
     ice = ubits(bs,344,2);
+    spare2 = ubits(bs,346,6); // FIX: how to treat this???
     extended_water_level = ubits(bs,346,6); // FIX: how to treat this???
 }
 
@@ -846,7 +847,7 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad=0) {
   precip_type = ubits(bs, 336, 3);
   salinity = ubits(bs, 339, 9) / 10.;
   ice = ubits(bs, 348, 2); // yes/no/undef/unknown
-  spare = ubits(bs, 350, 10);
+  spare2 = ubits(bs, 350, 10);
 }
 
 void Ais8_1_31::print() {
@@ -854,3 +855,244 @@ void Ais8_1_31::print() {
             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
   // TODO: implment
 }
+
+
+
+
+
+// TODO
+// void Ais8_200_::print() {
+//   std::cout << "BBM_ris_8_200__: " << message_id
+//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
+// }
+
+
+// River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
+// Inland ship static and voyage related data
+Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) {
+  assert(nmea_payload);
+  init();
+
+  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+  if (168 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+
+  std::bitset<168> bs;
+  status = aivdm_to_bits(bs, nmea_payload);
+  if (had_error()) return;  // checks status
+
+  message_id = ubits(bs, 0, 6);
+  if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  repeat_indicator = ubits(bs,6,2);
+  mmsi = ubits(bs,8,30);
+  spare = ubits(bs,38,2);  // TODO: has meaning?
+  dac = ubits(bs,40,10);
+  fi = ubits(bs,50,6);
+
+  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
+  if ( 1 != dac || 10 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+
+  eu_id = ais_str(bs, 56, 48);
+  length = ubits(bs, 104, 13) / 10.; // m
+  beam = ubits(bs, 117, 10) / 10.; // m
+  ship_type = ubits(bs, 127, 14);
+  haz_cargo = ubits(bs, 141, 3);
+  draught = ubits(bs, 144, 11) / 10.; // m
+  loaded = ubits(bs, 155, 2);
+  speed_qual = bs[157];
+  course_qual = bs[158];
+  heading_qual = bs[159];
+  spare2 = ubits(bs, 160, 8);
+}
+
+// TODO
+// void Ais8_200_::print() {
+//   std::cout << "BBM_ris_8_200_10_inland_ship_static: " << message_id
+//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
+// }
+
+
+// River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
+Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) {
+  assert(nmea_payload);
+  init();
+
+  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+
+  if (256 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+
+  std::bitset<256> bs;
+  status = aivdm_to_bits(bs, nmea_payload);
+  if (had_error()) return;  // checks status
+
+  message_id = ubits(bs, 0, 6);
+  if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  repeat_indicator = ubits(bs,6,2);
+  mmsi = ubits(bs,8,30);
+  spare = ubits(bs,38,2);  // TODO: has meaning?
+  dac = ubits(bs,40,10);
+  fi = ubits(bs,50,6);
+
+  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
+  if ( 1 != dac || 23 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+
+  // Ummm... who starts counting bits at 1, not zero?
+  utc_year_start = ubits(bs, 56, 9);
+  utc_month_start = ubits(bs, 65, 4);
+  utc_day_start = ubits(bs, 69, 4);  // ERROR: not enough bits to cover 1-31
+  utc_year_end = ubits(bs, 73, 9);
+  utc_month_end = ubits(bs, 82, 4);
+  utc_day_end = ubits(bs, 86, 4);  // ERROR: not enough bits to cover 1-31
+
+  utc_hour_start = ubits(bs, 90, 5);
+  utc_min_start = ubits(bs, 95, 6);
+  utc_hour_end = ubits(bs, 101, 5);
+  utc_min_end = ubits(bs, 106, 6);
+
+  x1 = sbits(bs, 112, 28) / 600000.;
+  y1 = sbits(bs, 140, 27) / 600000.;
+  x2 = sbits(bs, 167, 28) / 600000.;
+  y2 = sbits(bs, 195, 27) / 600000.;
+
+  type = ubits(bs, 222, 4);
+  min = ubits(bs, 226, 9);
+  max = ubits(bs, 235, 9);
+  classification = ubits(bs, 244, 2);
+  wind_dir = ubits(bs, 246, 4);
+  spare2 = ubits(bs, 250, 6);
+}
+
+// TODO
+// void Ais8_200_::print() {
+//   std::cout << "BBM_ris_8_200_23_: " << message_id
+//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
+// }
+
+
+// River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
+Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) {
+  assert(nmea_payload);
+  init();
+
+  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+
+  if (168 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+
+  std::bitset<168> bs;
+  status = aivdm_to_bits(bs, nmea_payload);
+  if (had_error()) return;  // checks status
+
+  message_id = ubits(bs, 0, 6);
+  if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  repeat_indicator = ubits(bs,6,2);
+  mmsi = ubits(bs,8,30);
+  spare = ubits(bs,38,2);  // TODO: has meaning?
+  dac = ubits(bs,40,10);
+  fi = ubits(bs,50,6);
+
+  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
+  if ( 1 != dac || 24 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  ais_str(bs, 56, 12);
+  for (size_t i=0; i < 4; i++) {
+    size_t start = 68 + 25*i;
+    guage_ids[i] = ubits(bs, start, 11);
+    const int sign = bs[start+11]?1:-1; // 0 negative, 1 pos
+    levels[i] = sign * ubits(bs, start+12, 13); // ERROR: the spec has a bit listing mistake
+  }
+}
+
+// TODO
+// void Ais8_200_24::print() {
+//   std::cout << "BBM_ris_8_200_24_: " << message_id
+//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
+// }
+
+
+// River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
+Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad) {
+  assert(nmea_payload);
+  init();
+
+  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+
+  if (168 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+
+  std::bitset<168> bs;
+  status = aivdm_to_bits(bs, nmea_payload);
+  if (had_error()) return;  // checks status
+
+  message_id = ubits(bs, 0, 6);
+  if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  repeat_indicator = ubits(bs,6,2);
+  mmsi = ubits(bs,8,30);
+  spare = ubits(bs,38,2);  // TODO: has meaning?
+  dac = ubits(bs,40,10);
+  fi = ubits(bs,50,6);
+
+  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
+  if ( 1 != dac || 40 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  x = sbits(bs, 56, 28) / 600000.;
+  y = sbits(bs, 84, 27) / 600000.;
+  form = ubits(bs, 111, 4);
+  dir = ubits(bs, 115, 9); // degrees
+  stream_dir = ubits(bs, 124, 3);
+  status_raw = ubits(bs, 127, 30);
+  // status[ ] = bite me;
+  spare2 = ubits(bs, 157, 11);
+}
+
+// TODO
+// void Ais8_200_::print() {
+//   std::cout << "BBM_ris_8_200__: " << message_id
+//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
+// }
+
+
+
+// River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
+Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad) {
+  assert(nmea_payload);
+  init();
+
+  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+
+  // TODO: what if people get smart and leave out the 51 spare bits?
+  if (168 != num_bits && 136 != num_bits && 88 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+
+  std::bitset<168> bs;
+  status = aivdm_to_bits(bs, nmea_payload);
+  if (had_error()) return;  // checks status
+
+  message_id = ubits(bs, 0, 6);
+  if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  repeat_indicator = ubits(bs,6,2);
+  mmsi = ubits(bs,8,30);
+  spare = ubits(bs,38,2);  // TODO: has meaning?
+  dac = ubits(bs,40,10);
+  fi = ubits(bs,50,6);
+
+  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
+  if ( 1 != dac || 55 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  crew = ubits(bs, 56, 8);
+  passengers = ubits(bs, 64, 13);
+  yet_more_personnel = ubits(bs, 77, 8);
+  if (88==num_bits) {
+    spare2[0] = ubits(bs, 85, 3);
+    spare2[1] = 0;
+    spare2[2] = 0;
+  } else if (136==num_bits) {
+    // as in the spec - maybe?
+    spare2[0] = ubits(bs, 85, 32);
+    spare2[1] = ubits(bs, 117, 32);
+    spare2[2] = ubits(bs, 149, 19);
+  } else {
+    spare2[0] = ubits(bs, 85, 32);
+    spare2[1] = ubits(bs, 117, 19);
+    spare2[2] = 0;
+  }
+}
+
+// TODO
+// void Ais8_200_::print() {
+//   std::cout << "BBM_ris_8_200__: " << message_id
+//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
+// }
