@@ -1115,7 +1115,7 @@ class Ais8_200_10 : public Ais8 {
   int haz_cargo;
   float draught;
   int loaded;
-  int speed_qual, course_qual, heading_qual; // sensor quality;
+  int speed_qual, course_qual, heading_qual; // sensor quality
   int spare2;
   Ais8_200_10(const char *nmea_payload, const size_t pad);
   // void print();

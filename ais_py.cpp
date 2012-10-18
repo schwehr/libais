@@ -1187,6 +1187,103 @@ ais8_1_31_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
   // no 32 broadcast
 
+
+// DAC 200 - River Information System
+void
+ais8_200_10_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_200_10 msg(nmea_payload, pad);
+  if (msg.had_error()) return;   // TODO: handle errors
+
+  DictSafeSetItem(dict, "eu_id", msg.eu_id);
+  DictSafeSetItem(dict, "length", msg.length);
+  DictSafeSetItem(dict, "beam", msg.beam);
+  DictSafeSetItem(dict, "ship_type", msg.ship_type);
+  DictSafeSetItem(dict, "haz_cargo", msg.haz_cargo);
+  DictSafeSetItem(dict, "draught", msg.draught);
+  DictSafeSetItem(dict, "loaded", msg.loaded);
+  DictSafeSetItem(dict, "speed_qual", msg.speed_qual);
+  DictSafeSetItem(dict, "course_qual", msg.course_qual);
+  DictSafeSetItem(dict, "heading_qual", msg.heading_qual);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
+}
+
+// River Information System
+void
+ais8_200_23_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_200_23 msg(nmea_payload, pad);
+  if (msg.had_error()) return;   // TODO: handle errors correctly
+
+  DictSafeSetItem(dict, "utc_year_start", msg.utc_year_start);
+  DictSafeSetItem(dict, "utc_month_start", msg.utc_month_start);
+  DictSafeSetItem(dict, "utc_day_start", msg.utc_day_start);
+  DictSafeSetItem(dict, "utc_year_end", msg.utc_year_end);
+  DictSafeSetItem(dict, "utc_month_end", msg.utc_month_end);
+  DictSafeSetItem(dict, "utc_day_end", msg.utc_day_end);
+  DictSafeSetItem(dict, "utc_hour_start", msg.utc_hour_start);
+  DictSafeSetItem(dict, "utc_min_start", msg.utc_min_start);
+  DictSafeSetItem(dict, "utc_hour_end", msg.utc_hour_end);
+  DictSafeSetItem(dict, "utc_min_end", msg.utc_min_end);
+  DictSafeSetItem(dict, "x1", msg.x1);
+  DictSafeSetItem(dict, "y1", msg.y1);
+  DictSafeSetItem(dict, "x2", msg.x2);
+  DictSafeSetItem(dict, "y2", msg.y2);
+  DictSafeSetItem(dict, "type", msg.type);
+  DictSafeSetItem(dict, "min", msg.min);
+  DictSafeSetItem(dict, "max", msg.max);
+  DictSafeSetItem(dict, "classification", msg.classification);
+  DictSafeSetItem(dict, "wind_dir", msg.wind_dir);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
+}
+
+// River Information System
+void
+ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_200_24 msg(nmea_payload, pad);
+  if (msg.had_error()) return;   // TODO: handle errors correctly
+  DictSafeSetItem(dict, "country", msg.country);
+  PyObject *id_list = PyList_New(4);
+  for (size_t i=0; i<4; i++) PyList_SetItem(id_list, 0,  PyInt_FromLong(msg.guage_ids[i]));
+  DictSafeSetItem(dict, "guage_ids", id_list);
+  PyObject *level_list = PyList_New(4);
+  for (size_t i=0; i<4; i++) PyList_SetItem(level_list, 0, PyFloat_FromDouble(msg.levels[i]));
+  DictSafeSetItem(dict, "levels", level_list);
+}
+
+// River Information System
+void
+ais8_200_40_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_200_40 msg(nmea_payload, pad);
+  if (msg.had_error()) return;   // TODO: handle errors correctly
+  DictSafeSetItem(dict, "x", msg.x);
+  DictSafeSetItem(dict, "y", msg.y);
+  DictSafeSetItem(dict, "form", msg.form);
+  DictSafeSetItem(dict, "dir", msg.dir);
+  DictSafeSetItem(dict, "stream_dir", msg.stream_dir);
+  DictSafeSetItem(dict, "status_raw", msg.status_raw);
+  // TODO: extract status components
+  DictSafeSetItem(dict, "spare2", msg.spare2);
+
+}
+
+// River Information System
+void
+ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  Ais8_200_55 msg(nmea_payload, pad);
+  if (msg.had_error()) return;   // TODO: handle errors correctly
+  DictSafeSetItem(dict, "crew", msg.crew);
+  DictSafeSetItem(dict, "passengers", msg.passengers);
+  DictSafeSetItem(dict, "yet_more_personnel", msg.yet_more_personnel);
+  PyObject *spare2_list = PyList_New(3);
+  for (size_t i=0; i<3; i++) PyList_SetItem(spare2_list, 0,  PyInt_FromLong(msg.spare2[i]));
+  DictSafeSetItem(dict, "spare2", spare2_list);
+}
+
+
     // AIS Binary broadcast messages.  There will be a huge number of subtypes
     // If we don't know how to decode it, just return the dac, fi
 PyObject*
