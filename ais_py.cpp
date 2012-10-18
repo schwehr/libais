@@ -1322,7 +1322,29 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
             break;
         }
         break;
+    case 200: // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
+      switch (msg.fi) {
+        case 10: // Inland ship static and voyage related data
+          ais8_200_10_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          break;
+          // 21: Addressed only
+          // 22: Addressed only
+        case 23: // EMMA warning
+          ais8_200_23_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          break;
+        case 24: // Water level
+          ais8_200_24_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          break;
+        case 40: // A-to-N Signal status
+          ais8_200_40_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          break;
+        case 55: // Inland number of persons on board - why do we need another damn message?
+          ais8_200_55_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          break;
+      }
+      break;
     case 366: // United states
+      // TODO: implement
         DictSafeSetItem(dict,"parsed",false);
         break;
     default:
