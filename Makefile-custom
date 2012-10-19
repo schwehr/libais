@@ -181,16 +181,17 @@ ais12.o: ais.h
 ais14.o: ais.h
 ais15.o: ais.h
 ais16.o: ais.h
-#ais17.o: ais.h
+ais17.o: ais.h
 ais18.o: ais.h
 ais19.o: ais.h
-#ais20.o: ais.h
+ais20.o: ais.h
 ais21.o: ais.h
-#ais22.o: ais.h
-#ais23.o: ais.h
+ais22.o: ais.h
+ais23.o: ais.h
 ais24.o: ais.h
-#ais25.o: ais.h
-#ais26.o: ais.h
+ais25.o: ais.h
+ais26.o: ais.h
+ais27.o: ais.h
 ais_py.o: ais.h
 test_libais.o: ais.h
 
