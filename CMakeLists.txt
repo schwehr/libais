@@ -25,24 +25,25 @@ set (SOURCES
     ais7_13
     ais8 ais8_001_22 ais8_366_22
     ais9
-    ais10
-    # See ais4_11
-    ais12
-    # See ais7_13
-    ais14
-    ais15
-    ais16
-    ais17
-    ais18
-    ais19
-    ais20
-    ais21
-    ais22
-    ais23
-    ais24
-    ais25
-    ais26
-    ais27
+    ais10 # :
+    # ais11 ; - See 4
+    ais12 # <
+    # ais13 = See 7
+    ais14 # >
+    ais15 # ?
+    ais16 # @
+    ais17 # A
+    ais18 # B
+    ais19 # C
+    ais20 # D
+    ais21 # E
+    ais22 # F
+    ais23 # G
+    ais24 # H
+    ais25 # I
+    ais26 # J
+    ais27 # K
+    # ais28 # L - Not yet defined
 )
 
 install(FILES ${HEADERS} DESTINATION include)
