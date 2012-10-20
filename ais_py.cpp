@@ -2126,13 +2126,14 @@ decode(PyObject *self, PyObject *args) {
     const char *nmea_payload;
     // TODO: what to do about if no pad bits?  Maybe warn and set to 0?
     if (!PyArg_ParseTuple(args, "si", &nmea_payload, &_pad)) {
+      std::cerr << "WARNING: Expected pad in decode.  Assuming 0.  Pad must be an integer.\n";
+      _pad = 0;
+      if (!PyArg_ParseTuple(args, "s", &nmea_payload)) {
         PyErr_Format(ais_py_exception, "ais.decode: expected string argument");
         return 0;
+      }
     }
     const size_t pad = _pad;
-    //cerr << "ppad: " << pad << " " << _pad << "\n";
-    //cerr << "decode nmea_payload: " << nmea_payload << "\n";
-
     PyObject *result=0;
 
     //
