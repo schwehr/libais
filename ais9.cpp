@@ -22,7 +22,7 @@ Ais9::Ais9(const char *nmea_payload) {
     alt = ubits(bs,38, 12);
     sog = ubits(bs,50,10) / 10.;
 
-    position_accuracy = ubits(bs,60,1);
+    position_accuracy = bs[60];
     x = sbits(bs, 61, 28) / 600000.;
     y = sbits(bs, 89, 27) / 600000.;
 

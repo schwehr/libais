@@ -43,8 +43,8 @@ Ais5::Ais5(const char *nmea_payload) {
     draught = ubits(bs, 294, 8) / 10.;
     destination = ais_str(bs, 302, 120);
     //cout << "destination:" << destination << endl;
-    dte = ubits(bs, 422, 1);
-    spare = ubits(bs, 423, 1);
+    dte = bs[422];
+    spare = bs[423];
 }
 
 void Ais5::print() {

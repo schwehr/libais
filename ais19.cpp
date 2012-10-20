@@ -20,7 +20,7 @@ Ais19::Ais19(const char *nmea_payload) {
     spare = ubits(bs,38,8);
     sog = ubits(bs,46,10) / 10.;
 
-    position_accuracy = ubits(bs,56,1);
+    position_accuracy = bs[56];
     x = sbits(bs, 57, 28) / 600000.;
     y = sbits(bs, 85, 27) / 600000.;
 

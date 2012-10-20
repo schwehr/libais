@@ -33,7 +33,7 @@ Ais4_11::Ais4_11(const char *nmea_payload) {
     minute = ubits(bs,66,6);
     second = ubits(bs,72,6);
 
-    position_accuracy = ubits(bs,78,1);
+    position_accuracy = bs[78];
     x = sbits(bs, 79, 28) / 600000.;
     y = sbits(bs, 107, 27) / 600000.;
 
