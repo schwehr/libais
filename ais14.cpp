@@ -2,6 +2,7 @@
 // Safety related broadcast message (SRBM)
 #include "ais.h"
 
+// TODO: pad
 Ais14::Ais14
 (const char *nmea_payload) {
     assert(nmea_payload);

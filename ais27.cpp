@@ -7,7 +7,6 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) {
     init();
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;  assert(96==num_bits);
-    //const int num_char = std::strlen(nmea_payload);
 
     if (96 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
@@ -33,7 +32,6 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) {
 
 
 void Ais27::print() {
-    //CHECKPOINT;
     std::cout << "K - 27 - Long-range AIS broadcast message" << message_id << "\n"
               << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n";
     // TODO: finish

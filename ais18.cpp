@@ -3,11 +3,7 @@
 
 #include "ais.h"
 
-//#include <iostream>
-//#include <bitset>
-//#include <string>
-//#include <cassert>
-
+// TODO: pad
 Ais18::Ais18(const char *nmea_payload) {
     assert(nmea_payload);
 
@@ -18,7 +14,7 @@ Ais18::Ais18(const char *nmea_payload) {
         return;
     }
 
-    std::bitset<168> bs; // 1 slot
+    std::bitset<168> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
@@ -47,12 +43,11 @@ Ais18::Ais18(const char *nmea_payload) {
     raim = bool(bs[147]);
     commstate_flag = bs[148];  // 0 SOTDMA, 1 ITDMA
 
-    // FIX: set all to -1 and set valids to NOT!
+    // TODO: set all to -1 and set valids to NOT!
 
     if (1 == unit_flag) {
         // CS - carrier sense - fixed commstate payload of 1100000000000000110
         int commstate = ubits(bs,149, 19);
-        //std::cout << "\tcs commstate: " << commstate << std::endl;
         if (393222 != commstate) {
             // FIX: is this the right value?
             // FIX: return an error?

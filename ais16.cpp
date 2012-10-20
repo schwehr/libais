@@ -2,7 +2,7 @@
 
 #include "ais.h"
 
-
+// TODO: pad
 Ais16::Ais16(const char *nmea_payload) {
     assert(nmea_payload);
     init();
@@ -12,7 +12,6 @@ Ais16::Ais16(const char *nmea_payload) {
     const int num_char = std::strlen(nmea_payload);
     if (num_char != 16 && num_char != 24 && num_char != 28) {
         status = AIS_ERR_BAD_BIT_COUNT;
-        //std::cerr << "num_char: " << num_char << std::endl;
         return;
     }
 

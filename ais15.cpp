@@ -2,6 +2,7 @@
 
 #include "ais.h"
 
+// TODO: pad
 Ais15::Ais15(const char *nmea_payload) {
     assert(nmea_payload);
     init();
@@ -12,7 +13,6 @@ Ais15::Ais15(const char *nmea_payload) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
     }
-    // expect 15, 18, or 27 characters
 
     std::bitset<162> bs; // 160 / 6 = 26.66
     status = aivdm_to_bits(bs, nmea_payload);

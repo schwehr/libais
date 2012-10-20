@@ -6,8 +6,8 @@
 #include <bitset>
 #include <string>
 #include <cassert>
-//#include <cmath>
 
+// TODO: pad
 Ais4_11::Ais4_11(const char *nmea_payload) {
     assert(nmea_payload);
     init();

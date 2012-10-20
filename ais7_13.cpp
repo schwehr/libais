@@ -7,12 +7,12 @@
 //#include <vector>
 //using namespace std;
 
+// TODO: pad
 Ais7_13::Ais7_13(const char *nmea_payload) {
     init();
 
     assert (nmea_payload);
     const size_t num_bits = strlen(nmea_payload) * 6;
-    //cout << "num_bits: " << num_bits << endl;
 
     if (! ((40+32*1)==num_bits or (40+32*2)==num_bits or (40+32*3)==num_bits or (40+32*4)==num_bits) ){
         status = AIS_ERR_BAD_BIT_COUNT;

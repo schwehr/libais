@@ -1,6 +1,7 @@
 // Msg 20 D - data link management
 #include "ais.h"
 
+// TODO: pad
 Ais20::Ais20(const char *nmea_payload) {
     assert(nmea_payload);
 
@@ -9,7 +10,6 @@ Ais20::Ais20(const char *nmea_payload) {
     const int num_char = std::strlen(nmea_payload);
     if (num_char != 12 and num_char != 18 and num_char != 23 and num_char != 27) {
         status = AIS_ERR_BAD_BIT_COUNT;
-        //std::cerr << "ERROR Ais20 num_char " << num_char << std::endl;
         return;
     }
 
@@ -25,7 +25,6 @@ Ais20::Ais20(const char *nmea_payload) {
     spare = ubits(bs,38,2);
 
     // TODO: make this an array of blocks with 4 element
-
     // TODO: Are the ever no blocks set????
 
     offset_1 = ubits(bs,40,12);

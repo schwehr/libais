@@ -1,14 +1,16 @@
 // Since 2010-May-05
 // Msg 19 C - Extended Class B equipment position report
+
 #include "ais.h"
 
+// TODO: pad
 Ais19::Ais19(const char *nmea_payload) {
     assert(nmea_payload);
 
     init();
     if (strlen(nmea_payload) != 52) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<312> bs; // 1 + a partial slot
+    std::bitset<312> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

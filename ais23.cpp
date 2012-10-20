@@ -1,6 +1,8 @@
 // Msg 23 - G - Channel Management
+
 #include "ais.h"
 
+// TODO: pad
 Ais23::Ais23(const char *nmea_payload) {
     assert(nmea_payload);
     init();
@@ -35,7 +37,6 @@ Ais23::Ais23(const char *nmea_payload) {
 
 
 void Ais23::print() {
-    //CHECKPOINT;
     std::cout << "Group assignment command: " << message_id << "\n"
               << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n";
     // TODO: finish

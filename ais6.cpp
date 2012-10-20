@@ -7,16 +7,10 @@
 
 Ais6::Ais6(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    //assert(nmea_ord_initialized); // Make sure we have the lookup table built
-
     init();
     const int payload_len = strlen(nmea_payload)*6 - 46; // in bits w/o DAC/FI
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-    //if (num_bits < 56) { status = AIS_ERR_BAD_BIT_COUNT; return; }
-    if (num_bits < 88) {
-      //std::cerr << "Msg 6 too short: " << num_bits << " '" << nmea_payload << "'\n";
-      status = AIS_ERR_BAD_BIT_COUNT; return;
-    }
+    if (num_bits < 88) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     if (payload_len < 0 or payload_len > 952) {
         status = AIS_ERR_BAD_BIT_COUNT;
@@ -27,7 +21,6 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) {
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
-    //if (!decode_header6(bs, this)) return; // side effect - sets status
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -38,8 +31,6 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) {
   spare = bs[71];
   dac = ubits(bs,72,10);
   fi = ubits(bs,82,6);
-
-  //std::cerr << "Ais6 constructor: dac=" << dac << " fi=" << fi << " payload: '" << nmea_payload << "'" << std::endl;
 
     // Handle all the byte aligned payload
     for (int i=0; i<payload_len/8; i++) {
@@ -54,24 +45,6 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) {
 }
 
 
-#if 0
-bool Ais6::decode_header6(const std::bitset<MAX_BITS> &bs) {
-    message_id = ubits(bs, 0, 6);
-    if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return false; }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
-    seq = ubits(bs,38,2);
-    mmsi_dest = ubits(bs, 40, 30);
-    retransmit = !bool(bs[70]);
-    spare = bs[71];
-    dac = ubits(bs,72,10);
-    fi = ubits(bs,82,6);
-
-
-    return true;
-}
-#endif
-
 void Ais6::print() {
     std::cout << "AIS_addressed_binary_message: " << message_id
               << "\tmmsi: " << mmsi << "\n"
@@ -80,7 +53,7 @@ void Ais6::print() {
               << "\tretransmit" << retransmit << "\n"
               << "\tspare" << spare << "\n"
               << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-    std::cout << "\tpayload: "; // << std::hex << std::uppercase; // << std::setfill('0') << std::setw(2) << "\n";
+    std::cout << "\tpayload: ";
     for (std::vector<unsigned char>::iterator i = payload.begin(); i != payload.end(); i++) {
         std::cout << std::hex <<std::setfill('0') << std::setw(2)<< int(*i);
     }
@@ -93,15 +66,13 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //std::cerr << "Ais6_1_0: " << num_bits << " " << nmea_payload << "\n";
 
   if (88 > num_bits || num_bits > 936) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
   std::bitset<1024> bs;  // TODO: what is the real max size?
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) { return; }  // checks status
+  if (had_error()) { return; }
 
-  //decode_header6(bs, this); // TODO:Correct cast?
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -142,9 +113,8 @@ Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<112> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header6(bs, this); // TODO:Correct cast?
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -178,9 +148,8 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<104> bs; // TODO: what is the real bit count?
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header6(bs, this); // TODO:Correct cast?
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -215,9 +184,8 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<104> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header6(bs, this); // TODO:Correct cast?
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -254,9 +222,8 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header6(bs, this); // TODO:Correct cast?
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -300,9 +267,8 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header6(bs, this); // TODO:Correct cast?
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -314,7 +280,6 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad=0) {
   dac = ubits(bs,72,10);
   fi = ubits(bs,82,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 12 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   assert(false); // TODO: add in the offset of the dest mmsi
@@ -375,7 +340,6 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad=0) {
   dac = ubits(bs,72,10);
   fi = ubits(bs,82,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 14 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   utc_month = ubits(bs, 88, 4);
@@ -431,7 +395,6 @@ Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad=0) {
   dac = ubits(bs,72,10);
   fi = ubits(bs,82,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 18 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   link_id = ubits(bs, 56+32, 10);
@@ -465,9 +428,8 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header6(bs);
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -479,7 +441,6 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad=0) {
   dac = ubits(bs,72,10);
   fi = ubits(bs,82,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 20 != fi ) { /*std::cerr << "6_1_20 error dac/fi\n";*/ status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   link_id = ubits(bs, 88, 10);
@@ -526,9 +487,8 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<576> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header6(bs);
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -541,12 +501,10 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad=0) {
   fi = ubits(bs,82,6);
 
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 25 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   amount_unit = ubits(bs, 88, 2);
   amount = ubits(bs, 90, 10);
-  //const size_t chunk = 17;  // 17 bits per cargo info
   const size_t total_cargos = int(floor((num_bits - 100) / 17.));
   for (size_t cargo_num=0; cargo_num < total_cargos; cargo_num++) {
     Ais6_1_25_Cargo cargo;
@@ -555,8 +513,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad=0) {
     cargo.imdg_valid = cargo.spare_valid = cargo.un_valid = cargo.bc_valid = cargo.marpol_oil_valid = cargo.marpol_cat_valid = false;
     // TODO: is this the correct behavior?
     switch(cargo.code_type) {
-      //case 0:
-      //  break;
+      // No 0
       case 1:  // IMDG Code in packed form
         cargo.imdg = ubits(bs, start+4, 7); cargo.imdg_valid = true;
         cargo.spare = ubits(bs, start+11, 6); cargo.spare_valid = true;
@@ -577,10 +534,8 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad=0) {
         cargo.marpol_cat = ubits(bs, start+4, 3); cargo.marpol_cat_valid = true;
         cargo.spare = ubits(bs, start+7, 10); cargo.spare_valid = true;
         break;
-      //case 6: // Rregional use
-        //break;
-      //case 7: // 7-15 reserved for future
-        //break;
+      // 6: Regional use
+      // 7: 7-15 reserved for future
       default:
           ; // Just push in an all blank record?
     }
@@ -606,16 +561,14 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   // TODO: might get messages with not all windows.  Might also get 360 bits
   if (350 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header6(bs);
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -627,7 +580,6 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad=0) {
   dac = ubits(bs,72,10);
   fi = ubits(bs,82,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 32 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   utc_month = ubits(bs, 88, 4);
@@ -666,9 +618,8 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<104> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header6(bs, this); // TODO:Correct cast?
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);

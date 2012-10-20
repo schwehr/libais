@@ -1,6 +1,8 @@
 // Msg 22 - F - Channel Management
+
 #include "ais.h"
 
+// TODO: pad
 Ais22::Ais22(const char *nmea_payload) {
     assert(nmea_payload);
     init();
@@ -13,7 +15,7 @@ Ais22::Ais22(const char *nmea_payload) {
     if (had_error()) return;
 
     message_id = ubits(bs, 0, 6);
-    if (message_id != 22) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
+    if (message_id != 22) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
     repeat_indicator = ubits(bs,6,2);
     mmsi = ubits(bs,8,30);
     spare = ubits(bs,38,2);
@@ -21,13 +23,13 @@ Ais22::Ais22(const char *nmea_payload) {
     chan_a = ubits(bs,40,12);
     chan_b = ubits(bs,52,12);
     txrx_mode = ubits(bs, 64, 4);
-    power_low = bool(bs[68]); // 0 = high
+    power_low = bool(bs[68]);
 
-    // WARNING: OUT OF ORDER
-    bool addressed = bool(bs[139]);  // TODO: check!
+    // WARNING: OUT OF ORDER DECODE
+    bool addressed = bool(bs[139]);
 
-    // if addressed false, then geographic position
     if (not(addressed)) {
+      // geographic position
       pos_valid = true;
       dest_valid = false;
       x1 = sbits(bs, 69, 28) / 600000.;
@@ -53,7 +55,6 @@ Ais22::Ais22(const char *nmea_payload) {
 
 
 void Ais22::print() {
-    //CHECKPOINT;
     std::cout << "Channel Management: " << message_id << "\n"
               << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n";
     // TODO: finish

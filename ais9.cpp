@@ -2,6 +2,7 @@
 
 #include "ais.h"
 
+// TODO: pad and numbits
 Ais9::Ais9(const char *nmea_payload) {
     assert(nmea_payload);
     init();
@@ -11,7 +12,7 @@ Ais9::Ais9(const char *nmea_payload) {
         return;
     }
 
-    std::bitset<168> bs; // 1 slot
+    std::bitset<168> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
@@ -30,9 +31,9 @@ Ais9::Ais9(const char *nmea_payload) {
     timestamp = ubits(bs, 128, 6);
     alt_sensor = int(bs[134]);
     spare = ubits(bs, 135, 7);
-    dte = int(bs[142]);
+    dte = bs[142];
     spare2 = ubits(bs, 143, 3);
-    assigned_mode = int(bs[146]);
+    assigned_mode = bs[146];
     raim = bool(bs[147]);
     commstate_flag = bs[148];  // 0 SOTDMA, 1 ITDMA
 

@@ -6,34 +6,31 @@
 #include <cmath>
 #include <iomanip>
 
+// TODO: pad
 Ais8::Ais8(const char *nmea_payload) {
     assert(nmea_payload);
-	assert(nmea_ord_initialized); // Make sure we have the lookup table built
+    assert(nmea_ord_initialized); // Make sure we have the lookup table built
     init();
     const int payload_len = strlen(nmea_payload)*6 - 46; // in bits w/o DAC/FI
-    //std::cout << "payload_len: " << strlen(nmea_payload) << " " << strlen(nmea_payload)*6 << " " << payload_len << " " << payload_len / 8 << "\n";
     if (payload_len < 0 or payload_len > 952) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
     }
 
-    std::bitset<MAX_BITS> bs;  // FIX: shouldn't this be a max of 1192?
+    std::bitset<MAX_BITS> bs;
     status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;  // checks status
+    if (had_error()) return;
 
-    if (!decode_header8(bs)) return; // side effect - sets status
+    if (!decode_header8(bs)) return;
 
     // Handle all the byte aligned payload
     for (int i=0; i<payload_len/8; i++) {
         const int start = 56+i*8;
-        //std::cout << "payload: " << i << " " << start <<"\n";
         payload.push_back(ubits(bs,start,8));
     }
-    const int remainder = payload_len % 8; // FIX: need to handle spare bits!!
-    //std::cout << "remainder: " << remainder << "\n";
+    const int remainder = payload_len % 8; // TODO: need to handle spare bits!!
     if (remainder > 0) {
         const int start = (payload_len/8) * 8;
-        //std::cout << "start: " << start <<"\n";
         payload.push_back(ubits(bs, start, remainder));
     }
 }
@@ -52,12 +49,11 @@ bool Ais8::decode_header8(const std::bitset<MAX_BITS> &bs) {
 void Ais8::print() {
     std::cout << "AIS_broadcast_binary_message: " << message_id
               << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-    std::cout << "\tpayload: "; // << std::hex << std::uppercase; // << std::setfill('0') << std::setw(2) << "\n";
+    std::cout << "\tpayload: ";
     for (std::vector<unsigned char>::iterator i = payload.begin(); i != payload.end(); i++) {
         std::cout << std::hex <<std::setfill('0') << std::setw(2)<< int(*i);
     }
     std::cout << std::dec << std::nouppercase << std::endl;
-    //std::cout << "test: " << 1 << " " << 255 << " " << std::hex << 255 << std::endl;
 }
 
 
@@ -66,12 +62,11 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  std::cerr << "Ais8_1_0: " << num_bits << " " << nmea_payload << "\n";
 
   if (56 > num_bits || num_bits > 1024) { return;  }
 
 
-  std::bitset<1024> bs;  // TODO: what is the real max size?
+  std::bitset<MAX_BITS> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) { return; }  // checks status
 
@@ -90,7 +85,6 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad=0) {
 
   const size_t text_size = 6 * ((num_bits - 68)/6);
   const size_t spare2_size = num_bits - 68 - text_size;  // wrong?  needs to land on 8-bit boundary
-  std::cerr << "text_size: " << text_size,
   text =  ais_str(bs,68,text_size);
 
   // TODO: Is this correct?
@@ -109,16 +103,13 @@ void Ais8_1_0::print() {
 Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);  assert(pad <= 7);
     init();
-    //CHECKPOINT;
 
     if (strlen(nmea_payload) != 59) {  status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
     std::bitset<354> bs;  // 352 + 2 spares to be 6 bit aligned
     status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;  // checks status
-    // CHECKPOINT;
+    if (had_error()) return;
 
-    //decode_header8(bs);
     message_id = ubits(bs, 0, 6);
     if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
     repeat_indicator = ubits(bs,6,2);
@@ -128,8 +119,6 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) {
     dac = ubits(bs,40,10);
     fi = ubits(bs,50,6);
 
-    //CHECKPOINT;
-    // FIX: if dac is not 001, it could still possibly be correct
     if ( 1 != dac || 11 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
     y = sbits(bs,56,24) / 60000.; // YES, lat is first
@@ -208,24 +197,21 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   if (472 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<472> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 13 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   reason = ais_str(bs, 56, 120);
@@ -233,7 +219,6 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad=0) {
   location_to = ais_str(bs, 296, 120);
   radius = ubits(bs, 416, 10);
   units = ubits(bs, 426, 2);
-  // utc?  warning: day/month out of order
   day_from = ubits(bs, 428, 5);
   month_from = ubits(bs, 433, 4);
   hour_from = ubits(bs, 437, 5);
@@ -262,24 +247,21 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   if (72 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<72> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //decode_header8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 15 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   air_draught = ubits(bs, 56, 11) / 10.;
@@ -302,25 +284,21 @@ Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   if (72 == num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<72> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  //header_decode8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 16 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   persons = ubits(bs, 56, 13);
@@ -342,7 +320,6 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   if (56 != num_bits && 176 != num_bits && 295 != num_bits && 416 != num_bits && 536 != num_bits) {
     status = AIS_ERR_BAD_BIT_COUNT; return;
@@ -350,19 +327,16 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<536> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  // decode_header8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 17 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   const size_t num_targets = (num_bits - 56) / 120;
@@ -396,26 +370,22 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
-  // I bet some people transmit without the idiodic spare padding
+  // Some people transmit without the idiodic spare padding
   if (258 != num_bits && 360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  // decode_header8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 19 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   link_id = ubits(bs, 56, 10);
@@ -444,7 +414,6 @@ void Ais8_1_19::print() {
 // No 8_1_20
 
 
-
 // IMO Circ 289 - Weather observation report from ship
 // See also Circ 236
 Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad=0) {
@@ -452,20 +421,18 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   if (360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  // decode_header8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
@@ -517,8 +484,6 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad=0) {
     rel_pressure = ubits(bs, 136, 10) / 10. -50;
     pressure_tendency = ubits(bs, 146, 4);
     wind_dir = ubits(bs, 150, 7) * 5;
-    // 6+2+30+2+16 +1 +16+15 +4+6+5+3+7+5+7+11+10+4+7 == 157
-
     wind_speed_ms = ubits(bs, 157, 8) * 0.5; // m/s
     wind_dir_rel = ubits(bs, 165, 7) * 5;
     wind_speed_rel= ubits(bs, 172, 8) * 0.5; // m/s
@@ -533,8 +498,6 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad=0) {
     wx[0] = ubits(bs, 227, 9); // current
     wx[1] = ubits(bs, 236, 5); // past 1
     wx[2] = ubits(bs, 241, 5); // past 2
-    // 6+2+30+2+16 +1 +16+15 +4+6+5+3+7+5+7+11+10+4+7 +8+7+8+8+7+10+7+9+6+9+5+5 == 246
-
     cloud_total = ubits(bs, 246, 4) * 10;
     cloud_low = ubits(bs, 250, 4);
     cloud_low_type = ubits(bs, 254, 6);
@@ -547,8 +510,6 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad=0) {
     swell_period = ubits(bs, 296, 5); // s
     swell_height = ubits(bs, 301, 6) * 0.5; // m
     swell_dir_2 = ubits(bs, 307, 6) * 10;
-    // 6+2+30+2+16 +1 +16+15 +4+6+5+3+7+5+7+11+10+4+7 +8+7+8+8+7+10+7+9+6+9+5+5 +4+4+6+6+6+7+5+6+6+5+6+6 == 313
-
     swell_period_2 = ubits(bs, 313, 5); // s
     swell_height_2 = ubits(bs, 318, 6) * 0.5; // m
     ice_thickness = ubits(bs, 324, 7) / 100.; // network is cm, storing m
@@ -559,11 +520,10 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad=0) {
     ice_situation = ubits(bs, 346, 5);
     ice_devel = ubits(bs, 351, 5);
     bearing_ice_edge = ubits(bs, 356, 4) * 45;
-    // 6+2+30+2+16 +1 +16+15 +4+6+5+3+7+5+7+11+10+4+7 +8+7+8+8+7+10+7+9+6+9+5+5 +4+4+6+6+6+7+5+6+6+5+6+6 +5+6+7+3+3+5+4+5+5+4 == 360
-
   }
 
 }
+
 
 void Ais8_1_21::print() {
   std::cout << "BBM_imo_8_1_21_Weather observation report from ship: " << message_id
@@ -580,25 +540,21 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   if (360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  // decode_header8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 24 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   link_id = ubits(bs, 56, 10);
@@ -607,7 +563,7 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad=0) {
   next_ports[0] = ais_str(bs, 109, 30);
   next_ports[1] = ais_str(bs, 139, 30);
 
-  // TODO enum list of param types
+  // TODO: enum list of param types
   // 0 NA, 1 operational, 2 SNAFU, 3 no data
   for (size_t equip_num=0; equip_num < 26; equip_num++) {
     solas_status[equip_num] = ubits(bs, 169 + 2 * equip_num, 2);
@@ -643,27 +599,22 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   // TODO: make sure the message is a multiple of waypoints or on slot boundaries
-
   if (56 > num_bits || num_bits > 1008) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<1008> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
-  // decode_header8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 26 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   // TODO: implement
@@ -685,24 +636,21 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   if (172 > num_bits || num_bits > 997) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<997> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  // decode_header8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 27 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   link_id = ubits(bs, 56, 10);
@@ -739,32 +687,26 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  std::cerr << "Ais8_1_29 bits: " << num_bits << "\n";
 
-  if (72 > num_bits || num_bits > 1032) { std::cerr << "A\n"; status = AIS_ERR_BAD_BIT_COUNT; return; }
+  if (72 > num_bits || num_bits > 1032) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<1032> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  // decode_header8(bs);
   message_id = ubits(bs, 0, 6);
-  if (8 != message_id) {std::cerr << "B\n";  status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  if (8 != message_id) {status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
-  if ( 1 != dac || 29 != fi ) { std::cerr << "C\n"; status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  if ( 1 != dac || 29 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   link_id = ubits(bs, 56, 10);
   size_t text_bits = num_bits - 66;
-  //if (text_bits % 6) std::cerr << "WARNING: unhandled spare bits" << std::endl;
   text = ais_str(bs, 66, text_bits);
-  //std::cerr << "Ais8_1_29: '" << text << "'\n";
   const size_t spare2_bits = text_bits % 6;
   if (spare2_bits) {
     const size_t start = 66+text_bits;
@@ -791,18 +733,16 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad=0) {
 
   std::bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
-  // decode_header8(bs);
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 31 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   x = sbits(bs,56,25) / 60000.;
@@ -857,16 +797,6 @@ void Ais8_1_31::print() {
 }
 
 
-
-
-
-// TODO
-// void Ais8_200_::print() {
-//   std::cout << "BBM_ris_8_200__: " << message_id
-//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-// }
-
-
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
 // Inland ship static and voyage related data
 Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) {
@@ -878,17 +808,16 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) {
 
   std::bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 10 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   eu_id = ais_str(bs, 56, 48);
@@ -904,12 +833,6 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) {
   spare2 = ubits(bs, 160, 8);
 }
 
-// TODO
-// void Ais8_200_::print() {
-//   std::cout << "BBM_ris_8_200_10_inland_ship_static: " << message_id
-//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-// }
-
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
 Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) {
@@ -922,20 +845,19 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) {
 
   std::bitset<256> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 23 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
-  // Ummm... who starts counting bits at 1, not zero?
+  // Ummm... who starts counting bits at 1, not zero?  Evil specification doc
   utc_year_start = ubits(bs, 56, 9);
   utc_month_start = ubits(bs, 65, 4);
   utc_day_start = ubits(bs, 69, 4);  // ERROR: not enough bits to cover 1-31
@@ -961,12 +883,6 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) {
   spare2 = ubits(bs, 250, 6);
 }
 
-// TODO
-// void Ais8_200_::print() {
-//   std::cout << "BBM_ris_8_200_23_: " << message_id
-//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-// }
-
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
 Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) {
@@ -979,18 +895,18 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) {
 
   std::bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 24 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+
   ais_str(bs, 56, 12);
   for (size_t i=0; i < 4; i++) {
     size_t start = 68 + 25*i;
@@ -999,12 +915,6 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) {
     levels[i] = sign * ubits(bs, start+12, 13); // ERROR: the spec has a bit listing mistake
   }
 }
-
-// TODO
-// void Ais8_200_24::print() {
-//   std::cout << "BBM_ris_8_200_24_: " << message_id
-//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-// }
 
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
@@ -1018,34 +928,27 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad) {
 
   std::bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 40 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+
   x = sbits(bs, 56, 28) / 600000.;
   y = sbits(bs, 84, 27) / 600000.;
   form = ubits(bs, 111, 4);
   dir = ubits(bs, 115, 9); // degrees
   stream_dir = ubits(bs, 124, 3);
   status_raw = ubits(bs, 127, 30);
-  // status[ ] = bite me;
+  // TODO: status[ ] = bite me;
   spare2 = ubits(bs, 157, 11);
 }
-
-// TODO
-// void Ais8_200_::print() {
-//   std::cout << "BBM_ris_8_200__: " << message_id
-//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-// }
-
 
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
@@ -1055,23 +958,24 @@ Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad) {
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  // TODO: what if people get smart and leave out the 51 spare bits?
+  // People might get smart and leave out the 51 spare bits
+  // TODO: do we have any cases of that?
   if (168 != num_bits && 136 != num_bits && 88 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;  // checks status
+  if (had_error()) return;
 
   message_id = ubits(bs, 0, 6);
   if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
   mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);  // TODO: has meaning?
+  spare = ubits(bs,38,2);
   dac = ubits(bs,40,10);
   fi = ubits(bs,50,6);
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 55 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+
   crew = ubits(bs, 56, 8);
   passengers = ubits(bs, 64, 13);
   yet_more_personnel = ubits(bs, 77, 8);
@@ -1091,8 +995,3 @@ Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad) {
   }
 }
 
-// TODO
-// void Ais8_200_::print() {
-//   std::cout << "BBM_ris_8_200__: " << message_id
-//             << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-// }

@@ -5,12 +5,13 @@
 
 #include "ais.h"
 
+// TODO: pad
 Ais24::Ais24(const char *nmea_payload) {
     assert (nmea_payload);
     init();
     const int num_bits = (strlen(nmea_payload) * 6);
-    // 160 + 2 spare for part A
     if (160 != num_bits && 168 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+
     std::bitset<168> bs;
 
     status = aivdm_to_bits(bs, nmea_payload);

@@ -138,12 +138,12 @@ const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = { // 128] = {
    "Undefined (default)" //, // 127
 };
 
+// TODO: pad
 Ais8_366_22::Ais8_366_22(const char *nmea_payload) {
     assert(nmea_payload);
     assert(strlen(nmea_payload) >= 28);
     init();
     const int num_bits = (strlen(nmea_payload) * 6);
-    // FIX: make the bit checks more exact
     if (208 <= num_bits && num_bits >= 1020) { status = AIS_ERR_BAD_BIT_COUNT; return; }
     std::bitset<MAX_BITS> bs;
 
@@ -151,8 +151,6 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload) {
     if (had_error()) return;
 
     if (!decode_header8(bs)) return;
-    assert(366==dac);
-    assert(22==fi);
     link_id = ubits(bs,56,10);
     notice_type = ubits(bs,66,7);
     month = ubits(bs,73,4);
@@ -163,14 +161,7 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload) {
     duration_minutes = ubits(bs,93,18);
 
     const int num_sub_areas = int( floor( (num_bits - 111)/90.) );
-    std::cout << "num_sub_areas: " << num_bits << " " << num_bits - 111
-         << " " << (num_bits - 111)/90.
-         << " " << floor( (num_bits - 111)/90.)
-         << " -> " << int( floor( (num_bits - 111)/90.) )
-              << " " << num_sub_areas
-              <<"\n";
     for (int sub_area_idx=0; sub_area_idx < num_sub_areas; sub_area_idx++) {
-        //const sub_area_
         Ais8_366_22_SubArea *sub_area = ais8_366_22_subarea_factory(bs, 111+90*sub_area_idx);
         if (sub_area) { sub_areas.push_back(sub_area); }
         else {
@@ -181,11 +172,9 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload) {
 }
 
 Ais8_366_22::~Ais8_366_22() {
-    std::cout << "Ais8_366_22: destructor" << std::endl;
     for (size_t i=0; i < sub_areas.size(); i++) {
         delete sub_areas[i];
     }
-    std::cout << "\n\n";
 }
 
 void
@@ -219,7 +208,6 @@ void Ais8_366_22_Circle::print() {
     else
         std::cout << "\t\tCircle: " << " " << x << " " << y << " radius_m: " << radius_m << std::endl;
 
-    //<< " precision FIX(!?!?) " << precision
 }
 
 Ais8_366_22_Rect::Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {

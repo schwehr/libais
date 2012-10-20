@@ -1,6 +1,8 @@
 // Msg 25 - I - Channel Management
+
 #include "ais.h"
 
+// TODO: pad
 Ais25::Ais25(const char *nmea_payload) {
     assert(nmea_payload);
     init();
@@ -38,12 +40,10 @@ Ais25::Ais25(const char *nmea_payload) {
 
       // TODO: deal with payload - probably need to pass in the spare bits
     }
-
 }
 
 
 void Ais25::print() {
-    //CHECKPOINT;
     std::cout << "Single slot binary message: " << message_id << "\n"
               << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n";
     // TODO: finish

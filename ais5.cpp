@@ -8,7 +8,7 @@
 //#include <cassert>
 //#include <cmath>
 
-
+// TODO: pad
 Ais5::Ais5(const char *nmea_payload) {
     assert(nmea_payload);
     init();

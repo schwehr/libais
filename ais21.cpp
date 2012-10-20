@@ -1,5 +1,6 @@
 // Since 2010-May-05
 // Msg 21 - ATON status
+
 #include "ais.h"
 
 Ais21::Ais21(const char *nmea_payload, const size_t pad) {
@@ -8,10 +9,10 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-    // 272-360 - FIX: make this more careful
+    // TODO: make this more careful than 272-360
     if (272 > num_bits || num_bits > 360) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<360> bs; // 360 % 6 == 0 -> 60 NMEA characters exactly
+    std::bitset<360> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

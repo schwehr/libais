@@ -1,6 +1,7 @@
 // Since 2010-May-14
 #include "ais.h"
 
+// TODO: pad
 Ais12::Ais12(const char *nmea_payload) {
     assert(nmea_payload);
     init();

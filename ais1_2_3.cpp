@@ -13,12 +13,12 @@ using namespace std;
 
 Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     assert(nmea_payload);
-    assert(nmea_ord_initialized); // Make sure we have the lookup table built
+    assert(nmea_ord_initialized);  // Make sure we have the lookup table built
     init();
 
     if (strlen(nmea_payload) != 168/6) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<168> bs; // 1 slot
+    std::bitset<168> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
@@ -32,9 +32,8 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     mmsi = ubits(bs,8,30);
     nav_status = ubits(bs,38,4);
 
-    /*const int*/ rot_raw = sbits(bs,42,8);
+    rot_raw = sbits(bs,42,8);
     rot_over_range = abs(rot_raw) > 126 ? true : false ;
-    //rot = 4.733 * sqrt(fabs(rot_raw));  // FIX: this was wrong... double check
     rot = pow( (rot_raw/4.733), 2 );
     if (rot_raw < 0) rot = -rot;
 
@@ -117,7 +116,6 @@ Ais1_2_3::print(bool verbose/*=false*/) {
     cout << "\tpos_acc: " << position_accuracy << endl;
     cout << "\tpos_x: " << x << endl;
     cout << "\tpos_y: " << y << endl;
-    //cout << "cog_raw: " << ubits(bs,116,12) << endl;
     cout << "\tcog: " << cog << endl;
     cout << "\ttrue_heading:" << true_heading << endl;
     cout << "\ttimestamp: " << timestamp << endl;

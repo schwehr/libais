@@ -2,7 +2,7 @@
 
 #include "ais.h"
 
-
+// TODO: pad
 Ais17::Ais17(const char *nmea_payload) {
     assert(nmea_payload);
     init();
@@ -34,5 +34,5 @@ Ais17::Ais17(const char *nmea_payload) {
       // No corrections
       return;
     }
-    //std::cerr << "TODO: unpack all the correction data messages" << std::endl;
+    // TODO: unpack all the correction data messages
 }

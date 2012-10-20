@@ -10,7 +10,7 @@
 #include <cstring>
 #include <string>
 
-#include <iostream> // for checkpoint
+#include <iostream>
 
 #define LIBAIS_VERSION_MAJOR 0
 #define LIBAIS_VERSION_MINOR 9
@@ -27,8 +27,6 @@ const std::string nth_field(const std::string &str, const size_t n, const char c
 extern bool nmea_ord_initialized; // If this is false, you need to call build_nmea_lookup.
 
 void build_nmea_lookup();
-
-//void aivdm_to_bits(bitset<168> &bits, const char *nmea_payload);
 
 enum AIS_STATUS {
     AIS_OK,
@@ -62,7 +60,7 @@ public:
     void init() {
         status = AIS_OK;
 #ifndef NDEBUG
-        // FIX: should we be setting these?  The individual messages need to do this.
+        // TODO: should we be setting these?  The individual messages need to do this.
         message_id = repeat_indicator = mmsi = -666;
 #endif
     }
@@ -206,8 +204,7 @@ public:
 
     std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
 
-  Ais6(const char *nmea_payload, const size_t pad);
-  //bool decode_header6(const std::bitset<MAX_BITS> &bs);
+    Ais6(const char *nmea_payload, const size_t pad);
     void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6 const& msg);
@@ -375,7 +372,6 @@ class Ais6_1_20 : public Ais6 {
   int services[26];
   std::string name;
   float x, y;
-  //int spare;  No bits?  WTF
 
   Ais6_1_20(const char *nmea_payload, const size_t pad);
   void print();
@@ -525,14 +521,6 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_0 const& msg);
 // 8_1_3 No message
 // 8_1_4 No message
 
-// ITU 1371-1 - this is OLD
-// class Ais8_1_ : public Ais8 {
-// public:
-
-//   Ais8_1_(const char *nmea_payload, size_t pad);
-//     void print();
-// };
-// std::ostream& operator<< (std::ostream& o, Ais8_1_ const& msg);
 
 // Persons on board ITU 1371-1 - this is OLD
 class Ais8_1_40 : public Ais8 {
@@ -585,7 +573,7 @@ public:
     float salinity;
     int ice; // yes/no/undef/unknown
     int spare2;
-  int extended_water_level; //spare;  // OHMEX uses this for extra water level precision
+    int extended_water_level; //spare;  // OHMEX uses this for extra water level precision
 
   Ais8_1_11(const char *nmea_payload, size_t pad);
     void print();
@@ -599,7 +587,7 @@ class Ais8_1_13 : public Ais8 {
   std::string reason, location_from, location_to;
   int radius;
   int units;
-  // utc?  warning: day/month out of order
+  // TODO: utc?  warning: day/month out of order
   int day_from, month_from, hour_from, minute_from;
   int day_to, month_to, hour_to, minute_to;
   int spare2;
@@ -765,7 +753,7 @@ class Ais8_1_24 : public Ais8 {
   float air_draught;  // m
   std::string last_port, next_ports[2];
 
-  // TODO enum list of param types
+  // TODO: enum list of param types
   int solas_status[26]; // 0 NA, 1 operational, 2 SNAFU, 3 no data
   int ice_class;
   int shaft_power; // horses
@@ -1100,9 +1088,7 @@ class Ais8_200_10 : public Ais8 {
   int speed_qual, course_qual, heading_qual; // sensor quality
   int spare2;
   Ais8_200_10(const char *nmea_payload, const size_t pad);
-  // void print();
 };
-// std::ostream& operator<< (std::ostream& o, Ais8_200_10 const& msg);
 
   // 21 and 22 do not exist
 
@@ -1123,9 +1109,7 @@ class Ais8_200_23 : public Ais8 {
   int spare2;
 
   Ais8_200_23(const char *nmea_payload, const size_t pad);
-  // void print();
 };
-// std::ostream& operator<< (std::ostream& o, Ais8_200_23 const& msg);
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
 // Water Level
@@ -1135,9 +1119,7 @@ class Ais8_200_24 : public Ais8 {
   int guage_ids[4];
   float levels[4]; // m
   Ais8_200_24(const char *nmea_payload, const size_t pad);
-  // void print();
 };
-// std::ostream& operator<< (std::ostream& o, Ais8_200_24 const& msg);
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
 class Ais8_200_40 : public Ais8 {
@@ -1147,12 +1129,10 @@ class Ais8_200_40 : public Ais8 {
   int dir; // degrees
   int stream_dir;
   int status_raw;
-  //int status[9];  // WTF is the encoding for this?
+  // TODO: int status[9];  // WTF is the encoding for this?
   int spare2;
   Ais8_200_40(const char *nmea_payload, const size_t pad);
-  // void print();
 };
-// std::ostream& operator<< (std::ostream& o, Ais8_200_40 const& msg);
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
 class Ais8_200_55 : public Ais8 {
@@ -1162,10 +1142,7 @@ class Ais8_200_55 : public Ais8 {
   int yet_more_personnel; // WTF?  Like a maid or waiter?
   int spare2[3]; // JERKS... why 51 spare bits?
   Ais8_200_55(const char *nmea_payload, const size_t pad);
-  // void print();
 };
-// std::ostream& operator<< (std::ostream& o, Ais8_200_55 const& msg);
-
 
 
 // New IMO Circ 289 Area notice broadcast is DAC 1, FI 22
@@ -1584,12 +1561,11 @@ std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 // 'I' - Single slot binary message - addressed or broadcast - TODO: handle payload
 class Ais25 : public AisMsg {
 public:
-  //bool addressed; // broadcast if false - destination indicator
     bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
 
     bool dest_mmsi_valid;
     int dest_mmsi; // only valid if addressed
-    //std::vector<unsigned char> payload; // If unstructured.  Yuck.
+    // TODO: std::vector<unsigned char> payload; // If unstructured.  Yuck.
 
     int dac; // valid it use_app_id
     int fi;
@@ -1611,7 +1587,7 @@ public:
     int dac; // valid it use_app_id
     int fi;
 
-    //std::vector<unsigned char> payload; // If unstructured.  Yuck.
+    // TODO: std::vector<unsigned char> payload; // If unstructured.  Yuck.
 
     int commstate_flag; // 0 - SOTDMA, 1 - TDMA
 
@@ -1676,7 +1652,6 @@ extern std::bitset<6> nmea_ord[128];
 template<size_t T>
 AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
     assert(nmea_payload);
-    //assert(nmea_ord_initialized);
     if (strlen(nmea_payload) > T/6) {
 #ifndef NDEBUG
         std::cerr << "ERROR: message longer than max allowed size (" << T/6 << "): found "
@@ -1685,11 +1660,9 @@ AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
 #endif
         return AIS_ERR_MSG_TOO_LONG;
     }
-    //assert (strlen(nmea_payload) <= T/6 );
     for (size_t char_idx=0; nmea_payload[char_idx] != '\0' && char_idx < T/6; char_idx++) {
         int c = int(nmea_payload[char_idx]);
         if (c<48 or c>119 or (c>=88 and c<=95) ) {
-            //std::cout << "bad character: '" << nmea_payload[char_idx] << "' " << c << std::endl;
             return AIS_ERR_BAD_NMEA_CHR;
         }
         const std::bitset<6> bs_for_char = nmea_ord[ c ];
@@ -1739,7 +1712,6 @@ const std::string ais_str(const std::bitset<T> &bits, const size_t start, const 
     assert (len % 6 == 0);
     const size_t num_char = len / 6;
     std::string result(num_char, '@');
-    //cout << "str: " << T << " " << start << " " << len << " " << num_char << " " << result << endl;
     for (size_t char_idx=0; char_idx < num_char; char_idx++) {
         const int char_num = ubits(bits, start+char_idx*6, 6);
         result[char_idx] = bits_to_char_tbl[char_num];
