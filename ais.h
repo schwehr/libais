@@ -1,9 +1,7 @@
+// -*- c++ -*-
+
 #ifndef AIS_H
 #define AIS_H
-
-// -*- c++ -*-
-// Since Apr 2010
-// g++ ais_pos.cxx -o ais_pos -g -Wall -O3 -Wimplicit -W -Wredundant-decls -pedantic  -funroll-loops -fexpensive-optimizations
 
 #include <bitset>
 #include <string>
@@ -14,10 +12,8 @@
 
 #include <iostream> // for checkpoint
 
-//#define LIBAIS_VERSION_MAJOR @LIBAIS_VERSION_MAJOR@
-//#define LIBAIS_VERSION_MINOR @LIBAIS_VERSION_MINOR@
 #define LIBAIS_VERSION_MAJOR 0
-#define LIBAIS_VERSION_MINOR 8
+#define LIBAIS_VERSION_MINOR 9
 
 //////////////////////////////////////////////////////////////////////
 // Helpers
@@ -60,24 +56,10 @@ public:
     int repeat_indicator;
     int mmsi;
 
-    bool had_error() {
-        /*
-        std::cout << "in_had_error: " << status << " " << AIS_OK << " "  << (AIS_OK != status)
-                  << " " << false << true << std::endl
-                  << "\t" << AIS_STATUS_STRINGS[AIS_OK] << " "
-                  <<  AIS_STATUS_STRINGS[status] << "\n";
-
-        const bool result = (status != AIS_OK);
-        std::cout << "error_status: " << (result?"HAD_ERROR":"should be okay") << std::endl;
-        return result; */
-        return status != AIS_OK;
-    }
+    bool had_error() {  return status != AIS_OK;  }
     AIS_STATUS get_error() {return status;}
     AIS_STATUS status; // AIS_OK or error code
-    //AisMsg() {init();}
-//protected:
     void init() {
-        //std::cout << "AisMsg_init: setting ok" << std::endl;
         status = AIS_OK;
 #ifndef NDEBUG
         // FIX: should we be setting these?  The individual messages need to do this.
