@@ -11,12 +11,12 @@ CXXFLAGS :=
 CXXFLAGS := 
 
 WARN := -Wall
-WARN += -Wimplicit 
+#WARN += -Wimplicit 
 #WARN += -pedantic # long long
 WARN += -W 
 WARN += -Wredundant-decls
 #WARN += -Werror
-WARN += -Wmissing-prototypes
+#WARN += -Wmissing-prototypes
 WARN += -Wunknown-pragmas
 WARN += -Wunused
 WARN += -Wunused
