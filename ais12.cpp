@@ -8,7 +8,7 @@ Ais12::Ais12(const char *nmea_payload) {
 
     const int num_char = strlen(nmea_payload);
     // WARNING: the spec says max of 1008 bits, but 168 + 4*256 => 1192 bits or 199 characters
-    if ( num_char < 12 or num_char > 199 ) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    if ( num_char < 12 || num_char > 199 ) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     std::bitset<1192> bs; // Spec says 1008
     status = aivdm_to_bits(bs, nmea_payload);

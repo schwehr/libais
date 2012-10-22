@@ -1660,7 +1660,7 @@ AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
     }
     for (size_t char_idx=0; nmea_payload[char_idx] != '\0' && char_idx < T/6; char_idx++) {
         int c = int(nmea_payload[char_idx]);
-        if (c<48 or c>119 or (c>=88 and c<=95) ) {
+        if (c<48 || c>119 || (c>=88 and c<=95) ) {
             return AIS_ERR_BAD_NMEA_CHR;
         }
         const std::bitset<6> bs_for_char = nmea_ord[ c ];

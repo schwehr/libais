@@ -46,7 +46,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
     commstate_flag = bs[comm_flag_offset];
     sync_state = ubits(bs, comm_flag_offset+1 , 2); // Both SOTDMA and TDMA
 
-    if (not commstate_flag) {
+    if (!commstate_flag) {
       // SOTDMA
       slot_timeout = ubits(bs, comm_flag_offset+3 ,3);
       slot_timeout_valid = true;

@@ -18,7 +18,7 @@ Ais4_11::Ais4_11(const char *nmea_payload) {
     if (had_error()) return;
 
     message_id = ubits(bs, 0, 6);
-    if (message_id != 4 and message_id != 11) {
+    if (message_id != 4 && message_id != 11) {
         status = AIS_ERR_WRONG_MSG_TYPE;
         return;
     }

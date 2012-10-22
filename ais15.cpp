@@ -8,7 +8,7 @@ Ais15::Ais15(const char *nmea_payload) {
     init();
 
     const int num_char = std::strlen(nmea_payload);
-    if (num_char != 15 && num_char!=18 and num_char!=27) {
+    if (num_char != 15 && num_char!=18 && num_char!=27) {
         // 88-160 bits
         status = AIS_ERR_BAD_BIT_COUNT;
         return;

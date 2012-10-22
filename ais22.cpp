@@ -28,7 +28,7 @@ Ais22::Ais22(const char *nmea_payload) {
     // WARNING: OUT OF ORDER DECODE
     bool addressed = bs[139];
 
-    if (not(addressed)) {
+    if (!addressed) {
       // geographic position
       pos_valid = true;
       dest_valid = false;

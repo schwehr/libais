@@ -9,7 +9,7 @@ Ais14::Ais14
     init();
 
     const int num_bits = strlen(nmea_payload)*6;
-    if (num_bits < 46 or num_bits > 1008) {
+    if (num_bits < 46 || num_bits > 1008) {
         // FIX: can't check to make sure the string occurs on 6-bit boundaries
         // Need to know the spare bits
         status = AIS_ERR_BAD_BIT_COUNT;

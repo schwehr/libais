@@ -12,7 +12,7 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) {
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
     if (num_bits < 88) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    if (payload_len < 0 or payload_len > 952) {
+    if (payload_len < 0 || payload_len > 952) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
     }

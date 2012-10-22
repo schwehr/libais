@@ -11,7 +11,7 @@ Ais7_13::Ais7_13(const char *nmea_payload) {
     assert (nmea_payload);
     const size_t num_bits = strlen(nmea_payload) * 6;
 
-    if (! ((40+32*1)==num_bits or (40+32*2)==num_bits or (40+32*3)==num_bits or (40+32*4)==num_bits) ){
+    if (! ((40+32*1)==num_bits || (40+32*2)==num_bits || (40+32*3)==num_bits || (40+32*4)==num_bits) ){
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
     }
@@ -21,7 +21,7 @@ Ais7_13::Ais7_13(const char *nmea_payload) {
     if (had_error()) return;
 
     message_id = ubits(bs, 0, 6);
-    if (message_id != 7 and message_id != 13) {
+    if (message_id != 7 && message_id != 13) {
         status = AIS_ERR_WRONG_MSG_TYPE;
         return;
     }

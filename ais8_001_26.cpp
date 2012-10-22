@@ -245,7 +245,7 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) {
   if (had_error()) return;
 
   if (!decode_header8(bs)) return;
-  if (1 != dac or 26 != fi) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  if (1 != dac || 26 != fi) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   const size_t num_sensor_reports = (num_bits - 56) / AIS8_1_26_REPORT_SIZE;
   if ((num_bits - 56) % AIS8_1_26_REPORT_SIZE) {

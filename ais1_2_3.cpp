@@ -23,7 +23,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     if (had_error()) return;
 
     message_id = ubits(bs, 0, 6);
-    if (message_id < 1 or message_id > 3) {
+    if (message_id < 1 || message_id > 3) {
         status = AIS_ERR_WRONG_MSG_TYPE;
         return;
     }

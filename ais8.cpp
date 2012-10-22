@@ -12,7 +12,7 @@ Ais8::Ais8(const char *nmea_payload) {
     assert(nmea_ord_initialized); // Make sure we have the lookup table built
     init();
     const int payload_len = strlen(nmea_payload)*6 - 46; // in bits w/o DAC/FI
-    if (payload_len < 0 or payload_len > 952) {
+    if (payload_len < 0 || payload_len > 952) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
     }

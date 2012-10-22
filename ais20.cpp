@@ -8,7 +8,7 @@ Ais20::Ais20(const char *nmea_payload) {
     init();
 
     const int num_char = std::strlen(nmea_payload);
-    if (num_char != 12 and num_char != 18 and num_char != 23 and num_char != 27) {
+    if (num_char != 12 && num_char != 18 && num_char != 23 && num_char != 27) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
     }
