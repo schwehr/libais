@@ -170,7 +170,7 @@ public:
 
     std::vector<Ais8_001_22_SubArea *> sub_areas;
 
-  Ais8_001_22(const char *nmea_payload, const size_t pad);
+    Ais8_001_22(const char *nmea_payload, const size_t pad);
     ~Ais8_001_22();
     void print();
 

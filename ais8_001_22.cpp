@@ -2,6 +2,7 @@
 #include "ais8_001_22.h"
 
 #include <cmath>
+#include <iomanip>
 
 const char *ais8_001_22_shape_names[8] = {"Circle/Pt","Rect", "Sector","Polyline","Polygon","Text","Reserved_6","Reserved_7"};
 
@@ -148,43 +149,34 @@ static void decode_xy(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset,
     // This is the same for all but the text subarea
     // OLD Nav 55: sbits(bs, offset+5, 28) / 600000.;
     x = sbits(bs, offset+5, 25) / 60000.;
-    y = sbits(bs, offset+5+25, 24) / 60000.;
+    y = sbits(bs, offset+30, 24) / 60000.;
 }
 
 Ais8_001_22_Circle::Ais8_001_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
-    //x         = sbits(bs, offset+5, 28) / 600000.;
-    //y         = sbits(bs, offset+5+28, 27) / 600000.;
     decode_xy(bs, offset, x, y);
-
-    precision = ubits(bs,offset+5+25+24,3);  // useless
-    radius_m  = ubits(bs,offset+5+25+24+3,12) * scale_multipliers[scale_factor];
-    spare     = ubits(bs,offset+5+25+24+3+12,18);
-    assert(87==5+25+24+3+12+18);
+    precision = ubits(bs, offset+54, 3);  // useless
+    radius_m  = ubits(bs, offset+57, 12) * scale_multipliers[scale_factor];
+    spare     = ubits(bs, offset+69, 18);
 }
 
 void Ais8_001_22_Circle::print() {
     if (radius_m == 0)
         std::cout << "Point: " << " " << x << " " << y << "    prec: " << precision << std::endl;
-        //<< "  (Can start a polyline or polygon)" << std::endl;
     else
         std::cout << "Circle: " << " " << x << " " << y << "    radius_m: " << radius_m
                   << "    prec: " << precision<< std::endl;
-    //<< " precision FIX(!?!?) " << precision
 }
 
 Ais8_001_22_Rect::Ais8_001_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
-    //x          = sbits(bs, offset+5, 28) / 600000.;
-    //y          = sbits(bs, offset+5+28, 27) / 600000.;
     decode_xy(bs, offset, x, y);
 
-    precision = ubits(bs,offset+5+25+24,3);  // useless
-    e_dim_m    = ubits(bs, offset+5+25+24+3, 8) * scale_multipliers[scale_factor];
-    n_dim_m    = ubits(bs, offset+5+25+24+3+8, 8) * scale_multipliers[scale_factor];
-    orient_deg = ubits(bs, offset+5+25+24+3+8+8, 9);
-    spare      = ubits(bs, offset+5+25+24+3+8+8+9, 5);
-    assert(AIS8_001_22_SUBAREA_SIZE == 5+25+24+3+8+8+9+5);
+    precision  = ubits(bs, offset+54, 3);  // useless
+    e_dim_m    = ubits(bs, offset+57, 8) * scale_multipliers[scale_factor];
+    n_dim_m    = ubits(bs, offset+65, 8) * scale_multipliers[scale_factor];
+    orient_deg = ubits(bs, offset+73, 9);
+    spare      = ubits(bs, offset+82, 5);
 }
 
 void Ais8_001_22_Rect::print() {
@@ -196,16 +188,12 @@ void Ais8_001_22_Rect::print() {
 
 Ais8_001_22_Sector::Ais8_001_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
-    //x          = sbits(bs, offset+5, 28) / 600000.;
-    //y          = sbits(bs, offset+5+28, 27) / 600000.;
     decode_xy(bs, offset, x, y);
 
-    precision = ubits(bs, offset+5+25+24, 3);  // useless
-
-    radius_m        = ubits(bs, offset+5+25+24+3, 12) * scale_multipliers[scale_factor];
-    left_bound_deg  = ubits(bs, offset+5+25+24+3+12, 9);
-    right_bound_deg = ubits(bs, offset+5+25+24+3+12+9, 9);
-    assert(AIS8_001_22_SUBAREA_SIZE == 5+25+24+3+12+9+9);
+    precision       = ubits(bs, offset+54, 3);  // useless
+    radius_m        = ubits(bs, offset+57, 12) * scale_multipliers[scale_factor];
+    left_bound_deg  = ubits(bs, offset+69, 9);
+    right_bound_deg = ubits(bs, offset+78, 9);
 }
 
 void Ais8_001_22_Sector::print() {
@@ -220,14 +208,13 @@ static const size_t PT_AD_SIZE=10+10;
 Ais8_001_22_Polyline::Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
     for (size_t i=0; i<4; i++) {
-        const int angle = ubits(bs, offset+5+    (i*PT_AD_SIZE), 10);
-        const int dist  = ubits(bs, offset+5+10+ (i*PT_AD_SIZE), 10) * scale_multipliers[scale_factor];
+        const int angle = ubits(bs, offset+5+  (i*PT_AD_SIZE), 10);
+        const int dist  = ubits(bs, offset+15+ (i*PT_AD_SIZE), 10) * scale_multipliers[scale_factor];
         if (0==dist) break;
         angles.push_back(angle);
         dists_m.push_back(dist);
     }
     spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
-    assert(AIS8_001_22_SUBAREA_SIZE == 5+(4*20)+2);
 }
 
 void Ais8_001_22_Polyline::print() {
@@ -247,7 +234,6 @@ Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, c
         dists_m.push_back(dist);
     }
     spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
-    assert(AIS8_001_22_SUBAREA_SIZE == 5+(4*20)+2);
 }
 
 void Ais8_001_22_Polygon::print() {
@@ -267,17 +253,9 @@ void Ais8_001_22_Text::print() {
 }
 
 
-
-
-// Ais8_001_22_AreaShapeEnum getAreaShape(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-//     // Figure out which shape type or set as an error
-//     const int area_shape_int = ubits(bs,offset,3);
-// }
-
 // Call the appropriate constructor
 Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const Ais8_001_22_AreaShapeEnum area_shape = (Ais8_001_22_AreaShapeEnum)ubits(bs, offset, 3);
-    //std::cout << "area_shape: off: " << offset << " shape: "<< area_shape << " [" << ais8_001_22_shape_names[area_shape] << "]\n";
     if (AIS8_001_22_SHAPE_ERROR == area_shape) {
         std::cerr << "ERROR: Bad area shape!  Bummer" << std::endl;
         return 0;
@@ -285,23 +263,18 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
     Ais8_001_22_SubArea *area=0;
     switch (area_shape) {
     case AIS8_001_22_SHAPE_CIRCLE:
-        //std::cout << "Found circle" << std::endl;
         area = new Ais8_001_22_Circle(bs, offset);
         break;
     case AIS8_001_22_SHAPE_RECT:
-        //std::cout << "Found rect" << std::endl;
         area = new Ais8_001_22_Rect(bs, offset);
         return area;
     case AIS8_001_22_SHAPE_SECTOR:
-        //std::cout << "Found sector" << std::endl;
         area = new Ais8_001_22_Sector(bs, offset);
         break;
     case AIS8_001_22_SHAPE_POLYLINE:
-        //std::cout << "Found polyline" << std::endl;
         area = new Ais8_001_22_Polyline(bs, offset);
         break;
     case AIS8_001_22_SHAPE_POLYGON:
-        //std::cout << "Found polygon" << std::endl;
         area = new Ais8_001_22_Polygon(bs, offset);
         break;
     case AIS8_001_22_SHAPE_TEXT:
@@ -324,26 +297,22 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
 //////////////////////////////////////////////////////////////////////
 
 Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
-    //std::cerr << "WARNING: Ais8_001_22 is totally untests" << std::endl;
     assert(nmea_payload);
     assert(nmea_ord_initialized); // Make sure we have the lookup table built
     assert(strlen(nmea_payload) >= 33);
 
     init();
     const int num_bits = strlen(nmea_payload) * 6 - pad;
-    // FIX: make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
+    // TODO: make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
     // Spec is not byte aligned.  BAD!
-    //if (198 <= num_bits && num_bits >= 981) { status = AIS_ERR_BAD_BIT_COUNT; return; }
-    if (198 < num_bits && num_bits > 984) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    if (198 > num_bits || num_bits > 984) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    assert(nmea_ord_initialized); // Extra careful that we have a lookup table
     std::bitset<MAX_BITS> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
     if (!decode_header8(bs)) return;
-    assert(1==dac);
-    assert(22==fi);
+
     link_id = ubits(bs,56,10);
     notice_type = ubits(bs,66,7);
     month = ubits(bs,73,4);
@@ -355,14 +324,6 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
 
     // Use floor to be able to ignore any spare bits
     const int num_sub_areas = int( floor( (num_bits - 111)/87.) );
-    /*
-    std::cout << "num_sub_areas: " << num_bits << " " << num_bits - 111
-              << " " << (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE)
-              << " " << floor( (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE))
-              << " -> " << int( floor( (num_bits - 111)/float(AIS8_001_22_SUBAREA_SIZE)) )
-              << " " << num_sub_areas
-              <<"\n";
-    */
     for (int sub_area_idx=0; sub_area_idx < num_sub_areas; sub_area_idx++) {
         Ais8_001_22_SubArea *sub_area = ais8_001_22_subarea_factory(bs, 111+ AIS8_001_22_SUBAREA_SIZE*sub_area_idx);
         if (sub_area) {
@@ -377,25 +338,19 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
     */
 
     // FIX: watch out for mandatory spare bits to byte align payload
-} // end constructor
+}
 
 Ais8_001_22::~Ais8_001_22() {
-    //std::cout << "Ais8_001_22: destructor.  sub_areas: " << sub_areas.size() << std::endl;
-
     // FIX: why is the destructor getting called 2x for each sub area?
     for (size_t i=0; i < sub_areas.size(); i++) {
         delete sub_areas[i];  // FIX: leak?
         //sub_areas[i] = 0;
     }
-    //std::cout << "\n\n";
 }
 
-#include <iomanip>
 
 void
 Ais8_001_22::print() {
-    //std::cout << ;
-
     std::cout
         << "Area_Notice: " << message_id << "\n"
         << "\tDAC: " << dac << "\tFI:" << fi << "\n";
@@ -416,7 +371,6 @@ Ais8_001_22::print() {
         << " -> [" << ais8_001_22_notice_names[notice_type] << "]\n";
 
     for (size_t i=0; i < sub_areas.size(); i++) {
-        //std::cout << "\tSubarea: " << i << std::endl;
         std::cout << "\t\t" << i << ": ";
         sub_areas[i]->print();
     }
