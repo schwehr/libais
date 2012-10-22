@@ -5,7 +5,6 @@
 #include <sstream>
 #include <string>
 #include <cstring>
-//using namespace std;
 
 #define UNUSED __attribute((__unused__))
 
@@ -25,13 +24,10 @@ std::vector<std::string> split(const std::string &s, char delim) {
 }
 
 
-
-//int main(UNUSED char *argc, UNUSED char* argv[]) {
-int main( int argc,  char* argv[]) {
+int main(int argc,  char* argv[]) {
     build_nmea_lookup();
 
     assert(2<=argc);
-    //std::string filename(argv[1]);
     std::ifstream infile(argv[1]);
     if (! infile.is_open() ) {
         std::cerr << "Unable to open file: " << argv[1] << std::endl;
@@ -40,14 +36,9 @@ int main( int argc,  char* argv[]) {
 
     int i = 0;
     std::string line;
-    //char line[1024];
     while (!infile.eof()) {
         i++;
         getline(infile,line); // G++ problem with this and a string
-        //infile.getline(line,1024);
-
-
-        //if (strlen(line) < 20) {continue;}
         if (line.size() < 20) {continue;}
         if ('!' != line[0]  ||  'A' != line[1] ) {continue;}
         std::string line_str(line);
@@ -61,8 +52,5 @@ int main( int argc,  char* argv[]) {
             std::cout << m5.mmsi << "," << m5.name << "," << m5.callsign << "," << m5.type_and_cargo << std::endl;
         }
     }
-
-
     return 0;
-
 }

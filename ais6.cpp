@@ -260,7 +260,6 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   if (num_bits != 360) {
     status = AIS_ERR_BAD_BIT_COUNT; return;  }
@@ -320,7 +319,6 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
   if (376 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT;  return; }
 
@@ -328,7 +326,6 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad=0) {
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
-  //decode_header6();
   message_id = ubits(bs, 0, 6);
   if (6 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
   repeat_indicator = ubits(bs,6,2);
@@ -347,7 +344,7 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad=0) {
 
   for (size_t window_num=0; window_num < 3; window_num++) {
     Ais6_1_14_Window w;
-    const size_t start = 88 + 9 + window_num * 100; //(27+28+5+6+5+6+9+7);
+    const size_t start = 88 + 9 + window_num * 100;
     // yes, bits are lat, lon
     w.y = sbits(bs, start, 27) / 600000.;
     w.x = sbits(bs, start+27, 28) / 600000.;
@@ -422,9 +419,8 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad=0) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  //const int num_char = strlen(nmea_payload);
 
-  if (360 != num_bits) { /*std::cerr << "6_1_20 error: wrong bit count\n";*/ status = AIS_ERR_BAD_BIT_COUNT; return; }
+  if (360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
@@ -441,7 +437,7 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad=0) {
   dac = ubits(bs,72,10);
   fi = ubits(bs,82,6);
 
-  if ( 1 != dac || 20 != fi ) { /*std::cerr << "6_1_20 error dac/fi\n";*/ status = AIS_ERR_WRONG_MSG_TYPE; return; }
+  if ( 1 != dac || 20 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   link_id = ubits(bs, 88, 10);
   length = ubits(bs, 98, 9);

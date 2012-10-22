@@ -1,3 +1,5 @@
+// TODO: check for reference counting leaks
+
 #include "ais.h"
 #include "ais8_001_22.h"
 
@@ -21,7 +23,7 @@ void TupleSafeSetItem(PyObject *tuple, const long position, const long val) {
     Py_DECREF(val_obj);
 }
 #endif
-    //inline
+
 void
 DictSafeSetItem(PyObject *dict, const std::string &key, const long val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
@@ -75,7 +77,6 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
     PyObject *val_obj = PyBool_FromLong(val);
     assert(key_obj);
     assert(val_obj);
-    //cout << "setting: "<< ( val ? "true":"false") << endl;
     PyDict_SetItem(dict, key_obj, val_obj);
     Py_DECREF(key_obj);
     Py_DECREF(val_obj);
@@ -115,7 +116,6 @@ DictSafeSetItem(PyObject *dict, const std::string &key, PyObject *val_obj) {
     assert(key_obj);
     PyDict_SetItem(dict, key_obj, val_obj);
     Py_DECREF(key_obj);
-    //Py_DECREF(val_obj); // FIX: is this a leak?
 }
 
 
@@ -182,10 +182,10 @@ ais1_2_3_to_pydict(const char *nmea_payload) {
 }
 
 
+// TODO: pad
 PyObject *
 ais4_11_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
-    //assert(168/6 == strlen(nmea_payload));  // Should be checked inside the class
 
     Ais4_11 msg(nmea_payload);
     if (msg.had_error()) {
@@ -235,11 +235,10 @@ ais4_11_to_pydict(const char *nmea_payload) {
 }
 
 
-
+  // TODO: pad
 PyObject *
 ais5_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
-    //assert((424+2)/6 == strlen(nmea_payload));  Check inside the class
     Ais5 msg(nmea_payload);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais5: %s", AIS_STATUS_STRINGS[msg.get_error()]);
@@ -317,7 +316,6 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
     if (msg.had_error()) return; // TODO: do better
 
     DictSafeSetItem(dict,"ack_dac", msg.ack_dac);
-    //std::cerr << "TODO: implement 4 with for loop" << std::endl;
     PyObject *cap_list = PyList_New(26);
     PyObject *res_list = PyList_New(26);
     for (size_t cap_num=0; cap_num < 128/2; cap_num++) {
@@ -349,8 +347,7 @@ ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   assert(nmea_payload); assert(0 <= pad && pad <= 7); // TODO: check for error
   Ais6_1_12 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    //PyErr_Format(ais_py_exception, "Ais6_1_12: %s", AIS_STATUS_STRINGS[msg.get_error()]);
-    //std::cerr << "6_1_12 decode failed: " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+    // TODO: unify the error handling.
     return false;
   }
 
@@ -380,12 +377,7 @@ void
 ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(0 <= pad && pad <= 7);
   Ais6_1_14 msg(nmea_payload, pad); // TODO: check for error
-   if (msg.had_error()) {
-     //PyErr_Format(ais_py_exception, "Ais6_1_14: %s", AIS_STATUS_STRINGS[msg.get_error()]);
-     //std::cerr << "6_1_14 decode failed: " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
-    //DictSafeSetItem(window, "parsed", false);
-    return;
-  }
+  if (msg.had_error()) { return; }
 
   DictSafeSetItem(dict, "utc_month", msg.utc_month);
   DictSafeSetItem(dict, "utc_day", msg.utc_day);
@@ -450,11 +442,9 @@ ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   if (msg.services_known) {
     PyObject *serv_list = PyList_New(26);
     for(size_t serv_num=0; serv_num<26; serv_num++) {
-      //std::cerr << msg.services[serv_num] << " ";
       PyObject *serv = PyInt_FromLong(long(msg.services[serv_num]));
       PyList_SetItem(serv_list, serv_num, serv);
     }
-    //std::cerr << "\n";
     DictSafeSetItem(dict, "services", serv_list);
   }
   DictSafeSetItem(dict, "name", msg.name);
@@ -462,14 +452,10 @@ ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   DictSafeSetItem(dict, "y", msg.y);
 }
 
-  // 6_1_21
-  // 6_1_22
-  // 6_1_23
-  // 6_1_24
+// 6_1_21, 6_1_22, 6_1_23 and 6_1_24 Do not exist (yet?)
 
 void
 ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-  // TODO: totally untested
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais6_1_25 msg(nmea_payload, pad);  // TODO: check for error
   if (msg.had_error()) return;
@@ -607,12 +593,10 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 
+// TODO: pad
 PyObject*
 ais7_13_to_pydict(const char *nmea_payload) {
     assert(nmea_payload);
-    //const size_t num_bits = strlen(nmea_payload) * 6;
-    //assert ( (40+32*1)==num_bits or (40+32*2)==num_bits or (40+32*3)==num_bits or (40+32*4) == num_bits);
-    // checked inside the message
     Ais7_13 msg(nmea_payload);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais7_13: %s", AIS_STATUS_STRINGS[msg.get_error()]);
@@ -626,21 +610,13 @@ ais7_13_to_pydict(const char *nmea_payload) {
 
     PyObject *list = PyList_New(msg.dest_mmsi.size());
     for (size_t i=0; i < msg.dest_mmsi.size(); i++) {
-        // FIX: is this my memory leak?
         PyObject *tuple = PyTuple_New(2);
         PyTuple_SetItem(tuple,0,PyLong_FromLong(msg.dest_mmsi[i])); // Steals ref
         PyTuple_SetItem(tuple,1,PyLong_FromLong(msg.seq_num[i])); // Steals ref
-        //TupleSafeSetItem(tuple, 0, msg.dest_mmsi[i]);
-        //TupleSafeSetItem(tuple, 1, msg.seq_num[i]);
-
         PyList_SetItem(list, i, tuple); // Steals ref
-        //Py_DECREF(list);
     }
-    // FIX: probably a memory leak with list
     PyDict_SetItem(dict, PyUnicode_FromString("acks"), list);
     Py_DECREF(list);
-    //Py_DECREF(list);
-    //Py_DECREF(dict);
     return dict;
 }
 
@@ -649,7 +625,7 @@ void
 ais8_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
     assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
     Ais8_1_0 msg(nmea_payload, pad);
-    if (msg.had_error()) {std::cerr << "ais8_1_0 had an error\n"; return;} // TODO: better error handling
+    if (msg.had_error()) { return;} // TODO: better error handling
     DictSafeSetItem(dict,"ack_required",  msg.ack_required);
     DictSafeSetItem(dict,"msg_seq",  msg.msg_seq);
     DictSafeSetItem(dict,"text", msg.text);
@@ -898,11 +874,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
         switch(msg.sub_areas[i]->getType()) {
         case AIS8_001_22_SHAPE_CIRCLE: // or point
             {
-                // cout << i << ": POINT or CIRCLE\n";
                 PyObject *sub_area = PyDict_New();
-                //DictSafeSetItem(sub_area,"area_type",msg.sub_areas[i]->getType());
-                // FIX: could easily optimize to have only one copy of each string around at a Python Obj
-                //DictSafeSetItem(sub_area,"area_type_str",ais8_001_22_shape_names[msg.sub_areas[i]->getType()]);
                 Ais8_001_22_Circle *c = (Ais8_001_22_Circle*)msg.sub_areas[i];
 
                 DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_CIRCLE);
@@ -913,7 +885,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area,"y",c->y);
                 DictSafeSetItem(sub_area,"precision",c->precision);
                 DictSafeSetItem(sub_area,"radius",c->radius_m);
-                //DictSafeSetItem(sub_area,"spare",c->spare);
+                // TODO: spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -932,7 +904,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area,"e_dim_m",c->e_dim_m);
                 DictSafeSetItem(sub_area,"n_dim_m",c->n_dim_m);
                 DictSafeSetItem(sub_area,"orient_deg",c->orient_deg);
-                //DictSafeSetItem(sub_area,"spare",c->spare);
+                // TODO: spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -951,7 +923,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area,"radius",c->radius_m);
                 DictSafeSetItem(sub_area,"left_bound_deg",c->left_bound_deg);
                 DictSafeSetItem(sub_area,"right_bound_deg",c->right_bound_deg);
-                //DictSafeSetItem(sub_area,"spare",c->spare);
+                // TODO: spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -969,7 +941,6 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 PyObject *dist_list = PyList_New(polyline->angles.size());
 
                 for (size_t pt_num=0; pt_num < polyline->angles.size(); pt_num++) {
-                    // FIX: memory leak with the floats?
                     PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polyline->angles [pt_num]));
                     PyList_SetItem(dist_list,  pt_num, PyFloat_FromDouble(polyline->dists_m[pt_num]));
                 }
@@ -977,7 +948,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area,"angles", angle_list);
                 DictSafeSetItem(sub_area,"dists_m", dist_list);
 
-                //DictSafeSetItem(sub_area,"spare",c->spare);
+                // TODO: spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -995,7 +966,6 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 PyObject *dist_list = PyList_New(polygon->angles.size());
 
                 for (size_t pt_num=0; pt_num < polygon->angles.size(); pt_num++) {
-                    // FIX: memory leak with the floats?
                     PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polygon->angles [pt_num]));
                     PyList_SetItem(dist_list,  pt_num, PyFloat_FromDouble(polygon->dists_m[pt_num]));
                 }
@@ -1003,7 +973,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area,"angles", angle_list);
                 DictSafeSetItem(sub_area,"dists_m", dist_list);
 
-                //DictSafeSetItem(sub_area,"spare",c->spare);
+                // TODO: spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -1013,13 +983,10 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 PyObject *sub_area = PyDict_New();
 
                 Ais8_001_22_Text *text = (Ais8_001_22_Text*)msg.sub_areas[i];
-                cout << "\ttext: '" << text->text << endl;
-                //PyObject *text_obj = PyUnicode_FromString(text->text.c_str());
                 DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_TEXT);
                 DictSafeSetItem(sub_area,"sub_area_type_str","text");
 
                 DictSafeSetItem(sub_area,"text", text->text);
-                //Py_DECREF(text_obj);
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -1046,11 +1013,9 @@ ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   PyObject *port_list = PyList_New(2);
   PyObject *port0=PyUnicode_FromString(msg.next_ports[0].c_str());
   PyObject *port1=PyUnicode_FromString(msg.next_ports[0].c_str());
-  // TODO: Make sure this is correct reference counts
   PyList_SetItem(port_list, 0, port0); Py_DECREF(port0);
   PyList_SetItem(port_list, 1, port1); Py_DECREF(port1);
 
-  //int solas_status[26];
   PyObject *solas_list = PyList_New(26);
   for(size_t solas_num=0; solas_num<26; solas_num++) {
     PyObject *solas = PyInt_FromLong(msg.solas_status[solas_num]);
@@ -1078,8 +1043,6 @@ void
 ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_26 msg(nmea_payload, pad);  // TODO: check for errors
-
-  //std::vector<Ais8_1_26_SensorReport> reports;
 
   std::cerr << "TODO: Implement the huge 8_1_26 env message";
 }
@@ -1290,17 +1253,12 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     DictSafeSetItem(dict,"spare", msg.spare);
     DictSafeSetItem(dict,"dac", msg.dac);
     DictSafeSetItem(dict,"fi", msg.fi);
-    //DictSafeSetItem(dict,"parsed",false);
 
     // TODO: better error handling
     switch (msg.dac) {
     case 1:  // IMO
         switch (msg.fi) {
-
-            //
-            // ITU-R.M.1371-3 IFM messages.  Annex 5, Section 5.  See IMO Circ 289 for recommended usage
-            //
-
+          // ITU-R.M.1371-3 IFM messages.  Annex 5, Section 5.  See IMO Circ 289 for recommended usage
         case 0: // Text using 6 bit ascii
           ais8_1_0_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict,"parsed",true);
@@ -1352,7 +1310,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
           ais8_1_19_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict,"parsed",true);
           break;
-        //case 20: // Berthing data
+        // case 20: // Berthing data
         //    ais8_1_20_append_pydict(nmea_payload, dict, pad);
         //    DictSafeSetItem(dict,"parsed",true);
         //    break;
@@ -1372,11 +1330,11 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
           ais8_1_24_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict,"parsed",true);
           break;
-        //case 25: //
+        // case 25: //
         //    ais8_1_25_append_pydict(nmea_payload, dict, pad);
         //    DictSafeSetItem(dict,"parsed",true);
         //    break;
-        //case 26: // Env Sensor Report
+        // case 26: // Env Sensor Report
         //  ais8_1_26_append_pydict(nmea_payload, dict, pad);
         //  DictSafeSetItem(dict,"parsed",true);
         //  break;
@@ -1384,7 +1342,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
           ais8_1_27_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict,"parsed",true);
           break;
-        //case 28: //
+        // case 28: //
         //    ais8_1_28_append_pydict(nmea_payload, dict, pad);
         //    DictSafeSetItem(dict,"parsed",true);
         //    break;
@@ -2016,7 +1974,7 @@ ais25_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict,"repeat_indicator", msg.repeat_indicator);
     DictSafeSetItem(dict,"mmsi", msg.mmsi);
 
-    //DictSafeSetItem(dict,"use_app_id", msg.use_app_id);
+    // TODO use_app_id
     if (msg.dest_mmsi_valid) DictSafeSetItem(dict,"dest_mmsi", msg.dest_mmsi);
     if (msg.use_app_id) {
       DictSafeSetItem(dict,"dac", msg.dac);
@@ -2229,7 +2187,6 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'L': // 28 - UNKNOWN
-        //result = ais28_to_pydict(nmea_payload);
         PyErr_Format(ais_py_exception, "ais.decode: message 28 (L) not yet handled");
         break;
 

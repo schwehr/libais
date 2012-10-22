@@ -23,7 +23,6 @@ TEST(TestAis1_2_3, BitDecoding) {
     const string bits_expected("000001000101011101111001000100011010000000100000000000000001010101100010010101011111010100100010111110000100010000000111000100101111111110000000000000011000100010111001");
     bitset<168> bs;
     AIS_STATUS status = aivdm_to_bits(bs, m_str.c_str());
-    //cout << "decode_status: " << status << endl;
     ASSERT_EQ(AIS_OK,status);
     for (size_t i=0; i < 168; i++) {
         char c = bs[i]? '1':'0';
@@ -64,9 +63,7 @@ TEST(TestAis1_2_3, AisMsg1) {
     const string body(nth_field(m_str,5,','));
     ASSERT_STREQ("15Mq4J0P01EREODRv4@74gv00HRq",body.c_str());
     Ais1_2_3 m(body.c_str());
-    //cout << "AisMsg had_error should be: " << AIS_OK << " == " << m.get_error() << endl;
     ASSERT_EQ(AIS_OK, m.get_error());
-    //m.print(true);
 
     ASSERT_EQ(1,m.message_id);
     ASSERT_EQ(0,m.repeat_indicator);
@@ -75,7 +72,7 @@ TEST(TestAis1_2_3, AisMsg1) {
 
     ASSERT_EQ(true,m.rot_over_range);
     ASSERT_EQ(-128,m.rot_raw);
-    //ASSERT_FLOAT_EQ(-731.386, m.rot);
+    // ASSERT_FLOAT_EQ(-731.386, m.rot);
     ASSERT_NEAR(-731.386, m.rot, 0.001);
 
     ASSERT_FLOAT_EQ(0.1,m.sog);

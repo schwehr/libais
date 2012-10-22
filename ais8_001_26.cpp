@@ -2,9 +2,9 @@
 
 // http://www.dtic.mil/cgi-bin/GetTRDoc?AD=ADA504755
 // Phase I Summary Report on AIS Transmit Project (Environmental Message)
+// TODO: should print methods be to stdout?
 
 #include "ais.h"
-//Ais8_1_26_Location : public Ais8_1_26_SensorReport
 
 
 Ais8_1_26_Location::Ais8_1_26_Location(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
@@ -18,7 +18,7 @@ Ais8_1_26_Location::Ais8_1_26_Location(const std::bitset<AIS8_MAX_BITS> &bs, con
 
 void
 Ais8_1_26_Location::print() {
-  std::cerr << "Loca: " << x << " " << y << " " << z 
+  std::cerr << "Loca: " << x << " " << y << " " << z
             << " " << owner << " " << timeout
             << "\n";
 }
@@ -82,9 +82,9 @@ Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const s
   type = ubits(bs, offset+78, 3);
   spare = ubits(bs, offset+81, 4);
 }
-  
+
 void Ais8_1_26_Curr2D::print() {
-  std::cerr << "Cr2D: " << currents[0].speed << " " << currents[1].speed << " " 
+  std::cerr << "Cr2D: " << currents[0].speed << " " << currents[1].speed << " "
             << currents[2].speed << " " << type << "\n";
 }
 
@@ -92,22 +92,17 @@ void Ais8_1_26_Curr2D::print() {
 Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   for (size_t idx=0; idx < 2; idx++) {
     size_t start = offset + idx * 33;
-    //Ais8_1_26_Curr3D_Current current;
-    // ERROR: no way to get flow in the negative direction for north, east and up.
-    // Propose that we could stick sign bits in the spare.
     currents[idx].north = ubits (bs, start, 8) / 10.;
     currents[idx].east = ubits (bs, start+8, 8) / 10.;
     currents[idx].up = ubits (bs, start+16, 8) / 10.;
     currents[idx].depth = ubits (bs, start+24, 9);
-    //currents.push_back(current);
   }
   type = ubits (bs, offset+66, 3);
   spare = ubits (bs, offset+69, 16);
 }
 
 void Ais8_1_26_Curr3D::print() {
-  // TODO: shouldn't these all be stdout?
-  std::cerr << "Cr3D: " 
+  std::cerr << "Cr3D: "
             << currents[0].north << " " << currents[0].east << " " << currents[0].up << " " << currents[0].depth << " "
             << currents[1].north << " " << currents[1].east << " " << currents[1].up << " " << currents[1].depth
             << "\n";
@@ -117,16 +112,13 @@ void Ais8_1_26_Curr3D::print() {
 Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   for (size_t idx=0; idx < 2; idx++) {
     size_t start = offset + idx * 42;
-    //Ais8_1_26_HorzFlow_Current current;
     currents[idx].bearing = ubits(bs, start, 9);
     currents[idx].dist = ubits(bs, start+9, 7);
     currents[idx].speed = ubits(bs, start+16, 8) / 10.;
     currents[idx].dir = ubits(bs, start+24, 9);
     currents[idx].level = ubits(bs, start+33, 9);
-    //currents.push_back(current);
   }
   spare = bs[offset+84];
-  
 }
 
 void Ais8_1_26_HorzFlow::print() {

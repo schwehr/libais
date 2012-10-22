@@ -2,12 +2,6 @@
 // Class A shipdata
 #include "ais.h"
 
-//#include <iostream>
-//#include <bitset>
-//#include <string>
-//#include <cassert>
-//#include <cmath>
-
 // TODO: pad
 Ais5::Ais5(const char *nmea_payload) {
     assert(nmea_payload);
@@ -42,7 +36,6 @@ Ais5::Ais5(const char *nmea_payload) {
     eta_minute = ubits(bs, 288, 6);
     draught = ubits(bs, 294, 8) / 10.;
     destination = ais_str(bs, 302, 120);
-    //cout << "destination:" << destination << endl;
     dte = bs[422];
     spare = bs[423];
 }

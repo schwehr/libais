@@ -135,7 +135,7 @@ const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = { // 128] = {
    "(reserved for future use)", // 124
    "Other – Define in associated text field", // 125
    "Cancellation – cancel area as identified by Message Linkage ID", // 126
-   "Undefined (default)" //, // 127
+   "Undefined (default)" // 127
 };
 
 // TODO: pad
@@ -197,9 +197,9 @@ Ais8_366_22_Circle::Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, con
     const int scale_factor = ubits(bs,offset+3,2);
     x         = sbits(bs, offset+5, 28) / 600000.;
     y         = sbits(bs, offset+5+28, 27) / 600000.;
-    //precision = ubits(bs,offset+5+28+27,2);  // FIX: should precision
-    radius_m  = ubits(bs,offset+5+28+27/*+2*/,12) * scale_multipliers[scale_factor];
-    spare     = ubits(bs,offset+5+28+27/*+2*/+12,16);
+    // TODO: precision? And bit counts for radius  and spare?
+    radius_m  = ubits(bs,offset+5+28+27,12) * scale_multipliers[scale_factor];
+    spare     = ubits(bs,offset+5+28+27+12,16);
 }
 
 void Ais8_366_22_Circle::print() {

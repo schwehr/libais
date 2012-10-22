@@ -1,5 +1,7 @@
 // -*- c++ -*-
 
+// TODO: should all messages just use MAX_BITS or should it be set for each message?
+
 #ifndef AIS_H
 #define AIS_H
 
@@ -49,7 +51,7 @@ struct AisPoint {
 };
 
 class AisMsg {
-public:
+ public:
     int message_id;
     int repeat_indicator;
     int mmsi;
@@ -58,16 +60,13 @@ public:
     AIS_STATUS get_error() {return status;}
     AIS_STATUS status; // AIS_OK or error code
     void init() {
-        status = AIS_OK;
-#ifndef NDEBUG
-        // TODO: should we be setting these?  The individual messages need to do this.
-        message_id = repeat_indicator = mmsi = -666;
-#endif
+      status = AIS_OK;
+      // TODO: should all common headers be set to an invalid value?
     }
 };
 
 class Ais1_2_3 : public AisMsg {
-public:
+ public:
     int nav_status;
     bool rot_over_range;
     int rot_raw;
@@ -190,7 +189,7 @@ const size_t AIS6_MAX_BITS = 1192;
 
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
-public:
+ public:
     Ais6() {}
 
     static const int MAX_BITS = AIS6_MAX_BITS;
@@ -256,7 +255,7 @@ class Ais6_1_2 : public Ais6 {
  public:
   int req_dac;
   int req_fi;
-  //int spare2;
+  // TODO: spare2?
 
   Ais6_1_2(const char *nmea_payload, const size_t pad);
   void print();
@@ -469,7 +468,7 @@ std::ostream& operator<< (std::ostream& o, Ais6_1_32 const& msg);
 
 // 7 and 13 are ACKs for msg 6 and 12
 class Ais7_13 : public AisMsg {
-public:
+ public:
     int spare;
 
     std::vector<int> dest_mmsi;
@@ -486,13 +485,13 @@ const size_t AIS8_MAX_BITS = 1192;
 
 // AIS Binary Broadcast message ... parent to many
 class Ais8 : public AisMsg {
-public:
+ public:
   Ais8() {}
 
-  static const int MAX_BITS = AIS8_MAX_BITS; //1192; //1008;
+  static const int MAX_BITS = AIS8_MAX_BITS;
 
   int spare;
-  //int seq; // ITU M.R. 1371-3 Anex 2 5.3.1
+  // TODO: seq? // ITU M.R. 1371-3 Anex 2 5.3.1
   int dac; // dac+fi = app id
   int fi;
 
@@ -506,7 +505,7 @@ std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
 
 // Text telegram ITU 1371-1 - this is OLD
 class Ais8_1_0 : public Ais8 {
-public:
+ public:
   bool ack_required;
   int msg_seq;
   std::string text;
@@ -525,7 +524,7 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_0 const& msg);
 
 // Persons on board ITU 1371-1 - this is OLD
 class Ais8_1_40 : public Ais8 {
-public:
+ public:
   int persons;
   int spare2;
   Ais8_1_40(const char *nmea_payload, size_t pad);
@@ -537,7 +536,7 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_40 const& msg);
 // IMO Circ 289 met hydro - Not to be transmitted after 2013-Jan-01
 // See also IMO Circ 236
 class Ais8_1_11 : public Ais8 {
-public:
+ public:
     float x, y; // warning... appears in the bit stream as y,x
     int day;
     int hour;
@@ -574,7 +573,7 @@ public:
     float salinity;
     int ice; // yes/no/undef/unknown
     int spare2;
-    int extended_water_level; //spare;  // OHMEX uses this for extra water level precision
+    int extended_water_level;  // OHMEX uses this for extra water level precision
 
   Ais8_1_11(const char *nmea_payload, size_t pad);
     void print();
@@ -675,7 +674,7 @@ class Ais8_1_21 : public Ais8 {
   std::string location;
   float x, y; // 25, 24 bits
   int utc_day, utc_hour, utc_min;
-  //int wx;
+  // wx - use wx[0]
   float horz_viz; // nautical miles
   int humidity;  // %
   int wind_speed;  // ave knots
@@ -699,19 +698,19 @@ class Ais8_1_21 : public Ais8 {
   int cog;
   float sog;
   int heading;  // Assume this is true degrees????
-  //int pressure;
+  // pressure defined in type 0
   float rel_pressure;  // 3 hour hPa
-  // pressure_tendency
-  //int wind_dir;
+  // pressure_tendenc defined in type 0
+  // wind_dir defined in type 0
   float wind_speed_ms; // m/s
   int wind_dir_rel;
   float wind_speed_rel; // m/s
   float wind_gust_speed; // m/s
   int wind_gust_dir;
-  int air_temp_raw;  // Seriously?  I'm not saving air temperature in fracking kelvin.
-  // humid
+  int air_temp_raw;  // TODO: Seriously?  Convert this to C.  Kelvin does not make send
+  // humidity defined in type 0
   // sea_temp_k
-  int water_temp_raw;  // TODO fix this
+  int water_temp_raw;  // TODO: fix this
   // hor_viz
   int wx[3]; // current, past 1, past 2
   int cloud_total;
@@ -742,7 +741,6 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_21 const& msg);
 
 
 // SEE ais8_001_22.h for Area notice
-
 
 // No message 8_1_23
 
@@ -1167,7 +1165,7 @@ class Ais8_200_55 : public Ais8 {
 // Old Zone message for SBNMS / Boston right whales
 #if 0
 class Ais8_366_34 : public Ais8 {
-public:
+ public:
     int zone_id;
     int zone_type;
     int day;
@@ -1182,7 +1180,7 @@ std::ostream& operator<< (std::ostream& o, Ais8_366_34 const& msg);
 #endif
 
 class Ais9 : public AisMsg {
-public:
+ public:
     int alt; // m above sea level
     float sog;
     int position_accuracy;
@@ -1235,7 +1233,7 @@ std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
 
 // 10 ":" - UTC and date inquiry
 class Ais10 : public AisMsg {
-public:
+ public:
     int spare;
     int dest_mmsi;
     int spare2;
@@ -1249,7 +1247,7 @@ std::ostream& operator<< (std::ostream& o, Ais10 const& msg);
 
 // '<' - Addressd safety related
 class Ais12 : public AisMsg {
-public:
+ public:
     int seq_num;
     int dest_mmsi;
     bool retransmitted;
@@ -1265,7 +1263,7 @@ std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
 
 // '>' - Safety broadcast
 class Ais14 : public AisMsg {
-public:
+ public:
     int spare;
     std::string text;
     int expected_num_spare_bits; // The bits in the nmea_payload not used
@@ -1278,7 +1276,7 @@ std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
 
 // ? - Interrogation
 class Ais15 : public AisMsg {
-public:
+ public:
     int spare;
     int mmsi_1;
     int msg_1_1;
@@ -1301,7 +1299,7 @@ std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
 
 // @ - Assigned mode command
 class Ais16 : public AisMsg {
-public:
+ public:
     int spare;
     int dest_mmsi_a;
     int offset_a;
@@ -1321,30 +1319,18 @@ struct GnssCorrection17 {
     int msg_type;
     int station_id;
     int z_cnt;
-    //int n;
     int health;
   // TODO: DGNSS data word - what is their word size?
 };
 
-// A - GNSS broacast - FIX: only partially coded
+// A - GNSS broacast - TODO: only partially coded
 class Ais17 : public AisMsg {
-public:
+ public:
     int spare;
     float x, y;
     int spare2;
 
-  // TODO: These should be lists for each payload?  Use a struct?
-#if 0
-    int msg_type;
-    int station_id;
-    int z_cnt;
-    int n;
-    int health;
-#endif
-  // std::vector<GnssCorrection17> corrections;
-
-    // Anyfield below here is subject to change
-  //std::vector<unsigned char> payload; // Up to 29 words... FIX: what should be here?
+    // TODO: Handle payload
 
     Ais17(const char *nmea_payload);
     void print();
@@ -1354,7 +1340,7 @@ std::ostream& operator<< (std::ostream& o, Ais17 const& msg);
 
 // B - Class B position report
 class Ais18 : public AisMsg {
-public:
+ public:
     int spare;
     float sog;
     int position_accuracy;
@@ -1409,7 +1395,7 @@ std::ostream& operator<< (std::ostream& o, Ais18 const& msg);
 
 // C - Class B extended ship and position
 class Ais19 : public AisMsg {
-public:
+ public:
     int spare;
     float sog;
     int position_accuracy;
@@ -1437,7 +1423,7 @@ std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
 
 // 'D' - Data link management - FIX: not yet coded
 class Ais20 : public AisMsg {
-public:
+ public:
     int spare;
     int offset_1;
     int num_slots_1;
@@ -1470,7 +1456,7 @@ std::ostream& operator<< (std::ostream& o, Ais20 const& msg);
 
 // 'E' - Aids to navigation report - FIX: not yet coded
 class Ais21 : public AisMsg {
-public:
+ public:
 
     int aton_type;
     std::string name;
@@ -1498,7 +1484,7 @@ std::ostream& operator<< (std::ostream& o, Ais21 const& msg);
 
 // 'F' - Channel Management
 class Ais22 : public AisMsg {
-public:
+ public:
     int spare;
     int chan_a;
     int chan_b;
@@ -1528,7 +1514,7 @@ std::ostream& operator<< (std::ostream& o, Ais22 const& msg);
 
 // 'G' - Group Assignment Command - FIX: not yet coded
 class Ais23 : public AisMsg {
-public:
+ public:
     int spare;
     float x1,y1;
     float x2,y2;
@@ -1550,7 +1536,7 @@ std::ostream& operator<< (std::ostream& o, Ais23 const& msg);
 
 // Class B Static Data report
 class Ais24 : public AisMsg {
-public:
+ public:
     int part_num;
 
     // Part A
@@ -1573,7 +1559,7 @@ std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 
 // 'I' - Single slot binary message - addressed or broadcast - TODO: handle payload
 class Ais25 : public AisMsg {
-public:
+ public:
     bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
 
     bool dest_mmsi_valid;
@@ -1590,8 +1576,7 @@ std::ostream& operator<< (std::ostream& o, Ais25 const& msg);
 
 // 'J' - Multi slot binary message with comm state - TODO: handle payload
 class Ais26 : public AisMsg {
-public:
-  //bool addressed; // broadcast if false - destination indicator
+ public:
     bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
 
     bool dest_mmsi_valid;
@@ -1641,7 +1626,7 @@ std::ostream& operator<< (std::ostream& o, Ais26 const& msg);
 
 // K - Long-range position report - e.g. for satellite receivers
 class Ais27 : public AisMsg {
-public:
+ public:
     int position_accuracy;
     bool raim ;
     int nav_status;

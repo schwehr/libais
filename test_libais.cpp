@@ -2,9 +2,6 @@
 
 #include "ais8_001_22.h"
 
-//#include <cstdlib>
-//using namespace std;
-
 #define UNUSED __attribute((__unused__))
 
 int main(UNUSED int argc, UNUSED char* argv[]) {
@@ -40,21 +37,13 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     if (true) {
         // Causes bus error
         // !AIVDM,1,1,,A,74i:pT000000,0*52,b003669977,1273190417
-        //CHECKPOINT;
-        {Ais7_13 msg("74i:pT000000"); msg.print();}
-        //CHECKPOINT;
-
-        {Ais7_13 msg("75Mu6d0P17IP?PfGSC29WOvb0<14"); msg.print();}
-
-        //CHECKPOINT;
+        { Ais7_13 msg("74i:pT000000"); msg.print(); }
+        { Ais7_13 msg("75Mu6d0P17IP?PfGSC29WOvb0<14"); msg.print(); }
         { Ais7_13 msg("74eGSe@0owtf"); msg.print(); }
-
-        //CHECKPOINT;
         {
             Ais7_13 msg("74eGSe@0owt");
             assert(msg.had_error());
             std::cout << "expect error " << AIS_ERR_BAD_BIT_COUNT << ": " << msg.get_error() << std::endl;
-            //msg.print();
         }
     }
 
@@ -78,7 +67,6 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     ///// 1 11 IMO Met Hydro
 
     if (true) {
-        //CHECKPOINT;
         int i=0;
         // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
         {
@@ -87,11 +75,9 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n";
         }
-        //CHECKPOINT;
-
     }
 
-    if (true) {   
+    if (true) {
         // # NO Location
         // Environment: mmsi=366001 sensor_reports: [1]
         //    SensorReport Location: site_id=1 type=0 d=22 hr=0 m=8 x=181 y=91 z=200.2 owner=5 - "port authority" timeout=5 - 24 (hrs)
@@ -144,7 +130,6 @@ bit_len: 578
             else std::cout<<"FAILED 8 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n";
         }
-        //CHECKPOINT;
 
     }
 
@@ -278,7 +263,7 @@ bit_len: 578
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
             std::cout << "\n";
         }
-        //!AIVDM,1,1,,B,?h3Ovn1GP<K0<P@59a0,2*04,d-077,S1832,t004248.00,T48.85520485,r07RPAL1,1272415370
+        // !AIVDM,1,1,,B,?h3Ovn1GP<K0<P@59a0,2*04,d-077,S1832,t004248.00,T48.85520485,r07RPAL1,1272415370
         {
             Ais15 msg("?h3Ovn1GP<K0<P@59a0");  i++;
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED 15 "<< i << " "<< AIS_STATUS_STRINGS[msg.get_error()] << "\n";
@@ -339,7 +324,6 @@ bit_len: 578
     //////////////////////////////////////////////////////////////////////
 
     if (true) {
-        //CHECKPOINT;
         int i=0;
         // From OHMEX test at CCOM
         // !AIVDM,1,1,,A,E52HH<h:W4?Sa2Pb?Q0dgVPa4W0uM`P9<EmvH00000u@20,4*15,1269957000.16
@@ -350,8 +334,8 @@ bit_len: 578
             std::cout << "\n";
         }
 
-        //!AIVDM,2,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q,0*46
-        //!AIVDM,2,2,5,B,:D44QDlp0C1DU00,2*36
+        // !AIVDM,2,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q,0*46
+        // !AIVDM,2,2,5,B,:D44QDlp0C1DU00,2*36
         // Becomes !AIVDM,1,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q:D44QDlp0C1DU00,2*63
         {
             Ais21 msg("E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q:D44QDlp0C1DU00");  i++;
@@ -398,7 +382,7 @@ bit_len: 578
         }
 
         if (true) {
-            //# Circle
+            // # Circle
             // AreaNotice: type=1  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
             // !ECBBM,1,1,3,A,8,5fF0`2qP000N1n0uT0h7mH3E0000,5*42
             // !AIVDM,1,1,,A,81mg=5AKUP:0fH0007PMP?I0<1uF0m@000,3*1A
@@ -411,7 +395,6 @@ bit_len: 578
         }
 
         if (true) {
-        //if (true) {
             std::cout << "========== Rectangle =========\n\n";
             // AreaNotice: type=3  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
             // {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"areas": [{"n_dim": 1000, "orientation": 0, "geometry": {"type": "Polygon", "coordinates": [[-69.80000000000004, 42.099999999999966], [-69.75162960655275, 42.100327032875335], [-69.7517359921246, 42.10933275886458], [-69.80011323018579, 42.1090056233274], [-69.80000000000004, 42.099999999999966]]}, "area_shape": 1, "e_dim": 4000, "area_shape_name": "rectangle"}], "bbm_type": [366, 22], "bbm_name": "area_notice", "freetext": null}}
@@ -424,7 +407,7 @@ bit_len: 578
 
         if (true) {
             std::cout << "========== Sector =========\n\n";
-            //Sector AreaNotice: type=4  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
+            // Sector AreaNotice: type=4  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 1
             Ais8_366_22 msg("81mg=5AKUP:2>H0007R=P?I0<3jQwl0:6@");
             if (!msg.had_error()) msg.print(); else std::cout<<"Sector FAILED\n";
             std::cout << "\n";
@@ -434,7 +417,7 @@ bit_len: 578
             std::cout << "========== Line =========\n\n";
             // Line - 1 segment
             {
-                Ais8_366_22 msg("81mg=5AKUP:5>H0007P=P?I0>CQh000003@D7QJ00;@01J000"); //81mg=5AKUP:2fH0007P=P?I0<4e7p00003@D7QJ00;@");
+                Ais8_366_22 msg("81mg=5AKUP:5>H0007P=P?I0>CQh000003@D7QJ00;@01J000");
                 if (!msg.had_error()) msg.print(); else std::cout<<"Line seg FAILED\n";
             }
             std::cout << "========== END LINE ==========\n\n";
@@ -479,12 +462,7 @@ bit_len: 578
 
     if (true) {
         std::cout << "bbm: 8 1 22" << std::endl;
-        //for (size_t i=0; i < AIS8_001_22_NUM_NAMES; i++) {
-        //    std::cout << i << "\t" << notice_names[i] << "\n";
-        //}
-
         if (true) {
-            // Point
             /*
               AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
               !AIVDM,1,1,,A,81mg=5@0EP:0>H0007P>0<D1<qp400000,0*1D
@@ -495,8 +473,6 @@ bit_len: 578
 
               original_geojson: {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T00:00:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Marine mammal habitat", "stop": "2011-07-06T01:00:00Z", "areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.0]}, "area_shape_name": "point", "area_shape": 0}], "bbm_type": [1, 22], "bbm_name": "area_notice", "area_type": 0}}
              */
-
-
             std::cout << "\n\nPoint: ****\n";
             Ais8_001_22 msg("81mg=5@0EP:0>H0007P>0<D1<qp400000", 0);
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
@@ -505,7 +481,6 @@ bit_len: 578
 
 
         if (true) {
-            // Circle
             /*
               AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
               "mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T00:00:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Marine mammal habitat", "stop": "2011-07-06T01:00:00Z", "areas": [{"geometry": {"type": "Polygon", "coordinates": [[-69.74852592241444, 42.050347260650405],
@@ -522,7 +497,6 @@ bit_len: 578
 
 
         if (true) {
-            // Rect
             /*
 AreaNotice: type=3  start=2011-07-06 05:31:00  duration=60 m  link_id=10  sub-areas: 1
 {"mmsi": 123456789, "repeat": 0, "msgtype": 8,
@@ -618,22 +592,6 @@ AreaNotice: type=7  start=2011-07-06 23:59:00  duration=60 m  link_id=10  sub-ar
             if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
             std::cout << "\n";
         }
-
-#if 0
-
-        if (true) {
-            /*
-
-             */
-            std::cout << "\n\n: ****\n";
-            Ais8_001_22 msg("");
-            if (!msg.had_error()) msg.print(); else std::cout<<"FAILED\n";
-            std::cout << "\n";
-        }
-#endif
-
-
-
     }
 
 

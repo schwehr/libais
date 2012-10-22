@@ -134,7 +134,7 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = { // 128] = {
    "(reserved for future use)", // 124
    "Other - Define in associated text field", // 125
    "Cancellation - cancel area as identified by Message Linkage ID", // 126
-   "Undefined (default)" //, // 127
+   "Undefined (default)" // 127
 };
 
 static int scale_multipliers[4] = {1,10,100,1000};
@@ -245,7 +245,7 @@ void Ais8_001_22_Polygon::print() {
 
 Ais8_001_22_Text::Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     text = std::string(ais_str(bs, offset+3, 84));
-    //spare = ubits(bs,offset+87,3);
+    // TODO: spare?
 }
 
 void Ais8_001_22_Text::print() {
@@ -343,8 +343,7 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
 Ais8_001_22::~Ais8_001_22() {
     // FIX: why is the destructor getting called 2x for each sub area?
     for (size_t i=0; i < sub_areas.size(); i++) {
-        delete sub_areas[i];  // FIX: leak?
-        //sub_areas[i] = 0;
+        delete sub_areas[i];  // TODO: no I need to set pointers to 0 after deleting?
     }
 }
 

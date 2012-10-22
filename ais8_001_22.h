@@ -38,10 +38,8 @@ extern const char *ais8_001_22_shape_names[8];
 //////////////////////////////////////////////////////////////////////
 
 class Ais8_001_22_SubArea {
-public:
-    //Ais8_001_22_AreaShapeEnum area_shape;
+ public:
     virtual Ais8_001_22_AreaShapeEnum getType() const = 0;
-    // FIX: make the destructor pure virtual
     virtual ~Ais8_001_22_SubArea() {}
     virtual void print()=0;
 };
@@ -50,7 +48,7 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
 
 // or Point if radius is 0
 class Ais8_001_22_Circle : public Ais8_001_22_SubArea {
-public:
+ public:
     float x,y; // longitude and latitude
     // Going to assume that the precision is load of crap
     int precision; // How many decimal places for x and y.  Track it, but it's useless in my opinion
@@ -64,7 +62,7 @@ public:
 };
 
 class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
-public:
+ public:
     float x,y; // longitude and latitude
     int precision; // How many decimal places for x and y.  Useless
     int e_dim_m; // East dimension in meters
@@ -80,7 +78,7 @@ public:
 };
 
 class Ais8_001_22_Sector : public Ais8_001_22_SubArea {
-public:
+ public:
     float x,y; // longitude and latitude
     int precision; // How many decimal places for x and y  FIX: in IMO, but not RTCM
     int radius_m;
@@ -97,11 +95,8 @@ public:
 // Must have a point before on the VDL
 // FIX: do I bring in the prior point x,y, precision?
 class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
-public:
-
-    // x, y, and precision sent as separate Point before the waypoint start
-    //float x,y; // longitude and latitude
-    //int precision; // How many decimal places for x and y.  FIX: in IMO
+ public:
+    // TODO: int precision; // How many decimal places for x and y.  FIX: in IMO
 
     // Up to 4 points
     std::vector<float> angles;
@@ -118,11 +113,8 @@ public:
 // FIX: brin in the prior point?  And do we fold the sub area data
 // into one polygon if there are more than one?
 class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
-public:
-
-    // x, y, and precision sent as separate Point before the waypoint start
-    //float x,y; // longitude and latitude
-    //int precision; // How many decimal places for x and y.  FIX: in IMO
+ public:
+    // TODO: int precision; // How many decimal places for x and y.  FIX: in IMO
 
     // Up to 4 points in a first message, but aggregated if multiple sub areas
     std::vector<float> angles;
@@ -137,9 +129,9 @@ public:
 
 
 class Ais8_001_22_Text : public Ais8_001_22_SubArea {
-public:
+ public:
     std::string text;
-    //unsigned int spare; // 3 bits
+    // TODO: spare?
 
     Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Text() {}
@@ -153,7 +145,7 @@ public:
 //////////////////////////////////////////////////////////////////////
 
 class Ais8_001_22 : public Ais8 {
-public:
+ public:
     // Common block at the front
     int link_id; // 10 bit id to match up text blocks
     int notice_type; // area_type / Notice Description

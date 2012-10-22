@@ -57,7 +57,6 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
 
 
 void Ais21::print() {
-    //CHECKPOINT;
     std::cout << "ATON status: " << message_id << "\n"
               << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n"
 

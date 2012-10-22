@@ -2,10 +2,7 @@
 
 #include <iostream>
 #include <bitset>
-//#include <string>
 #include <cassert>
-//#include <vector>
-//using namespace std;
 
 // TODO: pad
 Ais7_13::Ais7_13(const char *nmea_payload) {
