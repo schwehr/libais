@@ -23,7 +23,7 @@ set (SOURCES
     ais4_11
     ais5
     ais7_13
-    ais8 ais8_001_22 ais8_366_22
+    ais8 ais8_001_22 ais8_001_26 ais8_366_22
     ais9
     ais10 # :
     # ais11 ; - See 4
