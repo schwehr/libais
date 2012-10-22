@@ -527,7 +527,6 @@ ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 PyObject*
 ais6_to_pydict(const char *nmea_payload, const size_t pad) {
-  //std::cerr << "ais6_to_pydict: " << nmea_payload << "\n";
     assert (nmea_payload);
     Ais6 msg(nmea_payload, pad);
     if (msg.had_error()) {
@@ -547,11 +546,8 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
     DictSafeSetItem(dict,"fi", msg.fi);
 
     // TODO: manage all the submessage types
-    //DictSafeSetItem(dict,"parsed",false);
 
-    //std::cerr << "ais6_to_pydict: " << msg.dac << " " << msg.fi << "\n";
-
-  // TODO: properly handle exceptions in the sub messages!!!!
+    // TODO: properly handle exceptions in the sub messages!!!!
     switch (msg.dac) {
       case 1:  // IMO
       switch (msg.fi) {
@@ -666,8 +662,8 @@ ais8_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
     // FIX: add error checking
 void
 ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-  assert(nmea_payload); assert(dict); assert(0<= pad && pad <= 7); // 7 should be 5, right?
-  Ais8_1_11 msg(nmea_payload, pad);
+    assert(nmea_payload); assert(dict); assert(pad < 6);
+    Ais8_1_11 msg(nmea_payload, pad);
     DictSafeSetItem(dict,"x", msg.x);
     DictSafeSetItem(dict,"y", msg.y);
 
@@ -715,21 +711,11 @@ ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
     DictSafeSetItem(dict,"spare2", msg.extended_water_level);
 }
 
-#if 0
-void
-ais8_1__append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_ msg(nmea_payload, pad);  // TODO: check for errors
-  // TODO: implement
-  std::cerr << "TODO: implment" << std::endl;
-}
-#endif
-
   // 12 is addressed
 
 void
 ais8_1_13_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  assert(nmea_payload); assert(dict); assert(pad < 6);
   Ais8_1_13 msg(nmea_payload, pad);  // TODO: check for errors
   DictSafeSetItem(dict, "reason", msg.reason);
   DictSafeSetItem(dict, "location_from", msg.location_from);
