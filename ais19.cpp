@@ -40,7 +40,7 @@ Ais19::Ais19(const char *nmea_payload) {
     dim_d = ubits(bs, 295, 6);
 
     fix_type = ubits(bs, 301, 4);
-    raim = bool(bs[305]);
+    raim = bs[305];
     dte = bs[306];
     assigned_mode = bs[307];
     spare3 = ubits(bs,308,4);

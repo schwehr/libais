@@ -20,13 +20,13 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) {
     mmsi = ubits(bs,8,30);
 
     position_accuracy = bs[38];
-    raim = bool(bs[39]);
+    raim = bs[39];
     nav_status = ubits(bs, 40, 4);
     x = sbits(bs, 44, 18) / 600.;
     y = sbits(bs, 62, 17) / 600.;
     sog = ubits(bs,79,6);
     cog = ubits(bs,85,9);
-    gnss = !bool(bs[94]);
+    gnss = !bs[94];
     spare = bs[95];
 }
 

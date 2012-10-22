@@ -84,7 +84,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
       slots_to_allocate = ubits(bs, comm_flag_offset+16, 3);
       slots_to_allocate_valid = true;
 
-      keep_flag = bool(bs[comm_flag_offset+19]);
+      keep_flag = bs[comm_flag_offset+19];
       keep_flag_valid = true;
     }
 

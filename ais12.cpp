@@ -21,8 +21,8 @@ Ais12::Ais12(const char *nmea_payload) {
 
     seq_num = ubits(bs,38,2);
     dest_mmsi = ubits(bs,40,30);
-    retransmitted = bool(bs[70]);
-    spare = bool(bs[71]);
+    retransmitted = bs[70];
+    spare = bs[71];
     int num_txt_bits = 6 * ((num_char * 6 - 72) / 6);
     text = ais_str(bs,72,num_txt_bits);
 }

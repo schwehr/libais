@@ -31,11 +31,11 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
     dim_d = ubits(bs, 243, 6);
     fix_type = ubits(bs, 249, 4);
     timestamp = ubits(bs, 253, 6);
-    off_pos = bool(bs[259]);
+    off_pos = bs[259];
     aton_status = ubits(bs, 260, 8);
-    raim = bool(bs[268]);
-    virtual_aton = bool(bs[269]);
-    assigned_mode = bool(bs[270]);
+    raim = bs[268];
+    virtual_aton = bs[269];
+    assigned_mode = bs[270];
     spare = bs[271];
 
     const size_t extra_total_bits = num_bits - 272;

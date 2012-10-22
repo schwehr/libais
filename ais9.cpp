@@ -34,7 +34,7 @@ Ais9::Ais9(const char *nmea_payload) {
     dte = bs[142];
     spare2 = ubits(bs, 143, 3);
     assigned_mode = bs[146];
-    raim = bool(bs[147]);
+    raim = bs[147];
     commstate_flag = bs[148];  // 0 SOTDMA, 1 ITDMA
 
     sync_state = ubits(bs, 149, 2);
@@ -90,7 +90,7 @@ Ais9::Ais9(const char *nmea_payload) {
         slots_to_allocate = ubits(bs, 164, 3);
         slots_to_allocate_valid = true;
 
-        keep_flag = bool(bs[167]);
+        keep_flag = bs[167];
         keep_flag_valid = true;
     }
 }

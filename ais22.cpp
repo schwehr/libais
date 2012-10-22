@@ -23,10 +23,10 @@ Ais22::Ais22(const char *nmea_payload) {
     chan_a = ubits(bs,40,12);
     chan_b = ubits(bs,52,12);
     txrx_mode = ubits(bs, 64, 4);
-    power_low = bool(bs[68]);
+    power_low = bs[68];
 
     // WARNING: OUT OF ORDER DECODE
-    bool addressed = bool(bs[139]);
+    bool addressed = bs[139];
 
     if (not(addressed)) {
       // geographic position
@@ -40,9 +40,9 @@ Ais22::Ais22(const char *nmea_payload) {
       pos_valid = false;
       dest_valid = true;
       dest_mmsi_1 = ubits(bs, 69, 30);
-      // 5 spare 0 bits
+      // TODO: save the 5 spare bits
       dest_mmsi_2 = ubits(bs, 104, 30);
-      // 5 spare 0 bits
+      // TODO: save the 5 spare bits
     }
 
     // OUT OF ORDER: addressed is before

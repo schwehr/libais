@@ -80,7 +80,7 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad=0) {
   fi = ubits(bs,50,6);
 
   if ( 1 != dac || 0 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-  ack_required = bool(bs[56]);
+  ack_required = bs[56];
   msg_seq = ubits(bs,57,11);
 
   const size_t text_size = 6 * ((num_bits - 68)/6);

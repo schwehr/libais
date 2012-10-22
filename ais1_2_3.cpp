@@ -46,7 +46,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     timestamp = ubits(bs, 137, 6);
     special_manoeuvre = ubits(bs, 143, 2);
     spare = ubits(bs, 145, 3);
-    raim = bool(bs[148]);
+    raim = bs[148];
 
     sync_state = ubits(bs, 149, 2);
 
@@ -100,7 +100,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
         slots_to_allocate = ubits(bs, 164, 3);
         slots_to_allocate_valid = true;
 
-        keep_flag = bool(bs[167]);
+        keep_flag = bs[167];
         keep_flag_valid = true;
     }
 }

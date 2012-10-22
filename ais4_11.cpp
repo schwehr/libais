@@ -40,7 +40,7 @@ Ais4_11::Ais4_11(const char *nmea_payload) {
     fix_type = ubits(bs,134,4);
     transmission_ctl = bs[138];
     spare = ubits(bs,139,9);
-    raim = bool(bs[148]);
+    raim = bs[148];
 
     //
     // SOTDMA commstate

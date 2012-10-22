@@ -217,7 +217,7 @@ bool decode_header6(std::bitset<T> &bs, Ais6 &msg) {
   msg.mmsi = ubits(bs,8,30);
   msg.seq = ubits(bs,38,2);
   msg.mmsi_dest = ubits(bs, 40, 30);
-  msg.retransmit = !bool(bs[70]);
+  msg.retransmit = !bs[70];
   msg.spare = bs[71];
   msg.dac = ubits(bs,72,10);
   msg.fi = ubits(bs,82,6);

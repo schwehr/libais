@@ -40,7 +40,7 @@ Ais18::Ais18(const char *nmea_payload) {
     band_flag = bs[144];
     m22_flag = bs[145];
     mode_flag = bs[146];
-    raim = bool(bs[147]);
+    raim = bs[147];
     commstate_flag = bs[148];  // 0 SOTDMA, 1 ITDMA
 
     // TODO: set all to -1 and set valids to NOT!
@@ -93,7 +93,7 @@ Ais18::Ais18(const char *nmea_payload) {
             slots_to_allocate = ubits(bs, 164, 3);
             slots_to_allocate_valid = true;
 
-            keep_flag = bool(bs[167]);
+            keep_flag = bs[167];
             keep_flag_valid = true;
         }
     }
