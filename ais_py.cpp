@@ -1038,13 +1038,212 @@ ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
   // no 25 broadcast
 
+static void ais8_1_26_append_pydict_sensor_hdr(PyObject *dict, Ais8_1_26_SensorReport* rpt) {
+  assert(dict);
+  assert(rpt);
+  DictSafeSetItem(dict, "report_type", rpt->report_type);
+  DictSafeSetItem(dict, "utc_day", rpt->utc_day);
+  DictSafeSetItem(dict, "utc_hr", rpt->utc_hr);
+  DictSafeSetItem(dict, "utc_min", rpt->utc_min);
+  DictSafeSetItem(dict, "site_id", rpt->site_id);
+}
+
 // IMO Circ 289 - Environmental
 void
 ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-  assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
+  assert(nmea_payload);
+  assert(dict);
+  assert(pad < 6);
   Ais8_1_26 msg(nmea_payload, pad);  // TODO: check for errors
 
-  std::cerr << "TODO: Implement the huge 8_1_26 env message";
+  PyObject *rpt_list = PyList_New(msg.reports.size());
+  DictSafeSetItem(dict, "reports", rpt_list);
+
+  for (size_t rpt_num=0; rpt_num < msg.reports.size(); rpt_num++) {
+    PyObject *rpt_dict = PyDict_New();
+    PyList_SetItem(rpt_list, rpt_num, rpt_dict);
+
+    switch(msg.reports[rpt_num]->report_type) {
+      // case AIS8_1_26_SENSOR_ERROR:
+      case AIS8_1_26_SENSOR_LOCATION:
+        {
+          Ais8_1_26_Location *rpt = (Ais8_1_26_Location *)msg.reports[rpt_num];
+          ais8_1_26_append_pydict_sensor_hdr(rpt_dict, rpt);
+          DictSafeSetItem(rpt_dict, "x", rpt->x);
+          DictSafeSetItem(rpt_dict, "y", rpt->y);
+          DictSafeSetItem(rpt_dict, "z", rpt->z);
+          DictSafeSetItem(rpt_dict, "owner", rpt->owner);
+          DictSafeSetItem(rpt_dict, "timeout", rpt->timeout);
+          DictSafeSetItem(rpt_dict, "spare", rpt->spare);
+        }
+        break;
+      case AIS8_1_26_SENSOR_STATION:
+        {
+          Ais8_1_26_Station *rpt = (Ais8_1_26_Station *)msg.reports[rpt_num];
+          DictSafeSetItem(rpt_dict, "name", rpt->name);
+          DictSafeSetItem(rpt_dict, "spare", rpt->spare);
+        }
+        break;
+      case AIS8_1_26_SENSOR_WIND:
+        {
+          Ais8_1_26_Wind *rpt = (Ais8_1_26_Wind *)msg.reports[rpt_num];
+          DictSafeSetItem(rpt_dict, "wind_speed", rpt->wind_speed);
+          DictSafeSetItem(rpt_dict, "wind_gust", rpt->wind_gust);
+          DictSafeSetItem(rpt_dict, "wind_dir", rpt->wind_dir);
+          DictSafeSetItem(rpt_dict, "wind_gust_dir", rpt->wind_gust_dir);
+          DictSafeSetItem(rpt_dict, "sensor_type", rpt->sensor_type);
+          DictSafeSetItem(rpt_dict, "wind_forcast", rpt->wind_forcast);
+          DictSafeSetItem(rpt_dict, "wind_gust_forcast", rpt->wind_gust_forcast);
+          DictSafeSetItem(rpt_dict, "wind_dir_forcast", rpt->wind_dir_forcast);
+          DictSafeSetItem(rpt_dict, "utc_day_forcast", rpt->utc_day_forcast);
+          DictSafeSetItem(rpt_dict, "utc_hour_forcast", rpt->utc_hour_forcast);
+          DictSafeSetItem(rpt_dict, "utc_min_forcast", rpt->utc_min_forcast);
+          DictSafeSetItem(rpt_dict, "duration", rpt->duration);
+          DictSafeSetItem(rpt_dict, "spare", rpt->spare);
+        }
+        break;
+      case AIS8_1_26_SENSOR_WATER_LEVEL:
+        {
+          Ais8_1_26_WaterLevel *rpt = (Ais8_1_26_WaterLevel *)msg.reports[rpt_num];
+          DictSafeSetItem(rpt_dict, "type", rpt->type);
+          DictSafeSetItem(rpt_dict, "level", rpt->level);
+          DictSafeSetItem(rpt_dict, "trend", rpt->trend);
+          DictSafeSetItem(rpt_dict, "vdatum", rpt->vdatum);
+          DictSafeSetItem(rpt_dict, "sensor_type", rpt->sensor_type);
+          DictSafeSetItem(rpt_dict, "forcast_type", rpt->forcast_type);
+          DictSafeSetItem(rpt_dict, "level_forcast", rpt->level_forcast);
+          DictSafeSetItem(rpt_dict, "utc_day_forcast", rpt->utc_day_forcast);
+          DictSafeSetItem(rpt_dict, "utc_hour_forcast", rpt->utc_hour_forcast);
+          DictSafeSetItem(rpt_dict, "utc_min_forcast", rpt->utc_min_forcast);
+          DictSafeSetItem(rpt_dict, "duration", rpt->duration);
+          DictSafeSetItem(rpt_dict, "spare", rpt->spare);
+        }
+        break;
+      case AIS8_1_26_SENSOR_CURR_2D:
+        {
+          Ais8_1_26_Curr2D *rpt = (Ais8_1_26_Curr2D *)msg.reports[rpt_num];
+          DictSafeSetItem(rpt_dict, "type", rpt->type);
+          DictSafeSetItem(rpt_dict, "spare", rpt->spare);
+
+          PyObject *curr_list = PyList_New(3);
+          DictSafeSetItem(dict, "currents", curr_list);
+          for(size_t idx=0; idx<3; idx++) {
+            PyObject *curr_dict = PyDict_New();
+            DictSafeSetItem(curr_dict, "speed", rpt->currents[idx].speed);
+            DictSafeSetItem(curr_dict, "dir", rpt->currents[idx].dir);
+            DictSafeSetItem(curr_dict, "depth", rpt->currents[idx].depth);
+            PyList_SetItem(curr_list, idx, curr_dict);
+          }
+        }
+        break;
+      case AIS8_1_26_SENSOR_CURR_3D:
+        {
+          Ais8_1_26_Curr3D *rpt = (Ais8_1_26_Curr3D *)msg.reports[rpt_num];
+
+          DictSafeSetItem(rpt_dict, "type", rpt->type);
+          DictSafeSetItem(rpt_dict, "spare", rpt->spare);
+
+          PyObject *curr_list = PyList_New(3);
+          DictSafeSetItem(dict, "currents", curr_list);
+          for(size_t idx=0; idx<2; idx++) {
+            // ERROR: no way to specify negative direction
+            PyObject *curr_dict = PyDict_New();
+            PyList_SetItem(curr_list, idx, curr_dict);
+            DictSafeSetItem(curr_dict, "north", rpt->currents[idx].north);
+            DictSafeSetItem(curr_dict, "east", rpt->currents[idx].east);
+            DictSafeSetItem(curr_dict, "up", rpt->currents[idx].up);
+            DictSafeSetItem(curr_dict, "depth", rpt->currents[idx].depth);
+          }
+        }
+        break;
+      case AIS8_1_26_SENSOR_HORZ_FLOW:
+        {
+          Ais8_1_26_HorzFlow *rpt = (Ais8_1_26_HorzFlow *)msg.reports[rpt_num];
+          DictSafeSetItem(rpt_dict, "spare", rpt->spare);
+
+          PyObject *curr_list = PyList_New(3);
+          DictSafeSetItem(dict, "currents", curr_list);
+          for(size_t idx=0; idx<2; idx++) {
+            PyObject *curr_dict = PyDict_New();
+            PyList_SetItem(curr_list, idx, curr_dict);
+            DictSafeSetItem(curr_dict, "bearing", rpt->currents[idx].bearing);
+            DictSafeSetItem(curr_dict, "dist", rpt->currents[idx].dist);
+            DictSafeSetItem(curr_dict, "speed", rpt->currents[idx].speed);
+            DictSafeSetItem(curr_dict, "dir", rpt->currents[idx].dir);
+            DictSafeSetItem(curr_dict, "level", rpt->currents[idx].level);
+          }
+        }
+        break;
+      case AIS8_1_26_SENSOR_SEA_STATE:
+        {
+          Ais8_1_26_SeaState *rpt = (Ais8_1_26_SeaState *)msg.reports[rpt_num];
+          DictSafeSetItem(rpt_dict, "swell_height", rpt->swell_height);
+          DictSafeSetItem(rpt_dict, "swell_period", rpt->swell_period);
+          DictSafeSetItem(rpt_dict, "swell_dir", rpt->swell_dir);
+          DictSafeSetItem(rpt_dict, "sea_state", rpt->sea_state);
+          DictSafeSetItem(rpt_dict, "swell_sensor_type", rpt->swell_sensor_type);
+          DictSafeSetItem(rpt_dict, "water_temp", rpt->water_temp);
+          DictSafeSetItem(rpt_dict, "water_temp_depth", rpt->water_temp_depth);
+          DictSafeSetItem(rpt_dict, "water_sensor_type", rpt->water_sensor_type);
+          DictSafeSetItem(rpt_dict, "wave_height", rpt->wave_height);
+          DictSafeSetItem(rpt_dict, "wave_period", rpt->wave_period);
+          DictSafeSetItem(rpt_dict, "wave_dir", rpt->wave_dir);
+          DictSafeSetItem(rpt_dict, "wave_sensor_type", rpt->wave_sensor_type);
+          DictSafeSetItem(rpt_dict, "salinity", rpt->salinity);
+        }
+        break;
+      case AIS8_1_26_SENSOR_SALINITY:
+        {
+          Ais8_1_26_Salinity *rpt = (Ais8_1_26_Salinity *)msg.reports[rpt_num];
+          DictSafeSetItem(rpt_dict, "water_temp", rpt->water_temp);
+          DictSafeSetItem(rpt_dict, "conductivity", rpt->conductivity);
+          DictSafeSetItem(rpt_dict, "pressure", rpt->pressure);
+          DictSafeSetItem(rpt_dict, "salinity", rpt->salinity);
+          DictSafeSetItem(rpt_dict, "salinity_type", rpt->salinity_type);
+          DictSafeSetItem(rpt_dict, "sensor_type", rpt->sensor_type);
+          DictSafeSetItem(rpt_dict, "spare0", rpt->spare[0]);
+          DictSafeSetItem(rpt_dict, "spare1", rpt->spare[1]);
+        }
+        break;
+      case AIS8_1_26_SENSOR_WX:
+        {
+          Ais8_1_26_Wx *rpt = (Ais8_1_26_Wx *)msg.reports[rpt_num];
+          DictSafeSetItem(rpt_dict, "air_temp", rpt->air_temp);
+          DictSafeSetItem(rpt_dict, "air_temp_sensor_type", rpt->air_temp_sensor_type);
+          DictSafeSetItem(rpt_dict, "precip", rpt->precip);
+          DictSafeSetItem(rpt_dict, "horz_vis", rpt->horz_vis);
+          DictSafeSetItem(rpt_dict, "dew_point", rpt->dew_point);
+          DictSafeSetItem(rpt_dict, "dew_point_type", rpt->dew_point_type);
+          DictSafeSetItem(rpt_dict, "air_pressure", rpt->air_pressure);
+          DictSafeSetItem(rpt_dict, "air_pressure_trend", rpt->air_pressure_trend);
+          DictSafeSetItem(rpt_dict, "air_pressor_type", rpt->air_pressor_type);
+          DictSafeSetItem(rpt_dict, "salinity", rpt->salinity);
+          DictSafeSetItem(rpt_dict, "spare", rpt->spare);
+        }
+        break;
+      case AIS8_1_26_SENSOR_AIR_DRAUGHT:
+        {
+          Ais8_1_26_AirDraught *rpt = (Ais8_1_26_AirDraught *)msg.reports[rpt_num];
+          DictSafeSetItem(rpt_dict, "draught", rpt->draught);
+          DictSafeSetItem(rpt_dict, "gap", rpt->gap);
+          DictSafeSetItem(rpt_dict, "forcast_gap", rpt->forcast_gap);
+          DictSafeSetItem(rpt_dict, "int trend", rpt->trend);
+          DictSafeSetItem(rpt_dict, "int utc_day_forcast", rpt->utc_day_forcast);
+          DictSafeSetItem(rpt_dict, "utc_hour_forcast", rpt->utc_hour_forcast);
+          DictSafeSetItem(rpt_dict, "utc_min_forcast", rpt->utc_min_forcast);
+          DictSafeSetItem(rpt_dict, "spare", rpt->spare);
+        }
+        break;
+      // case AIS8_1_26_SENSOR_RESERVED_11
+      // case AIS8_1_26_SENSOR_RESERVED_12
+      // case AIS8_1_26_SENSOR_RESERVED_13
+      // case AIS8_1_26_SENSOR_RESERVED_14
+      // case AIS8_1_26_SENSOR_RESERVED_15
+      default:
+        std::cerr << "WARNING: unhandled sensor report type:" << msg.reports[rpt_num]->report_type << "\n";
+        // TODO: handle error
+      } // Switch
+  }
 }
 
 // IMO Circ 289 - Route information
@@ -1261,7 +1460,6 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
           // ITU-R.M.1371-3 IFM messages.  Annex 5, Section 5.  See IMO Circ 289 for recommended usage
         case 0: // Text using 6 bit ascii
           ais8_1_0_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
 
         // 1 is listed in ITU 1371-1 as addressed only.  Not listed in 1371-3
@@ -1276,34 +1474,27 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
             // TODO: error checking
         case 11: // Met/Hydrogrolocal - not to be used after 1 Jan 2013
           ais8_1_11_append_pydict(nmea_payload, dict, pad);
-            DictSafeSetItem(dict,"parsed",true);
             break;
             // 12 is an ABM
         case 13: // Fairway closed - not to be used after 1 Jan 2013
           // TODO: untested - no messages found
           ais8_1_13_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
           // No 14
         case 15: // Extended ship static and voyage related data - not to be used after 1 Jan 2013
           // TODO: untested - no messages found
           ais8_1_15_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
             // 16 has conflicting definition in the old 1371-1: VTS targets
         case 16: // Number of persons on board - not to be used after 1 Jan 2013
           ais8_1_16_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
             // 17 has conflicting definition in 1371-1: IFM 17: Ship waypoints (WP) and/or route plan report
         case 17: // VTS-generated/synthetic targets - not to be used after 1 Jan 2013
           // TODO: untested - no messages found
           ais8_1_17_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
-
-          // No 18
-
+        // No 18
             // ITU 1371-1 conflict: IFM 19: Extended ship static and voyage related data
         case 19: // Marine traffic signal
           // TODO: untested - no messages found
@@ -1317,44 +1508,28 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
         case 21: // Weather obs report from ship
           // TODO: untested - no messages found
           ais8_1_21_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
         case 22: // Area notice
             ais8_1_22_append_pydict(nmea_payload, dict, pad);
-            DictSafeSetItem(dict,"parsed",true);
             break;
-
         // 23 is ADDRESSED ONLY
-
         case 24: // Extended ship static and voyage-related
           ais8_1_24_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
-        // case 25: //
-        //    ais8_1_25_append_pydict(nmea_payload, dict, pad);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
-        // case 26: // Env Sensor Report
-        //  ais8_1_26_append_pydict(nmea_payload, dict, pad);
-        //  DictSafeSetItem(dict,"parsed",true);
-        //  break;
-        case 27: //
+        // no 25
+        case 26: // Env Sensor Report
+          ais8_1_26_append_pydict(nmea_payload, dict, pad);
+          break;
+        case 27: // Route
           ais8_1_27_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
-        // case 28: //
-        //    ais8_1_28_append_pydict(nmea_payload, dict, pad);
-        //    DictSafeSetItem(dict,"parsed",true);
-        //    break;
+        // no 28
         case 29: // IMO Circ 289 Text description
           ais8_1_29_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
         case 31: // IMO Circ 289 Meteorological and Hydrographic data
           ais8_1_31_append_pydict(nmea_payload, dict, pad);
-          DictSafeSetItem(dict,"parsed",true);
           break;
-
 
             // ITU 1371-1 only: 3.10 - IFM 40: Number of persons on board
 
@@ -1366,27 +1541,29 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     case 200: // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
       switch (msg.fi) {
         case 10: // Inland ship static and voyage related data
-          ais8_200_10_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          ais8_200_10_append_pydict(nmea_payload, dict, pad);
           break;
           // 21: Addressed only
           // 22: Addressed only
         case 23: // EMMA warning
-          ais8_200_23_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          ais8_200_23_append_pydict(nmea_payload, dict, pad);
           break;
         case 24: // Water level
-          ais8_200_24_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          ais8_200_24_append_pydict(nmea_payload, dict, pad);
           break;
         case 40: // A-to-N Signal status
-          ais8_200_40_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          ais8_200_40_append_pydict(nmea_payload, dict, pad);
           break;
         case 55: // Inland number of persons on board - why do we need another damn message?
-          ais8_200_55_append_pydict(nmea_payload, dict, pad);  DictSafeSetItem(dict,"parsed",true);
+          ais8_200_55_append_pydict(nmea_payload, dict, pad);
           break;
+        default:
+            DictSafeSetItem(dict,"parsed",false);
+            break;
       }
       break;
-    case 366: // United states
+      //case 366: // United states
       // TODO: implement
-        DictSafeSetItem(dict,"parsed",false);
         break;
     default:
         DictSafeSetItem(dict,"parsed",false);

@@ -202,7 +202,7 @@ Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_M
 
   Ais8_1_26_SensorReport *rpt = 0;
   switch(rpt_type) {
-  case AIS8_1_26_SENSOR_LOCATION:    rpt = new Ais8_1_26_Location(bs,rpt_start); break;
+  case AIS8_1_26_SENSOR_LOCATION:    rpt = new Ais8_1_26_Location(bs, rpt_start); break;
   case AIS8_1_26_SENSOR_STATION:     rpt = new Ais8_1_26_Station(bs, rpt_start); break;
   case AIS8_1_26_SENSOR_WIND:        rpt = new Ais8_1_26_Wind(bs, rpt_start); break;
   case AIS8_1_26_SENSOR_WATER_LEVEL: rpt = new Ais8_1_26_WaterLevel(bs, rpt_start); break;
@@ -247,7 +247,7 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) {
   if (!decode_header8(bs)) return;
   if (1 != dac or 26 != fi) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
-  const int num_sensor_reports = (num_bits - 56) / AIS8_1_26_REPORT_SIZE;
+  const size_t num_sensor_reports = (num_bits - 56) / AIS8_1_26_REPORT_SIZE;
   if ((num_bits - 56) % AIS8_1_26_REPORT_SIZE) {
     std::cerr << "WARNING: extra data in sensor report msg 8_1_26\n";
   }

@@ -894,7 +894,7 @@ struct Ais8_1_26_Curr3D_Current {
 
 class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
  public:
-  std::vector<Ais8_1_26_Curr3D_Current> currents;
+  Ais8_1_26_Curr3D_Current currents[2];
   int type;
   int spare;
 
@@ -912,7 +912,7 @@ struct Ais8_1_26_HorzFlow_Current {
 
 class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
  public:
-  std::vector<Ais8_1_26_HorzFlow_Current> currents;
+  Ais8_1_26_HorzFlow_Current currents[2];
   int spare;
 
   Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
