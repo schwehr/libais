@@ -592,41 +592,7 @@ void Ais8_1_24::print() {
 // There is no 8_1_25
 
 
-// IMO Circ 289 - Environmental
-// See also Circ 236
-Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad=0) {
-  assert(nmea_payload);
-  init();
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
-  // TODO: make sure the message is a multiple of waypoints or on slot boundaries
-  if (56 > num_bits || num_bits > 1008) { status = AIS_ERR_BAD_BIT_COUNT; return; }
-
-  std::bitset<1008> bs;
-  status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;
-
-  message_id = ubits(bs, 0, 6);
-  if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-  repeat_indicator = ubits(bs,6,2);
-  mmsi = ubits(bs,8,30);
-  spare = ubits(bs,38,2);
-  dac = ubits(bs,40,10);
-  fi = ubits(bs,50,6);
-
-  if ( 1 != dac || 26 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-
-  // TODO: implement
-  assert(false);
-}
-
-void Ais8_1_26::print() {
-  std::cout << "BBM_imo_1_8_26_Environmental: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
-}
-
+// See ais8_001_26.cpp
 
 
 // IMO Circ 289 - Route information
@@ -994,4 +960,3 @@ Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad) {
     spare2[2] = 0;
   }
 }
-

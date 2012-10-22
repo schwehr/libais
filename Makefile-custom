@@ -61,6 +61,7 @@ SRCS += ais8.cpp
 
 # IMO Messages - Circ 289
 SRCS += ais8_001_22.cpp # Area notice
+SRCS += ais8_001_26.cpp # Env Sensors
 # US Specific Messages
 SRCS += ais8_366_22.cpp
 

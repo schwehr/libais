@@ -2,14 +2,13 @@
 
 #include "ais8_001_22.h"
 
+//#include <cstdlib>
 //using namespace std;
 
 #define UNUSED __attribute((__unused__))
 
 int main(UNUSED int argc, UNUSED char* argv[]) {
     build_nmea_lookup();
-
-    //CHECKPOINT;
 
     ////////////////////////////////////////
     // 1
@@ -91,6 +90,47 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         //CHECKPOINT;
 
     }
+
+    if (true) {   
+        // # NO Location
+        // Environment: mmsi=366001 sensor_reports: [1]
+        //    SensorReport Location: site_id=1 type=0 d=22 hr=0 m=8 x=181 y=91 z=200.2 owner=5 - "port authority" timeout=5 - 24 (hrs)
+        // !AIVDM,1,1,,A,800FEd@0FPd0P2kj=H3@B50vTe00,0*2E
+        Ais8_1_26 msg("800FEd@0FPd0P2kj=H3@B50vTe00", 0);
+        msg.print();
+    }
+
+    if (true) {
+        /*
+# Combining a bunch of types of reports together
+Environment: mmsi=123456789 sensor_reports: [5]
+	SensorReport Location: site_id=11 type=0 d=20 hr=20 m=38 x=-70.864399 y=43.092136 z=2.1 owner=5 - "port authority" timeout=5 - 24 (hrs)
+	SensorReport Id: site_id=11 type=1 d=20 hr=20 m=38 id="UNH JEL PIER@@"
+	SensorReport Wind: site_id=11 type=2 d=20 hr=20 m=38
+	sensor data description: 1 - "raw real time"
+	speed=4 gust=8 dir=160 gust_dir=170
+	forecast: speed=6 gust=9 dir=140
+	forecast_time: 20T17:00Z  duration:  10 (min)
+	SensorReport Current2d: site_id=11 type=4 d=20 hr=20 m=38
+	sensor data description: 1 - "raw real time"
+	speed=4.7 knots dir=175 depth=0 m
+	speed=4.1 knots dir=183 depth=2 m
+	speed=3.2 knots dir=189 depth=4 m
+	SensorReport Wx: site_id=11 type=9 d=20 hr=20 m=38
+	air_temp=23.3 air_temp_data_descr=1 - raw real time
+	precip=3 vis=14.2 dew=18.2 dew_data_descr=1 - raw real time
+	air_pres=1003 air_pres_trend=1 air_pres_data_descr=1 - raw real time
+	salinity=22.1
+bit_len: 578
+!AIVDM,2,1,1,A,81mg=5@0FPaBHGcfKj9R`Di0be006U9QJai41@aT218b@00bDV5Q12PEA32D,0*46
+!AIVDM,2,2,1,A,IB80D4aBHFGbt05:o0A0g@8@VU9QHrCiiK5V9K`0000,2*7C
+*/
+        Ais8_1_26 msg("81mg=5@0FPaBHGcfKj9R`Di0be006U9QJai41@aT218b@00bDV5Q12PEA32D"
+                      "IB80D4aBHFGbt05:o0A0g@8@VU9QHrCiiK5V9K`0000",2);
+        msg.print();
+    }
+
+
 
     ///// 366 34 - Old Zone Messages - Used up to Summer 2010 in Boston
     // http://schwehr.org/blog/archives/2009-10.html#e2009-10-15T16_52_31.txt
