@@ -1,4 +1,4 @@
-// Msg 25 - I - Channel Management
+// Msg 25 - I - Single slot binary message
 
 #include "ais.h"
 
