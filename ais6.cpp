@@ -45,22 +45,6 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) {
 }
 
 
-void Ais6::print() {
-    std::cout << "AIS_addressed_binary_message: " << message_id
-              << "\tmmsi: " << mmsi << "\n"
-              << "\tseq: " << seq << "\n"
-              << "\tmmsi_dest" << mmsi_dest << "\n"
-              << "\tretransmit" << retransmit << "\n"
-              << "\tspare" << spare << "\n"
-              << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-    std::cout << "\tpayload: ";
-    for (std::vector<unsigned char>::iterator i = payload.begin(); i != payload.end(); i++) {
-        std::cout << std::hex <<std::setfill('0') << std::setw(2)<< int(*i);
-    }
-    std::cout << std::dec << std::nouppercase << std::endl;
-}
-
-
 Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad=0) {
   assert(nmea_payload);
   init();
@@ -96,12 +80,6 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad=0) {
   else spare2 = ubits(bs,100+text_size,spare2_size);
 }
 
-void Ais6_1_0::print() {
-  std::cout << "ABM_imo_6_1_0: text " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n"
-            << "\ttext: " << text << "\n";
-}
-
 
 Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad=0) {
   assert(nmea_payload);
@@ -130,11 +108,6 @@ Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad=0) {
   ack_dac = ubits(bs,88,10);
   msg_seq = ubits(bs,98,11);
   spare2 = ubits(bs,109,3);
-}
-void Ais6_1_1::print() {
-  std::cout << "ABM_imo_6_1_1: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n"
-            << "\tack_dac: " << ack_dac << "\tmsg_seq: " << msg_seq << "\n";
 }
 
 
@@ -166,11 +139,6 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad=0) {
   req_dac = ubits(bs,88,10);
   req_fi = ubits(bs,98,6);
 }
-void Ais6_1_2::print() {
-  std::cout << "ABM_imo_6_1_2: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n"
-            << "\treq_dac: " << req_dac << "\treq_fi: " << req_fi << "\n";
-}
 
 
 // IFM 3: Capability interrogation - OLD ITU 1371-1
@@ -201,10 +169,6 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad=0) {
 
   req_dac = ubits(bs, 88, 10);
   spare2 = ubits(bs, 94, 6);
-}
-void Ais6_1_3::print() {
-  std::cout << "ABM_imo_6_1_3: " << message_id
-            << "\t\tdac: " << dac << "\tfi: " << fi << "\treq_dac: "<< req_dac << "\n";
 }
 
 // IFM 4: Capability reply - OLD ITU 1371-4
@@ -245,11 +209,6 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad=0) {
   spare2 = ubits(bs,226,6); // OR NOT
 
   assert(false); // TODO: add in the offset of the dest mmsi
-}
-void Ais6_1_4::print() {
-  std::cout << "ABM_imo_6_1_4: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
 }
 
 
@@ -300,12 +259,6 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad=0) {
   value_unit = ubits(bs, 323, 2);
   spare = ubits(bs, 325, 3);
   // 360
-}
-
-void Ais6_1_12::print() {
-  std::cout << "ABM_imo_6_1_12_Dangerous cargo: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
 }
 
 
@@ -361,12 +314,6 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad=0) {
 
 }
 
-void Ais6_1_14::print() {
-  std::cout << "ABM_imo_6_1_14_Tidal Window: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
-}
-
 
 // IMO Circ 289 - Clearance time to enter port
 Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad=0) {
@@ -407,11 +354,6 @@ Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad=0) {
   spare2[1] = ubits(bs, 349, 11);
 }
 
-void Ais6_1_18::print() {
-  std::cout << "ABM_imo_6_1_18_ClearanceToEnterPort: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
-}
 
 // IMO Circ 289 - Berthing data
 Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad=0) {
@@ -458,12 +400,6 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad=0) {
   name = ais_str(bs, 191, 120);;
   x = sbits(bs, 311, 25);
   y = sbits(bs, 336, 24);
-}
-
-void Ais6_1_20::print() {
-  std::cout << "ABM_imo_6_1_20_Berthing data: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
 }
 
 
@@ -540,12 +476,6 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad=0) {
 
 }
 
-void Ais6_1_25::print() {
-  std::cout << "ABM_imo_6_1_25_DangerousCargoIndication: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
-}
-
 
 // TODO: 6_1_28 - Modify 8_1_28 once that is debugged
 
@@ -596,12 +526,6 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad=0) {
   }
 }
 
-void Ais6_1_32::print() {
-  std::cout << "ABM_imo_8_1_32_TidalWindow: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
-}
-
 
 // IFM 40: people on board - OLD ITU 1371-4
 Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad=0) {
@@ -632,9 +556,4 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad=0) {
   persons = ubits(bs,88,13);
   spare2 = ubits(bs,101,3);
 
-}
-void Ais6_1_40::print() {
-  std::cout << "ABM_imo_6_1_40: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n"
-            << "\t\tpersons: " << persons << "\n";
 }

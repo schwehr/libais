@@ -34,10 +34,3 @@ Ais23::Ais23(const char *nmea_payload) {
     quiet = ubits(bs, 148, 4);
     spare3 = ubits(bs, 152, 6);
 }
-
-
-void Ais23::print() {
-    std::cout << "Group assignment command: " << message_id << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n";
-    // TODO: finish
-}

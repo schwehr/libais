@@ -38,10 +38,3 @@ Ais14::Ais14
     text = ais_str(bs, 40, num_char * 6);
     expected_num_spare_bits = num_bits - 40 - num_char*60; // Can use this to check later
 }
-
-void
-Ais14::print() {
-    std::cout << "Ais14 - Safety broadcast\n"
-              << "\tmessage_id: " << message_id << "  " << repeat_indicator << " " << mmsi << "\n"
-              << "\ttext: " << text << "\n";
-}

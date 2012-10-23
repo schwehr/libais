@@ -35,15 +35,3 @@ Ais7_13::Ais7_13(const char *nmea_payload) {
         seq_num.push_back(ubits(bs,40+i*32+30,2));
     }
 }
-
-void
-Ais7_13::print() {
-    std::cout << message_id << ( (7==message_id)?" ABM Ack":" safety ack" ) << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n";
-    std::cout << "\tspare: " << spare << "\n";
-    for (size_t i=0; i < dest_mmsi.size(); i++) {
-        std::cout << "\tack: " << dest_mmsi[i] << " seq: " << seq_num[i] << "\n";
-    }
-
-    std::cout << std::endl;
-}

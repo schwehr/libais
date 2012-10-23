@@ -112,7 +112,6 @@ class Ais1_2_3 : public AisMsg {
     bool keep_flag_valid;
 
     Ais1_2_3(const char *nmea_payload);
-    void print(bool verbose=false);
 };
 std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a);
 
@@ -153,7 +152,6 @@ class Ais4_11 : public AisMsg {
 
     // **NO** ITDMA
     Ais4_11(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais4_11 const& msg);
 
@@ -180,7 +178,6 @@ class Ais5 : public AisMsg {
     int spare;
 
     Ais5(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais5 const& msg);
 
@@ -204,7 +201,6 @@ class Ais6 : public AisMsg {
     std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
 
     Ais6(const char *nmea_payload, const size_t pad);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6 const& msg);
 
@@ -233,7 +229,6 @@ class Ais6_1_0 : public Ais6 {
   int spare2;
 
   Ais6_1_0(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_0 const& msg);
 
@@ -245,7 +240,6 @@ class Ais6_1_1 : public Ais6 {
   int spare2;
 
   Ais6_1_1(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_1 const& msg);
 
@@ -258,7 +252,6 @@ class Ais6_1_2 : public Ais6 {
   // TODO: spare2?
 
   Ais6_1_2(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_2 const& msg);
 
@@ -270,7 +263,6 @@ class Ais6_1_3 : public Ais6 {
   int spare2;
 
   Ais6_1_3(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_3 const& msg);
 
@@ -284,7 +276,6 @@ class Ais6_1_4 : public Ais6 {
   int spare2;
 
   Ais6_1_4(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_4 const& msg);
 
@@ -295,7 +286,6 @@ class Ais6_1_40 : public Ais6 {
   int spare2;
 
   Ais6_1_40(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_40 const& msg);
 
@@ -317,7 +307,6 @@ class Ais6_1_12 : public Ais6 {
   int spare2;
 
   Ais6_1_12(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_12 const& msg);
 
@@ -338,7 +327,6 @@ class Ais6_1_14 : public Ais6 {
   std::vector<Ais6_1_14_Window> windows;
 
   Ais6_1_14(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_14 const& msg);
 
@@ -353,7 +341,6 @@ class Ais6_1_18 : public Ais6 {
   int spare2[2]; // 32 bits per spare
 
   Ais6_1_18(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_18 const& msg);
 
@@ -373,7 +360,6 @@ class Ais6_1_20 : public Ais6 {
   float x, y;
 
   Ais6_1_20(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_20 const& msg);
 
@@ -405,7 +391,6 @@ class Ais6_1_25 : public Ais6 {
   std::vector<Ais6_1_25_Cargo> cargos;  // 0 to 17 cargo entries
 
   Ais6_1_25(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_25 const& msg);
 
@@ -422,7 +407,6 @@ class Ais6_1_28 : public Ais6 {
   std::vector<AisPoint> waypoints;
 
   Ais6_1_28(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_28 const& msg);
 
@@ -434,7 +418,6 @@ class Ais6_1_30 : public Ais6 {
   std::string text;
 
   Ais6_1_30(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_30 const& msg);
 
@@ -459,7 +442,6 @@ class Ais6_1_32 : public Ais6 {
   std::vector<Ais6_1_32_Window> windows;
 
   Ais6_1_32(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais6_1_32 const& msg);
 
@@ -475,7 +457,6 @@ class Ais7_13 : public AisMsg {
     std::vector<int> seq_num;
 
     Ais7_13(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 
@@ -499,7 +480,6 @@ class Ais8 : public AisMsg {
 
   Ais8(const char *nmea_payload);
   bool decode_header8(const std::bitset<MAX_BITS> &bs);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
 
@@ -512,7 +492,6 @@ class Ais8_1_0 : public Ais8 {
   int spare2;
 
   Ais8_1_0(const char *nmea_payload, size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_0 const& msg);
 
@@ -528,7 +507,6 @@ class Ais8_1_40 : public Ais8 {
   int persons;
   int spare2;
   Ais8_1_40(const char *nmea_payload, size_t pad);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_40 const& msg);
 
@@ -576,7 +554,6 @@ class Ais8_1_11 : public Ais8 {
     int extended_water_level;  // OHMEX uses this for extra water level precision
 
   Ais8_1_11(const char *nmea_payload, size_t pad);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
 
@@ -593,7 +570,6 @@ class Ais8_1_13 : public Ais8 {
   int spare2;
 
   Ais8_1_13(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_13 const& msg);
 
@@ -605,7 +581,6 @@ class Ais8_1_15 : public Ais8 {
   int spare2;
 
   Ais8_1_15(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_15 const& msg);
 
@@ -617,7 +592,6 @@ class Ais8_1_16 : public Ais8 {
   int spare2;
 
   Ais8_1_16(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_16 const& msg);
 
@@ -638,7 +612,6 @@ class Ais8_1_17 : public Ais8 {
   std::vector<Ais8_1_17_Target> targets;
 
   Ais8_1_17(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_17 const& msg);
 
@@ -659,7 +632,6 @@ class Ais8_1_19 : public Ais8 {
   int spare2[4];  // Arrrrrr.  102 wasted bits that could be corrupted.
 
   Ais8_1_19(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_19 const& msg);
 
@@ -735,7 +707,6 @@ class Ais8_1_21 : public Ais8 {
   int bearing_ice_edge;
 
   Ais8_1_21(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_21 const& msg);
 
@@ -766,7 +737,6 @@ class Ais8_1_24 : public Ais8 {
   int spare2;
 
   Ais8_1_24(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_24 const& msg);
 
@@ -803,7 +773,6 @@ class Ais8_1_26_SensorReport {
 
   virtual Ais8_1_26_SensorEnum getType() const = 0;
   virtual ~Ais8_1_26_SensorReport() {}
-  virtual void print()=0;
 };
 
 
@@ -818,7 +787,6 @@ class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
   Ais8_1_26_Location(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Location() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_LOCATION;}
-  void print();
 };
 
 class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
@@ -829,7 +797,6 @@ class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
   Ais8_1_26_Station(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Station() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_STATION;}
-  void print();
 };
 
 class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
@@ -846,7 +813,6 @@ class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
   Ais8_1_26_Wind(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Wind() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WIND;}
-  void print();
 };
 
 class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
@@ -866,7 +832,6 @@ class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
   Ais8_1_26_WaterLevel(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_WaterLevel() {};
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WATER_LEVEL;}
-  void print();
 };
 
 struct Ais8_1_26_Curr2D_Current {
@@ -884,7 +849,6 @@ class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
   Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Curr2D() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_2D;}
-  void print();
 };
 
 struct Ais8_1_26_Curr3D_Current {
@@ -901,7 +865,6 @@ class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
   Ais8_1_26_Curr3D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Curr3D() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_3D;}
-  void print();
 };
 
 struct Ais8_1_26_HorzFlow_Current {
@@ -918,7 +881,6 @@ class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
   Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_HorzFlow() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_HORZ_FLOW;}
-  void print();
 };
 
 class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
@@ -937,7 +899,6 @@ class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
   Ais8_1_26_SeaState(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_SeaState() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SEA_STATE;}
-  void print();
 };
 
 class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
@@ -953,7 +914,6 @@ class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
   Ais8_1_26_Salinity(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Salinity() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SALINITY;}
-  void print();
 };
 
 class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
@@ -973,7 +933,6 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
   Ais8_1_26_Wx(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Wx() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WX;}
-  void print();
 };
 
 class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
@@ -986,7 +945,6 @@ class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
   Ais8_1_26_AirDraught(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_AirDraught() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_AIR_DRAUGHT;}
-  void print();
 };
 
 // IMO Circ 289 Environmental
@@ -995,8 +953,7 @@ class Ais8_1_26 : public Ais8 {
   std::vector<Ais8_1_26_SensorReport *> reports;
 
   Ais8_1_26(const char *nmea_payload, const size_t pad);
-  ~Ais8_1_26();  
-  void print();
+  ~Ais8_1_26();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_26 const& msg);
 
@@ -1011,7 +968,6 @@ class Ais8_1_27 : public Ais8 {
   std::vector<AisPoint> waypoints;
 
   Ais8_1_27(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_27 const& msg);
 
@@ -1027,7 +983,6 @@ class Ais8_1_29 : public Ais8 {
   int spare2;
 
   Ais8_1_29(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_29 const& msg);
 
@@ -1081,7 +1036,6 @@ class Ais8_1_31 : public Ais8 {
   int spare2;
 
   Ais8_1_31(const char *nmea_payload, const size_t pad);
-  void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_1_31 const& msg);
 
@@ -1174,7 +1128,6 @@ class Ais8_366_34 : public Ais8 {
     int dur_min; // duration in minutes
 
     Ais8_366_34(const char *nmea_payload, const size_t pad=0);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_366_34 const& msg);
 #endif
@@ -1227,7 +1180,6 @@ class Ais9 : public AisMsg {
     bool keep_flag_valid;
 
     Ais9(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
 
@@ -1239,7 +1191,6 @@ class Ais10 : public AisMsg {
     int spare2;
 
     Ais10(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais10 const& msg);
 
@@ -1255,7 +1206,6 @@ class Ais12 : public AisMsg {
     std::string text;
 
     Ais12(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
 
@@ -1268,7 +1218,6 @@ class Ais14 : public AisMsg {
     std::string text;
     int expected_num_spare_bits; // The bits in the nmea_payload not used
     Ais14(const char *nmea_payload);
-    void print();
 };
 
 std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
@@ -1293,7 +1242,6 @@ class Ais15 : public AisMsg {
     int spare4;
 
     Ais15(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
 
@@ -1310,7 +1258,6 @@ class Ais16 : public AisMsg {
     int spare2;
 
     Ais16(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais16 const& msg);
 
@@ -1333,7 +1280,6 @@ class Ais17 : public AisMsg {
     // TODO: Handle payload
 
     Ais17(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais17 const& msg);
 
@@ -1388,7 +1334,6 @@ class Ais18 : public AisMsg {
     bool keep_flag_valid;
 
     Ais18(const char *nmea_payload);
-    void print();
 };
 
 std::ostream& operator<< (std::ostream& o, Ais18 const& msg);
@@ -1417,7 +1362,6 @@ class Ais19 : public AisMsg {
     int spare3;
 
     Ais19(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
 
@@ -1450,7 +1394,6 @@ class Ais20 : public AisMsg {
     int spare2;
 
     Ais20(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais20 const& msg);
 
@@ -1478,7 +1421,6 @@ class Ais21 : public AisMsg {
     int spare2;
 
     Ais21(const char *nmea_payload, const size_t pad=0);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais21 const& msg);
 
@@ -1508,7 +1450,6 @@ class Ais22 : public AisMsg {
     int spare2; // Lame that they make a huge spare here.  Bad bad bad
 
     Ais22(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais22 const& msg);
 
@@ -1529,7 +1470,6 @@ class Ais23 : public AisMsg {
     int spare3;
 
     Ais23(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais23 const& msg);
 
@@ -1553,7 +1493,6 @@ class Ais24 : public AisMsg {
     int spare;
 
     Ais24(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 
@@ -1570,7 +1509,6 @@ class Ais25 : public AisMsg {
     int fi;
 
     Ais25(const char *nmea_payload);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais25 const& msg);
 
@@ -1620,7 +1558,6 @@ class Ais26 : public AisMsg {
     bool keep_flag_valid;
 
     Ais26(const char *nmea_payload, const size_t pad=0);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais26 const& msg);
 
@@ -1637,7 +1574,6 @@ class Ais27 : public AisMsg {
     int spare;
 
     Ais27(const char *nmea_payload, const size_t pad=0);
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais27 const& a);
 

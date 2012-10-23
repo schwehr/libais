@@ -66,11 +66,3 @@ Ais20::Ais20(const char *nmea_payload) {
 
     spare2 = 0;
 }
-
-void
-Ais20::print() {
-    std::cout << "D' - Data link management: " << message_id
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n"
-              << "\tspare: " << spare << "\n";
-    // TODO: flush out the rest
-}

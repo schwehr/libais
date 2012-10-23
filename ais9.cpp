@@ -94,29 +94,3 @@ Ais9::Ais9(const char *nmea_payload) {
         keep_flag_valid = true;
     }
 }
-
-
-void Ais9::print() {
-    std::cout << "SAR position: "  << message_id << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n"
-              << "\talt: " << alt << " (m)  alt_sensor: " << alt_sensor << "\n"
-              << "\tposition_accuracy: " << position_accuracy << "\n"
-              << "\tlocation: " << x << " " << y << "\n"
-              << "\ttimestamp: " << timestamp << "spare: " << spare << "\n"
-              << "\tdte: " << dte << "spare2: " << spare2 << "\n"
-              << "\traim: " << (raim?"true":"false") << "\n"
-              << "\tcommstate_flag: " << commstate_flag
-              << std::endl;
-    // SOTDMA
-    if (slot_timeout_valid) std::cout << "\t\tslot_timeout: " << slot_timeout << "\n";
-    if (slot_offset_valid) std::cout << "\t\tslot_offset" << slot_offset << "\n";
-    if (utc_valid) std::cout <<"\t\tUTC: " << utc_hour << ":"<<utc_min << " spare:" << utc_spare << "\n";
-    if (slot_number_valid) std::cout << "\t\tslot_number: " << slot_number << "\n;";
-    if (received_stations_valid) std::cout << "\t\treceived_stations: " << received_stations << "\n";
-
-    // ITDMA
-    if (slot_increment_valid) std::cout << "\t\tslot_increment: " << slot_increment << "\n";
-    if (slots_to_allocate_valid) std::cout << "\t\tslots_to_allocate: " << slots_to_allocate << "\n";
-    if (keep_flag_valid) std::cout << "\t\tkeep_flag: " << keep_flag << "\n";
-
-}

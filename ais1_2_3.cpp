@@ -105,38 +105,6 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
     }
 }
 
-void
-Ais1_2_3::print(bool verbose/*=false*/) {
-    std::cout << "Class A Position: " << message_id
-              << std::endl;
-    if (!verbose) return;
-    cout << "\trow_raw: " << rot_raw << endl;
-    cout << "\trot: " << rot << " -> " << (rot_over_range? "greater than": " ") << " " << rot << endl;
-    cout << "\tsog: " << sog << endl;
-    cout << "\tpos_acc: " << position_accuracy << endl;
-    cout << "\tpos_x: " << x << endl;
-    cout << "\tpos_y: " << y << endl;
-    cout << "\tcog: " << cog << endl;
-    cout << "\ttrue_heading:" << true_heading << endl;
-    cout << "\ttimestamp: " << timestamp << endl;
-    cout << "\tspecial_manoeuvre: " << special_manoeuvre << endl;
-    cout << "\tspare: " << spare << endl;
-    cout << "\tsync_state: " << sync_state << endl;
-    if ( 1 == message_id || 2 == message_id) {
-        cout << "\tSOTDMA type " << message_id << endl;
-        cout << "\t\tslot_offset: " << slot_offset << endl;
-        cout << "\t\tslot_timeout: " << slot_timeout << endl;
-        cout << "\t\tslot_number: " << slot_number << endl;
-        cout << "\t\treceived_stations: " << received_stations << endl;
-    } else {
-        assert (3 == message_id);
-        cout << "\tITDMA type" << endl;
-        cout << "\t\tslot_increment: " << slot_increment << endl;
-        cout << "\t\tslots_to_allocate: "  << slots_to_allocate << endl;
-        cout << "\t\tkeep_flag: " << (keep_flag?"keep":"do_not_keep") << endl;
-    }
-}
-
 std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a)
 {
     return o << a.message_id << ": " << a.mmsi ;

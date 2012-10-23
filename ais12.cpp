@@ -26,11 +26,3 @@ Ais12::Ais12(const char *nmea_payload) {
     int num_txt_bits = 6 * ((num_char * 6 - 72) / 6);
     text = ais_str(bs,72,num_txt_bits);
 }
-
-void Ais12::print() {
-    std::cout << "Addressed safety message: " << message_id << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n"
-              << "\tseq_num: " << seq_num << " retransmitted: " << retransmitted << "\n"
-              << "\tdest_mmsi: " << dest_mmsi << "\n"
-              << "\ttext: " << text << std::endl;
-}

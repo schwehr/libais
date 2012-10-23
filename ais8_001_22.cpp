@@ -160,13 +160,6 @@ Ais8_001_22_Circle::Ais8_001_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, con
     spare     = ubits(bs, offset+69, 18);
 }
 
-void Ais8_001_22_Circle::print() {
-    if (radius_m == 0)
-        std::cout << "Point: " << " " << x << " " << y << "    prec: " << precision << std::endl;
-    else
-        std::cout << "Circle: " << " " << x << " " << y << "    radius_m: " << radius_m
-                  << "    prec: " << precision<< std::endl;
-}
 
 Ais8_001_22_Rect::Ais8_001_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
@@ -179,12 +172,6 @@ Ais8_001_22_Rect::Ais8_001_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const s
     spare      = ubits(bs, offset+82, 5);
 }
 
-void Ais8_001_22_Rect::print() {
-    std::cout << "\t\tRectangle: " << " " << x << " " << y << " prec: " << precision
-              << " e_dim_m: " << e_dim_m << " n_dim_m: " << n_dim_m
-              << " orient_deg: " << orient_deg
-              << std::endl;
-}
 
 Ais8_001_22_Sector::Ais8_001_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
@@ -196,11 +183,6 @@ Ais8_001_22_Sector::Ais8_001_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, con
     right_bound_deg = ubits(bs, offset+78, 9);
 }
 
-void Ais8_001_22_Sector::print() {
-    std::cout << "\t\tSector: " << " " << x << " " << y << " radius_m: " << radius_m << " prec: " << precision
-              << " left_bound_deg: " << left_bound_deg << " right_bound_deg: " << right_bound_deg
-              << std::endl;
-}
 
 // Size of one point angle and distance
 static const size_t PT_AD_SIZE=10+10;
@@ -217,12 +199,6 @@ Ais8_001_22_Polyline::Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs,
     spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
 }
 
-void Ais8_001_22_Polyline::print() {
-    std::cout << "Polyline: " << std::endl;
-    for (size_t i=0; i<angles.size(); i++) {
-        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
-    }
-}
 
 Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs,offset+3,2);
@@ -236,20 +212,10 @@ Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, c
     spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
 }
 
-void Ais8_001_22_Polygon::print() {
-    std::cout << "Polygon: " << std::endl;
-    for (size_t i=0; i<angles.size(); i++) {
-        std::cout << "\t\t\t" << i << ": " << angles[i] << " deg, " << dists_m[i] << " meters" << std::endl;
-    }
-}
 
 Ais8_001_22_Text::Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     text = std::string(ais_str(bs, offset+3, 84));
     // TODO: spare?
-}
-
-void Ais8_001_22_Text::print() {
-    std::cout << "Text: [" << text << "]" <<std::endl;
 }
 
 
@@ -344,33 +310,5 @@ Ais8_001_22::~Ais8_001_22() {
     // FIX: why is the destructor getting called 2x for each sub area?
     for (size_t i=0; i < sub_areas.size(); i++) {
         delete sub_areas[i];  // TODO: no I need to set pointers to 0 after deleting?
-    }
-}
-
-
-void
-Ais8_001_22::print() {
-    std::cout
-        << "Area_Notice: " << message_id << "\n"
-        << "\tDAC: " << dac << "\tFI:" << fi << "\n";
-    std::cout
-        << "\tStarting:  ";
-    std::cout << std::setfill('0') << std::setw(2) << month;
-    std::cout << std::setfill(' ') << std::setw(0) << "-";
-    std::cout << std::setfill('2') << std::setw(2) << day;
-    std::cout << std::setfill(' ') << std::setw(0) << "T";
-    std::cout << std::setfill('0') << std::setw(2) << hour;
-    std::cout << ":";
-    std::cout << std::setfill('0') << std::setw(2) << minute;
-    std::cout
-        << "Z\n"
-        << "\tLink id:   " << link_id << "\n"
-        << "\tDuration:  " << duration_minutes << " min\n"
-        << "\tArea_type: " << notice_type
-        << " -> [" << ais8_001_22_notice_names[notice_type] << "]\n";
-
-    for (size_t i=0; i < sub_areas.size(); i++) {
-        std::cout << "\t\t" << i << ": ";
-        sub_areas[i]->print();
     }
 }

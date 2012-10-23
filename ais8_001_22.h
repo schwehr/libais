@@ -41,7 +41,6 @@ class Ais8_001_22_SubArea {
  public:
     virtual Ais8_001_22_AreaShapeEnum getType() const = 0;
     virtual ~Ais8_001_22_SubArea() {}
-    virtual void print()=0;
 };
 
 Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
@@ -58,7 +57,6 @@ class Ais8_001_22_Circle : public Ais8_001_22_SubArea {
     Ais8_001_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Circle() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_CIRCLE;}
-    void print();
 };
 
 class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
@@ -73,7 +71,6 @@ class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
     Ais8_001_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Rect() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_RECT;}
-    void print();
 
 };
 
@@ -88,7 +85,6 @@ class Ais8_001_22_Sector : public Ais8_001_22_SubArea {
     Ais8_001_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Sector() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_SECTOR;}
-    void print();
 };
 
 // Or Waypoint
@@ -106,7 +102,6 @@ class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
     Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polyline() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYLINE;}
-    void print();
 
 };
 
@@ -124,7 +119,6 @@ class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
     Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polygon() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYGON;}
-    void print();
 };
 
 
@@ -136,7 +130,6 @@ class Ais8_001_22_Text : public Ais8_001_22_SubArea {
     Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Text() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_TEXT;}
-    void print();
 };
 
 
@@ -161,7 +154,6 @@ class Ais8_001_22 : public Ais8 {
 
     Ais8_001_22(const char *nmea_payload, const size_t pad);
     ~Ais8_001_22();
-    void print();
 
     /*
        FIX: need some sort of higher level accessors and checks

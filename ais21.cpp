@@ -54,28 +54,3 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
     }
 
 }
-
-
-void Ais21::print() {
-    std::cout << "ATON status: " << message_id << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n"
-
-              << "\taton_type: " << aton_type << "\n"
-              << "\tname: " << name << "\n"
-              << "\tposition_accuracy: " << position_accuracy << "\n"
-              << "\tloc: " << x << " " << y << "\n"
-              << "\tdim_a: " << dim_a << "\n"
-              << "\tdim_b: " << dim_b << "\n"
-              << "\tdim_c: " << dim_c << "\n"
-              << "\tdim_d: " << dim_d << "\n"
-              << "\tfix_type: " << fix_type << "\n"
-              << "\ttimestamp: " << timestamp << "\n"
-              << "\toff_pos: " << (off_pos?"true": "false") << "\n"
-              << "\tstatus: " << aton_status << "\n"
-              << "\traim: " << (raim?"true": "false") << "\n"
-              << "\tvirtual_aton: " << (virtual_aton?"true": "false") << "\n"
-              << "\tassigned_mode: " << (assigned_mode?"true": "false") << "\n"
-              << "\tspare: " << spare << "\n"
-              // Extended name goes on the end of name
-              << "\tspare2: " << spare2 << std::endl;
-}

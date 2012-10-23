@@ -31,7 +31,6 @@ class Ais8_366_22_SubArea {
  public:
     virtual Ais8_366_22_AreaShapeEnum getType()=0;
     virtual ~Ais8_366_22_SubArea() { }
-    virtual void print()=0;
 };
 
 Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
@@ -47,7 +46,6 @@ class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
     Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Circle() { std::cout << "Ais8_366_22_Circle: destructor" << std::endl;};
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_CIRCLE;}
-    void print();
 };
 
 class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
@@ -62,7 +60,6 @@ class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
     Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Rect() { std::cout << "Ais8_366_22_Rect: destructor" << std::endl;};
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_RECT;}
-    void print();
 
 };
 
@@ -78,7 +75,6 @@ class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
     Ais8_366_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Sector() { std::cout << "Ais8_366_22_Sector: destructor" << std::endl;};
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_SECTOR;}
-    void print();
 };
 
 // Or Waypoint
@@ -96,7 +92,6 @@ class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
     Ais8_366_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Polyline() { std::cout << "Ais8_366_22_Polyline: destructor" << std::endl;};
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYLINE;}
-    void print();
 
 };
 
@@ -113,7 +108,6 @@ class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
     Ais8_366_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Polygon() { std::cout << "Ais8_366_22_Polygon: destructor" << std::endl;};
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYGON;}
-    void print();
 };
 
 class Ais8_366_22_Text : public Ais8_366_22_SubArea {
@@ -124,7 +118,6 @@ class Ais8_366_22_Text : public Ais8_366_22_SubArea {
     Ais8_366_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Text() { std::cout << "Ais8_366_22_Text: destructor" << std::endl;};
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_TEXT;}
-    void print();
 };
 
 class Ais8_366_22 : public Ais8 {
@@ -143,7 +136,6 @@ class Ais8_366_22 : public Ais8 {
 
     Ais8_366_22(const char *nmea_payload);
     ~Ais8_366_22();
-    void print();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_366_22 const& msg);
 

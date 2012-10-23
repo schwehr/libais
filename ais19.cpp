@@ -45,22 +45,3 @@ Ais19::Ais19(const char *nmea_payload) {
     assigned_mode = bs[307];
     spare3 = ubits(bs,308,4);
 }
-
-void
-Ais19::print() {
-    std::cout << "Class B Extended Position and ship: " << message_id
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n"
-              << "\tspare: " << spare << " sog: " << sog << "\n"
-              << "\tposacc: " << position_accuracy << "\n"
-              << "\tx: " << x << "  y: " << y << "\n"
-              << "\tcog: " << cog << " true_heading: " << true_heading << "\n"
-              << "\ttimestamp: " << timestamp << " spare2: " << spare2 << "\n"
-              << "\tname: " << name << "\n"
-              << "\ttype_and_cargo: " << type_and_cargo << "\n"
-              << "\tdim: " << dim_a << " " << dim_b  << " "<< dim_c << " " << dim_d  << " (m)\n"
-              << "\tfix_type: " << fix_type << "\n"
-              << "\traim: " << (raim?"true":"false") << "\n"
-              << "\tdte: " << dte << " assigned_mode: " << assigned_mode << "\n"
-              << "\tspare3: " << spare3 << std::endl
-        ;
-}

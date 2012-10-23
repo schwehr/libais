@@ -1853,7 +1853,6 @@ ais18_to_pydict(const char *nmea_payload) {
                 break;
             default:
                 std::cout << "ERROR: slot_timeout: " << msg.slot_timeout << std::endl;
-                msg.print();
                 assert(false); // Should never get here.
             }
 

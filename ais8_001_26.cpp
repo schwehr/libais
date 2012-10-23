@@ -2,7 +2,6 @@
 
 // http://www.dtic.mil/cgi-bin/GetTRDoc?AD=ADA504755
 // Phase I Summary Report on AIS Transmit Project (Environmental Message)
-// TODO: should print methods be to stdout?
 
 #include "ais.h"
 
@@ -16,22 +15,12 @@ Ais8_1_26_Location::Ais8_1_26_Location(const std::bitset<AIS8_MAX_BITS> &bs, con
   spare = ubits(bs, offset+73, 12);
 }
 
-void
-Ais8_1_26_Location::print() {
-  std::cerr << "Loca: " << x << " " << y << " " << z
-            << " " << owner << " " << timeout
-            << "\n";
-}
-
 
 Ais8_1_26_Station::Ais8_1_26_Station(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   name = ais_str(bs, offset, 84);
   spare = ubits(bs, offset+84, 1);
 }
 
-void Ais8_1_26_Station::print() {
-  std::cerr << "Stat: " << name << "\n";
-}
 
 Ais8_1_26_Wind::Ais8_1_26_Wind(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   wind_speed = ubits(bs, offset, 7);
@@ -48,9 +37,7 @@ Ais8_1_26_Wind::Ais8_1_26_Wind(const std::bitset<AIS8_MAX_BITS> &bs, const size_
   duration = ubits(bs, offset+74, 8);
   spare = ubits(bs, offset+82, 3);
 }
-void Ais8_1_26_Wind::print () {
-  std::cerr << "Wind: " << wind_speed << " " << wind_dir << " " << sensor_type << " " << duration << "\n";
-}
+
 
 Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   type = bs[offset];
@@ -67,10 +54,6 @@ Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const std::bitset<AIS8_MAX_BITS> &bs,
   spare = ubits(bs, offset+68, 17);
 }
 
-void Ais8_1_26_WaterLevel::print() {
-    std::cerr << "WLvl" << level << " " << vdatum << " " << level_forcast << "\n";
-}
-
 
 Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   for (size_t idx=0; idx < 3; idx++) {
@@ -81,11 +64,6 @@ Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const s
   }
   type = ubits(bs, offset+78, 3);
   spare = ubits(bs, offset+81, 4);
-}
-
-void Ais8_1_26_Curr2D::print() {
-  std::cerr << "Cr2D: " << currents[0].speed << " " << currents[1].speed << " "
-            << currents[2].speed << " " << type << "\n";
 }
 
 
@@ -101,13 +79,6 @@ Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const std::bitset<AIS8_MAX_BITS> &bs, const s
   spare = ubits (bs, offset+69, 16);
 }
 
-void Ais8_1_26_Curr3D::print() {
-  std::cerr << "Cr3D: "
-            << currents[0].north << " " << currents[0].east << " " << currents[0].up << " " << currents[0].depth << " "
-            << currents[1].north << " " << currents[1].east << " " << currents[1].up << " " << currents[1].depth
-            << "\n";
-}
-
 
 Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   for (size_t idx=0; idx < 2; idx++) {
@@ -121,12 +92,6 @@ Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, con
   spare = bs[offset+84];
 }
 
-void Ais8_1_26_HorzFlow::print() {
-  std::cerr << "CrHz: "
-            << currents[0].speed << " " << currents[0].dir << " " << currents[0].level << " "
-            << currents[1].speed << " " << currents[1].dir << " " << currents[1].level << " "
-            << "\n";
-}
 
 Ais8_1_26_SeaState::Ais8_1_26_SeaState(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   swell_height = ubits(bs, offset, 8) / 10.;
@@ -144,9 +109,6 @@ Ais8_1_26_SeaState::Ais8_1_26_SeaState(const std::bitset<AIS8_MAX_BITS> &bs, con
   salinity = ubits(bs, offset+76, 9) / 10.;
 }
 
-void Ais8_1_26_SeaState::print() {
-    std::cerr << "Stat: " << swell_height << " " << sea_state<< " " << water_temp << " " << wave_height << "\n";
-}
 
 Ais8_1_26_Salinity::Ais8_1_26_Salinity(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   water_temp = ubits(bs, offset, 10) / 10. - 10;
@@ -159,9 +121,6 @@ Ais8_1_26_Salinity::Ais8_1_26_Salinity(const std::bitset<AIS8_MAX_BITS> &bs, con
   spare[1] = ubits(bs, offset+82, 3);
 }
 
-void Ais8_1_26_Salinity::print() {
-    std::cerr << "Salt: " << water_temp << " " << conductivity << " " << pressure << " " << salinity << "\n";
-}
 
 Ais8_1_26_Wx::Ais8_1_26_Wx(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   air_temp = sbits(bs, offset, 11) / 10.;
@@ -177,9 +136,6 @@ Ais8_1_26_Wx::Ais8_1_26_Wx(const std::bitset<AIS8_MAX_BITS> &bs, const size_t of
   spare = ubits(bs, offset+60, 25);
 }
 
-void Ais8_1_26_Wx::print() {
-    std::cerr << "Wx:   " << air_temp << " " << precip << " " << dew_point <<  " " <<  air_pressure << " " << salinity << "\n";
-}
 
 Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   draught = ubits(bs, offset, 13) / 100.;
@@ -192,9 +148,6 @@ Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const std::bitset<AIS8_MAX_BITS> &bs,
   spare = ubits(bs, offset+57, 28);
 }
 
-void Ais8_1_26_AirDraught::print () {
-    std::cerr << "ADft: " << draught << " " << gap << " " << " " << forcast_gap << "\n";
-}
 
 Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   const Ais8_1_26_SensorEnum rpt_type = (Ais8_1_26_SensorEnum)ubits(bs, offset, 4);
@@ -259,15 +212,6 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) {
         reports.push_back(sensor_report);
     } else std::cerr << "Failed to decode sensor report\n";
 
-  }
-}
-
-void Ais8_1_26::print() {
-  std::cout << "BBM_imo_1_8_26_Environmental: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  for(size_t rpt_idx=0; rpt_idx < reports.size(); rpt_idx++) {
-      std::cerr << "\t" << rpt_idx << ": ";
-      reports[rpt_idx]->print();
   }
 }
 

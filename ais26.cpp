@@ -89,10 +89,3 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
     }
 
 }
-
-
-void Ais26::print() {
-    std::cout << "Multi-slot slot binary message w/ comm state: " << message_id << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n";
-    // TODO: finish
-}

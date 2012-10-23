@@ -40,20 +40,6 @@ Ais5::Ais5(const char *nmea_payload) {
     spare = bs[423];
 }
 
-void Ais5::print() {
-    std::cout << "Ais5 - shipdata\n"
-         << "\tmessage_id: " << message_id << "  " << repeat_indicator << " " << mmsi << "\n"
-         << "\tcallsign: " << callsign << "\n"
-         << "\tname: " << name << "\n"
-         << "\ttype_and_cargo: " << type_and_cargo << "\n"
-         << "\tdim: " << dim_a << " " << dim_b  << " "<< dim_c << " " << dim_d  << " (m)\n"
-         << "\tfix_type: " << fix_type << "\n"
-         << "\teta: " << eta_month << "-" << eta_day << "T" << eta_hour << ":" << eta_minute << "\n"
-         << "\tdestination: " << destination << "\n"
-         << "\tdte: " << dte << "\n"
-         << "\tspare: " << spare << "\n"
-        ;
-}
 
 std::ostream& operator<< (std::ostream& o, Ais5 const& a)
 {

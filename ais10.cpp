@@ -25,9 +25,3 @@ Ais10::Ais10(const char *nmea_payload) {
     dest_mmsi = ubits(bs,40,30);
     spare2 = ubits(bs,70,2);
 }
-
-void Ais10::print() {
-    std::cout << "UTC and date inquiry: " << message_id << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n"
-              << "\tdest_mmsi: " << dest_mmsi << " " << "spare2: " << spare2 << "\n";
-}

@@ -52,10 +52,3 @@ Ais22::Ais22(const char *nmea_payload) {
 
     spare2 = ubits(bs, 145, 23);
 }
-
-
-void Ais22::print() {
-    std::cout << "Channel Management: " << message_id << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n";
-    // TODO: finish
-}

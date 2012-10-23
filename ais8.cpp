@@ -46,16 +46,6 @@ bool Ais8::decode_header8(const std::bitset<MAX_BITS> &bs) {
     return true;
 }
 
-void Ais8::print() {
-    std::cout << "AIS_broadcast_binary_message: " << message_id
-              << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-    std::cout << "\tpayload: ";
-    for (std::vector<unsigned char>::iterator i = payload.begin(); i != payload.end(); i++) {
-        std::cout << std::hex <<std::setfill('0') << std::setw(2)<< int(*i);
-    }
-    std::cout << std::dec << std::nouppercase << std::endl;
-}
-
 
 Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad=0) {
   assert(nmea_payload);
@@ -92,11 +82,6 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad=0) {
   else spare2 = ubits(bs,68,spare2_size);
 }
 
-void Ais8_1_0::print() {
-  std::cout << "ABM_imo_8_1_0: text " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n"
-            << "\ttext: " << text << "\n";
-}
 
 
 //////////////////////////////////////////////////////////////////////
@@ -163,32 +148,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) {
     extended_water_level = ubits(bs,346,6); // FIX: how to treat this???
 }
 
-void Ais8_1_11::print() {
-    std::cout << "BBM_imo_1_11_met_hydro: " << message_id
-              << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-
-    std::cout << "\tspare:" << spare << "\n"
-              << "\tlocation:" <<  x << " " <<  y << "\t(lon, lat WGS84)" << "\n"
-              << "\ttime:" <<  day << "T" << hour << ":" << minute << "Z\n"
-              << "\twind:" <<  wind_ave << " " << wind_dir << "\n"
-              << "\tgust:" <<  wind_gust << " " << wind_gust_dir << "\n"
-              << "\tair_temp:" <<  air_temp << "\thumidity:" <<  rel_humid << "\t:" <<  horz_vis << "\n"
-              << "\tdew_point:" <<  dew_point << "\tair_pres:" <<  air_pres << " trend: " << air_pres_trend << "\n"
-              << "\twater_level:" <<  water_level << " trend: " << water_level_trend << "\n"
-              << "\tcurrent:" <<  surf_cur_speed << " kts dir: " << surf_cur_dir << "\n"
-              << "\tcurr2:" <<  cur_speed_2 << " kts dir: " << cur_dir_2 << "\t " <<  cur_depth_2 << " m deep\n"
-              << "\tcurr3:" <<  cur_speed_3 << " kts dir: " << cur_dir_3 << "\t " <<  cur_depth_3 << " m deep\n"
-              << "\twaves:" <<  wave_height << " " << wave_period << " " <<  wave_dir << "\n"
-              << "\tswell:" <<  swell_height << " " <<  swell_period << " " <<  swell_dir << "\n"
-              << "\tsea_state:" <<  sea_state << "\twater_temp:" <<  water_temp << "\n"
-              << "\tprecip_type:" <<  precip_type << "\tsalinity:" <<  salinity << "\n"
-              << "\tice:" <<  ice << "\n"
-              << "\tspare_or_extended_wl:" <<  extended_water_level << std::endl;
-}
-
-
 // No 8_1_12
-
 
 // IMO Circ 289 - Fairway Closed
 // See also Circ 236
@@ -230,12 +190,6 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad=0) {
   spare2 = ubits(bs, 468, 4);
 }
 
-void Ais8_1_13::print() {
-  std::cout << "BBM_imo_8_1_13_FairwayClosed: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
-}
-
 
 // No 8_1_16
 
@@ -268,12 +222,6 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad=0) {
   spare2 = ubits(bs, 66, 5);
 }
 
-void Ais8_1_15::print() {
-  std::cout << "BBM_imo_1_8_15_Extended Shipdata - Air gap: " << message_id
-            << "\t\tdac: " << dac << "	fi:" << fi << "\n"
-            << "\t\tair_draught (m): " << air_draught << std::endl;
-}
-
 
 
 // IMO Circ 289 - Number of persons on board
@@ -303,12 +251,6 @@ Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad=0) {
 
   persons = ubits(bs, 56, 13);
   spare2 = ubits(bs, 69, 3);
-}
-
-void Ais8_1_16::print() {
-  std::cout << "BBM_imo_1_8_16_Number of persons on board: " << message_id
-            << "\t\tdac: " << dac << "	fi:" << fi << "\n"
-            << "\t\tpersons: " << persons << std::endl;
 }
 
 
@@ -354,12 +296,6 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad=0) {
   }
 }
 
-void Ais8_1_17::print() {
-  std::cout << "BBM_imo_1_8_17_VTS Generated/Synthetic Targets: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
-}
-
 
 // No msg 8_1_18
 
@@ -402,12 +338,6 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad=0) {
   spare2[1] = ubits(bs, 290, 32);
   spare2[2] = ubits(bs, 322, 32);
   spare2[3] = ubits(bs, 354, 6);
-}
-
-void Ais8_1_19::print() {
-  std::cout << "BBM_imo_8_1_19_Marine traffic signal: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
 }
 
 
@@ -525,14 +455,6 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad=0) {
 }
 
 
-void Ais8_1_21::print() {
-  std::cout << "BBM_imo_8_1_21_Weather observation report from ship: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
-}
-
-
-
 // IMO Circ 289 - Extended ship static and voyage-related
 // See also Circ 236
 Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad=0) {
@@ -580,12 +502,6 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad=0) {
   bunker_oil = ubits(bs, 323, 14);  // tonnes
   persons = ubits(bs, 337, 13);
   spare2 = ubits(bs, 350, 10);
-}
-
-void Ais8_1_24::print() {
-  std::cout << "BBM_imo_8_1_24_Extended ship static and voyage-related: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
 }
 
 
@@ -637,11 +553,6 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad=0) {
   }
 }
 
-void Ais8_1_27::print() {
-  std::cout << "BBM_imo_1_8_27_Route information: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
-}
 
 // No 8_1_28
 
@@ -680,11 +591,6 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad=0) {
   } else spare2 = 0;
 }
 
-void Ais8_1_29::print() {
-  std::cout << "BBM_imo_1_8_29_Text description: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n"
-            << "\t\tlink_id: " << link_id << "\ttext: " << text << std::endl;
-}
 
 
 // IMO Circ 289 - Meteorological and Hydrographic data
@@ -754,12 +660,6 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad=0) {
   salinity = ubits(bs, 339, 9) / 10.;
   ice = ubits(bs, 348, 2); // yes/no/undef/unknown
   spare2 = ubits(bs, 350, 10);
-}
-
-void Ais8_1_31::print() {
-  std::cout << "BBM_imo_8_1_31_MetHydrographic: " << message_id
-            << "\t\tdac: " << dac << "\tfi:" << fi << "\n";
-  // TODO: implment
 }
 
 

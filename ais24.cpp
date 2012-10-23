@@ -50,32 +50,3 @@ Ais24::Ais24(const char *nmea_payload) {
         return;
     }
 }
-
-void
-Ais24::print() {
-    std::cout << "Class B static data: " << message_id << "  part " << part_num << "\n";
-
-    switch (part_num) {
-
-    case 0:
-        std::cout << "\tname: " << name << std::endl;
-        break;
-
-    case 1:
-        std::cout << "\ttype_and_cargo: " << type_and_cargo << "\n"
-                  << "\tvendor_id: " << vendor_id << "\n"
-                  << "\tcallsign: " << callsign << "\n"
-                  << "\tdim: " << dim_a << " " << dim_b  << " "<< dim_c << " " << dim_d  << " (m)\n"
-                  << "\tspare: " << spare << std::endl;
-            ;
-        break;
-
-    case 2: // FALLTHROUGH - not yet defined by ITU
-    case 3: // FALLTHROUGH - not yet defined by ITU
-    default:
-        assert(false);
-        return;
-    }
-
-
-}

@@ -29,10 +29,3 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) {
     gnss = !bs[94];
     spare = bs[95];
 }
-
-
-void Ais27::print() {
-    std::cout << "K - 27 - Long-range AIS broadcast message" << message_id << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n";
-    // TODO: finish
-}

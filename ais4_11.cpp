@@ -82,19 +82,6 @@ Ais4_11::Ais4_11(const char *nmea_payload) {
         assert (false);
     }
 }
-
-void Ais4_11::print() {
-    std::cout << ( ( 4==message_id )?"bs_report: ":"utc response: ") << message_id << "\n"
-              << "\tmmsi: " << mmsi << " repeat: " << repeat_indicator << "\n"
-              << "\tdate/time: " << year << "-" << month << "-" << day
-              << "T" << hour << ":" << minute << ":" << second << "Z\n"
-              << "\tposition_accuracy: " << position_accuracy << "\n"
-              << "\tlocation: " << x << " " << y << "\n"
-              << "\tspare: " << spare << "\n"
-              << "\traim: " << (raim?"true":"false") << "\n"
-              << std::endl;
-}
-
 std::ostream& operator<< (std::ostream& o, Ais4_11 const& msg)
 {
     return o << msg.message_id << ": " << msg.mmsi;
