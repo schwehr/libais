@@ -1492,7 +1492,7 @@ class Ais24 : public AisMsg {
     int dim_d;
     int spare;
 
-    Ais24(const char *nmea_payload);
+  Ais24(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 

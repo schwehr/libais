@@ -2091,9 +2091,9 @@ ais23_to_pydict(const char *nmea_payload) {
 
 // H - Static data report
 PyObject*
-ais24_to_pydict(const char *nmea_payload) {
+ais24_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais24 msg(nmea_payload);
+    Ais24 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais24: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -2347,8 +2347,8 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'H': // 24 - Static data report
-        result = ais24_to_pydict(nmea_payload);
-        break;
+      result = ais24_to_pydict(nmea_payload, pad);
+      break;
 
     case 'I': // 25 - Single slot binary message - addressed or broadcast
         result = ais25_to_pydict(nmea_payload);    // TODO: handle payloads

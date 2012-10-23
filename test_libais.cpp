@@ -320,12 +320,12 @@ bit_len: 578
     if (true) {
         // !AIVDM,1,1,,B,H5NHcTP<51@4TrM>10584@U<D00,2*77,x337805,b003669710,1241895000
         {
-            Ais24 msg("H5NHcTP<51@4TrM>10584@U<D00");
+          Ais24 msg("H5NHcTP<51@4TrM>10584@U<D00", 2);
             if (msg.had_error())  std::cout<<"FAILED 24 1\n";
         }
         // !AIVDM,1,1,,B,HU2K5NTn13BijklG44oppk103210,0*06,s23294,d-114,T44.21624911,x731910,r13RSMT1,1241894986
         {
-            Ais24 msg("HU2K5NTn13BijklG44oppk103210");
+          Ais24 msg("HU2K5NTn13BijklG44oppk103210", 0);
             if (msg.had_error())  std::cout<<"FAILED 24 2\n";
         }
     }
