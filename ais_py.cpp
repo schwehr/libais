@@ -1591,7 +1591,7 @@ ais9_to_pydict(const char *nmea_payload) {
     DictSafeSetItem(dict, "spare2", msg.spare2);
     DictSafeSetItem(dict, "raim", msg.raim);
 
-    if (msg.commstate_flag) {
+    if (0==msg.commstate_flag) {
         // SOTMDA
       DictSafeSetItem(dict,"slot_timeout", msg.slot_timeout);
 
@@ -2173,7 +2173,7 @@ ais26_to_pydict(const char *nmea_payload, const size_t pad) {
     // TODO: handle payload
 
     DictSafeSetItem(dict,"sync_state", msg.sync_state);
-    if (!msg.commstate_flag) {
+    if (0==msg.commstate_flag) {
       // SOTDMA
       if (msg.received_stations_valid)
         DictSafeSetItem(dict,"received_stations", msg.received_stations);
