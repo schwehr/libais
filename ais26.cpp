@@ -8,7 +8,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
     init();
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-    const size_t comm_flag_offset = num_bits - 20;
+    const size_t comm_flag_offset = num_bits - 20 + 1;  // TODO: check for off by one.
 
     if (52 > num_bits || num_bits > 1064) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
@@ -20,6 +20,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
     if (26 != message_id) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
     repeat_indicator = ubits(bs,6,2);
     mmsi = ubits(bs,8,30);
+
 
     const bool addressed = bs[38];
     use_app_id = bs[39];
@@ -34,6 +35,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
       // TODO: deal with payload
 
     } else {
+      dest_mmsi_valid = false;
       // broadcast
       if (use_app_id) {
         dac = ubits(bs,40,10);
@@ -45,6 +47,18 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
 
     commstate_flag = bs[comm_flag_offset];
     sync_state = ubits(bs, comm_flag_offset+1 , 2); // Both SOTDMA and TDMA
+
+#ifndef NDEBUG
+    slot_timeout = -1;
+    received_stations = slot_number = utc_hour = utc_min = utc_spare -1;
+    slot_offset = slot_increment = slots_to_allocate = -1;
+    keep_flag = false;
+#endif
+
+    slot_timeout_valid = false;
+    received_stations_valid = slot_number_valid = utc_valid = false;
+    slot_offset_valid = slot_increment_valid = slots_to_allocate_valid = keep_flag_valid = false;
+
 
     if (!commstate_flag) {
       // SOTDMA

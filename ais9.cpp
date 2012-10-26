@@ -48,7 +48,7 @@ Ais9::Ais9(const char *nmea_payload) {
 
     slot_timeout_valid = false;
     received_stations_valid = slot_number_valid = utc_valid = false;
-    slot_offset_valid = slot_increment_valid = slots_to_allocate_valid = keep_flag_valid = 0;
+    slot_offset_valid = slot_increment_valid = slots_to_allocate_valid = keep_flag_valid = false;
 
     if (0 == commstate_flag) {
         // SOTDMA
@@ -85,6 +85,7 @@ Ais9::Ais9(const char *nmea_payload) {
     } else {
         // ITDMA
         slot_increment = ubits(bs, 151, 13);
+        std::cerr << "9 slot_inc: " << slot_increment << "\n";
         slot_increment_valid = true;
 
         slots_to_allocate = ubits(bs, 164, 3);
