@@ -165,7 +165,7 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload) {
         Ais8_366_22_SubArea *sub_area = ais8_366_22_subarea_factory(bs, 111+90*sub_area_idx);
         if (sub_area) { sub_areas.push_back(sub_area); }
         else {
-            std::cout << "ERROR: bad sub area " << sub_area_idx << std::endl;
+          status = AIS_ERR_BAD_SUB_SUB_MSG;
         }
     }
 
@@ -248,31 +248,22 @@ Ais8_366_22_Text::Ais8_366_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const s
 // Call the appropriate constructor
 Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const Ais8_366_22_AreaShapeEnum area_shape = (Ais8_366_22_AreaShapeEnum)ubits(bs, offset, 3);
-    std::cout << "area_shape: off: " << offset << " shape: "<< area_shape << " [" << shape_names[area_shape] << "]\n";
-    if (AIS8_366_22_SHAPE_ERROR == area_shape) {
-        std::cerr << "ERROR: Bad area shape!  Bummer" << std::endl;
-        return 0;
-    }
+    if (AIS8_366_22_SHAPE_ERROR == area_shape) { return 0; }
     Ais8_366_22_SubArea *area=0;
     switch (area_shape) {
     case AIS8_366_22_SHAPE_CIRCLE:
-        std::cout << "Found circle" << std::endl;
         area = new Ais8_366_22_Circle(bs, offset);
         break;
     case AIS8_366_22_SHAPE_RECT:
-        std::cout << "Found rect" << std::endl;
         area = new Ais8_366_22_Rect(bs, offset);
         return area;
     case AIS8_366_22_SHAPE_SECTOR:
-        std::cout << "Found sector" << std::endl;
         area = new Ais8_366_22_Sector(bs, offset);
         break;
     case AIS8_366_22_SHAPE_POLYLINE:
-        std::cout << "Found polyline" << std::endl;
         area = new Ais8_366_22_Polyline(bs, offset);
         break;
     case AIS8_366_22_SHAPE_POLYGON:
-        std::cout << "Found polygon" << std::endl;
         area = new Ais8_366_22_Polygon(bs, offset);
         break;
     case AIS8_366_22_SHAPE_TEXT:
@@ -280,11 +271,11 @@ Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
         break;
     case AIS8_366_22_SHAPE_RESERVED_6: // FALLTHROUGH
     case AIS8_366_22_SHAPE_RESERVED_7: // FALLTHROUGH
-        std::cerr << "Warning: bad area shape" << std::endl;
+      // Leave area as 0 to indicate error
         break;
     case AIS8_366_22_SHAPE_ERROR: // FALLTHROUGH
     default:
-        assert(false);
+      ; // Should never reach here
     }
     return area;
 }

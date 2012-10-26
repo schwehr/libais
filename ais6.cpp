@@ -179,9 +179,7 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad=0) {
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  std::cerr << "TODO: num_bits for 6_1_4: " << num_bits << std::endl;
-  // TODO: might also be possible: num_bits != 168
-  // TODO: or 226 bits?
+  // TODO: num_bits for 6_1_4.  226 bits?
   if (num_bits != 232) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
   std::bitset<168> bs;
@@ -390,13 +388,10 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad=0) {
   utc_hour = ubits(bs, 127, 5);
   utc_min = ubits(bs, 132, 6);
   services_known = bs[138];
-  std::cerr << "serv bit decode:";
   for (size_t serv_num=0; serv_num < 26; serv_num++) {
     const int val = ubits(bs, 139 + 2*serv_num, 2);
-    std::cerr << val << " ";
     services[serv_num] = int(ubits(bs, 139 + 2*serv_num, 2));
   }
-  std::cerr << "\n";
   name = ais_str(bs, 191, 120);;
   x = sbits(bs, 311, 25);
   y = sbits(bs, 336, 24);
@@ -415,7 +410,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad=0) {
   // Allowing a message with no payloads
   // TODO: (num_bits-100) % 17 != 0) is okay
   if (100 > num_bits || num_bits > 576) { status = AIS_ERR_BAD_BIT_COUNT; return; }
-  if ( (num_bits - 100) % 17 != 0) { std::cerr << "6_1_25 not 17 aligned;";status = AIS_ERR_BAD_BIT_COUNT; return; }
+  if ( (num_bits - 100) % 17 != 0) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<576> bs;
   status = aivdm_to_bits(bs, nmea_payload);

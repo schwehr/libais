@@ -522,12 +522,7 @@ AreaNotice: type=7  start=2011-07-06 23:59:00  duration=60 m  link_id=10  sub-ar
     }
 
 
-    //////////////////////////////
-    // DONE
-    //////////////////////////////
-
-    std::cerr << "Shutting down" << std::endl;
+    std::cout << "Shutting down.  SHOULD BE OK??" << std::endl;
 
     return 0;
-
 }

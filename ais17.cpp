@@ -11,7 +11,6 @@ Ais17::Ais17(const char *nmea_payload) {
     const int num_char = std::strlen(nmea_payload);
     if (num_char < 14 || num_char > 136) {
         status = AIS_ERR_BAD_BIT_COUNT;
-        std::cerr << "ais17_num_char: " << num_char << std::endl;
         return;
     }
 

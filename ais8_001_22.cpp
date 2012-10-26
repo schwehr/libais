@@ -222,10 +222,7 @@ Ais8_001_22_Text::Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const s
 // Call the appropriate constructor
 Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const Ais8_001_22_AreaShapeEnum area_shape = (Ais8_001_22_AreaShapeEnum)ubits(bs, offset, 3);
-    if (AIS8_001_22_SHAPE_ERROR == area_shape) {
-        std::cerr << "ERROR: Bad area shape!  Bummer" << std::endl;
-        return 0;
-    }
+    if (AIS8_001_22_SHAPE_ERROR == area_shape) { return 0; }
     Ais8_001_22_SubArea *area=0;
     switch (area_shape) {
     case AIS8_001_22_SHAPE_CIRCLE:
@@ -248,7 +245,7 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
         break;
     case AIS8_001_22_SHAPE_RESERVED_6: // FALLTHROUGH
     case AIS8_001_22_SHAPE_RESERVED_7: // FALLTHROUGH
-        std::cerr << "Warning: bad area shape" << std::endl;
+      // Keep area==0 to indicate error.
         break;
     case AIS8_001_22_SHAPE_ERROR: // FALLTHROUGH
     default:
@@ -295,20 +292,21 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
         if (sub_area) {
             sub_areas.push_back(sub_area);
         } else {
-            std::cout << "ERROR: bad sub area " << sub_area_idx << std::endl;
+          status = AIS_ERR_BAD_SUB_SUB_MSG;
         }
     }
-    /* FIX: inspect the subareas to make sure the are sane.
+    /* TODO: inspect the subareas to make sure the are sane.
        - polyline/polygon have a point first
        - text has geometry to go through it all
     */
-
-    // FIX: watch out for mandatory spare bits to byte align payload
+    // TODO: watch out for mandatory spare bits to byte align payload
 }
 
 Ais8_001_22::~Ais8_001_22() {
-    // FIX: why is the destructor getting called 2x for each sub area?
     for (size_t i=0; i < sub_areas.size(); i++) {
-        delete sub_areas[i];  // TODO: no I need to set pointers to 0 after deleting?
+        delete sub_areas[i];
+#ifndef NDEBUG
+        sub_areas[i] = 0;
+#endif
     }
 }

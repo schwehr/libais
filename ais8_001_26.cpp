@@ -154,6 +154,7 @@ Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_M
   const size_t rpt_start = offset+27;  // skip tp after site_id
 
   Ais8_1_26_SensorReport *rpt = 0;
+  // WARNING: out of order decoding.  Only get the report header if we can decode the type.
   switch(rpt_type) {
   case AIS8_1_26_SENSOR_LOCATION:    rpt = new Ais8_1_26_Location(bs, rpt_start); break;
   case AIS8_1_26_SENSOR_STATION:     rpt = new Ais8_1_26_Station(bs, rpt_start); break;
@@ -166,13 +167,13 @@ Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_M
   case AIS8_1_26_SENSOR_SALINITY:    rpt = new Ais8_1_26_Salinity(bs, rpt_start); break;
   case AIS8_1_26_SENSOR_WX:          rpt = new Ais8_1_26_Wx(bs, rpt_start); break;
   case AIS8_1_26_SENSOR_AIR_DRAUGHT: rpt = new Ais8_1_26_AirDraught(bs, rpt_start); break;
-  case AIS8_1_26_SENSOR_RESERVED_11: std::cerr << "NOT handled " << rpt_type << "\n";   break;
-  case AIS8_1_26_SENSOR_RESERVED_12: std::cerr << "NOT handled " << rpt_type << "\n";   break;
-  case AIS8_1_26_SENSOR_RESERVED_13: std::cerr << "NOT handled " << rpt_type << "\n";   break;
-  case AIS8_1_26_SENSOR_RESERVED_14: std::cerr << "NOT handled " << rpt_type << "\n";   break;
-  case AIS8_1_26_SENSOR_RESERVED_15: std::cerr << "NOT handled " << rpt_type << "\n";   break;
+  case AIS8_1_26_SENSOR_RESERVED_11: break;  // Leave rpt == 0 to indicate error
+  case AIS8_1_26_SENSOR_RESERVED_12: break;
+  case AIS8_1_26_SENSOR_RESERVED_13: break;
+  case AIS8_1_26_SENSOR_RESERVED_14: break;
+  case AIS8_1_26_SENSOR_RESERVED_15: break;
   default:
-    std::cerr << "ERROR: unhandle sensor report type: " << rpt_type << "\n";
+    ;  // Leave rpt == 0 to indicate error
   }
   if (rpt) {
     rpt->report_type = rpt_type;
@@ -201,21 +202,28 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) {
   if (1 != dac || 26 != fi) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   const size_t num_sensor_reports = (num_bits - 56) / AIS8_1_26_REPORT_SIZE;
-  if ((num_bits - 56) % AIS8_1_26_REPORT_SIZE) {
-    std::cerr << "WARNING: extra data in sensor report msg 8_1_26\n";
-  }
+
+  // TODO: what to do about extra data in sensor report msg 8_1_26?
+  // if ((num_bits - 56) % AIS8_1_26_REPORT_SIZE)
 
   for(size_t report_idx=0; report_idx < num_sensor_reports; report_idx++) {
     const size_t start = 56 + report_idx * AIS8_1_26_REPORT_SIZE;
     Ais8_1_26_SensorReport *sensor_report = ais8_1_26_sensor_report_factory(bs, start);
     if (sensor_report) {
         reports.push_back(sensor_report);
-    } else std::cerr << "Failed to decode sensor report\n";
+    } else {
+      status = AIS_ERR_BAD_SUB_SUB_MSG;
+    }
 
   }
 }
 
 
 Ais8_1_26::~Ais8_1_26() {
-  for (size_t i=0; i < reports.size(); i++) delete reports[i];
+  for (size_t i=0; i < reports.size(); i++) {
+    delete reports[i];
+#ifndef NDEBUG
+    reports[i] = 0;
+#endif
+  }
 }

@@ -328,8 +328,6 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
     }
     DictSafeSetItem(dict, "capabilities", cap_list);
     DictSafeSetItem(dict, "cap_reserved", res_list);
-
-
     DictSafeSetItem(dict,"spare2", msg.spare2);
 }
 
@@ -577,16 +575,14 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
         case 40: // OLD ITU 1371-1
           ais6_1_40_append_pydict(nmea_payload, dict, pad); break;
       default:
-        std::cerr << "not_parsed 6 sub 1: " << msg.dac << " " << msg.fi << "\n";
+        // TODO: Raise an exception?
         DictSafeSetItem(dict,"not_parsed", true);
-        ;
       }
       break;
 
       default:
-        std::cerr << "not_parsed 6 ** DAC **: " << msg.dac << " " << msg.fi << "\n";
+        // TODO: Raise an exception?
         DictSafeSetItem(dict,"not_parsed", true);
-        ;
     }
 
     return dict;
@@ -890,7 +886,6 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
             }
             break;
         case AIS8_001_22_SHAPE_RECT:
-            cout << i << ": RECT\n";
             {
                 PyObject *sub_area = PyDict_New();
                 Ais8_001_22_Rect *c = (Ais8_001_22_Rect*)msg.sub_areas[i];
@@ -909,7 +904,6 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
             }
             break;
         case AIS8_001_22_SHAPE_SECTOR:
-            cout << i << ": SECTOR\n";
             {
                 PyObject *sub_area = PyDict_New();
                 Ais8_001_22_Sector *c = (Ais8_001_22_Sector*)msg.sub_areas[i];
@@ -928,14 +922,12 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
             }
             break;
         case AIS8_001_22_SHAPE_POLYLINE:
-            cout << i << ": POLYLINE\n";
             {
                 PyObject *sub_area = PyDict_New();
                 Ais8_001_22_Polyline *polyline = (Ais8_001_22_Polyline*)msg.sub_areas[i];
 
                 DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_POLYLINE);
                 DictSafeSetItem(sub_area,"sub_area_type_str","polyline");
-                cout << "polyline: " << polyline->angles.size() << " " << polyline->dists_m.size() << endl;
                 assert (polyline->angles.size() == polyline->dists_m.size());
                 PyObject *angle_list = PyList_New(polyline->angles.size());
                 PyObject *dist_list = PyList_New(polyline->angles.size());
@@ -953,14 +945,12 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
             }
             break;
         case AIS8_001_22_SHAPE_POLYGON:
-            cout << i << ": POLYGON\n";
             {
                 PyObject *sub_area = PyDict_New();
                 Ais8_001_22_Polygon *polygon = (Ais8_001_22_Polygon*)msg.sub_areas[i];
 
                 DictSafeSetItem(sub_area,"sub_area_type",AIS8_001_22_SHAPE_POLYGON);
                 DictSafeSetItem(sub_area,"sub_area_type_str","polygon");
-                cout << "polygon: " << polygon->angles.size() << " " << polygon->dists_m.size() << endl;
                 assert (polygon->angles.size() == polygon->dists_m.size());
                 PyObject *angle_list = PyList_New(polygon->angles.size());
                 PyObject *dist_list = PyList_New(polygon->angles.size());
@@ -978,7 +968,6 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
             }
             break;
         case AIS8_001_22_SHAPE_TEXT:
-            cout << i << ": TEXT\n";
             {
                 PyObject *sub_area = PyDict_New();
 
@@ -992,7 +981,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
             break;
 
         default:
-            cerr << "DANGER! Unknown subarea type: " << msg.sub_areas[i]->getType();
+          ; // TODO: somehow mark an unknown subarea or raise an exception
         }
     }
     DictSafeSetItem(dict,"sub_areas",sub_area_list);
@@ -1234,17 +1223,17 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
           DictSafeSetItem(rpt_dict, "spare", rpt->spare);
         }
         break;
-      // case AIS8_1_26_SENSOR_RESERVED_11
-      // case AIS8_1_26_SENSOR_RESERVED_12
-      // case AIS8_1_26_SENSOR_RESERVED_13
-      // case AIS8_1_26_SENSOR_RESERVED_14
-      // case AIS8_1_26_SENSOR_RESERVED_15
+      case AIS8_1_26_SENSOR_RESERVED_11: // FALLTHROUGH
+      case AIS8_1_26_SENSOR_RESERVED_12:
+      case AIS8_1_26_SENSOR_RESERVED_13:
+      case AIS8_1_26_SENSOR_RESERVED_14:
+      case AIS8_1_26_SENSOR_RESERVED_15:
       default:
-        std::cerr << "WARNING: unhandled sensor report type:" << msg.reports[rpt_num]->report_type << "\n";
-        // TODO: handle error
-      } // Switch
+        ;  // TODO: mark a bad sensor type or raise exception
+      }
   }
 }
+
 
 // IMO Circ 289 - Route information
 void
@@ -1564,10 +1553,10 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
       break;
       //case 366: // United states
       // TODO: implement
-        break;
+      // break;
     default:
         DictSafeSetItem(dict,"parsed",false);
-        // cout << "Ais8: can't handle dac " << msg.dac << endl;
+        // TODO: raise exception or return standin?
     }
     // TODO: cehck for error here?
     return dict;
@@ -1852,7 +1841,6 @@ ais18_to_pydict(const char *nmea_payload) {
                 DictSafeSetItem(dict,"received_stations", msg.received_stations);
                 break;
             default:
-                std::cout << "ERROR: slot_timeout: " << msg.slot_timeout << std::endl;
                 assert(false); // Should never get here.
             }
 
@@ -2238,29 +2226,24 @@ ais27_to_pydict(const char *nmea_payload, const size_t pad) {
 static PyObject *
 decode(PyObject *self, PyObject *args) {
     if (!nmea_ord_initialized) {
-        std::cout << "Calling build_nmea_lut from decode" << endl;
-        build_nmea_lookup();
+      build_nmea_lookup();
     }
 
     int _pad;
     const char *nmea_payload;
     // TODO: what to do about if no pad bits?  Maybe warn and set to 0?
     if (!PyArg_ParseTuple(args, "si", &nmea_payload, &_pad)) {
-      std::cerr << "WARNING: Expected pad in decode.  Assuming 0.  Pad must be an integer.\n";
       _pad = 0;
       if (!PyArg_ParseTuple(args, "s", &nmea_payload)) {
-        PyErr_Format(ais_py_exception, "ais.decode: expected string argument");
+        PyErr_Format(ais_py_exception, "ais.decode: expected (string, integer) argument");
         return 0;
       }
     }
     const size_t pad = _pad;
     PyObject *result=0;
 
-    //
     // The grand dispatcher
-    //
     switch (nmea_payload[0]) {
-
     // Class A Position
     case '1': // FALLTHROUGH
     case '2': // FALLTHROUGH
@@ -2389,7 +2372,6 @@ initais(void)
         return;
     }
     build_nmea_lookup();
-    std::cerr << "built lookup table in initais" << std::endl;
 }
 #else
 //////////////////////////////////////////////////////////////////////
