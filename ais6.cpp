@@ -389,7 +389,7 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad=0) {
   utc_min = ubits(bs, 132, 6);
   services_known = bs[138];
   for (size_t serv_num=0; serv_num < 26; serv_num++) {
-    const int val = ubits(bs, 139 + 2*serv_num, 2);
+    // TODO: const int val = ubits(bs, 139 + 2*serv_num, 2);
     services[serv_num] = int(ubits(bs, 139 + 2*serv_num, 2));
   }
   name = ais_str(bs, 191, 120);;
