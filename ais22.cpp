@@ -15,12 +15,12 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (message_id != 22) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
-    spare = ubits(bs,38,2);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
+    spare = ubits(bs, 38, 2);
 
-    chan_a = ubits(bs,40,12);
-    chan_b = ubits(bs,52,12);
+    chan_a = ubits(bs, 40, 12);
+    chan_b = ubits(bs, 52, 12);
     txrx_mode = ubits(bs, 64, 4);
     power_low = bs[68];
 

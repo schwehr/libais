@@ -15,9 +15,9 @@ Ais23::Ais23(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (23 != message_id) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
-    spare = ubits(bs,38,2);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
+    spare = ubits(bs, 38, 2);
 
     x1 = sbits(bs, 40, 18) / 600.;
     y1 = sbits(bs, 58, 17) / 600.;

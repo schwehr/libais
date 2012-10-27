@@ -15,11 +15,11 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (18 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
 
-    spare = ubits(bs,38,8);
-    sog = ubits(bs,46,10) / 10.;
+    spare = ubits(bs, 38, 8);
+    sog = ubits(bs, 46, 10) / 10.;
 
     position_accuracy = bs[56];
     x = sbits(bs, 57, 28) / 600000.;
@@ -42,16 +42,16 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad) {
 
     if (1 == unit_flag) {
         // CS - carrier sense - fixed commstate payload of 1100000000000000110
-        int commstate = ubits(bs,149, 19);
+        int commstate = ubits(bs, 149, 19);
         if (393222 != commstate) {
-            // FIX: is this the right value?
-            // FIX: return an error?
+            // TODO: is this the right value?
+            // TODO: return an error?
         }
     } else {
         sync_state = ubits(bs, 149, 2);
         if (0 == commstate_flag) {
             // SOTDMA
-            slot_timeout = ubits(bs,151,3);
+            slot_timeout = ubits(bs, 151, 3);
 
             switch (slot_timeout) {
             case 0:
@@ -64,20 +64,20 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad) {
                 utc_spare = ubits(bs, 166, 2);
                 utc_valid = true;
                 break;
-            case 2: // FALLTHROUGH
-            case 4: // FALLTHROUGH
+            case 2:  // FALLTHROUGH
+            case 4:  // FALLTHROUGH
             case 6:
                 slot_number = ubits(bs, 154, 14);
                 slot_number_valid = true;
                 break;
-            case 3: // FALLTHROUGH
-            case 5: // FALLTHROUGH
+            case 3:  // FALLTHROUGH
+            case 5:  // FALLTHROUGH
             case 7:
                 received_stations = ubits(bs, 154, 14);
                 received_stations_valid = true;
                 break;
             default:
-                assert (false);
+                assert(false);
             }
 
         } else {

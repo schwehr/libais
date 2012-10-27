@@ -1,8 +1,10 @@
 // Msg 20 D - data link management
+
 #include "ais.h"
 
 Ais20::Ais20(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
+    assert(pad < 6);
 
     init();
 
@@ -13,24 +15,23 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
         return;
     }
 
-    std::bitset<160> bs; // 1 + a partial slot
+    std::bitset<160> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
     message_id = ubits(bs, 0, 6);
     if (20 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
-
-    spare = ubits(bs,38,2);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
+    spare = ubits(bs, 38, 2);
 
     // TODO: make this an array of blocks with 4 element
     // TODO: Are the ever no blocks set????
 
-    offset_1 = ubits(bs,40,12);
-    num_slots_1 = ubits(bs,52,4);
-    timeout_1 = ubits(bs,56,3);
-    incr_1 = ubits(bs,59,11);
+    offset_1 = ubits(bs, 40, 12);
+    num_slots_1 = ubits(bs, 52, 4);
+    timeout_1 = ubits(bs, 56, 3);
+    incr_1 = ubits(bs, 59, 11);
 
     if (12 == num_char) {
         group_valid_2 = group_valid_3 = group_valid_4 = false;
@@ -39,10 +40,10 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
     }
 
     group_valid_2 = true;
-    offset_2 = ubits(bs,70,12);
-    num_slots_2 = ubits(bs,82,4);
-    timeout_2 = ubits(bs,86,3);
-    incr_2 = ubits(bs,89,11);
+    offset_2 = ubits(bs, 70, 12);
+    num_slots_2 = ubits(bs, 82, 4);
+    timeout_2 = ubits(bs, 86, 3);
+    incr_2 = ubits(bs, 89, 11);
     if (18 == num_char) {
       group_valid_3 = group_valid_4 = false;
       spare2 = ubits(bs, 100, 4);  // Makes the result 8 bit / 1 byte aligned
@@ -50,19 +51,19 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
     }
 
     group_valid_3 = true;
-    offset_3 = ubits(bs,100,12);
-    num_slots_3 = ubits(bs,112,4);
-    timeout_3 = ubits(bs,116,3);
-    incr_3 = ubits(bs,119,11);
+    offset_3 = ubits(bs, 100, 12);
+    num_slots_3 = ubits(bs, 112, 4);
+    timeout_3 = ubits(bs, 116, 3);
+    incr_3 = ubits(bs, 119, 11);
     if (23 == num_char) {
         spare2 = ubits(bs, 130, 6);  // Makes the result 8 bit / 1 byte aligned
     }
 
     group_valid_4 = true;
-    offset_4 = ubits(bs,130,12);
-    num_slots_4 = ubits(bs,142,4);
-    timeout_4 = ubits(bs,146,3);
-    incr_4 = ubits(bs,149,11);
+    offset_4 = ubits(bs, 130, 12);
+    num_slots_4 = ubits(bs, 142, 4);
+    timeout_4 = ubits(bs, 146, 3);
+    incr_4 = ubits(bs, 149, 11);
 
     spare2 = 0;
 }

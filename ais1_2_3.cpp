@@ -1,22 +1,20 @@
 // Since Apr 2010
 
-#include "ais.h"
-
-#include <iostream>
-#include <bitset>
 #include <string>
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
 
-using namespace std;
+#include "ais.h"
+
+// #include <bitset>
 
 Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
     assert(nmea_ord_initialized);  // Make sure we have the lookup table built
     init();
 
-    if (0 != pad or strlen(nmea_payload) != 28) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    if (0 != pad || strlen(nmea_payload) != 28) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     std::bitset<168> bs;
     status = aivdm_to_bits(bs, nmea_payload);
@@ -28,16 +26,16 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) {
         return;
     }
 
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
-    nav_status = ubits(bs,38,4);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
+    nav_status = ubits(bs, 38, 4);
 
-    rot_raw = sbits(bs,42,8);
-    rot_over_range = abs(rot_raw) > 126 ? true : false ;
-    rot = pow( (rot_raw/4.733), 2 );
+    rot_raw = sbits(bs, 42, 8);
+    rot_over_range = abs(rot_raw) > 126 ? true : false;
+    rot = pow((rot_raw/4.733), 2);
     if (rot_raw < 0) rot = -rot;
 
-    sog = ubits(bs,50,10) / 10.;
+    sog = ubits(bs, 50, 10) / 10.;
     position_accuracy = bs[60];
     x = sbits(bs, 61, 28) / 600000.;
     y = sbits(bs, 89, 27) / 600000.;
@@ -61,8 +59,8 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) {
     slots_to_allocate = -1;  slots_to_allocate_valid = false;
     keep_flag = false; keep_flag_valid = false;
 
-    if ( 1 == message_id || 2 == message_id) {
-        slot_timeout = ubits(bs,151,3);
+    if (1 == message_id || 2 == message_id) {
+        slot_timeout = ubits(bs, 151, 3);
         slot_timeout_valid = true;
 
         switch (slot_timeout) {
@@ -76,24 +74,24 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) {
             utc_spare = ubits(bs, 166, 2);
             utc_valid = true;
             break;
-        case 2: // FALLTHROUGH
-        case 4: // FALLTHROUGH
+        case 2:  // FALLTHROUGH
+        case 4:  // FALLTHROUGH
         case 6:
             slot_number = ubits(bs, 154, 14);
             slot_number_valid = true;
             break;
-        case 3: // FALLTHROUGH
-        case 5: // FALLTHROUGH
+        case 3:  // FALLTHROUGH
+        case 5:  // FALLTHROUGH
         case 7:
             received_stations = ubits(bs, 154, 14);
             received_stations_valid = true;
             break;
         default:
-            assert (false);
+            assert(false);
         }
     } else {
         // ITDMA
-        assert (3 == message_id);
+        assert(3 == message_id);
         slot_increment = ubits(bs, 151, 13);
         slot_increment_valid = true;
 
@@ -105,7 +103,6 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) {
     }
 }
 
-std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a)
-{
-    return o << a.message_id << ": " << a.mmsi ;
+std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a) {
+    return o << a.message_id << ": " << a.mmsi;
 }

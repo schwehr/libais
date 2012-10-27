@@ -11,178 +11,168 @@
 #include <cassert>
 #include <vector>
 #include <cstring>
-#include <string>
-
 #include <iostream>
 
 #define LIBAIS_VERSION_MAJOR 0
 #define LIBAIS_VERSION_MINOR 9
 
-//////////////////////////////////////////////////////////////////////
-// Helpers
-
-#define CHECKPOINT std::cerr <<  __FILE__ << ": line " << __LINE__ << ": checkpoint" << std::endl
-
 const std::string nth_field(const std::string &str, const size_t n, const char c);
 
-//////////////////////////////////////////////////////////////////////
+extern bool nmea_ord_initialized;  // If this is false, you need to call build_nmea_lookup.
 
-extern bool nmea_ord_initialized; // If this is false, you need to call build_nmea_lookup.
-
-static const int MAX_BITS = 1192; // AIS8_MAX_BITS;
+static const int MAX_BITS = 1192;
 
 
 void build_nmea_lookup();
 
 enum AIS_STATUS {
-    AIS_OK,
-    AIS_ERR_BAD_BIT_COUNT,
-    AIS_ERR_WRONG_MSG_TYPE,
-    AIS_ERR_BAD_NMEA_CHR,
-    AIS_ERR_BAD_PTR,
-    AIS_ERR_UNKNOWN_MSG_TYPE,
-    AIS_ERR_MSG_NOT_IMPLEMENTED, // Meaning I haven't got to it yet
-    AIS_ERR_EXPECTED_STRING,
-    AIS_ERR_BAD_MSG_CONTENT,
-    AIS_ERR_MSG_TOO_LONG,
-    AIS_ERR_BAD_SUB_SUB_MSG,
-    AIS_STATUS_NUM_CODES
+  AIS_OK,
+  AIS_ERR_BAD_BIT_COUNT,
+  AIS_ERR_WRONG_MSG_TYPE,
+  AIS_ERR_BAD_NMEA_CHR,
+  AIS_ERR_BAD_PTR,
+  AIS_ERR_UNKNOWN_MSG_TYPE,
+  AIS_ERR_MSG_NOT_IMPLEMENTED,
+  AIS_ERR_EXPECTED_STRING,
+  AIS_ERR_BAD_MSG_CONTENT,
+  AIS_ERR_MSG_TOO_LONG,
+  AIS_ERR_BAD_SUB_SUB_MSG,
+  AIS_STATUS_NUM_CODES
 };
 
 extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
 
 struct AisPoint {
-  float x,y;
+  float x, y;
 };
 
 class AisMsg {
  public:
-    int message_id;
-    int repeat_indicator;
-    int mmsi;
+  int message_id;
+  int repeat_indicator;
+  int mmsi;
 
-    bool had_error() {  return status != AIS_OK;  }
-    AIS_STATUS get_error() {return status;}
-    AIS_STATUS status; // AIS_OK or error code
-    void init() {
-      status = AIS_OK;
-      // TODO: should all common headers be set to an invalid value?
-    }
+  bool had_error() {  return status != AIS_OK;  }
+  AIS_STATUS get_error() {return status;}
+  AIS_STATUS status;  // AIS_OK or error code
+  void init() {
+    status = AIS_OK;
+  }
 };
 
 class Ais1_2_3 : public AisMsg {
  public:
-    int nav_status;
-    bool rot_over_range;
-    int rot_raw;
-    float rot;
-    float sog;
-    int position_accuracy;
-    float x, y; // Long and lat
-    float cog;
-    int true_heading;
-    int timestamp;
-    int special_manoeuvre;
-    int spare;
-    bool raim;
+  int nav_status;
+  bool rot_over_range;
+  int rot_raw;
+  float rot;
+  float sog;
+  int position_accuracy;
+  float x, y;
+  float cog;
+  int true_heading;
+  int timestamp;
+  int special_manoeuvre;
+  int spare;
+  bool raim;
 
-    // COMM state SOTDMA msgs 1 and 2
-    int sync_state;  // SOTDMA and ITDMA
-    int slot_timeout;
-    bool slot_timeout_valid;
+  // COMM state SOTDMA msgs 1 and 2
+  int sync_state;  // SOTDMA and ITDMA
+  int slot_timeout;
+  bool slot_timeout_valid;
 
-    // Based on slot_timeout which ones are valid
-    int received_stations;
-    bool received_stations_valid;
+  // Based on slot_timeout which ones are valid
+  int received_stations;
+  bool received_stations_valid;
 
-    int slot_number;
-    bool slot_number_valid;
+  int slot_number;
+  bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have
-    int utc_hour;
-    int utc_min;
-    int utc_spare;
+  bool utc_valid;  // Only means that the values are set.  Can still have
+  int utc_hour;
+  int utc_min;
+  int utc_spare;
 
-    int slot_offset;
-    bool slot_offset_valid;
+  int slot_offset;
+  bool slot_offset_valid;
 
-    // ITDMA - msg type 3
-    int slot_increment;
-    bool slot_increment_valid;
+  // ITDMA - msg type 3
+  int slot_increment;
+  bool slot_increment_valid;
 
-    int slots_to_allocate;
-    bool slots_to_allocate_valid;
+  int slots_to_allocate;
+  bool slots_to_allocate_valid;
 
-    bool keep_flag;  // 3.3.7.3.2 Annex 2 ITDMA.  Table 20
-    bool keep_flag_valid;
+  bool keep_flag;  // 3.3.7.3.2 Annex 2 ITDMA.  Table 20
+  bool keep_flag_valid;
 
-    Ais1_2_3(const char *nmea_payload, const size_t pad);
+  Ais1_2_3(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a);
 
 // 4 bsreport and 11 utc date response
 class Ais4_11 : public AisMsg {
  public:
-    int year;
-    int month;
-    int day;
-    int hour;
-    int minute;
-    int second;
-    int position_accuracy;
-    float x, y; // longitude, latitude
-    int fix_type;
-    int transmission_ctl;
-    int spare;
-    bool raim;
+  int year;
+  int month;
+  int day;
+  int hour;
+  int minute;
+  int second;
+  int position_accuracy;
+  float x, y;
+  int fix_type;
+  int transmission_ctl;
+  int spare;
+  bool raim;
 
-    // COMM state SOTDMA msgs 1 and 2
-    int sync_state;
-    int slot_timeout;
+  // COMM state SOTDMA msgs 1 and 2
+  int sync_state;
+  int slot_timeout;
 
-    // Based on slot_timeout which ones are valid
-    int received_stations;
-    bool received_stations_valid;
+  // Based on slot_timeout which ones are valid
+  int received_stations;
+  bool received_stations_valid;
 
-    int slot_number;
-    bool slot_number_valid;
+  int slot_number;
+  bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have
-    int utc_hour;
-    int utc_min;
-    int utc_spare;
+  bool utc_valid;  // Only means that the values are set.  Can still have
+  int utc_hour;
+  int utc_min;
+  int utc_spare;
 
-    int slot_offset;
-    bool slot_offset_valid;
+  int slot_offset;
+  bool slot_offset_valid;
 
-    // **NO** ITDMA
-    Ais4_11(const char *nmea_payload, const size_t pad);
+  // **NO** ITDMA
+  Ais4_11(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais4_11 const& msg);
 
 
 class Ais5 : public AisMsg {
  public:
-    int ais_version;
-    int imo_num;
-    std::string callsign;
-    std::string name;
-    int type_and_cargo;
-    int dim_a;
-    int dim_b;
-    int dim_c;
-    int dim_d;
-    int fix_type;
-    int eta_month;
-    int eta_day;
-    int eta_hour;
-    int eta_minute;
-    float draught; // present static draft. m
-    std::string destination;
-    int dte;
-    int spare;
+  int ais_version;
+  int imo_num;
+  std::string callsign;
+  std::string name;
+  int type_and_cargo;
+  int dim_a;
+  int dim_b;
+  int dim_c;
+  int dim_d;
+  int fix_type;
+  int eta_month;
+  int eta_day;
+  int eta_hour;
+  int eta_minute;
+  float draught;  // present static draft. m
+  std::string destination;
+  int dte;
+  int spare;
 
-    Ais5(const char *nmea_payload, const size_t pad);
+  Ais5(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais5 const& msg);
 
@@ -192,36 +182,35 @@ const size_t AIS6_MAX_BITS = MAX_BITS;
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
  public:
-    Ais6() {}
+  Ais6() {}
 
-    static const int MAX_BITS = AIS6_MAX_BITS;
+  static const int MAX_BITS = AIS6_MAX_BITS;
 
-    int seq; // sequence number
-    int mmsi_dest;
-    bool retransmit;
-    int spare;
-    int dac; // dac+fi = app id
-    int fi;
+  int seq;  // sequence number
+  int mmsi_dest;
+  bool retransmit;
+  int spare;
+  int dac;  // dac+fi = app id
+  int fi;
+  std::vector<unsigned char> payload;  // If dac/fi (app id is now one we know).  without dac/fi
 
-    std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
-
-    Ais6(const char *nmea_payload, const size_t pad);
+  Ais6(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais6 const& msg);
 
 #if 0
 template<size_t T>
-bool decode_header6(std::bitset<T> &bs, Ais6 &msg) {
+bool decode_header6(const std::bitset<T> &bs, Ais6 &msg) {
   msg.message_id = ubits(bs, 0, 6);
   if (6 != msg.message_id) { msg.status = AIS_ERR_WRONG_MSG_TYPE; return false; }
-  msg.repeat_indicator = ubits(bs,6,2);
-  msg.mmsi = ubits(bs,8,30);
-  msg.seq = ubits(bs,38,2);
+  msg.repeat_indicator = ubits(bs, 6, 2);
+  msg.mmsi = ubits(bs, 8, 30);
+  msg.seq = ubits(bs, 38, 2);
   msg.mmsi_dest = ubits(bs, 40, 30);
   msg.retransmit = !bs[70];
   msg.spare = bs[71];
-  msg.dac = ubits(bs,72,10);
-  msg.fi = ubits(bs,82,6);
+  msg.dac = ubits(bs, 72, 10);
+  msg.fi = ubits(bs, 82, 6);
 }
 #endif
 
@@ -299,15 +288,15 @@ std::ostream& operator<< (std::ostream& o, Ais6_1_40 const& msg);
 class Ais6_1_12 : public Ais6 {
  public:
   std::string last_port;
-  int utc_month_dep; // actual time of departure
+  int utc_month_dep;  // actual time of departure
   int utc_day_dep, utc_hour_dep, utc_min_dep;
   std::string next_port;
-  int utc_month_next; // estimated arrival
+  int utc_month_next;  // estimated arrival
   int utc_day_next, utc_hour_next, utc_min_next;
   std::string main_danger;
   std::string imo_cat;
   int un;
-  int value; // UNIT???
+  int value;  // TODO: units?
   int value_unit;
   int spare2;
 
@@ -343,7 +332,7 @@ class Ais6_1_18 : public Ais6 {
   int utc_month, utc_day, utc_hour, utc_min;
   std::string port_berth, dest;
   float x, y;
-  int spare2[2]; // 32 bits per spare
+  int spare2[2];  // 32 bits per spare
 
   Ais6_1_18(const char *nmea_payload, const size_t pad);
 };
@@ -371,10 +360,10 @@ std::ostream& operator<< (std::ostream& o, Ais6_1_20 const& msg);
 
 struct Ais6_1_25_Cargo {
   int code_type;
-  bool imdg_valid; // also set with BC
+  bool imdg_valid;  // also set with BC
   int imdg;
   bool spare_valid;
-  int spare; // imdg or dc or marpols
+  int spare;  // imdg or dc or marpols
   bool un_valid;
   int un;
   bool bc_valid;
@@ -431,11 +420,11 @@ std::ostream& operator<< (std::ostream& o, Ais6_1_30 const& msg);
 // could use the same struct for for 8_1_14, but x and y are bit wise different.
 // two structs hints that things are not the same bitwise.
 struct Ais6_1_32_Window {
-  float x,y;
+  float x, y;
   int from_utc_hour, from_utc_min;
   int to_utc_hour, to_utc_min;
   int cur_dir;
-  float cur_speed; // knots
+  float cur_speed;  // knots
 };
 
 // IMO Circ 289 Tidal window
@@ -443,7 +432,6 @@ class Ais6_1_32 : public Ais6 {
  public:
   int utc_month;
   int utc_day;
-
   std::vector<Ais6_1_32_Window> windows;
 
   Ais6_1_32(const char *nmea_payload, const size_t pad);
@@ -456,12 +444,12 @@ std::ostream& operator<< (std::ostream& o, Ais6_1_32 const& msg);
 // 7 and 13 are ACKs for msg 6 and 12
 class Ais7_13 : public AisMsg {
  public:
-    int spare;
+  int spare;
 
-    std::vector<int> dest_mmsi;
-    std::vector<int> seq_num;
+  std::vector<int> dest_mmsi;
+  std::vector<int> seq_num;
 
-    Ais7_13(const char *nmea_payload, const size_t pad);
+  Ais7_13(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 
@@ -472,18 +460,15 @@ const size_t AIS8_MAX_BITS = 1192;
 // AIS Binary Broadcast message ... parent to many
 class Ais8 : public AisMsg {
  public:
-  Ais8() {}
-
-  //static const int MAX_BITS = AIS8_MAX_BITS;
-
   int spare;
   // TODO: seq? // ITU M.R. 1371-3 Anex 2 5.3.1
-  int dac; // dac+fi = app id
+  int dac;  // dac+fi = app id
   int fi;
 
-  std::vector<unsigned char> payload; // If dac/fi (app id is now one we know).  without dac/fi
+  std::vector<unsigned char> payload;  // If dac/fi (app id is now one we know).  without dac/fi
 
-  Ais8(const char *nmea_payload);
+  Ais8() {}
+  Ais8(const char *nmea_payload);  // TODO: pad
   bool decode_header8(const std::bitset<MAX_BITS> &bs);
 };
 std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
@@ -520,43 +505,43 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_40 const& msg);
 // See also IMO Circ 236
 class Ais8_1_11 : public Ais8 {
  public:
-    float x, y; // warning... appears in the bit stream as y,x
-    int day;
-    int hour;
-    int minute;
-    int wind_ave; // kts
-    int wind_gust; // kts
-    int wind_dir;
-    int wind_gust_dir;
-    float air_temp; // C
-    int rel_humid;
-    float dew_point;
-    float air_pres;
-    int air_pres_trend;
-    float horz_vis; // NM
-    float water_level; // m
-    int water_level_trend;
-    float surf_cur_speed;
-    int surf_cur_dir;
-    float cur_speed_2; // kts
-    int cur_dir_2;
-    int cur_depth_2; // m
-    float cur_speed_3; // kts
-    int cur_dir_3;
-    int cur_depth_3; // m
-    float wave_height; // m
-    int wave_period;
-    int wave_dir;
-    float swell_height;
-    int swell_period;
-    int swell_dir;
-    int sea_state; // beaufort scale
-    float water_temp;
-    int precip_type;
-    float salinity;
-    int ice; // yes/no/undef/unknown
-    int spare2;
-    int extended_water_level;  // OHMEX uses this for extra water level precision
+  float x, y;  // warning... appears in the bit stream as y,x
+  int day;
+  int hour;
+  int minute;
+  int wind_ave;  // kts
+  int wind_gust;  // kts
+  int wind_dir;
+  int wind_gust_dir;
+  float air_temp;  // C
+  int rel_humid;
+  float dew_point;
+  float air_pres;
+  int air_pres_trend;
+  float horz_vis;  // NM
+  float water_level;  // m
+  int water_level_trend;
+  float surf_cur_speed;
+  int surf_cur_dir;
+  float cur_speed_2;  // kts
+  int cur_dir_2;
+  int cur_depth_2;  // m
+  float cur_speed_3;  // kts
+  int cur_dir_3;
+  int cur_depth_3;  // m
+  float wave_height;  // m
+  int wave_period;
+  int wave_dir;
+  float swell_height;
+  int swell_period;
+  int swell_dir;
+  int sea_state;  // beaufort scale
+  float water_temp;
+  int precip_type;
+  float salinity;
+  int ice;  // yes/no/undef/unknown
+  int spare2;
+  int extended_water_level;  // OHMEX uses this for extra water level precision
 
   Ais8_1_11(const char *nmea_payload, size_t pad);
 };
@@ -605,7 +590,7 @@ struct Ais8_1_17_Target {
   int type;
   std::string id;
   int spare;
-  float x,y; // bits are lat, lon
+  float x, y;  // bits are lat, lon
   int cog;
   int timestamp;
   int sog;
@@ -649,23 +634,23 @@ class Ais8_1_21 : public Ais8 {
 
   // TYPE 0
   std::string location;
-  float x, y; // 25, 24 bits
+  float x, y;  // 25, 24 bits
   int utc_day, utc_hour, utc_min;
   // wx - use wx[0]
-  float horz_viz; // nautical miles
+  float horz_viz;  // nautical miles
   int humidity;  // %
   int wind_speed;  // ave knots
   int wind_dir;
-  float pressure; // hPa - float needed for type 1
+  float pressure;  // hPa - float needed for type 1
   int pressure_tendency;
-  float air_temp; // C
-  float water_temp; // C
-  int wave_period; // s
+  float air_temp;  // C
+  float water_temp;  // C
+  int wave_period;  // s
   float wave_height;
   int wave_dir;
-  float swell_height; // m
+  float swell_height;  // m
   int swell_dir;
-  int swell_period; // s
+  int swell_period;  // s
   int spare2;
 
   // TYPE 1 - !@#$!!!!!
@@ -679,17 +664,17 @@ class Ais8_1_21 : public Ais8 {
   float rel_pressure;  // 3 hour hPa
   // pressure_tendenc defined in type 0
   // wind_dir defined in type 0
-  float wind_speed_ms; // m/s
+  float wind_speed_ms;  // m/s
   int wind_dir_rel;
-  float wind_speed_rel; // m/s
-  float wind_gust_speed; // m/s
+  float wind_speed_rel;  // m/s
+  float wind_gust_speed;  // m/s
   int wind_gust_dir;
   int air_temp_raw;  // TODO: Seriously?  Convert this to C.  Kelvin does not make send
   // humidity defined in type 0
   // sea_temp_k
   int water_temp_raw;  // TODO: fix this
   // hor_viz
-  int wx[3]; // current, past 1, past 2
+  int wx[3];  // current, past 1, past 2
   int cloud_total;
   int cloud_low;
   int cloud_low_type;
@@ -702,7 +687,7 @@ class Ais8_1_21 : public Ais8 {
   // swell_period
   // swell_height
   int swell_dir_2, swell_period_2, swell_height_2;
-  float ice_thickness; // network is cm, storing m
+  float ice_thickness;  // network is cm, storing m
   int ice_accretion;
   int ice_accretion_cause;
   int sea_ice_concentration;
@@ -729,9 +714,9 @@ class Ais8_1_24 : public Ais8 {
   std::string last_port, next_ports[2];
 
   // TODO: enum list of param types
-  int solas_status[26]; // 0 NA, 1 operational, 2 SNAFU, 3 no data
+  int solas_status[26];  // 0 NA, 1 operational, 2 SNAFU, 3 no data
   int ice_class;
-  int shaft_power; // horses
+  int shaft_power;  // horses
   int vhf;
   std::string lloyds_ship_type;
   int gross_tonnage;
@@ -806,10 +791,10 @@ class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
  public:
-  int wind_speed, wind_gust ; // knots
+  int wind_speed, wind_gust;  // knots
   int wind_dir, wind_gust_dir;
   int sensor_type;
-  int wind_forcast, wind_gust_forcast; // knots
+  int wind_forcast, wind_gust_forcast;  // knots
   int wind_dir_forcast;
   int utc_day_forcast, utc_hour_forcast, utc_min_forcast;
   int duration;
@@ -823,7 +808,7 @@ class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
 class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
  public:
   int type;
-  float level; // m.  assuming it is being stored at 0.01 m inc.
+  float level;  // m.  assuming it is being stored at 0.01 m inc.
   int trend;
   int vdatum;
   int sensor_type;
@@ -832,17 +817,17 @@ class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
   int utc_day_forcast;
   int utc_hour_forcast;
   int utc_min_forcast;
-  int duration; // minutes
+  int duration;  // minutes
   int spare;
   Ais8_1_26_WaterLevel(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
-  Ais8_1_26_WaterLevel() {};
+  Ais8_1_26_WaterLevel() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WATER_LEVEL;}
 };
 
 struct Ais8_1_26_Curr2D_Current {
-  float speed; // knots
+  float speed;  // knots
   int dir;
-  int depth; // m
+  int depth;  // m
 };
 
 class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
@@ -858,7 +843,7 @@ class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
 
 struct Ais8_1_26_Curr3D_Current {
   float north, east, up;
-  int depth; // m
+  int depth;  // m
 };
 
 class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
@@ -873,9 +858,9 @@ class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
 };
 
 struct Ais8_1_26_HorzFlow_Current {
-  int bearing, dist; // deg, m
-  float speed; // knots
-  int dir, level; // deg, m
+  int bearing, dist;  // deg, m
+  float speed;  // knots
+  int dir, level;  // deg, m
 };
 
 class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
@@ -891,13 +876,13 @@ class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
 class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
  public:
   float swell_height;
-  int swell_period, swell_dir; // s, deg
+  int swell_period, swell_dir;  // s, deg
   int sea_state;
   int swell_sensor_type;
-  float water_temp, water_temp_depth; // C, m
+  float water_temp, water_temp_depth;  // C, m
   int water_sensor_type;
   float wave_height;
-  int wave_period, wave_dir; // s, deg
+  int wave_period, wave_dir;  // s, deg
   int wave_sensor_type;
   float salinity;
 
@@ -908,10 +893,10 @@ class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
  public:
-  float water_temp; // C
-  float conductivity; // siemens/m
-  float pressure; // decibars
-  float salinity; // 0/00 ppt
+  float water_temp;  // C
+  float conductivity;  // siemens/m
+  float pressure;  // decibars
+  float salinity;  // 0/00 ppt
   int salinity_type;
   int sensor_type;
   int spare[2];
@@ -923,16 +908,16 @@ class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
  public:
-  float air_temp; // C
+  float air_temp;  // C
   int air_temp_sensor_type;
   int precip;
-  float horz_vis; // nm
-  float dew_point; // C
+  float horz_vis;  // nm
+  float dew_point;  // C
   int dew_point_type;
-  int air_pressure; // hPa
+  int air_pressure;  // hPa
   int air_pressure_trend;
   int air_pressor_type;
-  float salinity; // 0/00 ppt
+  float salinity;  // 0/00 ppt
   int spare;
 
   Ais8_1_26_Wx(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
@@ -1005,39 +990,39 @@ class Ais8_1_31 : public Ais8 {
   int utc_day;
   int utc_hour;
   int utc_min;
-  int wind_ave; // kts
-  int wind_gust; // kts
+  int wind_ave;  // kts
+  int wind_gust;  // kts
   int wind_dir;
   int wind_gust_dir;
-  float air_temp; // C
+  float air_temp;  // C
   int rel_humid;
   float dew_point;
   int air_pres;
   int air_pres_trend;
-  float horz_vis; // NM
-  float water_level; // m
+  float horz_vis;  // NM
+  float water_level;  // m
   int water_level_trend;
 
   float surf_cur_speed;
   int surf_cur_dir;
-  float cur_speed_2; // kts
+  float cur_speed_2;  // kts
   int cur_dir_2;
-  int cur_depth_2; // m
-  float cur_speed_3; // kts
+  int cur_depth_2;  // m
+  float cur_speed_3;  // kts
   int cur_dir_3;
-  int cur_depth_3; // m
+  int cur_depth_3;  // m
 
-  float wave_height; // m
+  float wave_height;  // m
   int wave_period;
   int wave_dir;
-  float swell_height; // m
+  float swell_height;  // m
   int swell_period;
   int swell_dir;
-  int sea_state; // beaufort scale - Table 1.2
+  int sea_state;  // beaufort scale - Table 1.2
   float water_temp;
   int precip_type;
   float salinity;
-  int ice; // yes/no/undef/unknown
+  int ice;  // yes/no/undef/unknown
   int spare2;
 
   Ais8_1_31(const char *nmea_payload, const size_t pad);
@@ -1050,17 +1035,17 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_31 const& msg);
 class Ais8_200_10 : public Ais8 {
  public:
   std::string eu_id;  // European Vessel ID - 8 characters
-  float length, beam; // m
+  float length, beam;  // m
   int ship_type;
   int haz_cargo;
   float draught;
   int loaded;
-  int speed_qual, course_qual, heading_qual; // sensor quality
+  int speed_qual, course_qual, heading_qual;  // sensor quality
   int spare2;
   Ais8_200_10(const char *nmea_payload, const size_t pad);
 };
 
-  // 21 and 22 do not exist
+// 21 and 22 do not exist
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
 class Ais8_200_23 : public Ais8 {
@@ -1069,13 +1054,13 @@ class Ais8_200_23 : public Ais8 {
   int utc_year_end, utc_month_end, utc_day_end;
   int utc_hour_start, utc_min_start;
   int utc_hour_end, utc_min_end;
-  float x1,y1;
-  float x2,y2;
+  float x1, y1;
+  float x2, y2;
   int type;
   int min;
   int max;
   int classification;
-  int wind_dir; // EMMA CODE
+  int wind_dir;  // EMMA CODE
   int spare2;
 
   Ais8_200_23(const char *nmea_payload, const size_t pad);
@@ -1087,16 +1072,16 @@ class Ais8_200_24 : public Ais8 {
  public:
   std::string country;
   int guage_ids[4];
-  float levels[4]; // m
+  float levels[4];  // m
   Ais8_200_24(const char *nmea_payload, const size_t pad);
 };
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
 class Ais8_200_40 : public Ais8 {
  public:
-  float x,y;
+  float x, y;
   int form;
-  int dir; // degrees
+  int dir;  // degrees
   int stream_dir;
   int status_raw;
   // TODO: int status[9];  // WTF is the encoding for this?
@@ -1109,8 +1094,8 @@ class Ais8_200_55 : public Ais8 {
  public:
   int crew;
   int passengers;
-  int yet_more_personnel; // WTF?  Like a maid or waiter?
-  int spare2[3]; // JERKS... why 51 spare bits?
+  int yet_more_personnel;  // WTF?  Like a maid or waiter?
+  int spare2[3];  // JERKS... why 51 spare bits?
   Ais8_200_55(const char *nmea_payload, const size_t pad);
 };
 
@@ -1125,77 +1110,77 @@ class Ais8_200_55 : public Ais8 {
 #if 0
 class Ais8_366_34 : public Ais8 {
  public:
-    int zone_id;
-    int zone_type;
-    int day;
-    int hour;
-    int minute;
-    int dur_min; // duration in minutes
+  int zone_id;
+  int zone_type;
+  int day;
+  int hour;
+  int minute;
+  int dur_min;  // duration in minutes
 
-    Ais8_366_34(const char *nmea_payload, const size_t pad);
+  Ais8_366_34(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais8_366_34 const& msg);
 #endif
 
 class Ais9 : public AisMsg {
  public:
-    int alt; // m above sea level
-    float sog;
-    int position_accuracy;
-    float x, y; // Long and lat
-    float cog;
-    int timestamp;
-    int alt_sensor;
-    int spare;
-    int dte; // FIX: bool?
-    int spare2;
-    int assigned_mode;
-    bool raim;
-    int commstate_flag;
+  int alt;  // m above sea level
+  float sog;
+  int position_accuracy;
+  float x, y;  // Long and lat
+  float cog;
+  int timestamp;
+  int alt_sensor;
+  int spare;
+  int dte;  // FIX: bool?
+  int spare2;
+  int assigned_mode;
+  bool raim;
+  int commstate_flag;
 
-    int sync_state; // In both SOTDMA and ITDMA
+  int sync_state;  // In both SOTDMA and ITDMA
 
-    // SOTDMA
-    int slot_timeout;
-    bool slot_timeout_valid;
+  // SOTDMA
+  int slot_timeout;
+  bool slot_timeout_valid;
 
-    // Based on slot_timeout which ones are valid
-    int received_stations;
-    bool received_stations_valid;
+  // Based on slot_timeout which ones are valid
+  int received_stations;
+  bool received_stations_valid;
 
-    int slot_number;
-    bool slot_number_valid;
+  int slot_number;
+  bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have
-    int utc_hour;
-    int utc_min;
-    int utc_spare;
+  bool utc_valid;  // Only means that the values are set.  Can still have
+  int utc_hour;
+  int utc_min;
+  int utc_spare;
 
-    int slot_offset;
-    bool slot_offset_valid;
+  int slot_offset;
+  bool slot_offset_valid;
 
-    // ITDMA
-    int slot_increment;
-    bool slot_increment_valid;
+  // ITDMA
+  int slot_increment;
+  bool slot_increment_valid;
 
-    int slots_to_allocate;
-    bool slots_to_allocate_valid;
+  int slots_to_allocate;
+  bool slots_to_allocate_valid;
 
-    bool keep_flag;
-    bool keep_flag_valid;
+  bool keep_flag;
+  bool keep_flag_valid;
 
-    Ais9(const char *nmea_payload, const size_t pad);
+  Ais9(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
 
 // 10 ":" - UTC and date inquiry
 class Ais10 : public AisMsg {
  public:
-    int spare;
-    int dest_mmsi;
-    int spare2;
+  int spare;
+  int dest_mmsi;
+  int spare2;
 
-    Ais10(const char *nmea_payload, const size_t pad);
+  Ais10(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais10 const& msg);
 
@@ -1204,13 +1189,13 @@ std::ostream& operator<< (std::ostream& o, Ais10 const& msg);
 // '<' - Addressd safety related
 class Ais12 : public AisMsg {
  public:
-    int seq_num;
-    int dest_mmsi;
-    bool retransmitted;
-    int spare;
-    std::string text;
+  int seq_num;
+  int dest_mmsi;
+  bool retransmitted;
+  int spare;
+  std::string text;
 
-    XSAis12(const char *nmea_payload, const size_t pad);
+  Ais12(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
 
@@ -1219,10 +1204,10 @@ std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
 // '>' - Safety broadcast
 class Ais14 : public AisMsg {
  public:
-    int spare;
-    std::string text;
-    int expected_num_spare_bits; // The bits in the nmea_payload not used
-    Ais14(const char *nmea_payload, const size_t pad);
+  int spare;
+  std::string text;
+  int expected_num_spare_bits;  // The bits in the nmea_payload not used
+  Ais14(const char *nmea_payload, const size_t pad);
 };
 
 std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
@@ -1231,60 +1216,60 @@ std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
 // ? - Interrogation
 class Ais15 : public AisMsg {
  public:
-    int spare;
-    int mmsi_1;
-    int msg_1_1;
-    int slot_offset_1_1;
+  int spare;
+  int mmsi_1;
+  int msg_1_1;
+  int slot_offset_1_1;
 
-    int spare2;
-    int dest_msg_1_2;
-    int slot_offset_1_2;
+  int spare2;
+  int dest_msg_1_2;
+  int slot_offset_1_2;
 
-    int spare3;
-    int mmsi_2;
-    int msg_2;
-    int slot_offset_2;
-    int spare4;
+  int spare3;
+  int mmsi_2;
+  int msg_2;
+  int slot_offset_2;
+  int spare4;
 
-    Ais15(const char *nmea_payload, const size_t pad);
+  Ais15(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
 
 // @ - Assigned mode command
 class Ais16 : public AisMsg {
  public:
-    int spare;
-    int dest_mmsi_a;
-    int offset_a;
-    int inc_a;
-    int dest_mmsi_b;
-    int offset_b;
-    int inc_b;
-    int spare2;
+  int spare;
+  int dest_mmsi_a;
+  int offset_a;
+  int inc_a;
+  int dest_mmsi_b;
+  int offset_b;
+  int inc_b;
+  int spare2;
 
-    Ais16(const char *nmea_payload, const size_t pad);
+  Ais16(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais16 const& msg);
 
 // ITU-R M.823  http://www.itu.int/rec/R-REC-M.823/en
 struct GnssCorrection17 {
-    int msg_type;
-    int station_id;
-    int z_cnt;
-    int health;
+  int msg_type;
+  int station_id;
+  int z_cnt;
+  int health;
   // TODO: DGNSS data word - what is their word size?
 };
 
 // A - GNSS broacast - TODO: only partially coded
 class Ais17 : public AisMsg {
  public:
-    int spare;
-    float x, y;
-    int spare2;
+  int spare;
+  float x, y;
+  int spare2;
 
-    // TODO: Handle payload
+  // TODO: Handle payload
 
-    Ais17(const char *nmea_payload, const size_t pad);
+  Ais17(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais17 const& msg);
 
@@ -1292,53 +1277,53 @@ std::ostream& operator<< (std::ostream& o, Ais17 const& msg);
 // B - Class B position report
 class Ais18 : public AisMsg {
  public:
-    int spare;
-    float sog;
-    int position_accuracy;
-    float x, y; // Long and lat
-    float cog;
-    int true_heading;
-    int timestamp;
-    int spare2;
-    int unit_flag;
-    int display_flag;
-    int dsc_flag;
-    int band_flag;
-    int m22_flag;
-    int mode_flag;
-    bool raim;
-    int commstate_flag;
+  int spare;
+  float sog;
+  int position_accuracy;
+  float x, y;  // Long and lat
+  float cog;
+  int true_heading;
+  int timestamp;
+  int spare2;
+  int unit_flag;
+  int display_flag;
+  int dsc_flag;
+  int band_flag;
+  int m22_flag;
+  int mode_flag;
+  bool raim;
+  int commstate_flag;
 
-    // SOTDMA
-    int sync_state;
-    int slot_timeout;
+  // SOTDMA
+  int sync_state;
+  int slot_timeout;
 
-    XS// Based on slot_timeout which ones are valid
-    int received_stations;
-    bool received_stations_valid;
+  // Based on slot_timeout which ones are valid
+  int received_stations;
+  bool received_stations_valid;
 
-    int slot_number;
-    bool slot_number_valid;
+  int slot_number;
+  bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have
-    int utc_hour;
-    int utc_min;
-    int utc_spare;
+  bool utc_valid;  // Only means that the values are set.  Can still have
+  int utc_hour;
+  int utc_min;
+  int utc_spare;
 
-    int slot_offset;
-    bool slot_offset_valid;
+  int slot_offset;
+  bool slot_offset_valid;
 
-    // ITDMA
-    int slot_increment;
-    bool slot_increment_valid;
+  // ITDMA
+  int slot_increment;
+  bool slot_increment_valid;
 
-    int slots_to_allocate;
-    bool slots_to_allocate_valid;
+  int slots_to_allocate;
+  bool slots_to_allocate_valid;
 
-    bool keep_flag;
-    bool keep_flag_valid;
+  bool keep_flag;
+  bool keep_flag_valid;
 
-    Ais18(const char *nmea_payload, const size_t pad);
+  Ais18(const char *nmea_payload, const size_t pad);
 };
 
 std::ostream& operator<< (std::ostream& o, Ais18 const& msg);
@@ -1347,27 +1332,27 @@ std::ostream& operator<< (std::ostream& o, Ais18 const& msg);
 // C - Class B extended ship and position
 class Ais19 : public AisMsg {
  public:
-    int spare;
-    float sog;
-    int position_accuracy;
-    float x, y; // Long and lat
-    float cog;
-    int true_heading;
-    int timestamp;
-    int spare2;
-    std::string name;
-    int type_and_cargo;
-    int dim_a;
-    int dim_b;
-    int dim_c;
-    int dim_d;
-    int fix_type;
-    bool raim;
-    int dte;
-    int assigned_mode;
-    int spare3;
+  int spare;
+  float sog;
+  int position_accuracy;
+  float x, y;  // Long and lat
+  float cog;
+  int true_heading;
+  int timestamp;
+  int spare2;
+  std::string name;
+  int type_and_cargo;
+  int dim_a;
+  int dim_b;
+  int dim_c;
+  int dim_d;
+  int fix_type;
+  bool raim;
+  int dte;
+  int assigned_mode;
+  int spare3;
 
-    Ais19(const char *nmea_payload, const size_t pad);
+  Ais19(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
 
@@ -1375,108 +1360,107 @@ std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
 // TODO: consider a vector
 class Ais20 : public AisMsg {
  public:
-    int spare;
-    int offset_1;
-    int num_slots_1;
-    int timeout_1;
-    int incr_1;
+  int spare;
+  int offset_1;
+  int num_slots_1;
+  int timeout_1;
+  int incr_1;
 
-    int offset_2;
-    int num_slots_2;
-    int timeout_2;
-    int incr_2;
-    bool group_valid_2;
+  int offset_2;
+  int num_slots_2;
+  int timeout_2;
+  int incr_2;
+  bool group_valid_2;
 
-    int offset_3;
-    int num_slots_3;
-    int timeout_3;
-    int incr_3;
-    bool group_valid_3;
+  int offset_3;
+  int num_slots_3;
+  int timeout_3;
+  int incr_3;
+  bool group_valid_3;
 
-    int offset_4;
-    int num_slots_4;
-    int timeout_4;
-    int incr_4;
-    bool group_valid_4;
-    int spare2;
+  int offset_4;
+  int num_slots_4;
+  int timeout_4;
+  int incr_4;
+  bool group_valid_4;
+  int spare2;
 
-    Ais20(const char *nmea_payload, const size_t pad);
+  Ais20(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais20 const& msg);
 
 // 'E' - Aids to navigation report - FIX: not yet coded
 class Ais21 : public AisMsg {
  public:
+  int aton_type;
+  std::string name;
+  int position_accuracy;
+  float x, y;
+  int dim_a;
+  int dim_b;
+  int dim_c;
+  int dim_d;
+  int fix_type;
+  int timestamp;
+  bool off_pos;
+  int aton_status;
+  bool raim;
+  bool virtual_aton;
+  bool assigned_mode;
+  int spare;
+  // Extended name goes on the end of name
+  int spare2;
 
-    int aton_type;
-    std::string name;
-    int position_accuracy;
-    float x,y;
-    int dim_a;
-    int dim_b;
-    int dim_c;
-    int dim_d;
-    int fix_type;
-    int timestamp;
-    bool off_pos;
-    int aton_status;
-    bool raim;
-    bool virtual_aton;
-    bool assigned_mode;
-    int spare;
-    // Extended name goes on the end of name
-    int spare2;
-
-    Ais21(const char *nmea_payload, const size_t pad);
+  Ais21(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais21 const& msg);
 
 // 'F' - Channel Management
 class Ais22 : public AisMsg {
  public:
-    int spare;
-    int chan_a;
-    int chan_b;
-    int txrx_mode;
-    bool power_low;
+  int spare;
+  int chan_a;
+  int chan_b;
+  int txrx_mode;
+  bool power_low;
 
-    // if addressed false, then geographic position
-    bool pos_valid;
-    float x1,y1;
-    float x2,y2;
+  // if addressed false, then geographic position
+  bool pos_valid;
+  float x1, y1;
+  float x2, y2;
 
-    // if addressed is true
-    bool dest_valid;
-    int dest_mmsi_1;
-    int dest_mmsi_2;
+  // if addressed is true
+  bool dest_valid;
+  int dest_mmsi_1;
+  int dest_mmsi_2;
 
-    int chan_a_bandwidth;
-    int chan_b_bandwidth;
-    int zone_size;
+  int chan_a_bandwidth;
+  int chan_b_bandwidth;
+  int zone_size;
 
-    int spare2; // Lame that they make a huge spare here.  Bad bad bad
+  int spare2;  // Lame that they make a huge spare here.  Bad bad bad
 
-    Ais22(const char *nmea_payload, const size_t pad);
+  Ais22(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais22 const& msg);
 
 // 'G' - Group Assignment Command - FIX: not yet coded
 class Ais23 : public AisMsg {
  public:
-    int spare;
-    float x1,y1;
-    float x2,y2;
-    int station_type;
-    int type_and_cargo;
+  int spare;
+  float x1, y1;
+  float x2, y2;
+  int station_type;
+  int type_and_cargo;
 
-    int spare2; // 22 bits of spare here?  what were people thinking?
+  int spare2;  // 22 bits of spare here?  what were people thinking?
 
-    int txrx_mode;
-    int interval_raw; // raw value, not sec
-    int quiet;
-    int spare3;
+  int txrx_mode;
+  int interval_raw;  // raw value, not sec
+  int quiet;
+  int spare3;
 
-    Ais23(const char *nmea_payload, const size_t pad);
+  Ais23(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais23 const& msg);
 
@@ -1485,20 +1469,20 @@ std::ostream& operator<< (std::ostream& o, Ais23 const& msg);
 // TODO: This is structure differently than other conditional sections.  Narmalize
 class Ais24 : public AisMsg {
  public:
-    int part_num;
+  int part_num;
 
-    // Part A
-    std::string name;
+  // Part A
+  std::string name;
 
-    // Part B
-    int type_and_cargo;
-    std::string vendor_id;
-    std::string callsign;
-    int dim_a;
-    int dim_b;
-    int dim_c;
-    int dim_d;
-    int spare;
+  // Part B
+  int type_and_cargo;
+  std::string vendor_id;
+  std::string callsign;
+  int dim_a;
+  int dim_b;
+  int dim_c;
+  int dim_d;
+  int spare;
 
   Ais24(const char *nmea_payload, const size_t pad);
 };
@@ -1507,81 +1491,81 @@ std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 // 'I' - Single slot binary message - addressed or broadcast - TODO: handle payload
 class Ais25 : public AisMsg {
  public:
-    bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
+  bool use_app_id;  // if false, payload is unstructured binary.
 
-    bool dest_mmsi_valid;
-    int dest_mmsi; // only valid if addressed
-    // TODO: std::vector<unsigned char> payload; // If unstructured.  Yuck.
+  bool dest_mmsi_valid;
+  int dest_mmsi;  // only valid if addressed
+  // TODO: std::vector<unsigned char> payload;  // If unstructured.  Yuck.
 
-    int dac; // valid it use_app_id
-    int fi;
+  int dac;  // valid it use_app_id
+  int fi;
 
-    Ais25(const char *nmea_payload, const size_t pad);
+  Ais25(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais25 const& msg);
 
 // 'J' - Multi slot binary message with comm state - TODO: handle payload
 class Ais26 : public AisMsg {
  public:
-    bool use_app_id; // if false, payload is unstructured binary.  Commentary: do not use with this false
+  bool use_app_id;  // if false, payload is unstructured binary
 
-    bool dest_mmsi_valid;
-    int dest_mmsi; // only valid if addressed
+  bool dest_mmsi_valid;
+  int dest_mmsi;  // only valid if addressed
 
-    int dac; // valid it use_app_id
-    int fi;
+  int dac;  // valid it use_app_id
+  int fi;
 
-    // TODO: std::vector<unsigned char> payload; // If unstructured.  Yuck.
+  // TODO: std::vector<unsigned char> payload;  // If unstructured.  Yuck.
 
-    int commstate_flag; // 0 - SOTDMA, 1 - TDMA
+  int commstate_flag;  // 0 - SOTDMA, 1 - TDMA
 
-    // SOTDMA
-    int sync_state;
-    int slot_timeout;
-    bool slot_timeout_valid;
+  // SOTDMA
+  int sync_state;
+  int slot_timeout;
+  bool slot_timeout_valid;
 
-    // Based on slot_timeout which ones are valid
-    int received_stations;
-    bool received_stations_valid;
+  // Based on slot_timeout which ones are valid
+  int received_stations;
+  bool received_stations_valid;
 
-    int slot_number;
-    bool slot_number_valid;
+  int slot_number;
+  bool slot_number_valid;
 
-    bool utc_valid;  // Only means that the values are set.  Can still have
-    int utc_hour;
-    int utc_min;
-    int utc_spare;
+  bool utc_valid;  // Only means that the values are set.  Can still have
+  int utc_hour;
+  int utc_min;
+  int utc_spare;
 
-    int slot_offset;
-    bool slot_offset_valid;
+  int slot_offset;
+  bool slot_offset_valid;
 
-    // ITDMA
-    int slot_increment;
-    bool slot_increment_valid;
+  // ITDMA
+  int slot_increment;
+  bool slot_increment_valid;
 
-    int slots_to_allocate;
-    bool slots_to_allocate_valid;
+  int slots_to_allocate;
+  bool slots_to_allocate_valid;
 
-    bool keep_flag;
-    bool keep_flag_valid;
+  bool keep_flag;
+  bool keep_flag_valid;
 
-    Ais26(const char *nmea_payload, const size_t pad);
+  Ais26(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais26 const& msg);
 
 // K - Long-range position report - e.g. for satellite receivers
 class Ais27 : public AisMsg {
  public:
-    int position_accuracy;
-    bool raim ;
-    int nav_status;
-    float x, y;
-    int sog;
-    int cog;
-    bool gnss;  // warning: bits in AIS are flipped sense
-    int spare;
+  int position_accuracy;
+  bool raim;
+  int nav_status;
+  float x, y;
+  int sog;
+  int cog;
+  bool gnss;  // warning: bits in AIS are flipped sense
+  int spare;
 
-    Ais27(const char *nmea_payload, const size_t pad=0);
+  Ais27(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais27 const& a);
 
@@ -1593,72 +1577,73 @@ extern std::bitset<6> nmea_ord[128];
 
 template<size_t T>
 AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
-    assert(nmea_payload);
-    if (strlen(nmea_payload) > T/6) {
+  assert(nmea_payload);
+  if (strlen(nmea_payload) > T/6) {
 #ifndef NDEBUG
-        std::cerr << "ERROR: message longer than max allowed size (" << T/6 << "): found "
-                  << strlen(nmea_payload) << " characters in "
-                  << nmea_payload << std::endl;
+    std::cerr << "ERROR: message longer than max allowed size (" << T/6 << "): found "
+              << strlen(nmea_payload) << " characters in "
+              << nmea_payload << std::endl;
 #endif
-        return AIS_ERR_MSG_TOO_LONG;
+    return AIS_ERR_MSG_TOO_LONG;
+  }
+  for (size_t char_idx = 0; nmea_payload[char_idx] != '\0' && char_idx < T/6; char_idx++) {
+    int c = static_cast<int>(nmea_payload[char_idx]);
+    if (c < 48 || c > 119 || (c >= 88 && c <= 95)) {
+      return AIS_ERR_BAD_NMEA_CHR;
     }
-    for (size_t char_idx=0; nmea_payload[char_idx] != '\0' && char_idx < T/6; char_idx++) {
-        int c = int(nmea_payload[char_idx]);
-        if (c<48 || c>119 || (c>=88 and c<=95) ) {
-            return AIS_ERR_BAD_NMEA_CHR;
-        }
-        const std::bitset<6> bs_for_char = nmea_ord[ c ];
-        for (size_t offset=0; offset < 6 ; offset++) {
-            bits[char_idx*6 + offset] = bs_for_char[offset];
-        }
+    const std::bitset<6> bs_for_char = nmea_ord[ c ];
+    for (size_t offset = 0; offset < 6; offset++) {
+      bits[char_idx*6 + offset] = bs_for_char[offset];
     }
-    return AIS_OK;
+  }
+  return AIS_OK;
 }
 
 template<size_t T>
-int ubits(const std::bitset<T> &bits, const size_t start, const size_t len)
-{
-    assert (len <= 32);
-    assert (start+len <= T);
-    std::bitset<32> bs_tmp;
-    for (size_t i = 0; i < len; i++)
-        bs_tmp[i] = bits[start+len-i-1];
-    return bs_tmp.to_ulong();
+int ubits(const std::bitset<T> &bits, const size_t start, const size_t len) {
+  assert(len <= 32);
+  assert(start+len <= T);
+  std::bitset<32> bs_tmp;
+  for (size_t i = 0; i < len; i++)
+    bs_tmp[i] = bits[start+len-i-1];
+  return bs_tmp.to_ulong();
 }
 
+
+// TODO: do not use long
 typedef union {
-    long long_val;
-    unsigned long ulong_val;
+  long long_val;
+  unsigned long ulong_val;
 } long_union;
 
 template<size_t T>
 int sbits(std::bitset<T> bs, const size_t start, const size_t len) {
-    assert (len <= 32);
-    assert (start+len <= T); // FIX:  should it just be < ?
-    std::bitset<32> bs32;
-    if (len < 32 && 1 == bs[start] ) bs32.flip(); // pad 1's to the left if negative
+  assert(len <= 32);
+  assert(start+len <= T);  // TODO:  should it just be < ?
+  std::bitset<32> bs32;
+  if (len < 32 && 1 == bs[start] ) bs32.flip();  // pad 1's to the left if negative
 
-    for (size_t i = 0; i < len; i++)
-        bs32[i] = bs[start+len-i-1];
+  for (size_t i = 0; i < len; i++)
+    bs32[i] = bs[start+len-i-1];
 
-    long_union val;
-    val.ulong_val = bs32.to_ulong();
-    return val.long_val;
+  long_union val;
+  val.ulong_val = bs32.to_ulong();
+  return val.long_val;
 }
 
 extern const std::string bits_to_char_tbl;
 
 template<size_t T>
 const std::string ais_str(const std::bitset<T> &bits, const size_t start, const size_t len) {
-    assert (start+len < T);
-    assert (len % 6 == 0);
-    const size_t num_char = len / 6;
-    std::string result(num_char, '@');
-    for (size_t char_idx=0; char_idx < num_char; char_idx++) {
-        const int char_num = ubits(bits, start+char_idx*6, 6);
-        result[char_idx] = bits_to_char_tbl[char_num];
-    }
-    return result;
+  assert(start+len < T);
+  assert(len % 6 == 0);
+  const size_t num_char = len / 6;
+  std::string result(num_char, '@');
+  for (size_t char_idx = 0; char_idx < num_char; char_idx++) {
+    const int char_num = ubits(bits, start+char_idx*6, 6);
+    result[char_idx] = bits_to_char_tbl[char_num];
+  }
+  return result;
 }
 
 #endif

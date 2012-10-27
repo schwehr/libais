@@ -24,12 +24,12 @@ Ais8_1_26_Station::Ais8_1_26_Station(const std::bitset<AIS8_MAX_BITS> &bs, const
 
 Ais8_1_26_Wind::Ais8_1_26_Wind(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   wind_speed = ubits(bs, offset, 7);
-  wind_gust  = ubits(bs, offset+7, 7); // knots
+  wind_gust  = ubits(bs, offset+7, 7);  // knots
   wind_dir = ubits(bs, offset+14, 9);
   wind_gust_dir = ubits(bs, offset+23, 9);
   sensor_type = ubits(bs, offset+32, 3);
   wind_forcast = ubits(bs, offset+35, 7);
-  wind_gust_forcast = ubits(bs, offset+42, 7); // knots
+  wind_gust_forcast = ubits(bs, offset+42, 7);  // knots
   wind_dir_forcast = ubits(bs, offset+49, 9);
   utc_day_forcast = ubits(bs, offset+58, 5);
   utc_hour_forcast = ubits(bs, offset+63, 5);
@@ -56,7 +56,7 @@ Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const std::bitset<AIS8_MAX_BITS> &bs,
 
 
 Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-  for (size_t idx=0; idx < 3; idx++) {
+  for (size_t idx = 0; idx < 3; idx++) {
     size_t start = offset + idx * 26;
     currents[idx].speed = ubits(bs, start, 8) / 10.;
     currents[idx].dir = ubits(bs, start+8, 9);
@@ -68,20 +68,20 @@ Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const s
 
 
 Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-  for (size_t idx=0; idx < 2; idx++) {
+  for (size_t idx = 0; idx < 2; idx++) {
     size_t start = offset + idx * 33;
-    currents[idx].north = ubits (bs, start, 8) / 10.;
-    currents[idx].east = ubits (bs, start+8, 8) / 10.;
-    currents[idx].up = ubits (bs, start+16, 8) / 10.;
-    currents[idx].depth = ubits (bs, start+24, 9);
+    currents[idx].north = ubits(bs, start, 8) / 10.;
+    currents[idx].east = ubits(bs, start+8, 8) / 10.;
+    currents[idx].up = ubits(bs, start+16, 8) / 10.;
+    currents[idx].depth = ubits(bs, start+24, 9);
   }
-  type = ubits (bs, offset+66, 3);
-  spare = ubits (bs, offset+69, 16);
+  type = ubits(bs, offset+66, 3);
+  spare = ubits(bs, offset+69, 16);
 }
 
 
 Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-  for (size_t idx=0; idx < 2; idx++) {
+  for (size_t idx = 0; idx < 2; idx++) {
     size_t start = offset + idx * 42;
     currents[idx].bearing = ubits(bs, start, 9);
     currents[idx].dist = ubits(bs, start+9, 7);
@@ -96,7 +96,7 @@ Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, con
 Ais8_1_26_SeaState::Ais8_1_26_SeaState(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   swell_height = ubits(bs, offset, 8) / 10.;
   swell_period = ubits(bs, offset+8, 6);
-  swell_dir = ubits(bs, offset+14, 9) ;
+  swell_dir = ubits(bs, offset+14, 9);
   sea_state = ubits(bs, offset+23, 4);
   swell_sensor_type = ubits(bs, offset+27, 3);
   water_temp = sbits(bs, offset+30, 10) / 10.;
@@ -155,7 +155,7 @@ Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_M
 
   Ais8_1_26_SensorReport *rpt = 0;
   // WARNING: out of order decoding.  Only get the report header if we can decode the type.
-  switch(rpt_type) {
+  switch (rpt_type) {
   case AIS8_1_26_SENSOR_LOCATION:    rpt = new Ais8_1_26_Location(bs, rpt_start); break;
   case AIS8_1_26_SENSOR_STATION:     rpt = new Ais8_1_26_Station(bs, rpt_start); break;
   case AIS8_1_26_SENSOR_WIND:        rpt = new Ais8_1_26_Wind(bs, rpt_start); break;
@@ -173,7 +173,7 @@ Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_M
   case AIS8_1_26_SENSOR_RESERVED_14: break;
   case AIS8_1_26_SENSOR_RESERVED_15: break;
   default:
-    ;  // Leave rpt == 0 to indicate error
+    {}  // Leave rpt == 0 to indicate error
   }
   if (rpt) {
     rpt->report_type = rpt_type;
@@ -189,8 +189,10 @@ Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_M
 
 Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
-  assert(pad<6);
+  assert(pad < 6);
+
   init();
+
   const int num_bits = strlen(nmea_payload) * 6 - pad;
   if (168 > num_bits || num_bits > 1098) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
@@ -206,7 +208,7 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) {
   // TODO: what to do about extra data in sensor report msg 8_1_26?
   // if ((num_bits - 56) % AIS8_1_26_REPORT_SIZE)
 
-  for(size_t report_idx=0; report_idx < num_sensor_reports; report_idx++) {
+  for (size_t report_idx = 0; report_idx < num_sensor_reports; report_idx++) {
     const size_t start = 56 + report_idx * AIS8_1_26_REPORT_SIZE;
     Ais8_1_26_SensorReport *sensor_report = ais8_1_26_sensor_report_factory(bs, start);
     if (sensor_report) {
@@ -214,13 +216,12 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) {
     } else {
       status = AIS_ERR_BAD_SUB_SUB_MSG;
     }
-
   }
 }
 
 
 Ais8_1_26::~Ais8_1_26() {
-  for (size_t i=0; i < reports.size(); i++) {
+  for (size_t i = 0; i < reports.size(); i++) {
     delete reports[i];
 #ifndef NDEBUG
     reports[i] = 0;

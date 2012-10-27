@@ -18,9 +18,9 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (message_id != 21) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
-    aton_type = ubits(bs,38,5);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
+    aton_type = ubits(bs, 38, 5);
     name = ais_str(bs, 43, 120);
     position_accuracy = bs[163];
     x = sbits(bs, 164, 28) / 600000.;
@@ -44,13 +44,12 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
     const size_t extra_bits = extra_total_bits % 6;
 
     if (extra_chars > 0) {
-        name += ais_str(bs,272,extra_char_bits);
+        name += ais_str(bs, 272, extra_char_bits);
     }
 
     if (extra_bits > 0) {
-        spare2 = ubits(bs,272+extra_char_bits, extra_bits);
+        spare2 = ubits(bs, 272+extra_char_bits, extra_bits);
     } else {
         spare2 = 0;
     }
-
 }

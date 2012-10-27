@@ -1,5 +1,3 @@
-// Since Apr 2010
-// g++ ais_pos.cxx -o ais_pos -g -Wall -O3 -Wimplicit -W -Wredundant-decls -pedantic  -funroll-loops -fexpensive-optimizations
 
 #include "ais.h"
 
@@ -13,8 +11,8 @@ const std::string nth_field(const std::string &str, const size_t n, const char c
     // FIX: handle the off the end case better
     size_t pos;
     size_t count;
-    for (pos=0, count=0; count < n and pos != std::string::npos; count+=1) {
-        if (pos>0) pos += 1; // Skip past the current char that matched
+    for (pos = 0, count = 0; count < n and pos != std::string::npos; count+=1) {
+        if (pos > 0) pos += 1;  // Skip past the current char that matched
         pos = str.find(c, pos);
     }
     if (std::string::npos == pos) return std::string("");
@@ -47,9 +45,9 @@ bool nmea_ord_initialized = false;
 
 
 void build_nmea_lookup() {
-    for (int c=0; c < 128; c++) {
+    for (int c = 0; c < 128; c++) {
         int val = c - 48;
-        if (val>=40) val-= 8;
+        if (val >= 40) val-= 8;
         if (val < 0) continue;
         std::bitset<6> bits(val);
         bool tmp;
@@ -59,5 +57,4 @@ void build_nmea_lookup() {
         nmea_ord[c] = bits;
     }
     nmea_ord_initialized = true;
-
 }

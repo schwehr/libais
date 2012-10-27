@@ -1,4 +1,3 @@
-// Since 2010-May-05
 // Msg 19 C - Extended Class B equipment position report
 
 #include "ais.h"
@@ -17,11 +16,11 @@ Ais19::Ais19(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (19 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
 
-    spare = ubits(bs,38,8);
-    sog = ubits(bs,46,10) / 10.;
+    spare = ubits(bs, 38, 8);
+    sog = ubits(bs, 46, 10) / 10.;
 
     position_accuracy = bs[56];
     x = sbits(bs, 57, 28) / 600000.;
@@ -44,5 +43,5 @@ Ais19::Ais19(const char *nmea_payload, const size_t pad) {
     raim = bs[305];
     dte = bs[306];
     assigned_mode = bs[307];
-    spare3 = ubits(bs,308,4);
+    spare3 = ubits(bs, 308, 4);
 }

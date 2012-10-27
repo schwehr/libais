@@ -22,22 +22,22 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (16 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
 
-    spare = ubits(bs,38,2);
+    spare = ubits(bs, 38, 2);
 
-    dest_mmsi_a = ubits(bs,40,30);
-    offset_a = ubits(bs,70,12);
-    inc_a = ubits(bs,82,10);
+    dest_mmsi_a = ubits(bs, 40, 30);
+    offset_a = ubits(bs, 70, 12);
+    inc_a = ubits(bs, 82, 10);
     if (num_char == 16) {
       dest_mmsi_b = offset_b = inc_b = -1;  // TODO: Or would 0 be better?
-      spare2 = ubits(bs,92,4);
+      spare2 = ubits(bs, 92, 4);
       return;
     }
 
-    dest_mmsi_b = ubits(bs,92,30);
-    offset_b = ubits(bs,122,12);
-    inc_b = ubits(bs,134,10);
+    dest_mmsi_b = ubits(bs, 92, 30);
+    offset_b = ubits(bs, 122, 12);
+    inc_b = ubits(bs, 134, 10);
     spare2 = -1;  // TODO: Or would 0 be better?
 }

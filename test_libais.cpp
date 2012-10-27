@@ -4,6 +4,8 @@
 
 #include "ais8_001_22.h"
 
+#define CHECKPOINT std::cerr <<  __FILE__ << ": line " << __LINE__ << ": checkpoint" << std::endl
+
 #define UNUSED __attribute((__unused__))
 
 int main(UNUSED int argc, UNUSED char* argv[]) {

@@ -21,14 +21,14 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (17 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
 
-    spare = ubits(bs,38,2);
+    spare = ubits(bs, 38, 2);
 
     x = sbits(bs, 40, 18) / 600.;
     y = sbits(bs, 58, 17) / 600.;
-    spare2 = ubits(bs,75,5);
+    spare2 = ubits(bs, 75, 5);
 
     if (14 == num_char) {
       // No corrections

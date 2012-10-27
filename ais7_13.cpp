@@ -1,8 +1,8 @@
-#include "ais.h"
-
 #include <iostream>
 #include <bitset>
 #include <cassert>
+
+#include "ais.h"
 
 
 Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad) {
@@ -27,13 +27,13 @@ Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad) {
         status = AIS_ERR_WRONG_MSG_TYPE;
         return;
     }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
-    spare = ubits(bs,38,2);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
+    spare = ubits(bs, 38, 2);
 
     const size_t num_acks = (num_bits - 40) / 32;
-    for (size_t i=0; i < num_acks; i++) {
-        dest_mmsi.push_back(ubits(bs,40+i*32,30));
-        seq_num.push_back(ubits(bs,40+i*32+30,2));
+    for (size_t i = 0; i < num_acks; i++) {
+        dest_mmsi.push_back(ubits(bs, 40+i*32, 30));
+        seq_num.push_back(ubits(bs, 40+i*32+30, 2));
     }
 }

@@ -15,10 +15,10 @@ Ais9::Ais9(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (9 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
-    alt = ubits(bs,38, 12);
-    sog = ubits(bs,50,10) / 10.;
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
+    alt = ubits(bs, 38, 12);
+    sog = ubits(bs, 50, 10) / 10.;
 
     position_accuracy = bs[60];
     x = sbits(bs, 61, 28) / 600000.;
@@ -26,7 +26,7 @@ Ais9::Ais9(const char *nmea_payload, const size_t pad) {
 
     cog = ubits(bs, 116, 12) / 10.;
     timestamp = ubits(bs, 128, 6);
-    alt_sensor = int(bs[134]);
+    alt_sensor = bs[134];
     spare = ubits(bs, 135, 7);
     dte = bs[142];
     spare2 = ubits(bs, 143, 3);
@@ -49,7 +49,7 @@ Ais9::Ais9(const char *nmea_payload, const size_t pad) {
 
     if (0 == commstate_flag) {
         // SOTDMA
-        slot_timeout = ubits(bs,151,3);
+        slot_timeout = ubits(bs, 151, 3);
         slot_timeout_valid = true;
 
         switch (slot_timeout) {
@@ -63,26 +63,24 @@ Ais9::Ais9(const char *nmea_payload, const size_t pad) {
             utc_spare = ubits(bs, 166, 2);
             utc_valid = true;
             break;
-        case 2: // FALLTHROUGH
-        case 4: // FALLTHROUGH
+        case 2:  // FALLTHROUGH
+        case 4:  // FALLTHROUGH
         case 6:
             slot_number = ubits(bs, 154, 14);
             slot_number_valid = true;
             break;
-        case 3: // FALLTHROUGH
-        case 5: // FALLTHROUGH
+        case 3:  // FALLTHROUGH
+        case 5:  // FALLTHROUGH
         case 7:
             received_stations = ubits(bs, 154, 14);
             received_stations_valid = true;
             break;
         default:
-            assert (false);
+            assert(false);
         }
-
     } else {
         // ITDMA
         slot_increment = ubits(bs, 151, 13);
-        std::cerr << "9 slot_inc: " << slot_increment << "\n";
         slot_increment_valid = true;
 
         slots_to_allocate = ubits(bs, 164, 3);

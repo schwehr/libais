@@ -18,35 +18,31 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (26 != message_id) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
-
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
 
     const bool addressed = bs[38];
     use_app_id = bs[39];
     if (addressed) {
       dest_mmsi_valid = true;
       dest_mmsi = ubits(bs, 40, 30);
-
       if (use_app_id) {
-        dac = ubits(bs,70,10);
-        fi = ubits(bs,80,6);
+        dac = ubits(bs, 70, 10);
+        fi = ubits(bs, 80, 6);
       }
       // TODO: deal with payload
-
     } else {
       dest_mmsi_valid = false;
       // broadcast
       if (use_app_id) {
-        dac = ubits(bs,40,10);
-        fi = ubits(bs,50,6);
+        dac = ubits(bs, 40, 10);
+        fi = ubits(bs, 50, 6);
       }
-
       // TODO: deal with payload - probably need to pass in the spare bits
     }
 
     commstate_flag = bs[comm_flag_offset];
-    sync_state = ubits(bs, comm_flag_offset+1 , 2); // Both SOTDMA and TDMA
+    sync_state = ubits(bs, comm_flag_offset+1 , 2);  // Both SOTDMA and TDMA
 
 #ifndef NDEBUG
     slot_timeout = -1;
@@ -62,7 +58,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
 
     if (!commstate_flag) {
       // SOTDMA
-      slot_timeout = ubits(bs, comm_flag_offset+3 ,3);
+      slot_timeout = ubits(bs, comm_flag_offset+3, 3);
       slot_timeout_valid = true;
       switch (slot_timeout) {
         case 0:
@@ -75,20 +71,20 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
           utc_spare = ubits(bs, comm_flag_offset+18 , 2);
           utc_valid = true;
           break;
-        case 2: // FALLTHROUGH
-        case 4: // FALLTHROUGH
+        case 2:  // FALLTHROUGH
+        case 4:  // FALLTHROUGH
         case 6:
           slot_number = ubits(bs, comm_flag_offset+6 , 14);
           slot_number_valid = true;
           break;
-        case 3: // FALLTHROUGH
-        case 5: // FALLTHROUGH
+        case 3:  // FALLTHROUGH
+        case 5:  // FALLTHROUGH
         case 7:
           received_stations = ubits(bs, comm_flag_offset+6 , 14);
           received_stations_valid = true;
           break;
         default:
-          assert (false);
+          assert(false);
       }
     } else {
       // ITDMA
@@ -101,5 +97,4 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
       keep_flag = bs[comm_flag_offset+19];
       keep_flag_valid = true;
     }
-
 }

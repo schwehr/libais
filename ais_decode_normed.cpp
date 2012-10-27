@@ -12,7 +12,7 @@
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
     std::string item;
-    while(std::getline(ss, item, delim)) {
+    while (std::getline(ss, item, delim)) {
         elems.push_back(item);
     }
     return elems;
@@ -26,10 +26,9 @@ std::vector<std::string> split(const std::string &s, char delim) {
 
 int main(int argc,  char* argv[]) {
     build_nmea_lookup();
-
-    assert(2<=argc);
+    assert(2 <= argc);
     std::ifstream infile(argv[1]);
-    if (! infile.is_open() ) {
+    if (!infile.is_open()) {
         std::cerr << "Unable to open file: " << argv[1] << std::endl;
         exit(1);
     }
@@ -38,11 +37,11 @@ int main(int argc,  char* argv[]) {
     std::string line;
     while (!infile.eof()) {
         i++;
-        getline(infile,line); // G++ problem with this and a string
+        getline(infile, line); // G++ problem with this and a string
         if (line.size() < 20) {continue;}
         if ('!' != line[0]  ||  'A' != line[1] ) {continue;}
         std::string line_str(line);
-        std::vector<std::string> fields = split(line_str,',');
+        std::vector<std::string> fields = split(line_str, ',');
         {
             if (fields.size() < 7) continue;
             if (fields[5].size() < 5) continue;

@@ -1,10 +1,10 @@
-// Since Apr 2010
 // Class A shipdata
+
 #include "ais.h"
 
-// TODO: pad
 Ais5::Ais5(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
+    assert(pad < 6);
     init();
 
     if (2 != pad || strlen(nmea_payload) != 71) { status = AIS_ERR_BAD_BIT_COUNT; return; }
@@ -15,8 +15,8 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) {
 
     message_id = ubits(bs, 0, 6);
     if (5 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs,6,2);
-    mmsi = ubits(bs,8,30);
+    repeat_indicator = ubits(bs, 6, 2);
+    mmsi = ubits(bs, 8, 30);
 
     ais_version = ubits(bs, 38, 2);
     imo_num = ubits(bs, 40, 30);
@@ -41,9 +41,7 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) {
 }
 
 
-std::ostream& operator<< (std::ostream& o, Ais5 const& a)
-{
+std::ostream& operator<< (std::ostream& o, Ais5 const& a) {
     return o << 5 << ": " << a.mmsi << " \"" << a.name << "\" " << a.type_and_cargo
-             << " " << a.dim_a + a.dim_b << "x" << a.dim_c + a.dim_d << "x" << a.draught << "m"
-        ;
+             << " " << a.dim_a + a.dim_b << "x" << a.dim_c + a.dim_d << "x" << a.draught << "m";
 }
