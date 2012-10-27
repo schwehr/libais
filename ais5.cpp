@@ -3,13 +3,13 @@
 #include "ais.h"
 
 // TODO: pad
-Ais5::Ais5(const char *nmea_payload) {
+Ais5::Ais5(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
     init();
 
-    if (strlen(nmea_payload) != 71) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    if (2 != pad || strlen(nmea_payload) != 71) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<426> bs; // 424 + 2 spare bits => 71 characters
+    std::bitset<426> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

@@ -1,10 +1,10 @@
-// Since 2010-May-05
 // Msg 21 - ATON status
 
 #include "ais.h"
 
 Ais21::Ais21(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
+    assert(pad < 6);
     init();
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;

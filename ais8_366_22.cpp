@@ -139,11 +139,13 @@ const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = { // 128] = {
 };
 
 // TODO: pad
-Ais8_366_22::Ais8_366_22(const char *nmea_payload) {
+Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    assert(strlen(nmea_payload) >= 28);
+    assert(pad < 6);
+
     init();
-    const int num_bits = (strlen(nmea_payload) * 6);
+
+    const int num_bits = (strlen(nmea_payload) * 6) - pad;
     if (208 <= num_bits && num_bits >= 1020) { status = AIS_ERR_BAD_BIT_COUNT; return; }
     std::bitset<MAX_BITS> bs;
 

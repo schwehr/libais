@@ -4,12 +4,14 @@
 #include <bitset>
 #include <cassert>
 
-// TODO: pad
-Ais7_13::Ais7_13(const char *nmea_payload) {
+
+Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad) {
+    assert(nmea_payload);
+    assert(pad < 6);
+
     init();
 
-    assert (nmea_payload);
-    const size_t num_bits = strlen(nmea_payload) * 6;
+    const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
     if (! ((40+32*1)==num_bits || (40+32*2)==num_bits || (40+32*3)==num_bits || (40+32*4)==num_bits) ){
         status = AIS_ERR_BAD_BIT_COUNT;

@@ -2,13 +2,14 @@
 
 #include "ais.h"
 
-// TODO: pad
-Ais16::Ais16(const char *nmea_payload) {
+Ais16::Ais16(const char *nmea_payload, const size_t pad) {
+    assert(pad < 6);
     assert(nmea_payload);
     init();
 
     // 96 or 144 bits
     // 168 bits violates the spec but is common
+    // TODO: check the pad
     const int num_char = std::strlen(nmea_payload);
     if (num_char != 16 && num_char != 24 && num_char != 28) {
         status = AIS_ERR_BAD_BIT_COUNT;

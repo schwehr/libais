@@ -28,6 +28,8 @@ Ais24::Ais24(const char *nmea_payload, const size_t pad) {
     case 0: // Part A
         if (160 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
         name = ais_str(bs, 40, 120);
+        type_and_cargo = -1;
+        dim_a = dim_b = dim_c = dim_d = spare = -1;
         break;
 
     case 1: // Part B

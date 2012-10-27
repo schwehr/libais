@@ -7,10 +7,11 @@
 #include <string>
 #include <cassert>
 
-// TODO: pad
-Ais4_11::Ais4_11(const char *nmea_payload) {
+Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
     init();
+
+    if (0 != pad || strlen(nmea_payload) != 28) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     std::bitset<168> bs;
 

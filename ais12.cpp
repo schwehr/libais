@@ -1,16 +1,17 @@
-// Since 2010-May-14
+// < - ASRM
+
 #include "ais.h"
 
-// TODO: pad
-Ais12::Ais12(const char *nmea_payload) {
+Ais12::Ais12(const char *nmea_payload, const size_t pad) {
+    assert(pad < 6);
     assert(nmea_payload);
     init();
 
-    const int num_char = strlen(nmea_payload);
     // WARNING: the spec says max of 1008 bits, but 168 + 4*256 => 1192 bits or 199 characters
-    if ( num_char < 12 || num_char > 199 ) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+    if (num_bits < 72 || num_bits > 1192)  { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<1192> bs; // Spec says 1008
+    std::bitset<MAX_BITS> bs; // Spec says 1008
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
@@ -23,6 +24,8 @@ Ais12::Ais12(const char *nmea_payload) {
     dest_mmsi = ubits(bs,40,30);
     retransmitted = bs[70];
     spare = bs[71];
-    int num_txt_bits = 6 * ((num_char * 6 - 72) / 6);
-    text = ais_str(bs,72,num_txt_bits);
+    const int num_txt = (num_bits - 72) / 6;
+    const int num_txt_bits = num_txt * 6;
+    text = ais_str(bs, 72, num_txt_bits);
+    // TODO: watch for trailing spares
 }

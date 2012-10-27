@@ -1,12 +1,12 @@
 // Msg 20 D - data link management
 #include "ais.h"
 
-// TODO: pad
-Ais20::Ais20(const char *nmea_payload) {
+Ais20::Ais20(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
 
     init();
 
+    // TODO: figure out what pad is allowed.
     const int num_char = std::strlen(nmea_payload);
     if (num_char != 12 && num_char != 18 && num_char != 23 && num_char != 27) {
         status = AIS_ERR_BAD_BIT_COUNT;

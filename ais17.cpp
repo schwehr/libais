@@ -2,12 +2,13 @@
 
 #include "ais.h"
 
-// TODO: pad
-Ais17::Ais17(const char *nmea_payload) {
+Ais17::Ais17(const char *nmea_payload, const size_t pad) {
+    assert(pad < 6);
     assert(nmea_payload);
     init();
 
     // 80 to 816 bits
+    // TODO: pad
     const int num_char = std::strlen(nmea_payload);
     if (num_char < 14 || num_char > 136) {
         status = AIS_ERR_BAD_BIT_COUNT;

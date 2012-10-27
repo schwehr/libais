@@ -1,17 +1,13 @@
-// Since 2010-May-5
 // Safety related broadcast message (SRBM)
 #include "ais.h"
 
-// TODO: pad
-Ais14::Ais14
-(const char *nmea_payload) {
+Ais14::Ais14(const char *nmea_payload, const size_t pad) {
+    assert(pad < 6);
     assert(nmea_payload);
     init();
 
-    const int num_bits = strlen(nmea_payload)*6;
+    const int num_bits = strlen(nmea_payload)*6 - pad;
     if (num_bits < 46 || num_bits > 1008) {
-        // FIX: can't check to make sure the string occurs on 6-bit boundaries
-        // Need to know the spare bits
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
     }
@@ -29,7 +25,6 @@ Ais14::Ais14
 
     // TODO: fix processing of spare bits if any
     const int num_char = ( num_bits - 40 ) / 6;
-
     text = ais_str(bs, 40, num_char * 6);
     expected_num_spare_bits = num_bits - 40 - num_char*60; // Can use this to check later
 }

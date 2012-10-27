@@ -2,13 +2,13 @@
 
 #include "ais.h"
 
-// TODO: pad
-Ais25::Ais25(const char *nmea_payload) {
+Ais25::Ais25(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
+    assert(pad<6);
     init();
 
-    const int num_char = std::strlen(nmea_payload);
-    if (28 > num_char) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+    if (num_bits < 40 || num_bits > 168) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     std::bitset<168> bs;
     status = aivdm_to_bits(bs, nmea_payload);

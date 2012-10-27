@@ -1,13 +1,14 @@
-// Since 2010-May-14
+// ? - Interrogation
 
 #include "ais.h"
 
-// TODO: pad
-Ais15::Ais15(const char *nmea_payload) {
+Ais15::Ais15(const char *nmea_payload, const size_t pad) {
+    assert(pad < 6);
     assert(nmea_payload);
     init();
 
     const int num_char = std::strlen(nmea_payload);
+    // TODO: verify the pad makes sense for each size
     if (num_char != 15 && num_char!=18 && num_char!=27) {
         // 88-160 bits
         status = AIS_ERR_BAD_BIT_COUNT;

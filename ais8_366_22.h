@@ -25,8 +25,6 @@ enum Ais8_366_22_AreaShapeEnum {
 
 extern const char *shape_names[8];
 
-
-
 class Ais8_366_22_SubArea {
  public:
     virtual Ais8_366_22_AreaShapeEnum getType()=0;
@@ -134,7 +132,7 @@ class Ais8_366_22 : public Ais8 {
 
     std::vector<Ais8_366_22_SubArea *> sub_areas;
 
-    Ais8_366_22(const char *nmea_payload);
+  Ais8_366_22(const char *nmea_payload, const size_t pad);
     ~Ais8_366_22();
 };
 std::ostream& operator<< (std::ostream& o, Ais8_366_22 const& msg);

@@ -266,7 +266,7 @@ top_level = [
              'retransmitted': False,
              'seq_num': 0,
              'spare': 0,
-             'text': u'FROM ROCA CONTROL: PLEASE CONTACT ROCA CONTROL ON VHF CHANNEL 79 FOR MANDATORY REPORTP'}
+             'text': u'FROM ROCA CONTROL: PLEASE CONTACT ROCA CONTROL ON VHF CHANNEL 79 FOR MANDATORY REPORT'}
   },
 
   {
@@ -429,6 +429,25 @@ top_level = [
                'txrx_mode': 0,
                'zone_size': 3}
   },
+
+  {
+    'nmea': [ '!AIVDM,1,1,,B,G02:KpP1R`sn@291njF00000900,2*1C,raishub,1335089672' ],
+    'result': {'id': 23,
+               'interval_raw': 9,
+               'mmsi': 2268130,
+               'quiet': 4,
+               'repeat_indicator': 0,
+               'spare': 0,
+               'spare2': 0,
+               'spare3': 0,
+               'station_type': 6,
+               'txrx_mode': 0,
+               'type_and_cargo': 0,
+               'x1': 2.630000114440918,
+               'x2': 1.8266667127609253,
+               'y1': 51.06999969482422,
+               'y2': 50.68166732788086}
+    },
 
   {
     'nmea': [ '!AIVDM,1,1,,B,H3pro:4q3?=1B0000000000P7220,0*59,raishub,1332550009' ],

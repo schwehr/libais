@@ -122,10 +122,10 @@ DictSafeSetItem(PyObject *dict, const std::string &key, PyObject *val_obj) {
 extern "C" {
 
 PyObject *
-ais1_2_3_to_pydict(const char *nmea_payload) {
+ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
 
-    Ais1_2_3 msg(nmea_payload);
+    Ais1_2_3 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais1_2_3: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -184,10 +184,10 @@ ais1_2_3_to_pydict(const char *nmea_payload) {
 
 // TODO: pad
 PyObject *
-ais4_11_to_pydict(const char *nmea_payload) {
+ais4_11_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
 
-    Ais4_11 msg(nmea_payload);
+    Ais4_11 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais4_11: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -237,9 +237,9 @@ ais4_11_to_pydict(const char *nmea_payload) {
 
   // TODO: pad
 PyObject *
-ais5_to_pydict(const char *nmea_payload) {
+ais5_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais5 msg(nmea_payload);
+    Ais5 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais5: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -591,9 +591,9 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
 
 // TODO: pad
 PyObject*
-ais7_13_to_pydict(const char *nmea_payload) {
+ais7_13_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais7_13 msg(nmea_payload);
+    Ais7_13 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais7_13: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -1563,9 +1563,9 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 PyObject*
-ais9_to_pydict(const char *nmea_payload) {
+ais9_to_pydict(const char *nmea_payload, const size_t pad) {
     assert (nmea_payload);
-    Ais9 msg(nmea_payload);
+    Ais9 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais9: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -1618,11 +1618,11 @@ ais9_to_pydict(const char *nmea_payload) {
 
 // :
 PyObject*
-ais10_to_pydict(const char *nmea_payload) {
+ais10_to_pydict(const char *nmea_payload, const size_t pad) {
     assert (nmea_payload);
-    Ais10 msg(nmea_payload);
+    Ais10 msg(nmea_payload, pad);
     if (msg.had_error()) {
-        PyErr_Format(ais_py_exception, "Ais9: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+        PyErr_Format(ais_py_exception, "Ais10: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
     }
 
@@ -1642,9 +1642,9 @@ ais10_to_pydict(const char *nmea_payload) {
 
 // 12 - '<'
 PyObject*
-ais12_to_pydict(const char *nmea_payload) {
+ais12_to_pydict(const char *nmea_payload, const size_t pad) {
     assert (nmea_payload);
-    Ais12 msg(nmea_payload);
+    Ais12 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais9: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -1671,9 +1671,9 @@ ais12_to_pydict(const char *nmea_payload) {
 
 // 14 - '>'
 PyObject*
-ais14_to_pydict(const char *nmea_payload) {
+ais14_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais14 msg(nmea_payload);
+    Ais14 msg(nmea_payload, pad);
 
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais14: %s", AIS_STATUS_STRINGS[msg.get_error()]);
@@ -1693,9 +1693,9 @@ ais14_to_pydict(const char *nmea_payload) {
 
 // '?'
 PyObject*
-ais15_to_pydict(const char *nmea_payload) {
+ais15_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais15 msg(nmea_payload);
+    Ais15 msg(nmea_payload, pad);
 
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais15: %s", AIS_STATUS_STRINGS[msg.get_error()]);
@@ -1727,9 +1727,9 @@ ais15_to_pydict(const char *nmea_payload) {
 
 // '@'
 PyObject*
-ais16_to_pydict(const char *nmea_payload) {
+ais16_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais16 msg(nmea_payload);
+    Ais16 msg(nmea_payload, pad);
 
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais16: %s", AIS_STATUS_STRINGS[msg.get_error()]);
@@ -1758,9 +1758,9 @@ ais16_to_pydict(const char *nmea_payload) {
 
 // 'A' - TODO: incomplete
 PyObject*
-ais17_to_pydict(const char *nmea_payload) {
+ais17_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais17 msg(nmea_payload);
+    Ais17 msg(nmea_payload, pad);
 
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais17: %s", AIS_STATUS_STRINGS[msg.get_error()]);
@@ -1783,9 +1783,9 @@ ais17_to_pydict(const char *nmea_payload) {
 
 // 'B'
 PyObject*
-ais18_to_pydict(const char *nmea_payload) {
+ais18_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais18 msg(nmea_payload);
+    Ais18 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais18: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -1857,9 +1857,9 @@ ais18_to_pydict(const char *nmea_payload) {
 
 // 'C'
 PyObject*
-ais19_to_pydict(const char *nmea_payload) {
+ais19_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais19 msg(nmea_payload);
+    Ais19 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais19: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -1900,9 +1900,9 @@ ais19_to_pydict(const char *nmea_payload) {
 
 // TODO: 'D' - data link management
 PyObject*
-ais20_to_pydict(const char *nmea_payload) {
+ais20_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais20 msg(nmea_payload);
+    Ais20 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais20: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -2006,9 +2006,9 @@ ais21_to_pydict(const char *nmea_payload, const size_t pad) {
 
 // F - channel mangement
 PyObject*
-ais22_to_pydict(const char *nmea_payload) {
+ais22_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais22 msg(nmea_payload);
+    Ais22 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais22: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -2046,9 +2046,9 @@ ais22_to_pydict(const char *nmea_payload) {
 
 // F - group assignment command
 PyObject*
-ais23_to_pydict(const char *nmea_payload) {
+ais23_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais23 msg(nmea_payload);
+    Ais23 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais23: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -2095,11 +2095,9 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
     DictSafeSetItem(dict,"part_num", msg.part_num);
 
     switch(msg.part_num) {
-
     case 0: // Part A
         DictSafeSetItem(dict,"name",msg.name);
         break;
-
     case 1: // Part B
         DictSafeSetItem(dict,"type_and_cargo",msg.type_and_cargo);
         DictSafeSetItem(dict,"vendor_id",msg.vendor_id);
@@ -2125,9 +2123,9 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
 
 // I - single slot binary message
 PyObject*
-ais25_to_pydict(const char *nmea_payload) {
+ais25_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
-    Ais25 msg(nmea_payload);
+    Ais25 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais25: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
@@ -2248,16 +2246,16 @@ decode(PyObject *self, PyObject *args) {
     case '1': // FALLTHROUGH
     case '2': // FALLTHROUGH
     case '3':
-        result = ais1_2_3_to_pydict(nmea_payload);
-        break;
+      result = ais1_2_3_to_pydict(nmea_payload, pad);
+      break;
 
     case '4': // FALLTHROUGH - 4 - Basestation report
     case ';': //  11 - UTC date response
-        result = ais4_11_to_pydict(nmea_payload);
+        result = ais4_11_to_pydict(nmea_payload, pad);
         break;
 
     case '5': // 5 - Ship and Cargo
-        result = ais5_to_pydict(nmea_payload);
+        result = ais5_to_pydict(nmea_payload, pad);
         break;
 
     case '6': // 6 - Addressed binary message
@@ -2266,7 +2264,7 @@ decode(PyObject *self, PyObject *args) {
 
     case '7': // FALLTHROUGH - 7 - ACK for addressed binary message
     case '=': // 13 - ASRM Ack  (safety message)
-        result = ais7_13_to_pydict(nmea_payload);
+      result = ais7_13_to_pydict(nmea_payload, pad);
         break;
 
     case '8': // 8 - Binary broadcast message (BBM)
@@ -2274,47 +2272,47 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case '9': // 9 - SAR Position
-        result = ais9_to_pydict(nmea_payload);
+        result = ais9_to_pydict(nmea_payload, pad);
         break;
 
     case ':': // 10 - UTC Query
-        result = ais10_to_pydict(nmea_payload);
+        result = ais10_to_pydict(nmea_payload, pad);
         break;
 
     // ':' 11 - See 4
 
     case '<': // 12 - ASRM
-        result = ais12_to_pydict(nmea_payload);
+        result = ais12_to_pydict(nmea_payload, pad);
         break;
 
     // 13 - See 7
 
     case '>': // 14 - SRBM - Safety broadcast
-        result = ais14_to_pydict(nmea_payload);
+        result = ais14_to_pydict(nmea_payload, pad);
         break;
 
     case '?': // 15 - Interrogation
-        result = ais15_to_pydict(nmea_payload);
+        result = ais15_to_pydict(nmea_payload, pad);
         break;
 
     case '@': // 16 - Assigned mode command
-        result = ais16_to_pydict(nmea_payload);
+        result = ais16_to_pydict(nmea_payload, pad);
         break;
 
     case 'A': // 17 - GNSS broadcast
-        result = ais17_to_pydict(nmea_payload);
+        result = ais17_to_pydict(nmea_payload, pad);
         break;
 
     case 'B': // 18 - Position, Class B
-        result = ais18_to_pydict(nmea_payload);
+        result = ais18_to_pydict(nmea_payload, pad);
         break;
 
     case 'C': // 19 - Position and ship, Class B
-        result = ais19_to_pydict(nmea_payload);
+        result = ais19_to_pydict(nmea_payload, pad);
         break;
 
     case 'D': // 20 - Data link management
-        result = ais20_to_pydict(nmea_payload);
+        result = ais20_to_pydict(nmea_payload, pad);
         break;
 
     case 'E': // 21 - Aids to navigation report
@@ -2322,19 +2320,20 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'F': // 22 - Channel Management
-        result = ais22_to_pydict(nmea_payload);
+        result = ais22_to_pydict(nmea_payload, pad);
         break;
 
     case 'G': // 23 - Group Assignment Command
-        result = ais23_to_pydict(nmea_payload);
+        result = ais23_to_pydict(nmea_payload, pad);
         break;
 
     case 'H': // 24 - Static data report
-      result = ais24_to_pydict(nmea_payload, pad);
-      break;
+        result = ais24_to_pydict(nmea_payload, pad);
+        break;
 
     case 'I': // 25 - Single slot binary message - addressed or broadcast
-        result = ais25_to_pydict(nmea_payload);    // TODO: handle payloads
+      // TODO: handle payloads
+        result = ais25_to_pydict(nmea_payload, pad);
         break;
 
     case 'J': // 26 - Multi slot binary message with comm state

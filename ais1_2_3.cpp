@@ -11,12 +11,12 @@
 
 using namespace std;
 
-Ais1_2_3::Ais1_2_3(const char *nmea_payload) {
+Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
     assert(nmea_ord_initialized);  // Make sure we have the lookup table built
     init();
 
-    if (strlen(nmea_payload) != 168/6) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    if (0 != pad or strlen(nmea_payload) != 28) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     std::bitset<168> bs;
     status = aivdm_to_bits(bs, nmea_payload);

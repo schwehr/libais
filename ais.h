@@ -1,6 +1,7 @@
 // -*- c++ -*-
 
 // TODO: should all messages just use MAX_BITS or should it be set for each message?
+// TODO: create an archive of messages to do not decode.  Can libais be made to safely decode any of them?
 
 #ifndef AIS_H
 #define AIS_H
@@ -27,6 +28,9 @@ const std::string nth_field(const std::string &str, const size_t n, const char c
 //////////////////////////////////////////////////////////////////////
 
 extern bool nmea_ord_initialized; // If this is false, you need to call build_nmea_lookup.
+
+static const int MAX_BITS = 1192; // AIS8_MAX_BITS;
+
 
 void build_nmea_lookup();
 
@@ -112,7 +116,7 @@ class Ais1_2_3 : public AisMsg {
     bool keep_flag;  // 3.3.7.3.2 Annex 2 ITDMA.  Table 20
     bool keep_flag_valid;
 
-    Ais1_2_3(const char *nmea_payload);
+    Ais1_2_3(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a);
 
@@ -152,7 +156,7 @@ class Ais4_11 : public AisMsg {
     bool slot_offset_valid;
 
     // **NO** ITDMA
-    Ais4_11(const char *nmea_payload);
+    Ais4_11(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais4_11 const& msg);
 
@@ -178,12 +182,12 @@ class Ais5 : public AisMsg {
     int dte;
     int spare;
 
-    Ais5(const char *nmea_payload);
+    Ais5(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais5 const& msg);
 
 // Addessed binary message (ABM)
-const size_t AIS6_MAX_BITS = 1192;
+const size_t AIS6_MAX_BITS = MAX_BITS;
 
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
@@ -457,7 +461,7 @@ class Ais7_13 : public AisMsg {
     std::vector<int> dest_mmsi;
     std::vector<int> seq_num;
 
-    Ais7_13(const char *nmea_payload);
+    Ais7_13(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
 
@@ -470,7 +474,7 @@ class Ais8 : public AisMsg {
  public:
   Ais8() {}
 
-  static const int MAX_BITS = AIS8_MAX_BITS;
+  //static const int MAX_BITS = AIS8_MAX_BITS;
 
   int spare;
   // TODO: seq? // ITU M.R. 1371-3 Anex 2 5.3.1
@@ -1128,7 +1132,7 @@ class Ais8_366_34 : public Ais8 {
     int minute;
     int dur_min; // duration in minutes
 
-    Ais8_366_34(const char *nmea_payload, const size_t pad=0);
+    Ais8_366_34(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais8_366_34 const& msg);
 #endif
@@ -1180,7 +1184,7 @@ class Ais9 : public AisMsg {
     bool keep_flag;
     bool keep_flag_valid;
 
-    Ais9(const char *nmea_payload);
+    Ais9(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
 
@@ -1191,7 +1195,7 @@ class Ais10 : public AisMsg {
     int dest_mmsi;
     int spare2;
 
-    Ais10(const char *nmea_payload);
+    Ais10(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais10 const& msg);
 
@@ -1206,7 +1210,7 @@ class Ais12 : public AisMsg {
     int spare;
     std::string text;
 
-    Ais12(const char *nmea_payload);
+    XSAis12(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
 
@@ -1218,7 +1222,7 @@ class Ais14 : public AisMsg {
     int spare;
     std::string text;
     int expected_num_spare_bits; // The bits in the nmea_payload not used
-    Ais14(const char *nmea_payload);
+    Ais14(const char *nmea_payload, const size_t pad);
 };
 
 std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
@@ -1242,7 +1246,7 @@ class Ais15 : public AisMsg {
     int slot_offset_2;
     int spare4;
 
-    Ais15(const char *nmea_payload);
+    Ais15(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
 
@@ -1258,7 +1262,7 @@ class Ais16 : public AisMsg {
     int inc_b;
     int spare2;
 
-    Ais16(const char *nmea_payload);
+    Ais16(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais16 const& msg);
 
@@ -1280,7 +1284,7 @@ class Ais17 : public AisMsg {
 
     // TODO: Handle payload
 
-    Ais17(const char *nmea_payload);
+    Ais17(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais17 const& msg);
 
@@ -1309,7 +1313,7 @@ class Ais18 : public AisMsg {
     int sync_state;
     int slot_timeout;
 
-    // Based on slot_timeout which ones are valid
+    XS// Based on slot_timeout which ones are valid
     int received_stations;
     bool received_stations_valid;
 
@@ -1334,10 +1338,11 @@ class Ais18 : public AisMsg {
     bool keep_flag;
     bool keep_flag_valid;
 
-    Ais18(const char *nmea_payload);
+    Ais18(const char *nmea_payload, const size_t pad);
 };
 
 std::ostream& operator<< (std::ostream& o, Ais18 const& msg);
+
 
 // C - Class B extended ship and position
 class Ais19 : public AisMsg {
@@ -1362,11 +1367,12 @@ class Ais19 : public AisMsg {
     int assigned_mode;
     int spare3;
 
-    Ais19(const char *nmea_payload);
+    Ais19(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
 
-// 'D' - Data link management - FIX: not yet coded
+// 'D' - Data link management
+// TODO: consider a vector
 class Ais20 : public AisMsg {
  public:
     int spare;
@@ -1394,7 +1400,7 @@ class Ais20 : public AisMsg {
     bool group_valid_4;
     int spare2;
 
-    Ais20(const char *nmea_payload);
+    Ais20(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais20 const& msg);
 
@@ -1421,7 +1427,7 @@ class Ais21 : public AisMsg {
     // Extended name goes on the end of name
     int spare2;
 
-    Ais21(const char *nmea_payload, const size_t pad=0);
+    Ais21(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais21 const& msg);
 
@@ -1450,7 +1456,7 @@ class Ais22 : public AisMsg {
 
     int spare2; // Lame that they make a huge spare here.  Bad bad bad
 
-    Ais22(const char *nmea_payload);
+    Ais22(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais22 const& msg);
 
@@ -1470,12 +1476,13 @@ class Ais23 : public AisMsg {
     int quiet;
     int spare3;
 
-    Ais23(const char *nmea_payload);
+    Ais23(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais23 const& msg);
 
 
 // Class B Static Data report
+// TODO: This is structure differently than other conditional sections.  Narmalize
 class Ais24 : public AisMsg {
  public:
     int part_num;
@@ -1509,7 +1516,7 @@ class Ais25 : public AisMsg {
     int dac; // valid it use_app_id
     int fi;
 
-    Ais25(const char *nmea_payload);
+    Ais25(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais25 const& msg);
 
@@ -1558,7 +1565,7 @@ class Ais26 : public AisMsg {
     bool keep_flag;
     bool keep_flag_valid;
 
-    Ais26(const char *nmea_payload, const size_t pad=0);
+    Ais26(const char *nmea_payload, const size_t pad);
 };
 std::ostream& operator<< (std::ostream& o, Ais26 const& msg);
 
