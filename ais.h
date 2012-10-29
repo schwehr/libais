@@ -33,9 +33,11 @@ enum AIS_STATUS {
   AIS_ERR_BAD_PTR,
   AIS_ERR_UNKNOWN_MSG_TYPE,
   AIS_ERR_MSG_NOT_IMPLEMENTED,
+  AIS_ERR_MSG_SUB_NOT_IMPLEMENTED,
   AIS_ERR_EXPECTED_STRING,
   AIS_ERR_BAD_MSG_CONTENT,
   AIS_ERR_MSG_TOO_LONG,
+  AIS_ERR_BAD_SUB_MSG,
   AIS_ERR_BAD_SUB_SUB_MSG,
   AIS_STATUS_NUM_CODES
 };
@@ -1252,6 +1254,7 @@ class Ais16 : public AisMsg {
 std::ostream& operator<< (std::ostream& o, Ais16 const& msg);
 
 // ITU-R M.823  http://www.itu.int/rec/R-REC-M.823/en
+#if 0
 struct GnssCorrection17 {
   int msg_type;
   int station_id;
@@ -1259,6 +1262,7 @@ struct GnssCorrection17 {
   int health;
   // TODO: DGNSS data word - what is their word size?
 };
+#endif
 
 // A - GNSS broacast - TODO: only partially coded
 class Ais17 : public AisMsg {
@@ -1266,7 +1270,12 @@ class Ais17 : public AisMsg {
   int spare;
   float x, y;
   int spare2;
-
+  int gnss_type;
+  int z_cnt;
+  int station;
+  int seq;
+  // N - do not need to store this
+  int health;
   // TODO: Handle payload
 
   Ais17(const char *nmea_payload, const size_t pad);

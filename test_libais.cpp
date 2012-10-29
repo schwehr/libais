@@ -8,13 +8,12 @@
 
 #define UNUSED __attribute((__unused__))
 
+#define CHECK_ERROR(MSG) if (MSG.had_error()) std::cerr << "FAILED " << MSG.message_id << ": " << AIS_STATUS_STRINGS[MSG.get_error()] << "\n";
+
 int main(UNUSED int argc, UNUSED char* argv[]) {
     build_nmea_lookup();
 
-    ////////////////////////////////////////
     // 1
-    ////////////////////////////////////////
-
     if (true) {
         // !AIVDM,1,1,,B,15Mq4J0P01EREODRv4@74gv00HRq,0*72,b003669970,1272412824
       Ais1_2_3("15Mq4J0P01EREODRv4@74gv00HRq", 0);
@@ -224,6 +223,18 @@ bit_len: 578
       if (msg.had_error())  std::cerr<< "FAILED 17: " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
     }
 
+    // 17 - GNSS differential ITU-R.M.823
+    // GNSS Type 9
+    // !AIVDM,1,1,,A,A0475rQ?6<`Rp2Jp0W4`0OlCu1d=w1Cj<AKrU?8T,0*6E,raishub,1351296064
+    { Ais17 msg("A0475rQ?6<`Rp2Jp0W4`0OlCu1d=w1Cj<AKrU?8T",0);  CHECK_ERROR(msg);  /* std::cout << msg << "\n"; */ }
+    // !AIVDM,1,1,,A,A04<g?i:7Tcip2KB0wpf1h1?04H`wit0:jgwsh0U,0*38,raishub,1351296064
+    { Ais17 msg("A04<g?i:7Tcip2KB0wpf1h1?04H`wit0:jgwsh0U",0);  CHECK_ERROR(msg);  /* std::cout << msg << "\n"; */ }
+    // !AIVDM,1,1,,A,A0476CQb3Qba02Jt>i0`4wpsump@wJon:@Ov5OMH,0*20,raishub,1351297125
+    { Ais17 msg("A0476CQb3Qba02Jt>i0`4wpsump@wJon:@Ov5OMH",0);  CHECK_ERROR(msg);  /* std::cout << msg << "\n"; */ }
+    // !AIVDM,1,1,,A,A@4<gWQ;`8cl82K@GMd`4wmd5RP7w48HHiOu:QEI,0*28,raishub,1351297354
+    { Ais17 msg("A@4<gWQ;`8cl82K@GMd`4wmd5RP7w48HHiOu:QEI",0);  CHECK_ERROR(msg); /* std::cout << msg << "\n"; */ }
+    // !AIVDM,1,1,,A,A0476CQb3Qba02JtGtP`0Oo101d6wFL0@hgvCwpV,0*58,raishub,1351297831
+    { Ais17 msg("A0476CQb3Qba02JtGtP`0Oo101d6wFL0@hgvCwpV",0);  CHECK_ERROR(msg); /* std::cout << msg << "\n"; */ }
 
     // 18 - Class B
     // !AIVDM,1,1,,A,B5N3SRP0FFJFC`4:CQDFKwiP200>,0*75,b003669952,1272413103
