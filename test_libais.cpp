@@ -194,7 +194,7 @@ bit_len: 578
     // 15 - ? Interrogation
     //////////////////////////////////////////////////////////////////////
 
-    // TODO: what is wrong with 15?
+    // TODO(schwehr): what is wrong with 15?
     if (false) {
       // From GPSD - !AIVDM,1,1,,A,?5OP=l00052HD00,2*5B
       Ais15 msg_0("?5OP=l00052HD00",2);
@@ -205,7 +205,7 @@ bit_len: 578
       if (msg_1.had_error())  std::cerr << "FAILED 15 1: " << AIS_STATUS_STRINGS[msg_1.get_error()] << "\n";
         // !AIVDM,1,1,,B,?h3Ovn1GP<K0<P@59a0,2*04,d-077,S1832,t004248.00,T48.85520485,r07RPAL1,1272415370
       if (false) {
-        // TODO: broken?
+        // TODO(schwehr): broken?
         Ais15 msg("?h3Ovn1GP<K0<P@59a0", 2);
         if (msg.had_error())  std::cerr<<"FAILED 15 2: " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
       }
@@ -275,7 +275,7 @@ bit_len: 578
     }
 
 
-    // TODO: find a msg 20
+    // TODO(schwehr): find a msg 20
 
     // 21 - ATON status report
     if (true) {
@@ -338,7 +338,7 @@ bit_len: 578
     if (false) {
         if (true) {
             // Point
-          //Ais8_366_22 msg("81mg=5AKUP:0>H0007P=P?I0<12h000000", 3);  // TODO: is this the right pad?
+          //Ais8_366_22 msg("81mg=5AKUP:0>H0007P=P?I0<12h000000", 3);  // TODO(schwehr): is this the right pad?
           //  if (msg.had_error())  std::cerr<<"FAILED 8 366 22 pt\n";
         }
 
@@ -368,25 +368,25 @@ bit_len: 578
 
         if (true) {
           // Line - 1 segment
-          //Ais8_366_22 msg("81mg=5AKUP:5>H0007P=P?I0>CQh000003@D7QJ00;@01J000", ); // TODO: pad
+          //Ais8_366_22 msg("81mg=5AKUP:5>H0007P=P?I0>CQh000003@D7QJ00;@01J000", ); // TODO(schwehr): pad
           //if (msg.had_error())  std::cerr<<"Line seg FAILED\n";
         }
 
         if (true) {
           // Polygon - 2 segment - triangle
-          // Ais8_366_22 msg("81mg=5AKUP:3>H0007P=P?I0<5Wep000040DchFWWc@01J000"); // TODO: pad?
+          // Ais8_366_22 msg("81mg=5AKUP:3>H0007P=P?I0<5Wep000040DchFWWc@01J000"); // TODO(schwehr): pad?
           // if (msg.had_error())  std::cerr<<"Polygon FAILED\n";
         }
 
         if (true) {
           // Text AreaNotice: type=7  start=2009-07-06 00:00:04  duration=60 m  link_id=10  sub-areas: 2
-          // Ais8_366_22 msg("81mg=5AKUP:3fH0007P=P?I0<6RCp000055H@<1>1D9?>0000", ); // TODO: pad
+          // Ais8_366_22 msg("81mg=5AKUP:3fH0007P=P?I0<6RCp000055H@<1>1D9?>0000", ); // TODO(schwehr): pad
           // if (msg.had_error())  std::cerr<<"Text FAILED\n";
         }
 
         if (true) {
           // one-of-each
-          // TODO: pad
+          // TODO(schwehr): pad
           // Ais8_366_22 msg("81mg=5AKUP:4>H0007P=P?I0<8GOp00000=P?I0<8GOsr0001MPdd0<8GOv@j002MQ9w0<8GOq;0:6@=QWB0<8GOp00003EDG9J00;@01J000=R4U0<8GOp000040DchFWWc@01J005C?=5PD5HD000000");
           // if (msg.had_error())  std::cerr<<"one of each FAILED\n";
         }

@@ -28,13 +28,13 @@ Ais25::Ais25(const char *nmea_payload, const size_t pad) {
         dac = ubits(bs, 70, 10);
         fi = ubits(bs, 80, 6);
       }
-      // TODO: deal with payload
+      // TODO(schwehr): deal with payload
     } else {
       // broadcast
       if (use_app_id) {
         dac = ubits(bs, 40, 10);
         fi = ubits(bs, 50, 6);
       }
-      // TODO: deal with payload - probably need to pass in the spare bits
+      // TODO(schwehr): deal with payload - probably need to pass in the spare bits
     }
 }

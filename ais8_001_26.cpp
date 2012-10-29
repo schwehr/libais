@@ -205,7 +205,7 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) {
 
   const size_t num_sensor_reports = (num_bits - 56) / AIS8_1_26_REPORT_SIZE;
 
-  // TODO: what to do about extra data in sensor report msg 8_1_26?
+  // TODO(schwehr): what to do about extra data in sensor report msg 8_1_26?
   // if ((num_bits - 56) % AIS8_1_26_REPORT_SIZE)
 
   for (size_t report_idx = 0; report_idx < num_sensor_reports; report_idx++) {

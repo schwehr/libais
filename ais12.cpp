@@ -27,5 +27,5 @@ Ais12::Ais12(const char *nmea_payload, const size_t pad) {
     const int num_txt = (num_bits - 72) / 6;
     const int num_txt_bits = num_txt * 6;
     text = ais_str(bs, 72, num_txt_bits);
-    // TODO: watch for trailing spares
+    // TODO(schwehr): watch for trailing spares
 }

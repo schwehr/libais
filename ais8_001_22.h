@@ -77,7 +77,8 @@ class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
 class Ais8_001_22_Sector : public Ais8_001_22_SubArea {
  public:
     float x,y; // longitude and latitude
-    int precision; // How many decimal places for x and y  FIX: in IMO, but not RTCM
+    // TODO(schwehr): precision in IMO, but not RTCM.  Double check
+    int precision; // How many decimal places for x and y
     int radius_m;
     int left_bound_deg;
     int right_bound_deg;
@@ -89,10 +90,10 @@ class Ais8_001_22_Sector : public Ais8_001_22_SubArea {
 
 // Or Waypoint
 // Must have a point before on the VDL
-// FIX: do I bring in the prior point x,y, precision?
+// TODO(schwehr): do I bring in the prior point x,y, precision?
 class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
  public:
-    // TODO: int precision; // How many decimal places for x and y.  FIX: in IMO
+    // TODO(schwehr): int precision; // How many decimal places for x and y.  FIX: in IMO
 
     // Up to 4 points
     std::vector<float> angles;
@@ -105,11 +106,11 @@ class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
 
 };
 
-// FIX: brin in the prior point?  And do we fold the sub area data
+// TODO(schwehr): bring in the prior point?  And do we fold the sub area data
 // into one polygon if there are more than one?
 class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
  public:
-    // TODO: int precision; // How many decimal places for x and y.  FIX: in IMO
+    // TODO(schwehr): int precision; // How many decimal places for x and y.  FIX: in IMO
 
     // Up to 4 points in a first message, but aggregated if multiple sub areas
     std::vector<float> angles;
@@ -125,7 +126,7 @@ class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
 class Ais8_001_22_Text : public Ais8_001_22_SubArea {
  public:
     std::string text;
-    // TODO: spare?
+    // TODO(schwehr): spare?
 
     Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Text() {}
@@ -156,7 +157,7 @@ class Ais8_001_22 : public Ais8 {
     ~Ais8_001_22();
 
     /*
-       FIX: need some sort of higher level accessors and checks
+       TODO(schwehr): need some sort of higher level accessors and checks
        - return interpreted geometry and associated agreegated text
          - What formats to return?  GeoJSON, WKT, etc?
        - validate that the contents of sub_areas is sane

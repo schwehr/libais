@@ -2,9 +2,10 @@
 
 #include "ais.h"
 
-// TODO: pad and numbits
 Ais9::Ais9(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
+    assert(pad < 6);
+
     init();
 
     if (0 != pad || strlen(nmea_payload) != 28) { status = AIS_ERR_BAD_BIT_COUNT; return; }

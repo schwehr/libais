@@ -1,4 +1,5 @@
-// A - GNSS broacast - FIX: only partially coded
+// A - GNSS broacast -
+// TODO(schwehr): only partially coded - need to finish
 // http://www.itu.int/rec/R-REC-M.823/en
 
 // In 823, 30 bit words = 24 bits data followed by 6 parity bits.
@@ -39,13 +40,13 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
   z_cnt = ubits(bs, 96, 13);
   seq = ubits(bs, 109, 3);
 #if 0
-  // TODO: work in progress
+  // TODO(schwehr): work in progress
   const unsigned int n = ubits(bs, 112, 5);
 #endif
   health = ubits(bs, 117, 3);
 
 #if 0
-  // TODO: work in progress
+  // TODO(schwehr): work in progress
 
   // 2 of the n used above
   const size_t remain_bits = num_bits - 120;

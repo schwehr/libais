@@ -38,7 +38,7 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) {
         const int start = 88+i*8;
         payload.push_back(ubits(bs, start, 8));
     }
-    const int remainder = payload_len % 8;  // TODO: need to handle spare bits!!
+    const int remainder = payload_len % 8;  // TODO(schwehr): need to handle spare bits!!
     if (remainder > 0) {
         const int start = (payload_len/8) * 8;
         payload.push_back(ubits(bs, start, remainder));
@@ -56,7 +56,7 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad) {
 
   if (88 > num_bits || num_bits > 936) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-  std::bitset<1024> bs;  // TODO: what is the real max size?
+  std::bitset<1024> bs;  // TODO(schwehr): what is the real max size?
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) { return; }
 
@@ -126,7 +126,7 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad) {
 
   if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-  std::bitset<104> bs;  // TODO: what is the real bit count?
+  std::bitset<104> bs;  // TODO(schwehr): what is the real bit count?
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -181,7 +181,7 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad) {
 }
 
 // IFM 4: Capability reply - OLD ITU 1371-4
-// TODO: WTF?  10 + 128 + 6 == 80  Is this 168 or 232 bits?
+// TODO(schwehr): WTF?  10 + 128 + 6 == 80  Is this 168 or 232 bits?
 Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   assert(pad < 6);
@@ -190,7 +190,7 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) {
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  // TODO: num_bits for 6_1_4.  226 bits?
+  // TODO(schwehr): num_bits for 6_1_4.  226 bits?
   if (num_bits != 232) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
   std::bitset<168> bs;
@@ -216,7 +216,7 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) {
     cap_reserved[cap_num] = bs[start+1];
   }
   // spare2 = ubits(bs, 226, 6);  // OR NOT
-  // TODO: add in the offset of the dest mmsi
+  // TODO(schwehr): add in the offset of the dest mmsi
 }
 
 
@@ -250,7 +250,7 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad) {
 
   if ( 1 != dac || 12 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
-  // TODO: add in the offset of the dest mmsi
+  // TODO(schwehr): add in the offset of the dest mmsi
 
 #if 0
   last_port = ais_str(bs, 56, 30);
@@ -266,7 +266,7 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad) {
   main_danger = ais_str(bs, 156, 120);
   imo_cat = ais_str(bs, 276, 24);
   un = ubits(bs, 300, 13);
-  value = ubits(bs, 313, 10);  // TODO: units
+  value = ubits(bs, 313, 10);  // TODO(schwehr): units
   value_unit = ubits(bs, 323, 2);
   spare = ubits(bs, 325, 3);
   // 360
@@ -278,7 +278,7 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad) {
 // IMO Circ 289 - Tidal Window
 // See also Circ 236
 Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad) {
-  // TODO: untested - no sample messages of the correct length yet found.
+  // TODO(schwehr): untested - no sample messages of the correct length yet found.
   assert(nmea_payload);
   assert(pad < 6);
 
@@ -407,7 +407,7 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad) {
   utc_min = ubits(bs, 132, 6);
   services_known = bs[138];
   for (size_t serv_num = 0; serv_num < 26; serv_num++) {
-    // TODO: const int val = ubits(bs, 139 + 2*serv_num, 2);
+    // TODO(schwehr): const int val = ubits(bs, 139 + 2*serv_num, 2);
     services[serv_num] = static_cast<int>(ubits(bs, 139 + 2*serv_num, 2));
   }
   name = ais_str(bs, 191, 120);;
@@ -426,9 +426,9 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) {
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  // TODO: make sure the bits are a multiple of the size of cargos + header or padded to a slot boundary
+  // TODO(schwehr): make sure the bits are a multiple of the size of cargos + header or padded to a slot boundary
   // Allowing a message with no payloads
-  // TODO: (num_bits-100) % 17 != 0) is okay
+  // TODO(schwehr): (num_bits-100) % 17 != 0) is okay
   if (100 > num_bits || num_bits > 576) { status = AIS_ERR_BAD_BIT_COUNT; return; }
   if ( (num_bits - 100) % 17 != 0) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
@@ -457,7 +457,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) {
     const size_t start = 100 + 17*cargo_num;
     cargo.code_type = ubits(bs, start, 4);
     cargo.imdg_valid = cargo.spare_valid = cargo.un_valid = cargo.bc_valid = cargo.marpol_oil_valid = cargo.marpol_cat_valid = false;
-    // TODO: is this the correct behavior?
+    // TODO(schwehr): is this the correct behavior?
     switch (cargo.code_type) {
       // No 0
       case 1:  // IMDG Code in packed form
@@ -490,7 +490,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) {
 }
 
 
-// TODO: 6_1_28 - Modify 8_1_28 once that is debugged
+// TODO(schwehr): 6_1_28 - Modify 8_1_28 once that is debugged
 
 
 // IMO Circ 289 - Tidal window
@@ -503,7 +503,7 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad) {
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  // TODO: might get messages with not all windows.  Might also get 360 bits
+  // TODO(schwehr): might get messages with not all windows.  Might also get 360 bits
   if (350 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<360> bs;

@@ -7,7 +7,7 @@
 #include "ais.h"
 
 
-// TODO: pad
+// TODO(schwehr): pad
 Ais8::Ais8(const char *nmea_payload) {
     assert(nmea_payload);
     assert(nmea_ord_initialized);  // Make sure we have the lookup table built
@@ -29,7 +29,7 @@ Ais8::Ais8(const char *nmea_payload) {
         const int start = 56+i*8;
         payload.push_back(ubits(bs, start, 8));
     }
-    const int remainder = payload_len % 8;  // TODO: need to handle spare bits!!
+    const int remainder = payload_len % 8;  // TODO(schwehr): need to handle spare bits!!
     if (remainder > 0) {
         const int start = (payload_len/8) * 8;
         payload.push_back(ubits(bs, start, remainder));
@@ -78,7 +78,7 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad) {
   const size_t spare2_size = num_bits - 68 - text_size;  // wrong?  needs to land on 8-bit boundary
   text = ais_str(bs, 68, text_size);
 
-  // TODO: Is this correct?
+  // TODO(schwehr): Is this correct?
   if (!spare2_size)
     spare2 = 0;
   else
@@ -120,11 +120,11 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) {
     wind_gust_dir = ubits(bs, 144, 9);
     air_temp = ubits(bs, 153, 11) / 10. - 60;
     rel_humid = ubits(bs, 164, 7);
-    dew_point = ubits(bs, 171, 10) / 10. - 20;  // FIX: please be right
+    dew_point = ubits(bs, 171, 10) / 10. - 20;  // TODO(schwehr): verify
     air_pres = ubits(bs, 181, 9) + 800;
     air_pres_trend = ubits(bs, 190, 2);
     horz_vis = ubits(bs, 192, 8) / 10.;
-    water_level = ubits(bs, 200, 9) / 10. - 10;  // FIX: please be right for -10.0 to 30.0
+    water_level = ubits(bs, 200, 9) / 10. - 10;  // TODO(schwehr): verify for -10.0 to 30.0
     water_level_trend = ubits(bs, 209, 2);
     surf_cur_speed = ubits(bs, 211, 8) / 10.;
     surf_cur_dir = ubits(bs, 219, 9);
@@ -143,12 +143,12 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) {
     swell_dir = ubits(bs, 309, 9);
 
     sea_state = ubits(bs, 318, 4);
-    water_temp = ubits(bs, 322, 10) / 10. - 10;  // FIX: please be right for -10.0 to +50.0
+    water_temp = ubits(bs, 322, 10) / 10. - 10;  // TODO(schwehr): verify for -10.0 to +50.0
     precip_type = ubits(bs, 332, 3);
     salinity = ubits(bs, 335, 9);
     ice = ubits(bs, 344, 2);
-    spare2 = ubits(bs, 346, 6);  // FIX: how to treat this???
-    extended_water_level = ubits(bs, 346, 6);  // FIX: how to treat this???
+    spare2 = ubits(bs, 346, 6);  // TODO(schwehr): how to treat this spare vrs water level?
+    extended_water_level = ubits(bs, 346, 6);  // TODO(schwehr): ditto the above line
 }
 
 // No 8_1_12
@@ -230,7 +230,7 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad) {
 
 // IMO Circ 289 - Number of persons on board
 // See also Circ 236
-// TODO: there might also be an addressed version?
+// TODO(schwehr): there might also be an addressed version?
 Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   init();
@@ -371,7 +371,7 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) {
   fi = ubits(bs, 50, 6);
 
 
-  // TODO: what counties use their own dac/fi waters?  Please do NOT do that.
+  // TODO(schwehr): what counties use their own dac/fi waters?  Please do NOT do that.
   if ( 1 != dac || 21 != fi ) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   type_wx_report = bs[56];
@@ -383,14 +383,14 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) {
     utc_day = ubits(bs, 226, 5);
     utc_hour = ubits(bs, 231, 5);
     utc_min = ubits(bs, 236, 6);
-    wx[0] = ubits(bs, 242, 4);  // TODO: set wx[1] and wx[2]?
+    wx[0] = ubits(bs, 242, 4);  // TODO(schwehr): set wx[1] and wx[2]?
     horz_viz = ubits(bs, 246, 8) / 10.;  // nautical miles
     humidity = ubits(bs, 254, 7);  // %
     wind_speed = ubits(bs, 261, 7);  // ave knots
     wind_dir = ubits(bs, 268, 9);
     pressure = ubits(bs, 277, 9);  // hPa
     pressure_tendency = ubits(bs, 286, 4);
-    // TODO: is air_temp correct?
+    // TODO(schwehr): is air_temp correct?
     air_temp = sbits(bs, 290, 11) / 10.;  // C
     water_temp = ubits(bs, 301, 10) / 10. - 10;  // C
     wave_period = ubits(bs, 311, 6);  // s
@@ -403,7 +403,7 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) {
   } else {
     // type == 1
     // PAIN IN THE ASS WMO OBS from ship
-    // TODO: double check the insanity
+    // TODO(schwehr): double check the insanity
     x = (ubits(bs, 57, 16) / 100.) - 180;
     y = (ubits(bs, 73, 15) / 100.) - 180;
 
@@ -424,10 +424,10 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) {
     wind_gust_speed = ubits(bs, 180, 8) * 0.5;  // m/s
     wind_gust_dir = ubits(bs, 188, 7) * 5;
     // 0C = 273.15 Kelvin
-    // TODO: change this to celcius
+    // TODO(schwehr): change this to celcius
     air_temp_raw = ubits(bs, 195, 10);
     humidity =ubits(bs, 205, 7);
-    water_temp_raw = ubits(bs, 212, 9);  // TODO: change this to C.  Jerks.
+    water_temp_raw = ubits(bs, 212, 9);  // TODO(schwehr): change this to C.  Jerks.
     horz_viz = pow(ubits(bs, 221, 6), 2) * 13.073;  // WTF?  the result is meters.
     wx[0] = ubits(bs, 227, 9);  // current
     wx[1] = ubits(bs, 236, 5);  // past 1
@@ -488,7 +488,7 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad) {
   next_ports[0] = ais_str(bs, 109, 30);
   next_ports[1] = ais_str(bs, 139, 30);
 
-  // TODO: enum list of param types
+  // TODO(schwehr): enum list of param types
   // 0 NA, 1 operational, 2 SNAFU, 3 no data
   for (size_t equip_num = 0; equip_num < 26; equip_num++) {
     solas_status[equip_num] = ubits(bs, 169 + 2 * equip_num, 2);
@@ -635,7 +635,7 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad) {
   wind_gust_dir = ubits(bs, 145, 9);
   air_temp = sbits(bs, 154, 11) / 10. ;  // C
   rel_humid = ubits(bs, 165, 7);
-  dew_point = sbits(bs, 172, 10)/ 10.;  // TODO: How is this mapped?
+  dew_point = sbits(bs, 172, 10)/ 10.;  // TODO(schwehr): How is this mapped?
   air_pres = ubits(bs, 182, 9);
   air_pres_trend = ubits(bs, 191, 2);
 
@@ -817,7 +817,7 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad) {
   dir = ubits(bs, 115, 9);  // degrees
   stream_dir = ubits(bs, 124, 3);
   status_raw = ubits(bs, 127, 30);
-  // TODO: status[ ] = bite me;
+  // TODO(schwehr): status[ ] = bite me;
   spare2 = ubits(bs, 157, 11);
 }
 
@@ -830,7 +830,7 @@ Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad) {
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   // People might get smart and leave out the 51 spare bits
-  // TODO: do we have any cases of that?
+  // TODO(schwehr): do we have any cases of that?
   if (168 != num_bits && 136 != num_bits && 88 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
   std::bitset<168> bs;

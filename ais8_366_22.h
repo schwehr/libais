@@ -6,9 +6,8 @@
 
 // Which spec was I coding to?  Probably the Nav55
 
-// TODO: should spare be int or unsigned int?
+// TODO(schwehr): should spare be int or unsigned int?
 
-// FIX: remove cout's and this include will not be needed
 #include <iostream>
 
 enum Ais8_366_22_AreaShapeEnum {
@@ -37,26 +36,26 @@ Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const std::bitset<AIS8_MAX_BITS
 class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
  public:
     float x,y;
-    // TODO: int precision
+    // TODO(schwehr): int precision
     int radius_m;
     unsigned int spare;
 
     Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
-    ~Ais8_366_22_Circle() { std::cout << "Ais8_366_22_Circle: destructor" << std::endl;};
+    ~Ais8_366_22_Circle() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_CIRCLE;}
 };
 
 class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
  public:
     float x,y; // longitude and latitude
-    // TODO: int precision
+    // TODO(schwehr): int precision
     int e_dim_m; // East dimension in meters
     int n_dim_m;
     int orient_deg; // Orientation in degrees from true north
     unsigned int spare; // 5 bits
 
     Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
-    ~Ais8_366_22_Rect() { std::cout << "Ais8_366_22_Rect: destructor" << std::endl;};
+    ~Ais8_366_22_Rect() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_RECT;}
 
 };
@@ -64,14 +63,14 @@ class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
 class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
  public:
     float x,y;
-    // TODO: int precision
+    // TODO(schwehr): int precision
     int radius_m;
     int left_bound_deg;
     int right_bound_deg;
-    // TODO: spare?
+    // TODO(schwehr): spare?
 
     Ais8_366_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
-    ~Ais8_366_22_Sector() { std::cout << "Ais8_366_22_Sector: destructor" << std::endl;};
+    ~Ais8_366_22_Sector() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_SECTOR;}
 };
 
@@ -80,7 +79,7 @@ class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
 class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
  public:
     float x,y; // longitude and latitude
-    // TODO? precision
+    // TODO(schwehr)? precision
 
     // Up to 4 points
     std::vector<float> angles;
@@ -88,7 +87,7 @@ class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
     unsigned int spare;
 
     Ais8_366_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
-    ~Ais8_366_22_Polyline() { std::cout << "Ais8_366_22_Polyline: destructor" << std::endl;};
+    ~Ais8_366_22_Polyline() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYLINE;}
 
 };
@@ -96,7 +95,7 @@ class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
 class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
  public:
     float x,y; // longitude and latitude
-    // TODO: precision?
+    // TODO(schwehr): precision?
 
     // Up to 4 points in a first message, but aggregated if multiple sub areas
     std::vector<float> angles;
@@ -104,7 +103,7 @@ class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
     unsigned int spare;
 
     Ais8_366_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
-    ~Ais8_366_22_Polygon() { std::cout << "Ais8_366_22_Polygon: destructor" << std::endl;};
+    ~Ais8_366_22_Polygon() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYGON;}
 };
 
@@ -114,7 +113,7 @@ class Ais8_366_22_Text : public Ais8_366_22_SubArea {
     unsigned int spare; // 3 bits
 
     Ais8_366_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
-    ~Ais8_366_22_Text() { std::cout << "Ais8_366_22_Text: destructor" << std::endl;};
+    ~Ais8_366_22_Text() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_TEXT;}
 };
 

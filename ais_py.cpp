@@ -1,4 +1,5 @@
-// TODO: check for reference counting leaks
+// TODO(schwehr): check for reference counting leaks
+// TODO(schwehr): better error handling for all messages
 
 #include <Python.h>
 #include <cassert>
@@ -95,7 +96,7 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
 }
 #endif
 
-// FIX: float -> double?
+// TODO(schwehr): float -> double?
 void
 DictSafeSetItem(PyObject *dict, const std::string &key, const float val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
@@ -182,7 +183,6 @@ ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 
-// TODO: pad
 PyObject *
 ais4_11_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
@@ -235,7 +235,6 @@ ais4_11_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 
-  // TODO: pad
 PyObject *
 ais5_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
@@ -287,7 +286,7 @@ ais6_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 void
 ais6_1_1_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
     assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-    Ais6_1_1 msg(nmea_payload, pad);  // TODO: check for error
+    Ais6_1_1 msg(nmea_payload, pad);  // TODO(schwehr): check for error
     DictSafeSetItem(dict, "ack_dac", msg.ack_dac);
     DictSafeSetItem(dict, "msg_seq", msg.msg_seq);
     DictSafeSetItem(dict, "spare2", msg.spare2);
@@ -296,7 +295,7 @@ ais6_1_1_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 void
 ais6_1_2_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
     assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-    Ais6_1_2 msg(nmea_payload, pad);  // TODO: check for error
+    Ais6_1_2 msg(nmea_payload, pad);  // TODO(schwehr): check for error
     DictSafeSetItem(dict, "req_dac", msg.req_dac);
     DictSafeSetItem(dict, "req_fi", msg.req_fi);
 }
@@ -304,7 +303,7 @@ ais6_1_2_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 void
 ais6_1_3_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
     assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-    Ais6_1_3 msg(nmea_payload, pad);  // TODO: check for error
+    Ais6_1_3 msg(nmea_payload, pad);  // TODO(schwehr): check for error
     DictSafeSetItem(dict, "req_dac", msg.req_dac);
     DictSafeSetItem(dict, "spare2", msg.spare2);
 }
@@ -312,14 +311,14 @@ ais6_1_3_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 void
 ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
     assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-    Ais6_1_4 msg(nmea_payload, pad);  // TODO: check for error
-    if (msg.had_error()) return;  // TODO: do better
+    Ais6_1_4 msg(nmea_payload, pad);  // TODO(schwehr): check for error
+    if (msg.had_error()) return;  // TODO(schwehr): do better
 
     DictSafeSetItem(dict, "ack_dac", msg.ack_dac);
     PyObject *cap_list = PyList_New(26);
     PyObject *res_list = PyList_New(26);
     for (size_t cap_num = 0; cap_num < 128/2; cap_num++) {
-      // TODO: memory leak?
+      // TODO(schwehr): memory leak?
       PyObject *cap = PyInt_FromLong(long(msg.capabilities[cap_num]));
       PyList_SetItem(cap_list, cap_num, cap);
 
@@ -334,7 +333,7 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 void
 ais6_1_40_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
     assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-    Ais6_1_40 msg(nmea_payload, pad);  // TODO: check for error
+    Ais6_1_40 msg(nmea_payload, pad);  // TODO(schwehr): check for error
     DictSafeSetItem(dict, "persons", msg.persons);
     DictSafeSetItem(dict, "spare2", msg.spare2);
 }
@@ -346,7 +345,7 @@ ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   assert(pad < 6);
   Ais6_1_12 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    // TODO: unify the error handling.
+    // TODO(schwehr): unify the error handling.
     return false;
   }
 
@@ -363,7 +362,7 @@ ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   DictSafeSetItem(dict, "main_danger", msg.main_danger);
   DictSafeSetItem(dict, "imo_cat", msg.imo_cat);
   DictSafeSetItem(dict, "un", msg.un);
-  DictSafeSetItem(dict, "value", msg.value);  // TODO: units?
+  DictSafeSetItem(dict, "value", msg.value);  // TODO(schwehr): units?
   DictSafeSetItem(dict, "value_unit", msg.value_unit);
   DictSafeSetItem(dict, "spare2", msg.spare2);
   return true;
@@ -375,13 +374,13 @@ ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(0 <= pad && pad <= 7);
-  Ais6_1_14 msg(nmea_payload, pad);  // TODO: check for error
+  Ais6_1_14 msg(nmea_payload, pad);  // TODO(schwehr): check for error
   if (msg.had_error()) { return; }
 
   DictSafeSetItem(dict, "utc_month", msg.utc_month);
   DictSafeSetItem(dict, "utc_day", msg.utc_day);
 
-  if (!msg.windows.size()) return;  // TODO: is this an error?
+  if (!msg.windows.size()) return;  // TODO(schwehr): is this an error?
 
   PyObject *window_list = PyList_New(msg.windows.size());
   for(size_t w_num = 0; w_num < msg.windows.size(); w_num++) {
@@ -405,7 +404,7 @@ ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais6_1_18_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(0 <= pad && pad <= 7);
-  Ais6_1_18 msg(nmea_payload, pad);  // TODO: check for error
+  Ais6_1_18 msg(nmea_payload, pad);  // TODO(schwehr): check for error
 
   DictSafeSetItem(dict, "link_id", msg.link_id);
   DictSafeSetItem(dict, "utc_month", msg.utc_month);
@@ -426,7 +425,7 @@ ais6_1_18_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(0 <= pad && pad <= 7);
-  Ais6_1_20 msg(nmea_payload, pad);  // TODO: check for error
+  Ais6_1_20 msg(nmea_payload, pad);  // TODO(schwehr): check for error
   if (msg.had_error()) return;
 
   DictSafeSetItem(dict, "link_id", msg.link_id);
@@ -455,13 +454,13 @@ ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais6_1_25 msg(nmea_payload, pad);  // TODO: check for error
+  Ais6_1_25 msg(nmea_payload, pad);  // TODO(schwehr): check for error
   if (msg.had_error()) return;
 
   DictSafeSetItem(dict, "amount_unit", msg.amount_unit);
   DictSafeSetItem(dict, "amount", msg.amount);
 
-  if (0 == msg.cargos.size()) return;  // TODO: is this an error?
+  if (0 == msg.cargos.size()) return;  // TODO(schwehr): is this an error?
 
   PyObject *cargo_list = PyList_New(msg.cargos.size());
   for (size_t cargo_num = 0; cargo_num < msg.cargos.size(); cargo_num++) {
@@ -479,15 +478,15 @@ ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
   // 6_1_26
   // 6_1_27
-  // 6_1_28 - TODO: Route Addressed - clone from 8_1_27
+  // 6_1_28 - TODO(schwehr): Route Addressed - clone from 8_1_27
   // 6_1_29
-  // 6_1_30 - TODO: Text Addressed
+  // 6_1_30 - TODO(schwehr): Text Addressed
   // 6_1_31
 
 void
 ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais6_1_32 msg(nmea_payload, pad);  // TODO: check for error
+  Ais6_1_32 msg(nmea_payload, pad);  // TODO(schwehr): check for error
 
   DictSafeSetItem(dict, "utc_month", msg.utc_month);
   DictSafeSetItem(dict, "utc_day", msg.utc_day);
@@ -529,13 +528,13 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
     DictSafeSetItem(dict, "dac", msg.dac);
     DictSafeSetItem(dict, "fi", msg.fi);
 
-    // TODO: manage all the submessage types
+    // TODO(schwehr): manage all the submessage types
 
-    // TODO: properly handle exceptions in the sub messages!!!!
+    // TODO(schwehr): properly handle exceptions in the sub messages!!!!
     switch (msg.dac) {
       case 1:  // IMO
       switch (msg.fi) {
-        // TODO: make this a function so that it can be followed
+        // TODO(schwehr): make this a function so that it can be followed
         case 0:  // OLD ITU 1371-1
           ais6_1_0_append_pydict(nmea_payload, dict, pad); break;
         case 1:  // OLD ITU 1371-1
@@ -566,7 +565,7 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
         //   ais6_1_28_append_pydict(nmea_payload, dict, pad);
         //   break;
         // 29
-        // case 30:  // TODO: Text Addressed
+        // case 30:  // TODO(schwehr): Text Addressed
         //   ais6_1_30_append_pydict(nmea_payload, dict, pad);
         //   break;
         // 31
@@ -575,13 +574,13 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
         case 40:  // OLD ITU 1371-1
           ais6_1_40_append_pydict(nmea_payload, dict, pad); break;
       default:
-        // TODO: Raise an exception?
+        // TODO(schwehr): Raise an exception?
         DictSafeSetItem(dict, "not_parsed", true);
       }
       break;
 
       default:
-        // TODO: Raise an exception?
+        // TODO(schwehr): Raise an exception?
         DictSafeSetItem(dict, "not_parsed", true);
     }
 
@@ -589,7 +588,6 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 
-// TODO: pad
 PyObject*
 ais7_13_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
@@ -621,7 +619,7 @@ void
 ais8_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
     assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
     Ais8_1_0 msg(nmea_payload, pad);
-    if (msg.had_error()) { return; }  // TODO: better error handling
+    if (msg.had_error()) { return; }
     DictSafeSetItem(dict, "ack_required",  msg.ack_required);
     DictSafeSetItem(dict, "msg_seq",  msg.msg_seq);
     DictSafeSetItem(dict, "text", msg.text);
@@ -629,9 +627,8 @@ ais8_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 }
 
 
-// 1 to 10 do not exist
+// ais 8_1_[1..10] do not exist
 
-    // FIX: add error checking
 void
 ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
     assert(nmea_payload); assert(dict); assert(pad < 6);
@@ -688,7 +685,7 @@ ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_13_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(pad < 6);
-  Ais8_1_13 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_13 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
   DictSafeSetItem(dict, "reason", msg.reason);
   DictSafeSetItem(dict, "location_from", msg.location_from);
   DictSafeSetItem(dict, "location_to", msg.location_to);
@@ -710,7 +707,7 @@ ais8_1_13_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_15_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_15 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_15 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
   DictSafeSetItem(dict, "air_draught", msg.air_draught);
   DictSafeSetItem(dict, "spare2", msg.spare2);
 }
@@ -718,7 +715,7 @@ ais8_1_15_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_16_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_16 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_16 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
   DictSafeSetItem(dict, "persons", msg.persons);
   DictSafeSetItem(dict, "spare2", msg.spare2);
 }
@@ -727,7 +724,7 @@ ais8_1_16_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_17 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_17 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
   // std::vector<Ais8_1_17_Target> targets;
   PyObject *target_list = PyList_New(msg.targets.size());
   for (size_t target_num = 0; target_num < msg.targets.size(); target_num++) {
@@ -750,7 +747,7 @@ ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_19_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_19 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_19 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
   DictSafeSetItem(dict, "link_id", msg.link_id);
   DictSafeSetItem(dict, "name", msg.name);
   DictSafeSetItem(dict, "x", msg.x);
@@ -771,7 +768,7 @@ ais8_1_19_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_21 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_21 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
 
   DictSafeSetItem(dict, "x", msg.x);
   DictSafeSetItem(dict, "y", msg.y);
@@ -783,7 +780,7 @@ ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   if (0 == msg.type_wx_report) {
     // WX obs from ship
     DictSafeSetItem(dict, "location", msg.location);
-    DictSafeSetItem(dict, "wx", msg.wx[0]);  // TODO Rename present?
+    DictSafeSetItem(dict, "wx", msg.wx[0]);  // TODO(schwehr) Rename present?
     DictSafeSetItem(dict, "horz_viz", msg.horz_viz);
     DictSafeSetItem(dict, "humidity", msg.humidity);
     DictSafeSetItem(dict, "wind_speed", msg.wind_speed);
@@ -818,7 +815,7 @@ ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
     DictSafeSetItem(dict, "humidity", msg.humidity);
     DictSafeSetItem(dict, "water_temp_raw", msg.water_temp_raw);
     DictSafeSetItem(dict, "horz_viz", msg.horz_viz);
-    // TODO: list?
+    // TODO(schwehr): list?
     DictSafeSetItem(dict, "wx", msg.wx[0]);
     DictSafeSetItem(dict, "wx_next1", msg.wx[1]);
     DictSafeSetItem(dict, "wx_next2", msg.wx[2]);
@@ -850,7 +847,7 @@ ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 void
 ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
-    Ais8_001_22 msg(nmea_payload, pad);  // TODO: check for errors
+    Ais8_001_22 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
 
     DictSafeSetItem(dict, "link_id", msg.link_id);
     DictSafeSetItem(dict, "notice_type", msg.notice_type);
@@ -879,7 +876,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area, "y", c->y);
                 DictSafeSetItem(sub_area, "precision", c->precision);
                 DictSafeSetItem(sub_area, "radius", c->radius_m);
-                // TODO: spare?
+                // TODO(schwehr): spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -897,7 +894,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area, "e_dim_m", c->e_dim_m);
                 DictSafeSetItem(sub_area, "n_dim_m", c->n_dim_m);
                 DictSafeSetItem(sub_area, "orient_deg", c->orient_deg);
-                // TODO: spare?
+                // TODO(schwehr): spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -915,7 +912,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area, "radius", c->radius_m);
                 DictSafeSetItem(sub_area, "left_bound_deg", c->left_bound_deg);
                 DictSafeSetItem(sub_area, "right_bound_deg", c->right_bound_deg);
-                // TODO: spare?
+                // TODO(schwehr): spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -938,7 +935,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area, "angles", angle_list);
                 DictSafeSetItem(sub_area, "dists_m", dist_list);
 
-                // TODO: spare?
+                // TODO(schwehr): spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -961,7 +958,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 DictSafeSetItem(sub_area, "angles", angle_list);
                 DictSafeSetItem(sub_area, "dists_m", dist_list);
 
-                // TODO: spare?
+                // TODO(schwehr): spare?
                 PyList_SetItem(sub_area_list, i, sub_area);
             }
             break;
@@ -979,7 +976,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
             break;
 
         default:
-          {}  // TODO: somehow mark an unknown subarea or raise an exception
+          {}  // TODO(schwehr): somehow mark an unknown subarea or raise an exception
         }
     }
     DictSafeSetItem(dict, "sub_areas", sub_area_list);
@@ -992,7 +989,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_24 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_24 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
   DictSafeSetItem(dict, "link_id", msg.link_id);
   DictSafeSetItem(dict, "air_draught", msg.air_draught);
   DictSafeSetItem(dict, "last_port", msg.last_port);
@@ -1041,7 +1038,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
-  Ais8_1_26 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_26 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
 
   PyObject *rpt_list = PyList_New(msg.reports.size());
   DictSafeSetItem(dict, "reports", rpt_list);
@@ -1227,7 +1224,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       case AIS8_1_26_SENSOR_RESERVED_14:
       case AIS8_1_26_SENSOR_RESERVED_15:
       default:
-        {}  // TODO: mark a bad sensor type or raise exception
+        {}  // TODO(schwehr): mark a bad sensor type or raise exception
       }
   }
 }
@@ -1237,7 +1234,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_27 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_27 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
   DictSafeSetItem(dict, "link_id", msg.link_id);
   DictSafeSetItem(dict, "sender_type", msg.sender_type);
   DictSafeSetItem(dict, "route_type", msg.route_type);
@@ -1250,8 +1247,8 @@ ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   PyObject *waypoint_list = PyList_New(msg.waypoints.size());
   for (size_t waypoint_num = 0; waypoint_num < msg.waypoints.size(); waypoint_num++) {
     PyObject *waypoint = PyList_New(2);
-    PyList_SetItem(waypoint, 0, PyFloat_FromDouble(msg.waypoints[waypoint_num].x));  // TODO: Py_DECREF(); ?
-    PyList_SetItem(waypoint, 1, PyFloat_FromDouble(msg.waypoints[waypoint_num].y));  // TODO: Py_DECREF(); ?
+    PyList_SetItem(waypoint, 0, PyFloat_FromDouble(msg.waypoints[waypoint_num].x));  // TODO(schwehr): Py_DECREF(); ?
+    PyList_SetItem(waypoint, 1, PyFloat_FromDouble(msg.waypoints[waypoint_num].y));  // TODO(schwehr): Py_DECREF(); ?
     PyList_SetItem(waypoint_list, waypoint_num, waypoint);
   }
   PyDict_SetItem(dict, PyUnicode_FromString("waypoints"), waypoint_list);
@@ -1263,7 +1260,7 @@ ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_29_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_29 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_29 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
 
   DictSafeSetItem(dict, "link_id", msg.link_id);
   DictSafeSetItem(dict, "text", msg.text);
@@ -1274,7 +1271,7 @@ ais8_1_29_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 void
 ais8_1_31_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
-  Ais8_1_31 msg(nmea_payload, pad);  // TODO: check for errors
+  Ais8_1_31 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
 
   DictSafeSetItem(dict, "x", msg.x);
   DictSafeSetItem(dict, "y", msg.y);
@@ -1295,7 +1292,7 @@ ais8_1_31_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   DictSafeSetItem(dict, "water_level", msg.water_level);
   DictSafeSetItem(dict, "water_level_trend", msg.water_level_trend);
 
-  // TODO: make this a list of dicts
+  // TODO(schwehr): make this a list of dicts
   DictSafeSetItem(dict, "surf_cur_speed", msg.surf_cur_speed);
   DictSafeSetItem(dict, "surf_cur_dir", msg.surf_cur_dir);
   DictSafeSetItem(dict, "cur_speed_2", msg.cur_speed_2);
@@ -1326,7 +1323,7 @@ void
 ais8_200_10_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_200_10 msg(nmea_payload, pad);
-  if (msg.had_error()) return;   // TODO: handle errors
+  if (msg.had_error()) return;   // TODO(schwehr): handle errors
 
   DictSafeSetItem(dict, "eu_id", msg.eu_id);
   DictSafeSetItem(dict, "length", msg.length);
@@ -1346,7 +1343,7 @@ void
 ais8_200_23_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_200_23 msg(nmea_payload, pad);
-  if (msg.had_error()) return;   // TODO: handle errors correctly
+  if (msg.had_error()) return;   // TODO(schwehr): handle errors correctly
 
   DictSafeSetItem(dict, "utc_year_start", msg.utc_year_start);
   DictSafeSetItem(dict, "utc_month_start", msg.utc_month_start);
@@ -1375,7 +1372,7 @@ void
 ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_200_24 msg(nmea_payload, pad);
-  if (msg.had_error()) return;   // TODO: handle errors correctly
+  if (msg.had_error()) return;   // TODO(schwehr): handle errors correctly
   DictSafeSetItem(dict, "country", msg.country);
   PyObject *id_list = PyList_New(4);
   for (size_t i = 0; i < 4; i++) PyList_SetItem(id_list, 0, PyInt_FromLong(msg.guage_ids[i]));
@@ -1391,14 +1388,14 @@ ais8_200_40_append_pydict(const char *nmea_payload, PyObject *dict, const size_t
   assert(nmea_payload); assert(dict);
   assert(pad < 6);
   Ais8_200_40 msg(nmea_payload, pad);
-  if (msg.had_error()) return;   // TODO: handle errors correctly
+  if (msg.had_error()) return;   // TODO(schwehr): handle errors correctly
   DictSafeSetItem(dict, "x", msg.x);
   DictSafeSetItem(dict, "y", msg.y);
   DictSafeSetItem(dict, "form", msg.form);
   DictSafeSetItem(dict, "dir", msg.dir);
   DictSafeSetItem(dict, "stream_dir", msg.stream_dir);
   DictSafeSetItem(dict, "status_raw", msg.status_raw);
-  // TODO: extract status components
+  // TODO(schwehr): extract status components
   DictSafeSetItem(dict, "spare2", msg.spare2);
 }
 
@@ -1407,7 +1404,7 @@ void
 ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_200_55 msg(nmea_payload, pad);
-  if (msg.had_error()) return;   // TODO: handle errors correctly
+  if (msg.had_error()) return;   // TODO(schwehr): handle errors correctly
   DictSafeSetItem(dict, "crew", msg.crew);
   DictSafeSetItem(dict, "passengers", msg.passengers);
   DictSafeSetItem(dict, "yet_more_personnel", msg.yet_more_personnel);
@@ -1423,7 +1420,7 @@ PyObject*
 ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
 
-    // TODO: only decode dac/fi and push the header dict sets into the messages to avoid duplication.
+    // TODO(schwehr): only decode dac/fi and push the header dict sets into the messages to avoid duplication.
     Ais8 msg(nmea_payload);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais8: %s", AIS_STATUS_STRINGS[msg.get_error()]);
@@ -1438,7 +1435,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     DictSafeSetItem(dict, "dac", msg.dac);
     DictSafeSetItem(dict, "fi", msg.fi);
 
-    // TODO: better error handling
+    // TODO(schwehr): better error handling
     switch (msg.dac) {
     case 1:  // IMO
         switch (msg.fi) {
@@ -1456,18 +1453,18 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
             //
             // IMO Circ 289
             //
-            // TODO: error checking
+            // TODO(schwehr): error checking
         case 11:  // Met/Hydrogrolocal - not to be used after 1 Jan 2013
           ais8_1_11_append_pydict(nmea_payload, dict, pad);
             break;
             // 12 is an ABM
         case 13:  // Fairway closed - not to be used after 1 Jan 2013
-          // TODO: untested - no messages found
+          // TODO(schwehr): untested - no messages found
           ais8_1_13_append_pydict(nmea_payload, dict, pad);
           break;
           // No 14
         case 15:  // Extended ship static and voyage related data - not to be used after 1 Jan 2013
-          // TODO: untested - no messages found
+          // TODO(schwehr): untested - no messages found
           ais8_1_15_append_pydict(nmea_payload, dict, pad);
           break;
             // 16 has conflicting definition in the old 1371-1: VTS targets
@@ -1476,13 +1473,13 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
           break;
             // 17 has conflicting definition in 1371-1: IFM 17: Ship waypoints (WP) and/or route plan report
         case 17:  // VTS-generated/synthetic targets - not to be used after 1 Jan 2013
-          // TODO: untested - no messages found
+          // TODO(schwehr): untested - no messages found
           ais8_1_17_append_pydict(nmea_payload, dict, pad);
           break;
         // No 18
             // ITU 1371-1 conflict: IFM 19: Extended ship static and voyage related data
         case 19:  // Marine traffic signal
-          // TODO: untested - no messages found
+          // TODO(schwehr): untested - no messages found
           ais8_1_19_append_pydict(nmea_payload, dict, pad);
           DictSafeSetItem(dict, "parsed", true);
           break;
@@ -1491,7 +1488,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
         //    DictSafeSetItem(dict, "parsed",true);
         //    break;
         case 21:  // Weather obs report from ship
-          // TODO: untested - no messages found
+          // TODO(schwehr): untested - no messages found
           ais8_1_21_append_pydict(nmea_payload, dict, pad);
           break;
         case 22:  // Area notice
@@ -1548,13 +1545,13 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
       }
       break;
       // case 366:  // United states
-      //  TODO: implement
+      //  TODO(schwehr): implement
       //  break;
     default:
         DictSafeSetItem(dict, "parsed", false);
-        // TODO: raise exception or return standin?
+        // TODO(schwehr): raise exception or return standin?
     }
-    // TODO: cehck for error here?
+    // TODO(schwehr): check for error here?
     return dict;
 }
 
@@ -1752,7 +1749,7 @@ ais16_to_pydict(const char *nmea_payload, const size_t pad) {
     return dict;
 }
 
-// 'A' - TODO: incomplete
+// 'A' - GNSS differential - TODO(schwehr): incomplete
 PyObject*
 ais17_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
@@ -1894,7 +1891,7 @@ ais19_to_pydict(const char *nmea_payload, const size_t pad) {
     return dict;
 }
 
-// TODO: 'D' - data link management
+// TODO(schwehr): 'D' - data link management
 PyObject*
 ais20_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
@@ -1911,7 +1908,7 @@ ais20_to_pydict(const char *nmea_payload, const size_t pad) {
 
     DictSafeSetItem(dict, "spare", msg.spare);
 
-    // TODO: make a list of dicts or something else more sane
+    // TODO(schwehr): make a list of dicts or something else more sane
 
     int list_size = 1;
     if (msg.group_valid_4) list_size = 4;
@@ -2107,7 +2104,7 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
     case 3:  // FALLTHROUGH - not yet defined by ITU
     default:
         // status = AIS_ERR_BAD_MSG_CONTENT;
-        // FIX: setup python exception
+        // TODO(schwehr): setup python exception
         return 0;
     }
 
@@ -2130,14 +2127,14 @@ ais25_to_pydict(const char *nmea_payload, const size_t pad) {
     DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
     DictSafeSetItem(dict, "mmsi", msg.mmsi);
 
-    // TODO use_app_id
+    // TODO(schwehr) use_app_id
     if (msg.dest_mmsi_valid) DictSafeSetItem(dict, "dest_mmsi", msg.dest_mmsi);
     if (msg.use_app_id) {
       DictSafeSetItem(dict, "dac", msg.dac);
       DictSafeSetItem(dict, "fi", msg.fi);
     }
 
-    // TODO: handle payload
+    // TODO(schwehr): handle payload
 
     return dict;
 }
@@ -2162,7 +2159,7 @@ ais26_to_pydict(const char *nmea_payload, const size_t pad) {
       DictSafeSetItem(dict, "fi", msg.fi);
     }
 
-    // TODO: handle payload
+    // TODO(schwehr): handle payload
 
     DictSafeSetItem(dict, "sync_state", msg.sync_state);
     if (0 == msg.commstate_flag) {
@@ -2223,7 +2220,7 @@ decode(PyObject *self, PyObject *args) {
 
     int _pad;
     const char *nmea_payload;
-    // TODO: what to do about if no pad bits?  Maybe warn and set to 0?
+    // TODO(schwehr): what to do about if no pad bits?  Maybe warn and set to 0?
     if (!PyArg_ParseTuple(args, "si", &nmea_payload, &_pad)) {
       _pad = 0;
       if (!PyArg_ParseTuple(args, "s", &nmea_payload)) {
@@ -2326,12 +2323,12 @@ decode(PyObject *self, PyObject *args) {
         break;
 
     case 'I':  // 25 - Single slot binary message - addressed or broadcast
-      // TODO: handle payloads
+      // TODO(schwehr): handle payloads
         result = ais25_to_pydict(nmea_payload, pad);
         break;
 
     case 'J':  // 26 - Multi slot binary message with comm state
-        result = ais26_to_pydict(nmea_payload, pad);  // TODO: handle payloads
+        result = ais26_to_pydict(nmea_payload, pad);  // TODO(schwehr): handle payloads
         break;
 
     case 'K':  // 27 - Long-range AIS broadcast message
@@ -2454,7 +2451,7 @@ initais(void)
 
     // Initialize the lookuptable and exception
     build_nmea_lookup();
-    // FIX: is this cast bad?
+    // TODO(schwehr): is this cast bad?
     ais_py_exception = PyErr_NewException((char *)"ais.decode.error", 0, 0);
 
 #if PY_MAJOR_VERSION >= 3

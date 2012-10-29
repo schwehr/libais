@@ -1,7 +1,7 @@
 // -*- c++ -*-
 
-// TODO: should all messages just use MAX_BITS or should it be set for each message?
-// TODO: create an archive of messages to do not decode.  Can libais be made to safely decode any of them?
+// TODO(schwehr): should all messages just use MAX_BITS or should it be set for each message?
+// TODO(schwehr): create an archive of messages to do not decode.  Can libais be made to safely decode any of them?
 
 #ifndef AIS_H
 #define AIS_H
@@ -245,7 +245,7 @@ class Ais6_1_2 : public Ais6 {
  public:
   int req_dac;
   int req_fi;
-  // TODO: spare2?
+  // TODO(schwehr): spare2?
 
   Ais6_1_2(const char *nmea_payload, const size_t pad);
 };
@@ -298,7 +298,7 @@ class Ais6_1_12 : public Ais6 {
   std::string main_danger;
   std::string imo_cat;
   int un;
-  int value;  // TODO: units?
+  int value;  // TODO(schwehr): units?
   int value_unit;
   int spare2;
 
@@ -350,7 +350,7 @@ class Ais6_1_20 : public Ais6 {
   int position;
   int utc_month, utc_day, utc_hour, utc_min;
   bool services_known;
-  // TODO: enum of service types
+  // TODO(schwehr): enum of service types
   int services[26];
   std::string name;
   float x, y;
@@ -391,7 +391,7 @@ class Ais6_1_25 : public Ais6 {
 std::ostream& operator<< (std::ostream& o, Ais6_1_25 const& msg);
 
 
-// TODO: addressed sensor report 6_1_26
+// TODO(schwehr): addressed sensor report 6_1_26
 
 // IMO Circ 289 Route information
 class Ais6_1_28 : public Ais6 {
@@ -463,14 +463,14 @@ const size_t AIS8_MAX_BITS = 1192;
 class Ais8 : public AisMsg {
  public:
   int spare;
-  // TODO: seq? // ITU M.R. 1371-3 Anex 2 5.3.1
+  // TODO(schwehr): seq? // ITU M.R. 1371-3 Anex 2 5.3.1
   int dac;  // dac+fi = app id
   int fi;
 
   std::vector<unsigned char> payload;  // If dac/fi (app id is now one we know).  without dac/fi
 
   Ais8() {}
-  Ais8(const char *nmea_payload);  // TODO: pad
+  Ais8(const char *nmea_payload);  // TODO(schwehr): pad
   bool decode_header8(const std::bitset<MAX_BITS> &bs);
 };
 std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
@@ -556,7 +556,7 @@ class Ais8_1_13 : public Ais8 {
   std::string reason, location_from, location_to;
   int radius;
   int units;
-  // TODO: utc?  warning: day/month out of order
+  // TODO(schwehr): utc?  warning: day/month out of order
   int day_from, month_from, hour_from, minute_from;
   int day_to, month_to, hour_to, minute_to;
   int spare2;
@@ -671,10 +671,10 @@ class Ais8_1_21 : public Ais8 {
   float wind_speed_rel;  // m/s
   float wind_gust_speed;  // m/s
   int wind_gust_dir;
-  int air_temp_raw;  // TODO: Seriously?  Convert this to C.  Kelvin does not make send
+  int air_temp_raw;  // TODO(schwehr): Seriously?  Convert this to C.  Kelvin does not make send
   // humidity defined in type 0
   // sea_temp_k
-  int water_temp_raw;  // TODO: fix this
+  int water_temp_raw;  // TODO(schwehr): fix this
   // hor_viz
   int wx[3];  // current, past 1, past 2
   int cloud_total;
@@ -715,7 +715,7 @@ class Ais8_1_24 : public Ais8 {
   float air_draught;  // m
   std::string last_port, next_ports[2];
 
-  // TODO: enum list of param types
+  // TODO(schwehr): enum list of param types
   int solas_status[26];  // 0 NA, 1 operational, 2 SNAFU, 3 no data
   int ice_class;
   int shaft_power;  // horses
@@ -983,7 +983,7 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_29 const& msg);
 
 // IMO Circ 289 Meteorological and Hydrographic data
 // Section 1, Table 1.1
-// TODO: is this exactly the same as 8_1_11 or has anything changed?
+// TODO(schwehr): is this exactly the same as 8_1_11 or has anything changed?
 //       x,y swapped.
 class Ais8_1_31 : public Ais8 {
  public:
@@ -1086,7 +1086,7 @@ class Ais8_200_40 : public Ais8 {
   int dir;  // degrees
   int stream_dir;
   int status_raw;
-  // TODO: int status[9];  // WTF is the encoding for this?
+  // TODO(schwehr): int status[9];  // WTF is the encoding for this?
   int spare2;
   Ais8_200_40(const char *nmea_payload, const size_t pad);
 };
@@ -1129,12 +1129,12 @@ class Ais9 : public AisMsg {
   int alt;  // m above sea level
   float sog;
   int position_accuracy;
-  float x, y;  // Long and lat
+  float x, y;
   float cog;
   int timestamp;
   int alt_sensor;
   int spare;
-  int dte;  // FIX: bool?
+  int dte;
   int spare2;
   int assigned_mode;
   bool raim;
@@ -1260,11 +1260,11 @@ struct GnssCorrection17 {
   int station_id;
   int z_cnt;
   int health;
-  // TODO: DGNSS data word - what is their word size?
+  // TODO(schwehr): DGNSS data word - what is their word size?
 };
 #endif
 
-// A - GNSS broacast - TODO: only partially coded
+// A - GNSS broacast - TODO(schwehr): only partially coded
 class Ais17 : public AisMsg {
  public:
   int spare;
@@ -1276,7 +1276,7 @@ class Ais17 : public AisMsg {
   int seq;
   // N - do not need to store this
   int health;
-  // TODO: Handle payload
+  // TODO(schwehr): Handle payload
 
   Ais17(const char *nmea_payload, const size_t pad);
 };
@@ -1366,7 +1366,7 @@ class Ais19 : public AisMsg {
 std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
 
 // 'D' - Data link management
-// TODO: consider a vector
+// TODO(schwehr): consider a vector
 class Ais20 : public AisMsg {
  public:
   int spare;
@@ -1398,7 +1398,7 @@ class Ais20 : public AisMsg {
 };
 std::ostream& operator<< (std::ostream& o, Ais20 const& msg);
 
-// 'E' - Aids to navigation report - FIX: not yet coded
+// 'E' - Aids to navigation report
 class Ais21 : public AisMsg {
  public:
   int aton_type;
@@ -1453,7 +1453,7 @@ class Ais22 : public AisMsg {
 };
 std::ostream& operator<< (std::ostream& o, Ais22 const& msg);
 
-// 'G' - Group Assignment Command - FIX: not yet coded
+// 'G' - Group Assignment Command
 class Ais23 : public AisMsg {
  public:
   int spare;
@@ -1475,7 +1475,7 @@ std::ostream& operator<< (std::ostream& o, Ais23 const& msg);
 
 
 // Class B Static Data report
-// TODO: This is structure differently than other conditional sections.  Narmalize
+// TODO(schwehr): This is structure differently than other conditional sections.  Narmalize
 class Ais24 : public AisMsg {
  public:
   int part_num;
@@ -1497,14 +1497,14 @@ class Ais24 : public AisMsg {
 };
 std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
 
-// 'I' - Single slot binary message - addressed or broadcast - TODO: handle payload
+// 'I' - Single slot binary message - addressed or broadcast - TODO(schwehr): handle payload
 class Ais25 : public AisMsg {
  public:
   bool use_app_id;  // if false, payload is unstructured binary.
 
   bool dest_mmsi_valid;
   int dest_mmsi;  // only valid if addressed
-  // TODO: std::vector<unsigned char> payload;  // If unstructured.  Yuck.
+  // TODO(schwehr): std::vector<unsigned char> payload;  // If unstructured.  Yuck.
 
   int dac;  // valid it use_app_id
   int fi;
@@ -1513,7 +1513,7 @@ class Ais25 : public AisMsg {
 };
 std::ostream& operator<< (std::ostream& o, Ais25 const& msg);
 
-// 'J' - Multi slot binary message with comm state - TODO: handle payload
+// 'J' - Multi slot binary message with comm state - TODO(schwehr): handle payload
 class Ais26 : public AisMsg {
  public:
   bool use_app_id;  // if false, payload is unstructured binary
@@ -1524,7 +1524,7 @@ class Ais26 : public AisMsg {
   int dac;  // valid it use_app_id
   int fi;
 
-  // TODO: std::vector<unsigned char> payload;  // If unstructured.  Yuck.
+  // TODO(schwehr): std::vector<unsigned char> payload;  // If unstructured.  Yuck.
 
   int commstate_flag;  // 0 - SOTDMA, 1 - TDMA
 
@@ -1619,7 +1619,7 @@ int ubits(const std::bitset<T> &bits, const size_t start, const size_t len) {
 }
 
 
-// TODO: do not use long
+// TODO(schwehr): do not use long
 typedef union {
   long long_val;
   unsigned long ulong_val;
@@ -1628,7 +1628,7 @@ typedef union {
 template<size_t T>
 int sbits(std::bitset<T> bs, const size_t start, const size_t len) {
   assert(len <= 32);
-  assert(start+len <= T);  // TODO:  should it just be < ?
+  assert(start+len <= T);  // TODO(schwehr):  should it just be < ?
   std::bitset<32> bs32;
   if (len < 32 && 1 == bs[start] ) bs32.flip();  // pad 1's to the left if negative
 

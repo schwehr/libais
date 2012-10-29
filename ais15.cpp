@@ -8,7 +8,7 @@ Ais15::Ais15(const char *nmea_payload, const size_t pad) {
     init();
 
     const int num_char = std::strlen(nmea_payload);
-    // TODO: verify the pad makes sense for each size
+    // TODO(schwehr): verify the pad makes sense for each size
     if (num_char != 15 && num_char != 18 && num_char != 27) {
         // 88-160 bits
         status = AIS_ERR_BAD_BIT_COUNT;
@@ -31,14 +31,14 @@ Ais15::Ais15(const char *nmea_payload, const size_t pad) {
     msg_1_1 = ubits(bs, 70, 6);
     slot_offset_1_1 = ubits(bs, 76, 12);
 
-    // TODO: set remaining fields to -1
+    // TODO(schwehr): set remaining fields to -1
     if (num_char <= 15) return;
 
     spare2 = ubits(bs, 88, 2);
     dest_msg_1_2 = ubits(bs, 90, 6);
     slot_offset_1_2 = ubits(bs, 96, 12);
 
-    // TODO: set remaining fields to -1
+    // TODO(schwehr): set remaining fields to -1
     if (num_char <= 18) return;
 
     spare3 = ubits(bs, 108, 2);

@@ -98,21 +98,21 @@ class LineQueue(Queue.Queue):
             # last group was properly terminated
             for g in groups[:-1]:
                 if self.qsize() > self.lq_maxsize:
-                    continue # FIX: Would be better to add the most recent and drop one from the queue.
+                    continue # TODO(schwehr): Would be better to add the most recent and drop one from the queue.
                 Queue.Queue.put(self,g)
             self.input_buf = ''
         else:
             # last part is a fragment
             for g in groups[:-1]:
                 if self.qsize() > self.lq_maxsize:
-                    continue # FIX: Would be better to add the most recent and drop one from the queue.
+                    continue # TODO(schwehr): Would be better to add the most recent and drop one from the queue.
                 Queue.Queue.put(self,g)
             self.input_buf = groups[-1]
 
 class NormQueue(Queue.Queue):
     '''Normalized AIS messages that are multiple lines
 
-    - FIX: Can I get away with only keeping the body of beginning parts?
+    - TODO(schwehr): Can I get away with only keeping the body of beginning parts?
 
     - works based USCG dict representation of a line that comes back from the regex.
     - not worrying about the checksum.  Assume it already has been validated
@@ -157,7 +157,7 @@ class NormQueue(Queue.Queue):
         sen_num = int(msg['sen_num'])
 
         if sen_num == 1:
-            # FIX: would be a good place to check the message first letter to see if we can ditch it
+            # TODO(schwehr): would be a good place to check the message first letter to see if we can ditch it
 
             # Flush that station's seq and start it with a new msg component
             self.stations[station][seq] = [msg['body'],] # START
@@ -289,12 +289,12 @@ class VesselNames:
         # Totally new ship to us
         if mmsi not in self.vessels:
             if name is None:
-                # FIX: add logic to hold on to the type_and_cargo for those we do not have names for
+                # TODO(schwehr): add logic to hold on to the type_and_cargo for those we do not have names for
                 #self.vessels[mmsi] = (None, type_and_cargo)
                 # Don't update db until we have a name
                 return
 
-            # Have a name - try to insert - FIX: make it insert or update?
+            # Have a name - try to insert - TODO(schwehr): make it insert or update?
             #print ('before',mmsi)
             try:
                 if ENABLE_DB: self.cu.execute(self.sql_insert,new_vessel)
@@ -327,7 +327,7 @@ class VesselNames:
             return
 
         if self.v: print ('UPDATING_B:',mmsi,'  ',old_name,'->',name)
-        # FIX: what if someone deletes the entry from the db?
+        # TODO(schwehr): what if someone deletes the entry from the db?
 
         if ENABLE_DB: self.cu.execute(self.sql_update_name, new_vessel)
         self.cx.commit()
@@ -372,7 +372,7 @@ class VesselNames:
         #print (old_name,old_type_and_cargo,'->',)
         #print (name,type_and_cargo)
 
-        # FIX: what if someone deletes the entry from the db?
+        # TODO(schwehr): what if someone deletes the entry from the db?
         self.cu.execute(self.sql_update, vessel_dict)
         self.cx.commit()
         self.vessels[mmsi] = (name, type_and_cargo)
@@ -511,7 +511,6 @@ class PositionCache:
         if len(d)<2: return # Too short to make a line
         # Make a WKT line and push it into the db
         wkt = wkt_line(d)
-        #print ('WKT:',wkt)
         return wkt
 
     def update(self,vessel_pos_report, time_stamp=None):
@@ -521,15 +520,6 @@ class PositionCache:
         #
         mmsi = msg['mmsi']
 
-        # FIX!!!!!!!!!!!!!!!!!!! just for testing
-        #if mmsi != 367173260:    return
-
-
-        #print ('mmsi:',mmsi)
-        #if mmsi < 200000000:
-            #bad_mmsi.add(mmsi)
-            #print ('BAD_MMSI:',mmsi)
-        #    return
         if msg['x']>180: return # No GPS, so what can we do?
         if 'repeat_indicator' in msg:
             if 0 != msg['repeat_indicator']:
@@ -539,7 +529,6 @@ class PositionCache:
         #
         # Prep the world
         #
-        #print ('time_stamp_before:', msg['time_stamp'])
         if time_stamp is not None: msg['time_stamp'] = time_stamp
         elif 'time_stamp' not in msg or msg['time_stamp'] is None:
             print ('Setting to now')
@@ -549,7 +538,6 @@ class PositionCache:
         msg['datetime'] = datetime.datetime.utcfromtimestamp(int(float(msg['time_stamp'])))
 
         # else: leave the entry as it came in
-
 
         new_pos = {} # copy just what we need to conserve memory
         for field in ('mmsi', 'true_heading', 'sog', 'nav_status', 'cog', 'time_stamp', 'datetime', 'y', 'x'):
@@ -575,7 +563,7 @@ class PositionCache:
         last = self.vessels[mmsi]
         #print ('last:',last)
 
-        # FIX: move into if when working for speed to try to avoid the distance calc
+        # TODO(schwehr): move into if when working for speed to try to avoid the distance calc
         dt = msg['time_stamp'] - last['time_stamp']
 
         dm = dist_utm_m(msg['x'],msg['y'],last['x'],last['y'])
@@ -658,7 +646,7 @@ CREATE TABLE vessel_name (
        type_and_cargo INTEGER,
        response_class INTEGER -- 0 or Null == do not code differently.  1 == response vessel
 );
--- FIX: Add indexes for mmsi and response_class
+-- TODO(schwehr): Add indexes for mmsi and response_class
 """
 
 sql_create_vessel_pos = """
@@ -672,7 +660,7 @@ CREATE TABLE vessel_pos (
 SELECT AddGeometryColumn('vessel_pos','pos',4326,'POINT',2);
 SELECT AddGeometryColumn('vessel_pos','track',4326,'LINESTRING',2);
 
--- FIX: Add index on mmsi
+-- TODO(schwehr): Add index on mmsi
 """
 
 def create_tables(cx, v):
@@ -762,7 +750,7 @@ class ListenThread(threading.Thread):
 
 
 class ProcessingThread(threading.Thread):
-    '# FIX: break into more threads if it helps performance'
+    '# TODO(schwehr): break into more threads if it helps performance'
     def __init__(self, vessel_names, pos_cache, line_queue, norm_queue, verbose=True):
         self.v = verbose
         self.vessel_names = vessel_names
@@ -810,7 +798,7 @@ class ProcessingThread(threading.Thread):
 
             self.norm_queue.put(match)
 
-            # FIX: possibly decouple here
+            # TODO(schwehr): possibly decouple here
             while self.norm_queue.qsize()>0:
 
                 try:
@@ -995,76 +983,43 @@ def main():
                         continue
 
                     if len(result['body']) < 10: continue
-                    # FIX: make sure we have all the critical messages
+                    # TODO(schwehr): make sure we have all the critical messages
 
                     # FIX: add 9
                     if result['body'][0] not in ('1', '2', '3', '5', 'B', 'C', 'H') :
-                        #print( 'skipping',result['body'])
                         continue
-                    #print( 'not skipping',result['body'])
 
                     try:
                          msg = ais.decode(result['body'])
-                    #except ais.decode.error:
+                    # TODO(schwehr): except ais.decode.error:
                     except Exception as e:
-                        #print ()
-
                         if 'not yet handled' in str(e):
                             continue
                         if ' not known' in str(e): continue
 
-                        print ('BAD Decode:',result['body'][0]) #result
-                            #continue
+                        print ('BAD Decode:',result['body'][0])
                         print ('E:',Exception)
                         print ('e:',e)
                         continue
-                        #pass # Bad or unhandled message
-
-                    #continue #  FIX: Remove after debugging
 
                     counters[msg['id']] += 1
 
                     if msg['id'] in (1,2,3,5,18,19,24): ais_msg_cnt += 1
 
-                    #continue  # Skip all the database stuff
-
                     if msg['id'] in (1,2,3,18,19):
-                        # for field in ('received_stations', 'rot', 'raim', 'spare','timestamp', 'position_accuracy', 'rot_over_range', 'special_manoeuvre','slot_number',
-                        #               'utc_spare', 'utc_min', 'slots_to_allocate', 'slot_increment','commstate_flag', 'mode_flag', 'utc_hour', 'band_flag', 'keep_flag',
-                        #               ):
-                        #     try:
-                        #         msg.pop(field)
-                        #     except:
-                        #         pass
-                        #print (msg['mmsi'])
-                        #print (','.join(["'%s'" %(key,)for key in msg.keys()]))
-                        #print (result)
                         msg['time_stamp'] = float(result['time_stamp'])
-                        #if msg['mmsi'] in (304606000, 366904910, 366880220): dump_file.write(str(msg)+',\n')
                         pos_cache.update(msg)
                         continue
 
-                    #continue # FIX for debugging
-
-
                     if msg['id'] == 24:
-                        #print24(msg)
                         vessel_names.update_partial(msg)
-
-                    #continue # FIX remove
 
                     if msg['id'] in (5,19):
                         msg['name'] = msg['name'].strip(' @')
                         if len(msg['name']) == 0: continue # Skip blank names
-                        #print ('UPDATING vessel name', msg)
-                        #vessel_names.update(msg['mmsi'], msg['name'].rstrip('@'), msg['type_and_cargo'])
-                        #if msg['mmsi'] == 367178330:
-                        #    print (' CHECK:', msg['mmsi'], msg['name'])
                         vessel_names.update(msg)
-                        #print ()
 
     print ('match_count:',match_count)
-    #print (counters)
     for key in counters:
         if counters[key] < 1: continue
         print ('%d: %d' % (key,counters[key]))

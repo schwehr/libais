@@ -24,7 +24,7 @@ Ais14::Ais14(const char *nmea_payload, const size_t pad) {
 
     spare = ubits(bs, 38, 2);
 
-    // TODO: fix processing of spare bits if any
+    // TODO(schwehr): fix processing of spare bits if any
     const int num_char = (num_bits - 40) / 6;
     text = ais_str(bs, 40, num_char * 6);
     expected_num_spare_bits = num_bits - 40 - num_char*60;  // Can use this to check later

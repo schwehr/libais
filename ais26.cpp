@@ -1,4 +1,5 @@
-// 'J' - Multi slot binary message with comm state - TODO: handle payload
+// 'J' - Multi slot binary message with comm state
+// TODO(schwehr): handle payload
 // BAD: the comm-state is after the veriable payload.  This is a bad design.
 
 #include "ais.h"
@@ -8,7 +9,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
     init();
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-    const size_t comm_flag_offset = num_bits - 20 + 1;  // TODO: check for off by one.
+    const size_t comm_flag_offset = num_bits - 20 + 1;  // TODO(schwehr): check for off by one.
 
     if (52 > num_bits || num_bits > 1064) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
@@ -30,7 +31,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
         dac = ubits(bs, 70, 10);
         fi = ubits(bs, 80, 6);
       }
-      // TODO: deal with payload
+      // TODO(schwehr): deal with payload
     } else {
       dest_mmsi_valid = false;
       // broadcast
@@ -38,7 +39,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
         dac = ubits(bs, 40, 10);
         fi = ubits(bs, 50, 6);
       }
-      // TODO: deal with payload - probably need to pass in the spare bits
+      // TODO(schwehr): deal with payload - probably need to pass in the spare bits
     }
 
     commstate_flag = bs[comm_flag_offset];

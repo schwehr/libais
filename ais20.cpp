@@ -8,7 +8,7 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
 
     init();
 
-    // TODO: figure out what pad is allowed.
+    // TODO(schwehr): figure out what pad is allowed.
     const int num_char = std::strlen(nmea_payload);
     if (num_char != 12 && num_char != 18 && num_char != 23 && num_char != 27) {
         status = AIS_ERR_BAD_BIT_COUNT;
@@ -25,8 +25,8 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
     mmsi = ubits(bs, 8, 30);
     spare = ubits(bs, 38, 2);
 
-    // TODO: make this an array of blocks with 4 element
-    // TODO: Are the ever no blocks set????
+    // TODO(schwehr): make this an array of blocks with 4 element
+    // TODO(schwehr): Are the ever no blocks set????
 
     offset_1 = ubits(bs, 40, 12);
     num_slots_1 = ubits(bs, 52, 4);

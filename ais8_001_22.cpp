@@ -202,7 +202,7 @@ Ais8_001_22_Polyline::Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs,
     spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
 }
 
-// TODO: fold into polyline
+// TODO(schwehr): fold into polyline
 Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     for (size_t i = 0; i < 4; i++) {
@@ -218,7 +218,7 @@ Ais8_001_22_Polygon::Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, c
 
 Ais8_001_22_Text::Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     text = std::string(ais_str(bs, offset+3, 84));
-    // TODO: spare?
+    // TODO(schwehr): spare?
 }
 
 
@@ -271,7 +271,7 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
     init();
 
     const int num_bits = strlen(nmea_payload) * 6 - pad;
-    // TODO: make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
+    // TODO(schwehr): make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
     // Spec is not byte aligned.  BAD!
     if (198 > num_bits || num_bits > 984) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
@@ -300,11 +300,11 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
           status = AIS_ERR_BAD_SUB_SUB_MSG;
         }
     }
-    /* TODO: inspect the subareas to make sure the are sane.
+    /* TODO(schwehr): inspect the subareas to make sure the are sane.
        - polyline/polygon have a point first
        - text has geometry to go through it all
     */
-    // TODO: watch out for mandatory spare bits to byte align payload
+    // TODO(schwehr): watch out for mandatory spare bits to byte align payload
 }
 
 Ais8_001_22::~Ais8_001_22() {

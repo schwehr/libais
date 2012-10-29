@@ -11,7 +11,7 @@
 using namespace std;
 
 TEST(EmptyTest, Empty) {
-    // TODO: test the empty string case.  What should it do?
+    // TODO(schwehr): test the empty string case.  What should it do?
 }
 
 TEST(HelperTest, Helper) {

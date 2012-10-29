@@ -8,7 +8,7 @@
 #include <cmath>
 
 const std::string nth_field(const std::string &str, const size_t n, const char c) {
-    // FIX: handle the off the end case better
+    // TODO(schwehr): handle the off the end case better
     size_t pos;
     size_t count;
     for (pos = 0, count = 0; count < n and pos != std::string::npos; count+=1) {

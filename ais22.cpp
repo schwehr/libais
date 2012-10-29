@@ -39,9 +39,9 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad) {
       pos_valid = false;
       dest_valid = true;
       dest_mmsi_1 = ubits(bs, 69, 30);
-      // TODO: save the 5 spare bits
+      // TODO(schwehr): save the 5 spare bits
       dest_mmsi_2 = ubits(bs, 104, 30);
-      // TODO: save the 5 spare bits
+      // TODO(schwehr): save the 2nd 5 spare bits
     }
 
     // OUT OF ORDER: addressed is before

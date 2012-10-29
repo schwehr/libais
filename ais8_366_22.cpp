@@ -140,7 +140,7 @@ const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = {
   "Undefined (default)"  // 127
 };
 
-// TODO: pad
+
 Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
     assert(pad < 6);
@@ -192,8 +192,8 @@ Ais8_366_22_Circle::Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, con
     const int scale_factor = ubits(bs, offset+3, 2);
     x         = sbits(bs, offset+5, 28) / 600000.;
     y         = sbits(bs, offset+5+28, 27) / 600000.;
-    // TODO: precision? And bit counts for radius  and spare?
-    // TODO: collapse these numbers
+    // TODO(schwehr): precision? And bit counts for radius  and spare?
+    // TODO(schwehr): collapse these numbers
     radius_m  = ubits(bs, offset+5+28+27, 12) * scale_multipliers[scale_factor];
     spare     = ubits(bs, offset+5+28+27+12, 16);
 }
@@ -233,7 +233,7 @@ Ais8_366_22_Polyline::Ais8_366_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs,
 }
 
 
-// TODO: merge with Polyline
+// TODO(schwehr): merge with Polyline
 Ais8_366_22_Polygon::Ais8_366_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     for (size_t i = 0; i < 4; i++) {
