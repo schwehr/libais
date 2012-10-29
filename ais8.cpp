@@ -633,7 +633,7 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad) {
   wind_gust = ubits(bs, 129, 7);  // kts
   wind_dir = ubits(bs, 136, 9);
   wind_gust_dir = ubits(bs, 145, 9);
-  air_temp = sbits(bs, 154, 11) / 10. ;  // C
+  air_temp = sbits(bs, 154, 11) / 10.;  // C
   rel_humid = ubits(bs, 165, 7);
   dew_point = sbits(bs, 172, 10)/ 10.;  // TODO(schwehr): How is this mapped?
   air_pres = ubits(bs, 182, 9);

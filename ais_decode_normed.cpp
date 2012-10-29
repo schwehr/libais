@@ -37,7 +37,7 @@ int main(int argc,  char* argv[]) {
     std::string line;
     while (!infile.eof()) {
         i++;
-        getline(infile, line); // G++ problem with this and a string
+        getline(infile, line);  // G++ problem with this and a string
         if (line.size() < 20) {continue;}
         if ('!' != line[0]  ||  'A' != line[1] ) {continue;}
         std::string line_str(line);

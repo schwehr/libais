@@ -11,7 +11,7 @@ const std::string nth_field(const std::string &str, const size_t n, const char c
     // TODO(schwehr): handle the off the end case better
     size_t pos;
     size_t count;
-    for (pos = 0, count = 0; count < n and pos != std::string::npos; count+=1) {
+    for (pos = 0, count = 0; count < n && pos != std::string::npos; count+=1) {
         if (pos > 0) pos += 1;  // Skip past the current char that matched
         pos = str.find(c, pos);
     }

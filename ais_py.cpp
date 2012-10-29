@@ -20,7 +20,7 @@ void TupleSafeSetItem(PyObject *tuple, const long position, const long val) {
     assert(tuple);
     PyObject *val_obj = PyLong_FromLong(val);
     assert(val_obj);
-    PyTuple_SetItem(tuple,position, val_obj);
+    PyTuple_SetItem(tuple, position, val_obj);
     Py_DECREF(val_obj);
 }
 #endif
@@ -152,7 +152,7 @@ ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
     DictSafeSetItem(dict, "raim", msg.raim);
 
     // COMM States
-    DictSafeSetItem(dict, "sync_state", msg.sync_state); // In both SOTDMA and ITDMA
+    DictSafeSetItem(dict, "sync_state", msg.sync_state);  // In both SOTDMA and ITDMA
 
     // SOTDMA
     if (msg.message_id == 1 || msg.message_id == 2) {
@@ -383,7 +383,7 @@ ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   if (!msg.windows.size()) return;  // TODO(schwehr): is this an error?
 
   PyObject *window_list = PyList_New(msg.windows.size());
-  for(size_t w_num = 0; w_num < msg.windows.size(); w_num++) {
+  for (size_t w_num = 0; w_num < msg.windows.size(); w_num++) {
     PyObject *window = PyDict_New();
     DictSafeSetItem(window, "y", msg.windows[w_num].x);
     DictSafeSetItem(window, "x", msg.windows[w_num].y);  // yes, bits are lat, lon
@@ -438,7 +438,7 @@ ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   DictSafeSetItem(dict, "utc_min", msg.utc_min);
   if (msg.services_known) {
     PyObject *serv_list = PyList_New(26);
-    for(size_t serv_num = 0; serv_num < 26; serv_num++) {
+    for (size_t serv_num = 0; serv_num < 26; serv_num++) {
       PyObject *serv = PyInt_FromLong(long(msg.services[serv_num]));
       PyList_SetItem(serv_list, serv_num, serv);
     }
@@ -869,8 +869,10 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 Ais8_001_22_Circle *c = (Ais8_001_22_Circle*)msg.sub_areas[i];
 
                 DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_CIRCLE);
-                if (c->radius_m == 0) DictSafeSetItem(sub_area, "sub_area_type_str", "point");
-                else DictSafeSetItem(sub_area, "sub_area_type_str", "circle");
+                if (c->radius_m == 0)
+                  DictSafeSetItem(sub_area, "sub_area_type_str", "point");
+                else
+                  DictSafeSetItem(sub_area, "sub_area_type_str", "circle");
 
                 DictSafeSetItem(sub_area, "x", c->x);
                 DictSafeSetItem(sub_area, "y", c->y);
@@ -928,7 +930,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 PyObject *dist_list = PyList_New(polyline->angles.size());
 
                 for (size_t pt_num = 0; pt_num < polyline->angles.size(); pt_num++) {
-                    PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polyline->angles [pt_num]));
+                    PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polyline->angles[pt_num]));
                     PyList_SetItem(dist_list,  pt_num, PyFloat_FromDouble(polyline->dists_m[pt_num]));
                 }
 
@@ -951,7 +953,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
                 PyObject *dist_list = PyList_New(polygon->angles.size());
 
                 for (size_t pt_num = 0; pt_num < polygon->angles.size(); pt_num++) {
-                    PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polygon->angles [pt_num]));
+                    PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polygon->angles[pt_num]));
                     PyList_SetItem(dist_list,  pt_num, PyFloat_FromDouble(polygon->dists_m[pt_num]));
                 }
 
@@ -2353,8 +2355,7 @@ static PyMethodDef ais_methods[] = {
 
 #if 0
 PyMODINIT_FUNC
-initais(void)
-{
+initais(void) {
     PyObject *mod;
     mod = Py_InitModule("ais", ais_methods);
     if (mod == NULL) {
@@ -2460,4 +2461,4 @@ initais(void)
 }
 
 #endif
-} // extern "C"
+}  // extern "C"
