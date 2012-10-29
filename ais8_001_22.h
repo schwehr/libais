@@ -103,7 +103,6 @@ class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
     Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polyline() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYLINE;}
-
 };
 
 // TODO(schwehr): bring in the prior point?  And do we fold the sub area data
@@ -115,7 +114,7 @@ class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
     // Up to 4 points in a first message, but aggregated if multiple sub areas
     std::vector<float> angles;
     std::vector<float> dists_m;
-    unsigned int spare; // 2 bit
+    unsigned int spare;  // 2 bit
 
     Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polygon() {}
