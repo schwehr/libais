@@ -274,8 +274,26 @@ bit_len: 578
       if (msg_1.had_error())  std::cerr<<"FAILED 19 2: " << AIS_STATUS_STRINGS[msg_1.get_error()] << "\\n";
     }
 
+    // 20 - Link management
+    // !AIVDM,1,1,,A,D02E35iqlg6D000000000000000,2*70,raishub,1351296741
+    { Ais20 msg("D02E35iqlg6D000000000000000",2); CHECK_ERROR(msg); }
+    // !AIVDM,1,1,,B,D02M3UAalNfr<`N000000000000,2*4E,raishub,1351298486
+    { Ais20 msg("D02M3UAalNfr<`N000000000000",2); CHECK_ERROR(msg); }
+    // !AIVDM,1,1,,B,D>jQM4j3<v01O@v01M4v01`0v00,2*5D,raishub,1351298489
+    { Ais20 msg("D>jQM4j3<v01O@v01M4v01`0v00",2); CHECK_ERROR(msg); }
+    // !AIVDM,1,1,,B,D09RFOhupNfq6DO6DgMJ>4giK6D,2*17,raishub,1351298504
+    { Ais20 msg("D09RFOhupNfq6DO6DgMJ>4giK6D",2); CHECK_ERROR(msg); }
+    // !AIVDM,1,1,,A,D02M3diehNfr<`N01rlf0000000,2*1D,raishub,1351298476
+    { Ais20 msg("D02M3diehNfr<`N01rlf0000000",2); CHECK_ERROR(msg); }
 
-    // TODO(schwehr): find a msg 20
+    // Created by Kurt based on the above
+    // !AIVDM,1,1,,B,D02E35iqlg6D,0*41
+    { Ais20 msg("D02E35iqlg6D",0);  CHECK_ERROR(msg); }
+    // !AIVDM,1,1,,A,D00FEd@04V0@0ET0L0,4*0E,rFakeByKurt,1351557493.0
+    { Ais20 msg("D00FEd@04V0@0ET0L0", 4);  CHECK_ERROR(msg); }
+    // !AIVDM,1,1,,A,D00FEd@04V0@0ET0L0Pp0T,2*4C,rFakeByKurt,1351557873.89
+    { Ais20 msg("D00FEd@04V0@0ET0L0Pp0T", 2);  CHECK_ERROR(msg); }
+
 
     // 21 - ATON status report
     if (true) {

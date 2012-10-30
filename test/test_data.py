@@ -102,8 +102,8 @@ top_level = [
       '!AIVDM,2,2,9,B,00000000000,2*2E,raishub,1342579715',
     ],
     'result': {'ais_version': 1,
-             'callsign': u'OT4880@',
-             'destination': u'DELFZIJL@@@@@@@@@@@@',
+             'callsign': 'OT4880@',
+             'destination': 'DELFZIJL@@@@@@@@@@@@',
              'dim_a': 70,
              'dim_b': 12,
              'dim_c': 2,
@@ -118,7 +118,7 @@ top_level = [
              'id': 5,
              'imo_num': 0,
              'mmsi': 205488090,
-             'name': u'GUATEMALA@@@@@@B@@@@',
+             'name': 'GUATEMALA@@@@@@B@@@@',
              'repeat_indicator': 0,
              'spare': 0,
              'type_and_cargo': 107}
@@ -142,7 +142,7 @@ top_level = [
              'seq': 2,
              'spare': 0,
              'spare2': 0,
-             'text': u'<OSAKA HARBOUR R42>INFORMATION: WIND W 4M/S AT OSAKA HARBOUR RADAR(34-39-12N 135-25-50E) 10:25JST.'}
+             'text': '<OSAKA HARBOUR R42>INFORMATION: WIND W 4M/S AT OSAKA HARBOUR RADAR(34-39-12N 135-25-50E) 10:25JST.'}
   },
 
   {
@@ -266,7 +266,7 @@ top_level = [
              'retransmitted': False,
              'seq_num': 0,
              'spare': 0,
-             'text': u'FROM ROCA CONTROL: PLEASE CONTACT ROCA CONTROL ON VHF CHANNEL 79 FOR MANDATORY REPORT'}
+             'text': 'FROM ROCA CONTROL: PLEASE CONTACT ROCA CONTROL ON VHF CHANNEL 79 FOR MANDATORY REPORT'}
   },
 
   {
@@ -286,7 +286,7 @@ top_level = [
              'mmsi': 970210000,
              'repeat_indicator': 0,
              'spare': 0,
-             'text': u'SART TEST@@@@@@@'}
+             'text': 'SART TEST@@@@@@@'}
   },
 
   {
@@ -371,7 +371,7 @@ top_level = [
              'fix_type': 1,
              'id': 19,
              'mmsi': 525015117,
-             'name': u'JASA SETIA@@@@@@@@@@',
+             'name': 'JASA SETIA@@@@@@@@@@',
              'position_accuracy': 0,
              'raim': False,
              'repeat_indicator': 0,
@@ -386,7 +386,55 @@ top_level = [
              'y': 1.2654650211334229}
   },
 
-# TODO: Msg 20 D - data link management
+  {
+    'nmea': [ '!AIVDM,1,1,,B,D09RFOhupNfq6DO6DgMJ>4giK6D,2*17,raishub,1351298504' ],
+    'result': {'id': 20,
+               'mmsi': 9999999,
+               'repeat_indicator': 0,
+               'reservations': [{'incr': 750, 'num_slots': 1, 'offset': 990, 'timeout': 7},
+                                {'incr': 1125, 'num_slots': 1, 'offset': 1125, 'timeout': 7},
+                                {'incr': 225, 'num_slots': 5, 'offset': 759, 'timeout': 5},
+                                {'incr': 1125, 'num_slots': 5, 'offset': 764, 'timeout': 5}],
+               'spare': 0}
+    },
+
+  {
+    'nmea': [ '!AIVDM,1,1,,B,D02E35iqlg6D,0*41' ],
+    'result': {'id': 20,
+                'mmsi': 2442007,
+                'repeat_indicator': 0,
+                'reservations': [{'incr': 1125,
+                                  'num_slots': 2,
+                                  'offset': 1949,
+                                  'timeout': 7}],
+                'spare': 0}
+    },
+
+  {
+    'nmea': [ '!AIVDM,1,1,,A,D00FEd@04V0@0ET0L0,4*0E,rFakeByKurt,1351557493.0' ],
+    'result': {'id': 20,
+                'mmsi': 366001,
+                'repeat_indicator': 0,
+                'reservations': [{'incr': 4,
+                                  'num_slots': 2,
+                                  'offset': 1,
+                                  'timeout': 3},
+                                 {'incr': 7, 'num_slots': 6, 'offset': 5, 'timeout': 2}],
+                'spare': 0}
+    },
+
+  {
+    'nmea': [ '!AIVDM,1,1,,A,D00FEd@04V0@0ET0L0Pp0T,2*4C,rFakeByKurt,1351557873.89' ],
+    'result': {'id': 20,
+               'mmsi': 366001,
+               'repeat_indicator': 0,
+               'reservations': [{'incr': 4, 'num_slots': 2, 'offset': 1, 'timeout': 3},
+                                {'incr': 7, 'num_slots': 6, 'offset': 5, 'timeout': 2},
+                                {'incr': 9, 'num_slots': 3, 'offset': 8, 'timeout': 4},
+                                {'incr': 0, 'num_slots': 0, 'offset': 0, 'timeout': 0}],
+               'spare': 0}
+      },
+
 
   {
     'nmea': [ '!AIVDM,1,1,,B,E>jHC:k9Wbb4;WV2@6400000000@3nCL>v8t030HHKnf00,4*1C,raishub,1332547247' ],
@@ -400,7 +448,7 @@ top_level = [
                'fix_type': 7,
                'id': 21,
                'mmsi': 992351019,
-               'name': u'SOUTHWOLD LH@@@@@@@@',
+               'name': 'SOUTHWOLD LH@@@@@@@@',
                'off_pos': False,
                'position_accuracy': 1,
                'raim': False,
@@ -451,7 +499,7 @@ top_level = [
 
   {
     'nmea': [ '!AIVDM,1,1,,B,H3pro:4q3?=1B0000000000P7220,0*59,raishub,1332550009' ],
-    'result': {'callsign': u'@@@@@@@',
+    'result': {'callsign': '@@@@@@@',
                'dim_a': 4,
                'dim_b': 7,
                'dim_c': 2,
@@ -462,7 +510,7 @@ top_level = [
                'repeat_indicator': 0,
                'spare': 0,
                'type_and_cargo': 57,
-               'vendor_id': u'COMAR@@'}
+               'vendor_id': 'COMAR@@'}
   },
 
   {
