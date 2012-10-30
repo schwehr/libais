@@ -14,7 +14,7 @@
 #include <iostream>
 
 #define LIBAIS_VERSION_MAJOR 0
-#define LIBAIS_VERSION_MINOR 9
+#define LIBAIS_VERSION_MINOR 11
 
 const std::string nth_field(const std::string &str, const size_t n, const char c);
 
