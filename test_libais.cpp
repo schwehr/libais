@@ -309,7 +309,6 @@ bit_len: 578
 
     }
 
-
     {
       // !AIVDM,1,1,,B,F6@2lUP0<0010W@OoK8<@oPE`02`,0*03,raishub,1332549829
       Ais22 msg("F6@2lUP0<0010W@OoK8<@oPE`02`", 0);
