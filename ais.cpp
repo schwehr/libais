@@ -1,11 +1,17 @@
 #include "ais.h"
 
 const string nth_field(const string &str, const size_t n, const char c) {
-  // TODO(schwehr): handle the off the end case better
-  size_t pos;
-  size_t count;
-  for (pos = 0, count = 0; count < n && pos != string::npos; count+=1) {
-    if (pos > 0) pos += 1;  // Skip past the current char that matched
+  if (!n) {
+    const size_t pos = str.find(c);
+    cerr << "pos: " << pos << "\n";
+    if (pos == string::npos)
+      return string("");
+    return str.substr(0, pos);
+  }
+
+  size_t pos = 0;
+  for (size_t count = 0; count < n && pos != string::npos; count++) {
+    if (pos > 0) pos += 1;
     pos = str.find(c, pos);
   }
   if (string::npos == pos)
@@ -14,7 +20,7 @@ const string nth_field(const string &str, const size_t n, const char c) {
   const size_t start = pos;
   const size_t end = str.find(c, pos+1);
   if (string::npos == end)
-    return str.substr(start);
+    return str.substr(start+1);
   return str.substr(start+1, end-start-1);
 }
 
