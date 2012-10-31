@@ -1423,7 +1423,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
 
     // TODO(schwehr): only decode dac/fi and push the header dict sets into the messages to avoid duplication.
-    Ais8 msg(nmea_payload);
+    Ais8 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais8: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;

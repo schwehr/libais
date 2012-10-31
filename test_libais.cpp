@@ -70,7 +70,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
     if (true) {
       // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
-      Ais8 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P");
+      Ais8 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P", 2);
       if (msg.had_error()) cerr <<"FAILED 8 " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
     }
 

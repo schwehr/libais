@@ -7,12 +7,13 @@
 #include "ais.h"
 
 
-// TODO(schwehr): pad
-Ais8::Ais8(const char *nmea_payload) {
+Ais8::Ais8(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
+    assert(pad < 6);
     assert(nmea_ord_initialized);  // Make sure we have the lookup table built
     init();
-    const int payload_len = strlen(nmea_payload)*6 - 46;  // in bits w/o DAC/FI
+
+    const int payload_len = strlen(nmea_payload)*6 - 46 - pad;  // in bits w/o DAC/FI
     if (payload_len < 0 || payload_len > 952) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
@@ -35,6 +36,7 @@ Ais8::Ais8(const char *nmea_payload) {
         payload.push_back(ubits(bs, start, remainder));
     }
 }
+
 
 bool Ais8::decode_header8(const bitset<MAX_BITS> &bs) {
     message_id = ubits(bs, 0, 6);

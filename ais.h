@@ -463,7 +463,7 @@ class Ais8 : public AisMsg {
   vector<unsigned char> payload;  // If dac/fi (app id is now one we know).  without dac/fi
 
   Ais8() {}
-  Ais8(const char *nmea_payload);  // TODO(schwehr): pad
+  Ais8(const char *nmea_payload, const size_t pad);
   bool decode_header8(const bitset<MAX_BITS> &bs);
 };
 ostream& operator<< (ostream& o, Ais8 const& msg);
