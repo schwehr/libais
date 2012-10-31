@@ -104,6 +104,6 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) {
 }
 
 
-ostream& operator<< (ostream& o, const Ais1_2_3 &msg) {
+ostream& operator<< (ostream &o, const Ais1_2_3 &msg) {
     return o << msg.message_id << ": " << msg.mmsi;
 }
