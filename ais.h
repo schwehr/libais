@@ -555,7 +555,8 @@ class Ais8_1_13 : public Ais8 {
 };
 ostream& operator<< (ostream &o, const Ais8_1_13 &msg);
 
-// IMO Circ 236 Extended ship static and voyage data - Not to be transmitted after 2012-Jan-01
+// IMO Circ 236 Extended ship static and voyage data
+// Not to be transmitted after 2012-Jan-01
 class Ais8_1_15 : public Ais8 {
  public:
   float air_draught;
@@ -687,11 +688,9 @@ class Ais8_1_21 : public Ais8 {
 };
 ostream& operator<< (ostream &o, const Ais8_1_21 &msg);
 
-
 // SEE ais8_001_22.h for Area notice
 
 // No message 8_1_23
-
 
 // IMO Circ 289 Extended ship static and voyage-related
 class Ais8_1_24 : public Ais8 {
@@ -717,8 +716,7 @@ class Ais8_1_24 : public Ais8 {
 };
 ostream& operator<< (ostream &o, const Ais8_1_24 &msg);
 
-
-// No message 8_1_15
+// No message 8_1_25
 
 const size_t AIS8_1_26_REPORT_SIZE = 112;
 
@@ -752,8 +750,9 @@ class Ais8_1_26_SensorReport {
   virtual ~Ais8_1_26_SensorReport() {}
 };
 
-
-Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+Ais8_1_26_SensorReport*
+ais8_1_26_sensor_report_factory(const bitset<AIS8_MAX_BITS> &bs,
+                                const size_t offset);
 
 class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
  public:
@@ -1110,7 +1109,9 @@ class Ais8_366_22_SubArea {
     virtual ~Ais8_366_22_SubArea() { }
 };
 
-Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+Ais8_366_22_SubArea*
+ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
+                            const size_t offset);
 
 // or Point if radius is 0
 class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
@@ -1214,7 +1215,7 @@ class Ais8_366_22 : public Ais8 {
 };
 ostream& operator<< (ostream& o, Ais8_366_22 const& msg);
 
-const size_t AIS8_366_22_NUM_NAMES=128;
+const size_t AIS8_366_22_NUM_NAMES = 128;
 extern const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES];
 
 // 366 34 - Kurt older whale message 2008-2010
@@ -1673,20 +1674,20 @@ AIS_STATUS aivdm_to_bits(bitset<T> &bits, const char *nmea_payload) {
   assert(nmea_payload);
   if (strlen(nmea_payload) > T/6) {
 #ifndef NDEBUG
-    std::cerr << "ERROR: message longer than max allowed size (" << T/6 << "): found "
-              << strlen(nmea_payload) << " characters in "
+    std::cerr << "ERROR: message longer than max allowed size (" << T/6
+              << "): found " << strlen(nmea_payload) << " characters in "
               << nmea_payload << std::endl;
 #endif
     return AIS_ERR_MSG_TOO_LONG;
   }
-  for (size_t char_idx = 0; nmea_payload[char_idx] != '\0' && char_idx < T/6; char_idx++) {
-    int c = static_cast<int>(nmea_payload[char_idx]);
+  for (size_t idx = 0; nmea_payload[idx] != '\0' && idx < T/6; idx++) {
+    int c = static_cast<int>(nmea_payload[idx]);
     if (c < 48 || c > 119 || (c >= 88 && c <= 95)) {
       return AIS_ERR_BAD_NMEA_CHR;
     }
     const bitset<6> bs_for_char = nmea_ord[ c ];
     for (size_t offset = 0; offset < 6; offset++) {
-      bits[char_idx*6 + offset] = bs_for_char[offset];
+      bits[idx*6 + offset] = bs_for_char[offset];
     }
   }
   return AIS_OK;
@@ -1713,7 +1714,8 @@ int sbits(bitset<T> bs, const size_t start, const size_t len) {
   assert(len <= 32);
   assert(start+len <= T);  // TODO(schwehr):  should it just be < ?
   bitset<32> bs32;
-  if (len < 32 && 1 == bs[start] ) bs32.flip();  // pad 1's to the left if negative
+  // pad 1's to the left if negative
+  if (len < 32 && 1 == bs[start] ) bs32.flip();
 
   for (size_t i = 0; i < len; i++)
     bs32[i] = bs[start+len-i-1];
@@ -1726,7 +1728,8 @@ int sbits(bitset<T> bs, const size_t start, const size_t len) {
 extern const string bits_to_char_tbl;
 
 template<size_t T>
-const string ais_str(const bitset<T> &bits, const size_t start, const size_t len) {
+const string ais_str(const bitset<T> &bits, const size_t start,
+                     const size_t len) {
   assert(start+len < T);
   assert(len % 6 == 0);
   const size_t num_char = len / 6;
