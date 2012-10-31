@@ -4,7 +4,7 @@
 #include <Python.h>
 #include <cassert>
 #include <iostream>
-#include <string>
+//#include <string>
 
 #include "ais.h"
 #include "ais8_001_22.h"

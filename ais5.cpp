@@ -41,7 +41,8 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) {
 }
 
 
-ostream& operator<< (ostream& o, Ais5 const& a) {
-    return o << 5 << ": " << a.mmsi << " \"" << a.name << "\" " << a.type_and_cargo
-             << " " << a.dim_a + a.dim_b << "x" << a.dim_c + a.dim_d << "x" << a.draught << "m";
+ostream& operator<< (ostream& o, const Ais5 &msg) {
+    return o << 5 << ": " << msg.mmsi << " \"" << msg.name << "\" "
+             << msg.type_and_cargo << " " << msg.dim_a + msg.dim_b
+             << "x" << msg.dim_c + msg.dim_d << "x" << msg.draught << "m";
 }

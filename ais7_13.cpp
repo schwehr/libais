@@ -1,6 +1,3 @@
-#include <iostream>
-#include <bitset>
-#include <cassert>
 
 #include "ais.h"
 
