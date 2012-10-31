@@ -192,8 +192,6 @@ const size_t AIS6_MAX_BITS = MAX_BITS;
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
  public:
-  Ais6() {}
-
   static const int MAX_BITS = AIS6_MAX_BITS;
 
   int seq;  // sequence number
@@ -204,25 +202,11 @@ class Ais6 : public AisMsg {
   int fi;
   vector<unsigned char> payload;  // If dac/fi (app id is now one we know).  without dac/fi
 
+  Ais6() {}
   Ais6(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream& o, Ais6 const& msg);
 
-#if 0
-template<size_t T>
-bool decode_header6(const bitset<T> &bs, Ais6 &msg) {
-  msg.message_id = ubits(bs, 0, 6);
-  if (6 != msg.message_id) { msg.status = AIS_ERR_WRONG_MSG_TYPE; return false; }
-  msg.repeat_indicator = ubits(bs, 6, 2);
-  msg.mmsi = ubits(bs, 8, 30);
-  msg.seq = ubits(bs, 38, 2);
-  msg.mmsi_dest = ubits(bs, 40, 30);
-  msg.retransmit = !bs[70];
-  msg.spare = bs[71];
-  msg.dac = ubits(bs, 72, 10);
-  msg.fi = ubits(bs, 82, 6);
-}
-#endif
 
 // Text message - ITU 1371-1 - this is OLD
 class Ais6_1_0 : public Ais6 {
@@ -427,8 +411,9 @@ ostream& operator<< (ostream& o, Ais6_1_30 const& msg);
 
 
 // IMO Circ 289
-// could use the same struct for for 8_1_14, but x and y are bit wise different.
-// two structs hints that things are not the same bitwise.
+// Warning: The bit encoding for 6_1_14_Window and 6_1_32 on
+//   the wire has x and y in a different order.
+// TODO(schwehr): Reuse Ais6_1_14_Window
 struct Ais6_1_32_Window {
   float x, y;
   int from_utc_hour, from_utc_min;
