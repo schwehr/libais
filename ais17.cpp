@@ -1,6 +1,7 @@
 // A - GNSS broacast -
 // TODO(schwehr): only partially coded - need to finish
 // http://www.itu.int/rec/R-REC-M.823/en
+// http://www.iala-aism.org/iala/publications/documentspdf/doc_348_eng.pdf
 
 // In 823, 30 bit words = 24 bits data followed by 6 parity bits.
 // Parity bits are left out of the AIS payload?
