@@ -18,7 +18,7 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) {
         return;
     }
 
-    std::bitset<MAX_BITS> bs;
+    bitset<MAX_BITS> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
@@ -56,7 +56,7 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad) {
 
   if (88 > num_bits || num_bits > 936) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-  std::bitset<1024> bs;  // TODO(schwehr): what is the real max size?
+  bitset<1024> bs;  // TODO(schwehr): what is the real max size?
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) { return; }
 
@@ -95,7 +95,7 @@ Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad) {
 
   if ( num_bits != 112) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-  std::bitset<112> bs;
+  bitset<112> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -126,7 +126,7 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad) {
 
   if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-  std::bitset<104> bs;  // TODO(schwehr): what is the real bit count?
+  bitset<104> bs;  // TODO(schwehr): what is the real bit count?
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -159,7 +159,7 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad) {
 
   if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-  std::bitset<104> bs;
+  bitset<104> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -193,7 +193,7 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) {
   // TODO(schwehr): num_bits for 6_1_4.  226 bits?
   if (num_bits != 232) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-  std::bitset<168> bs;
+  bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -233,7 +233,7 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad) {
   if (num_bits != 360) {
     status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-  std::bitset<360> bs;
+  bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -288,7 +288,7 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad) {
 
   if (376 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT;  return; }
 
-  std::bitset<376> bs;
+  bitset<376> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -338,7 +338,7 @@ Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad) {
 
   if (360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<360> bs;
+  bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -380,7 +380,7 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad) {
 
   if (360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<360> bs;
+  bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -432,7 +432,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) {
   if (100 > num_bits || num_bits > 576) { status = AIS_ERR_BAD_BIT_COUNT; return; }
   if ( (num_bits - 100) % 17 != 0) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<576> bs;
+  bitset<576> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -506,7 +506,7 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad) {
   // TODO(schwehr): might get messages with not all windows.  Might also get 360 bits
   if (350 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<360> bs;
+  bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -553,7 +553,7 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad) {
 
   if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-  std::bitset<104> bs;
+  bitset<104> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 

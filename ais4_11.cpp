@@ -13,7 +13,7 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad) {
 
     if (0 != pad || strlen(nmea_payload) != 28) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<168> bs;
+    bitset<168> bs;
 
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
@@ -83,6 +83,8 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad) {
         assert(false);
     }
 }
-std::ostream& operator<< (std::ostream& o, Ais4_11 const& msg) {
+
+
+ostream& operator<< (ostream& o, Ais4_11 const& msg) {
     return o << msg.message_id << ": " << msg.mmsi;
 }

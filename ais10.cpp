@@ -8,7 +8,7 @@ Ais10::Ais10(const char *nmea_payload, const size_t pad) {
 
     if (pad != 0 || strlen(nmea_payload) != 72/6) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<72> bs;
+    bitset<72> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

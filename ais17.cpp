@@ -16,7 +16,7 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) { status = AIS_ERR_BAD_BIT_COUNT;  return; }
 
-  std::bitset<816> bs;
+  bitset<816> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -93,7 +93,7 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
 #endif
 }
 
-std::ostream& operator<< (std::ostream& o, Ais17 const& m) {
+ostream& operator<< (ostream& o, Ais17 const& m) {
     return o << "[" << m.message_id << "]: " << m.mmsi
              << " (" << m.x << ", " << m.y << ") t:"
              << m.gnss_type << ", z:" << m.z_cnt

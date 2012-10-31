@@ -30,7 +30,7 @@ class Ais8_366_22_SubArea {
     virtual ~Ais8_366_22_SubArea() { }
 };
 
-Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
 
 // or Point if radius is 0
 class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
@@ -40,7 +40,7 @@ class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
     int radius_m;
     unsigned int spare;
 
-    Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Circle() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_CIRCLE;}
 };
@@ -54,7 +54,7 @@ class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
     int orient_deg;  // Orientation in degrees from true north
     unsigned int spare;  // 5 bits
 
-    Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Rect() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_RECT;}
 };
@@ -68,7 +68,7 @@ class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
     int right_bound_deg;
     // TODO(schwehr): spare?
 
-    Ais8_366_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Sector() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_SECTOR;}
 };
@@ -81,11 +81,11 @@ class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
     // TODO(schwehr): precision
 
     // Up to 4 points
-    std::vector<float> angles;
-    std::vector<float> dists_m;
+    vector<float> angles;
+    vector<float> dists_m;
     unsigned int spare;
 
-    Ais8_366_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Polyline() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYLINE;}
 };
@@ -96,21 +96,21 @@ class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
     // TODO(schwehr): precision?
 
     // Up to 4 points in a first message, but aggregated if multiple sub areas
-    std::vector<float> angles;
-    std::vector<float> dists_m;
+    vector<float> angles;
+    vector<float> dists_m;
     unsigned int spare;
 
-    Ais8_366_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Polygon() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYGON;}
 };
 
 class Ais8_366_22_Text : public Ais8_366_22_SubArea {
  public:
-    std::string text;
+    string text;
     unsigned int spare;  // 3 bits
 
-    Ais8_366_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_366_22_Text() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_TEXT;}
 };
@@ -127,12 +127,14 @@ class Ais8_366_22 : public Ais8 {
     int duration_minutes;  // Time from the start until the notice expires
     // 1 or more sub messages
 
-    std::vector<Ais8_366_22_SubArea *> sub_areas;
+    vector<Ais8_366_22_SubArea *> sub_areas;
 
   Ais8_366_22(const char *nmea_payload, const size_t pad);
     ~Ais8_366_22();
 };
-std::ostream& operator<< (std::ostream& o, Ais8_366_22 const& msg);
+
+
+ostream& operator<< (ostream& o, Ais8_366_22 const& msg);
 
 const size_t AIS8_366_22_NUM_NAMES=128;
 extern const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES];

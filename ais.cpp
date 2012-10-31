@@ -7,24 +7,24 @@
 #include <cassert>
 #include <cmath>
 
-const std::string nth_field(const std::string &str, const size_t n, const char c) {
+const string nth_field(const string &str, const size_t n, const char c) {
     // TODO(schwehr): handle the off the end case better
     size_t pos;
     size_t count;
-    for (pos = 0, count = 0; count < n && pos != std::string::npos; count+=1) {
+    for (pos = 0, count = 0; count < n && pos != string::npos; count+=1) {
         if (pos > 0) pos += 1;  // Skip past the current char that matched
         pos = str.find(c, pos);
     }
-    if (std::string::npos == pos) return std::string("");
+    if (string::npos == pos) return string("");
 
     const size_t start = pos;
     const size_t end = str.find(c, pos+1);
-    if (std::string::npos == end) return str.substr(start);
+    if (string::npos == end) return str.substr(start);
     return str.substr(start+1, end-start-1);
 }
 
 // for decoding str bits inside of a binary message
-const std::string bits_to_char_tbl="@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";
+const string bits_to_char_tbl="@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";
 
 const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
     "AIS_OK",
@@ -40,7 +40,7 @@ const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
 };
 
 
-std::bitset<6> nmea_ord[128];
+bitset<6> nmea_ord[128];
 bool nmea_ord_initialized = false;
 
 
@@ -49,7 +49,7 @@ void build_nmea_lookup() {
         int val = c - 48;
         if (val >= 40) val-= 8;
         if (val < 0) continue;
-        std::bitset<6> bits(val);
+        bitset<6> bits(val);
         bool tmp;
         tmp = bits[5]; bits[5] = bits[0]; bits[0] = tmp;
         tmp = bits[4]; bits[4] = bits[1]; bits[1] = tmp;

@@ -43,7 +43,7 @@ class Ais8_001_22_SubArea {
     virtual ~Ais8_001_22_SubArea() {}
 };
 
-Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
 
 // or Point if radius is 0
 class Ais8_001_22_Circle : public Ais8_001_22_SubArea {
@@ -54,7 +54,7 @@ class Ais8_001_22_Circle : public Ais8_001_22_SubArea {
     int radius_m;
     unsigned int spare; // 18 bits
 
-    Ais8_001_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_001_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Circle() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_CIRCLE;}
 };
@@ -68,7 +68,7 @@ class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
     int orient_deg; // Orientation in degrees from true north
     unsigned int spare; // 5 bits
 
-    Ais8_001_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_001_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Rect() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_RECT;}
 
@@ -83,7 +83,7 @@ class Ais8_001_22_Sector : public Ais8_001_22_SubArea {
     int left_bound_deg;
     int right_bound_deg;
 
-    Ais8_001_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_001_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Sector() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_SECTOR;}
 };
@@ -96,11 +96,11 @@ class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
     // TODO(schwehr): int precision; // How many decimal places for x and y.  FIX: in IMO
 
     // Up to 4 points
-    std::vector<float> angles;
-    std::vector<float> dists_m;
+    vector<float> angles;
+    vector<float> dists_m;
     unsigned int spare; // 2 bit
 
-    Ais8_001_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polyline() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYLINE;}
 };
@@ -112,11 +112,11 @@ class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
     // TODO(schwehr): int precision; // How many decimal places for x and y.  FIX: in IMO
 
     // Up to 4 points in a first message, but aggregated if multiple sub areas
-    std::vector<float> angles;
-    std::vector<float> dists_m;
+    vector<float> angles;
+    vector<float> dists_m;
     unsigned int spare;  // 2 bit
 
-    Ais8_001_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_001_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Polygon() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYGON;}
 };
@@ -124,10 +124,10 @@ class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
 
 class Ais8_001_22_Text : public Ais8_001_22_SubArea {
  public:
-    std::string text;
+    string text;
     // TODO(schwehr): spare?
 
-    Ais8_001_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_001_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
     ~Ais8_001_22_Text() {}
     Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_TEXT;}
 };
@@ -150,7 +150,7 @@ class Ais8_001_22 : public Ais8 {
 
     // 1 or more sub messages
 
-    std::vector<Ais8_001_22_SubArea *> sub_areas;
+    vector<Ais8_001_22_SubArea *> sub_areas;
 
     Ais8_001_22(const char *nmea_payload, const size_t pad);
     ~Ais8_001_22();
@@ -165,4 +165,6 @@ class Ais8_001_22 : public Ais8 {
     */
 
 };
-std::ostream& operator<< (std::ostream& o, Ais8_001_22 const& msg);
+
+
+ostream& operator<< (ostream& o, Ais8_001_22 const& msg);

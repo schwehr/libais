@@ -11,7 +11,7 @@ Ais12::Ais12(const char *nmea_payload, const size_t pad) {
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
     if (num_bits < 72 || num_bits > 1192)  { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<MAX_BITS> bs;  // Spec says 1008
+    bitset<MAX_BITS> bs;  // Spec says 1008
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

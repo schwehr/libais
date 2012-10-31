@@ -8,13 +8,12 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
 
     init();
 
-    const int num_char = std::strlen(nmea_payload);
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
     if (num_bits < 72 || num_bits > 160) {
       status = AIS_ERR_BAD_BIT_COUNT;  return;
     }
 
-    std::bitset<162> bs;  // 160, but must be 6 bit aligned
+    bitset<162> bs;  // 160, but must be 6 bit aligned
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

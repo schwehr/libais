@@ -9,7 +9,7 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) {
 
     if (2 != pad || strlen(nmea_payload) != 71) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<426> bs;
+    bitset<426> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
@@ -41,7 +41,7 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) {
 }
 
 
-std::ostream& operator<< (std::ostream& o, Ais5 const& a) {
+ostream& operator<< (ostream& o, Ais5 const& a) {
     return o << 5 << ": " << a.mmsi << " \"" << a.name << "\" " << a.type_and_cargo
              << " " << a.dim_a + a.dim_b << "x" << a.dim_c + a.dim_d << "x" << a.draught << "m";
 }

@@ -12,7 +12,7 @@
 using namespace std;
 
 PyObject *ais_py_exception;
-const std::string exception_name("ais.decode.Error");
+const string exception_name("ais.decode.Error");
 
 #if 0
 // DO NOT do this
@@ -26,7 +26,7 @@ void TupleSafeSetItem(PyObject *tuple, const long position, const long val) {
 #endif
 
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, const long val) {
+DictSafeSetItem(PyObject *dict, const string &key, const long val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyLong_FromLong(val);
     assert(key_obj);
@@ -37,7 +37,7 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const long val) {
 }
 
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, const int val) {
+DictSafeSetItem(PyObject *dict, const string &key, const int val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyLong_FromLong(val);
     assert(key_obj);
@@ -48,7 +48,7 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const int val) {
 }
 
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, const std::string &val) {
+DictSafeSetItem(PyObject *dict, const string &key, const string &val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyUnicode_FromString(val.c_str());
     assert(key_obj);
@@ -60,7 +60,7 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const std::string &val) 
 
 
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, const char *val) {
+DictSafeSetItem(PyObject *dict, const string &key, const char *val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyUnicode_FromString(val);
     assert(key_obj);
@@ -73,7 +73,7 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const char *val) {
 
 #if 0
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
+DictSafeSetItem(PyObject *dict, const string &key, const bool val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyBool_FromLong(val);
     assert(key_obj);
@@ -84,7 +84,7 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
 }
 #else
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
+DictSafeSetItem(PyObject *dict, const string &key, const bool val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     assert(key_obj);
     if (val) {
@@ -98,7 +98,7 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
 
 // TODO(schwehr): float -> double?
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, const float val) {
+DictSafeSetItem(PyObject *dict, const string &key, const float val) {
     PyObject *key_obj = PyUnicode_FromString(key.c_str());
     PyObject *val_obj = PyFloat_FromDouble(val);
     assert(key_obj);
@@ -109,7 +109,7 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const float val) {
 }
 
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, PyObject *val_obj) {
+DictSafeSetItem(PyObject *dict, const string &key, PyObject *val_obj) {
     // When we need to add dictionaries and such to a dictionary
     assert(dict);
     assert(val_obj);
@@ -725,7 +725,7 @@ void
 ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
   assert(nmea_payload); assert(dict); assert(0 <= pad && pad <= 7);
   Ais8_1_17 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
-  // std::vector<Ais8_1_17_Target> targets;
+  // vector<Ais8_1_17_Target> targets;
   PyObject *target_list = PyList_New(msg.targets.size());
   for (size_t target_num = 0; target_num < msg.targets.size(); target_num++) {
     PyObject *target = PyDict_New();
@@ -2359,7 +2359,7 @@ initais(void) {
     PyObject *mod;
     mod = Py_InitModule("ais", ais_methods);
     if (mod == NULL) {
-        std::cerr << "UNABLE TO LOAD MODULE";
+        cerr << "UNABLE TO LOAD MODULE";
         return;
     }
     build_nmea_lookup();

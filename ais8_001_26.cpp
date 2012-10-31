@@ -6,7 +6,7 @@
 #include "ais.h"
 
 
-Ais8_1_26_Location::Ais8_1_26_Location(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_Location::Ais8_1_26_Location(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   x = sbits(bs, offset, 28) / 600000.;
   y = sbits(bs, offset+28, 27) / 600000.;
   z = ubits(bs, offset+55, 11) / 10.;
@@ -16,13 +16,13 @@ Ais8_1_26_Location::Ais8_1_26_Location(const std::bitset<AIS8_MAX_BITS> &bs, con
 }
 
 
-Ais8_1_26_Station::Ais8_1_26_Station(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_Station::Ais8_1_26_Station(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   name = ais_str(bs, offset, 84);
   spare = ubits(bs, offset+84, 1);
 }
 
 
-Ais8_1_26_Wind::Ais8_1_26_Wind(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_Wind::Ais8_1_26_Wind(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   wind_speed = ubits(bs, offset, 7);
   wind_gust  = ubits(bs, offset+7, 7);  // knots
   wind_dir = ubits(bs, offset+14, 9);
@@ -39,7 +39,7 @@ Ais8_1_26_Wind::Ais8_1_26_Wind(const std::bitset<AIS8_MAX_BITS> &bs, const size_
 }
 
 
-Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   type = bs[offset];
   level = sbits(bs, offset+1, 16) / 100.;
   trend = ubits(bs, offset+17, 2);
@@ -55,7 +55,7 @@ Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const std::bitset<AIS8_MAX_BITS> &bs,
 }
 
 
-Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   for (size_t idx = 0; idx < 3; idx++) {
     size_t start = offset + idx * 26;
     currents[idx].speed = ubits(bs, start, 8) / 10.;
@@ -67,7 +67,7 @@ Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const s
 }
 
 
-Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   for (size_t idx = 0; idx < 2; idx++) {
     size_t start = offset + idx * 33;
     currents[idx].north = ubits(bs, start, 8) / 10.;
@@ -80,7 +80,7 @@ Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const std::bitset<AIS8_MAX_BITS> &bs, const s
 }
 
 
-Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   for (size_t idx = 0; idx < 2; idx++) {
     size_t start = offset + idx * 42;
     currents[idx].bearing = ubits(bs, start, 9);
@@ -93,7 +93,7 @@ Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, con
 }
 
 
-Ais8_1_26_SeaState::Ais8_1_26_SeaState(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_SeaState::Ais8_1_26_SeaState(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   swell_height = ubits(bs, offset, 8) / 10.;
   swell_period = ubits(bs, offset+8, 6);
   swell_dir = ubits(bs, offset+14, 9);
@@ -110,7 +110,7 @@ Ais8_1_26_SeaState::Ais8_1_26_SeaState(const std::bitset<AIS8_MAX_BITS> &bs, con
 }
 
 
-Ais8_1_26_Salinity::Ais8_1_26_Salinity(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_Salinity::Ais8_1_26_Salinity(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   water_temp = ubits(bs, offset, 10) / 10. - 10;
   conductivity = ubits(bs, offset+10, 10) / 100.;
   pressure = ubits(bs, offset+20, 16) / 10.;
@@ -122,7 +122,7 @@ Ais8_1_26_Salinity::Ais8_1_26_Salinity(const std::bitset<AIS8_MAX_BITS> &bs, con
 }
 
 
-Ais8_1_26_Wx::Ais8_1_26_Wx(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_Wx::Ais8_1_26_Wx(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   air_temp = sbits(bs, offset, 11) / 10.;
   air_temp_sensor_type = ubits(bs, offset+11, 3);
   precip = ubits(bs, offset+14, 2);
@@ -137,7 +137,7 @@ Ais8_1_26_Wx::Ais8_1_26_Wx(const std::bitset<AIS8_MAX_BITS> &bs, const size_t of
 }
 
 
-Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   draught = ubits(bs, offset, 13) / 100.;
   gap = ubits(bs, offset+13, 13) / 10.;
   trend = ubits(bs, offset+26, 2);
@@ -149,7 +149,7 @@ Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const std::bitset<AIS8_MAX_BITS> &bs,
 }
 
 
-Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
   const Ais8_1_26_SensorEnum rpt_type = (Ais8_1_26_SensorEnum)ubits(bs, offset, 4);
   const size_t rpt_start = offset+27;  // skip tp after site_id
 
@@ -196,7 +196,7 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) {
   const int num_bits = strlen(nmea_payload) * 6 - pad;
   if (168 > num_bits || num_bits > 1098) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<MAX_BITS> bs;
+  bitset<MAX_BITS> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 

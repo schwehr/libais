@@ -12,7 +12,7 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
     // TODO(schwehr): make this more careful than 272-360
     if (272 > num_bits || num_bits > 360) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<360> bs;
+    bitset<360> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

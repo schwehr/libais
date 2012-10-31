@@ -15,7 +15,7 @@ Ais15::Ais15(const char *nmea_payload, const size_t pad) {
         return;
     }
 
-    std::bitset<162> bs;  // 160 / 6 = 26.66
+    bitset<162> bs;  // 160 / 6 = 26.66
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

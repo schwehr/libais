@@ -13,7 +13,7 @@ Ais14::Ais14(const char *nmea_payload, const size_t pad) {
         return;
     }
 
-    std::bitset<1008> bs;  // 424 + 2 spare bits => 71 characters
+    bitset<1008> bs;  // 424 + 2 spare bits => 71 characters
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) { return; }
 

@@ -16,7 +16,7 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad) {
         return;
     }
 
-    std::bitset<168> bs;
+    bitset<168> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

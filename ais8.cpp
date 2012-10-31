@@ -18,7 +18,7 @@ Ais8::Ais8(const char *nmea_payload) {
         return;
     }
 
-    std::bitset<MAX_BITS> bs;
+    bitset<MAX_BITS> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
@@ -36,7 +36,7 @@ Ais8::Ais8(const char *nmea_payload) {
     }
 }
 
-bool Ais8::decode_header8(const std::bitset<MAX_BITS> &bs) {
+bool Ais8::decode_header8(const bitset<MAX_BITS> &bs) {
     message_id = ubits(bs, 0, 6);
     if (8 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return false; }
     repeat_indicator = ubits(bs, 6, 2);
@@ -57,7 +57,7 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad) {
   if (56 > num_bits || num_bits > 1024) { return;  }
 
 
-  std::bitset<MAX_BITS> bs;
+  bitset<MAX_BITS> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) { return; }  // checks status
 
@@ -94,7 +94,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) {
 
     if (strlen(nmea_payload) != 59) {  status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
-    std::bitset<354> bs;  // 352 + 2 spares to be 6 bit aligned
+    bitset<354> bs;  // 352 + 2 spares to be 6 bit aligned
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 
@@ -163,7 +163,7 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad) {
 
   if (472 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<472> bs;
+  bitset<472> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -208,7 +208,7 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad) {
 
   if (72 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<72> bs;
+  bitset<72> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -239,7 +239,7 @@ Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad) {
 
   if (72 == num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<72> bs;
+  bitset<72> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -271,7 +271,7 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad) {
     status = AIS_ERR_BAD_BIT_COUNT; return;
   }
 
-  std::bitset<536> bs;
+  bitset<536> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -314,7 +314,7 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad) {
   // Some people transmit without the idiodic spare padding
   if (258 != num_bits && 360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<360> bs;
+  bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -358,7 +358,7 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) {
 
   if (360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<360> bs;
+  bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -468,7 +468,7 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad) {
 
   if (360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<360> bs;
+  bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -524,7 +524,7 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad) {
 
   if (172 > num_bits || num_bits > 997) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<997> bs;
+  bitset<997> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -570,7 +570,7 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad) {
 
   if (72 > num_bits || num_bits > 1032) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<1032> bs;
+  bitset<1032> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -608,7 +608,7 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad) {
 
   if (360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<360> bs;
+  bitset<360> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -677,7 +677,7 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) {
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (168 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<168> bs;
+  bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -714,7 +714,7 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) {
 
   if (256 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<256> bs;
+  bitset<256> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -764,7 +764,7 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) {
 
   if (168 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<168> bs;
+  bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -797,7 +797,7 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad) {
 
   if (168 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<168> bs;
+  bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 
@@ -833,7 +833,7 @@ Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad) {
   // TODO(schwehr): do we have any cases of that?
   if (168 != num_bits && 136 != num_bits && 88 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-  std::bitset<168> bs;
+  bitset<168> bs;
   status = aivdm_to_bits(bs, nmea_payload);
   if (had_error()) return;
 

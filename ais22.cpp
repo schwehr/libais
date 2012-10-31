@@ -9,7 +9,7 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad) {
 
     if (pad != 0 || 28 != std::strlen(nmea_payload)) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<168> bs;
+    bitset<168> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

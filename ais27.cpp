@@ -12,7 +12,7 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) {
 
     if (0 != pad || 96 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
-    std::bitset<96> bs;
+    bitset<96> bs;
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
 

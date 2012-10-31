@@ -149,7 +149,7 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad) {
 
     const int num_bits = (strlen(nmea_payload) * 6) - pad;
     if (208 <= num_bits && num_bits >= 1020) { status = AIS_ERR_BAD_BIT_COUNT; return; }
-    std::bitset<MAX_BITS> bs;
+    bitset<MAX_BITS> bs;
 
     status = aivdm_to_bits(bs, nmea_payload);
     if (had_error()) return;
@@ -188,7 +188,7 @@ Ais8_366_22::~Ais8_366_22() {
 // The index is the "Scale Factor"
 static int scale_multipliers[4] = {1, 10, 100, 1000};
 
-Ais8_366_22_Circle::Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_366_22_Circle::Ais8_366_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     x         = sbits(bs, offset+5, 28) / 600000.;
     y         = sbits(bs, offset+5+28, 27) / 600000.;
@@ -199,7 +199,7 @@ Ais8_366_22_Circle::Ais8_366_22_Circle(const std::bitset<AIS8_MAX_BITS> &bs, con
 }
 
 
-Ais8_366_22_Rect::Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_366_22_Rect::Ais8_366_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     x          = sbits(bs, offset+5, 28) / 600000.;
     y          = sbits(bs, offset+5+28, 27) / 600000.;
@@ -210,7 +210,7 @@ Ais8_366_22_Rect::Ais8_366_22_Rect(const std::bitset<AIS8_MAX_BITS> &bs, const s
 }
 
 
-Ais8_366_22_Sector::Ais8_366_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_366_22_Sector::Ais8_366_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     x          = sbits(bs, offset+5, 28) / 600000.;
     y          = sbits(bs, offset+5+28, 27) / 600000.;
@@ -220,7 +220,7 @@ Ais8_366_22_Sector::Ais8_366_22_Sector(const std::bitset<AIS8_MAX_BITS> &bs, con
 }
 
 
-Ais8_366_22_Polyline::Ais8_366_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_366_22_Polyline::Ais8_366_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     for (size_t i = 0; i < 4; i++) {
         const int angle = ubits(bs, offset+5+ (i*21), 10);
@@ -234,7 +234,7 @@ Ais8_366_22_Polyline::Ais8_366_22_Polyline(const std::bitset<AIS8_MAX_BITS> &bs,
 
 
 // TODO(schwehr): merge with Polyline
-Ais8_366_22_Polygon::Ais8_366_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_366_22_Polygon::Ais8_366_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     for (size_t i = 0; i < 4; i++) {
         const int angle = ubits(bs, offset+5+ (i*21), 10);
@@ -247,14 +247,14 @@ Ais8_366_22_Polygon::Ais8_366_22_Polygon(const std::bitset<AIS8_MAX_BITS> &bs, c
 }
 
 
-Ais8_366_22_Text::Ais8_366_22_Text(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    text = std::string(ais_str(bs, offset+3, 84));
+Ais8_366_22_Text::Ais8_366_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+    text = string(ais_str(bs, offset+3, 84));
     spare = ubits(bs, offset+87, 3);
 }
 
 
 // Call the appropriate constructor
-Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const Ais8_366_22_AreaShapeEnum area_shape = (Ais8_366_22_AreaShapeEnum)ubits(bs, offset, 3);
     if (AIS8_366_22_SHAPE_ERROR == area_shape) { return 0; }
     Ais8_366_22_SubArea *area = 0;
