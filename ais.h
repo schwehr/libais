@@ -26,13 +26,11 @@ using std::vector;
 
 const string nth_field(const string &str, const size_t n, const char c);
 
-// TODO(schwehr): make into a singleton
 extern bool nmea_ord_initialized;  // If false, call build_nmea_lookup
+bitset<6> reverse(const bitset<6> &bits);
+void build_nmea_lookup();
 
 static const int MAX_BITS = 1192;
-
-
-void build_nmea_lookup();
 
 enum AIS_STATUS {
   AIS_OK,

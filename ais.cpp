@@ -3,7 +3,6 @@
 const string nth_field(const string &str, const size_t n, const char c) {
   if (!n) {
     const size_t pos = str.find(c);
-    cerr << "pos: " << pos << "\n";
     if (pos == string::npos)
       return string("");
     return str.substr(0, pos);
@@ -40,24 +39,24 @@ const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
   "AIS_ERR_MSG_TOO_LONG",
 };
 
+bitset<6> reverse(const bitset<6> &bits) {
+  bitset<6> out;
+  for (size_t i = 0; i < 6; i++)
+    out[5-i] = bits[i];
+  return out;
+}
 
 bitset<6> nmea_ord[128];
 bool nmea_ord_initialized = false;
 
 // TODO(schwehr): singleton
-// TODO(schwehr): make tests and cleanup
 // http://gpsd.berlios.de/AIVDM.html#_aivdm_aivdo_payload_armoring
 void build_nmea_lookup() {
-  for (int c = 0; c < 128; c++) {
+  for (int c = 48; c < 128; c++) {
     int val = c - 48;
     if (val >= 40) val-= 8;
     if (val < 0) continue;
-    bitset<6> bits(val);
-    bool tmp;
-    tmp = bits[5]; bits[5] = bits[0]; bits[0] = tmp;
-    tmp = bits[4]; bits[4] = bits[1]; bits[1] = tmp;
-    tmp = bits[3]; bits[3] = bits[2]; bits[2] = tmp;
-    nmea_ord[c] = bits;
+    nmea_ord[c] = reverse(bitset<6>(val));
   }
   nmea_ord_initialized = true;
 }
