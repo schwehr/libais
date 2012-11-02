@@ -183,7 +183,6 @@ Ais8_366_22::~Ais8_366_22() {
     }
 }
 
-
 // Lookup table for the scale factors to decode the length / distance fields.
 // The index is the "Scale Factor"
 static int scale_multipliers[4] = {1, 10, 100, 1000};
@@ -191,34 +190,31 @@ static int scale_multipliers[4] = {1, 10, 100, 1000};
 Ais8_366_22_Circle::Ais8_366_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     x         = sbits(bs, offset+5, 28) / 600000.;
-    y         = sbits(bs, offset+5+28, 27) / 600000.;
+    y         = sbits(bs, offset+33, 27) / 600000.;
     // TODO(schwehr): precision? And bit counts for radius  and spare?
     // TODO(schwehr): collapse these numbers
-    radius_m  = ubits(bs, offset+5+28+27, 12) * scale_multipliers[scale_factor];
-    spare     = ubits(bs, offset+5+28+27+12, 16);
+    radius_m  = ubits(bs, offset+60, 12) * scale_multipliers[scale_factor];
+    spare     = ubits(bs, offset+72, 16);
 }
-
 
 Ais8_366_22_Rect::Ais8_366_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     x          = sbits(bs, offset+5, 28) / 600000.;
-    y          = sbits(bs, offset+5+28, 27) / 600000.;
-    e_dim_m    = ubits(bs, offset+5+28+27, 8) * scale_multipliers[scale_factor];
-    n_dim_m    = ubits(bs, offset+5+28+27+8, 8) * scale_multipliers[scale_factor];
-    orient_deg = ubits(bs, offset+5+28+27+8+8, 9);
-    spare      = ubits(bs, offset+5+28+27+8+8+9, 5);
+    y          = sbits(bs, offset+33, 27) / 600000.;
+    e_dim_m    = ubits(bs, offset+60, 8) * scale_multipliers[scale_factor];
+    n_dim_m    = ubits(bs, offset+68, 8) * scale_multipliers[scale_factor];
+    orient_deg = ubits(bs, offset+76, 9);
+    spare      = ubits(bs, offset+85, 5);
 }
-
 
 Ais8_366_22_Sector::Ais8_366_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
     x          = sbits(bs, offset+5, 28) / 600000.;
-    y          = sbits(bs, offset+5+28, 27) / 600000.;
-    radius_m        = ubits(bs, offset+5+28+27, 12) * scale_multipliers[scale_factor];
-    left_bound_deg  = ubits(bs, offset+5+28+27+12, 9);
-    right_bound_deg = ubits(bs, offset+5+28+27+12+9, 9);
+    y          = sbits(bs, offset+33, 27) / 600000.;
+    radius_m        = ubits(bs, offset+60, 12) * scale_multipliers[scale_factor];
+    left_bound_deg  = ubits(bs, offset+72, 9);
+    right_bound_deg = ubits(bs, offset+81, 9);
 }
-
 
 Ais8_366_22_Polyline::Ais8_366_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const int scale_factor = ubits(bs, offset+3, 2);
@@ -231,7 +227,6 @@ Ais8_366_22_Polyline::Ais8_366_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, cons
     }
     spare = bs[offset+89];
 }
-
 
 // TODO(schwehr): merge with Polyline
 Ais8_366_22_Polygon::Ais8_366_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
@@ -246,18 +241,15 @@ Ais8_366_22_Polygon::Ais8_366_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const 
     spare = bs[offset+89];
 }
 
-
 Ais8_366_22_Text::Ais8_366_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     text = string(ais_str(bs, offset+3, 84));
     spare = ubits(bs, offset+87, 3);
 }
 
-
 // Call the appropriate constructor
 Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
     const Ais8_366_22_AreaShapeEnum area_shape = (Ais8_366_22_AreaShapeEnum)ubits(bs, offset, 3);
-    if (AIS8_366_22_SHAPE_ERROR == area_shape) { return 0; }
-    Ais8_366_22_SubArea *area = 0;
+    Ais8_366_22_SubArea *area = NULL;
     switch (area_shape) {
     case AIS8_366_22_SHAPE_CIRCLE:
         area = new Ais8_366_22_Circle(bs, offset);
@@ -281,9 +273,10 @@ Ais8_366_22_SubArea* ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs
     case AIS8_366_22_SHAPE_RESERVED_7:  // FALLTHROUGH
       // Leave area as 0 to indicate error
         break;
-    case AIS8_366_22_SHAPE_ERROR:  // FALLTHROUGH
+    case AIS8_366_22_SHAPE_ERROR:
+        break;
     default:
-      {}  // Should never reach here
+        assert(false);
     }
     return area;
 }
