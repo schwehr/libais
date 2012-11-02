@@ -1904,16 +1904,12 @@ ais20_to_pydict(const char *nmea_payload, const size_t pad) {
     DictSafeSetItem(dict, "id", msg.message_id);
     DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
     DictSafeSetItem(dict, "mmsi", msg.mmsi);
-
     DictSafeSetItem(dict, "spare", msg.spare);
-
-    // TODO(schwehr): make a list of dicts or something else more sane
 
     int list_size = 1;
     if (msg.group_valid_4) list_size = 4;
     else if (msg.group_valid_3) list_size = 3;
     else if (msg.group_valid_2) list_size = 2;
-
 
     PyObject *list = PyList_New(list_size);
 
@@ -1952,6 +1948,7 @@ ais20_to_pydict(const char *nmea_payload, const size_t pad) {
       DictSafeSetItem(reservation, "incr", msg.incr_4);
       PyList_SetItem(list, 3, reservation);
     }
+
     PyDict_SetItem(dict, PyUnicode_FromString("reservations"), list);
 
     return dict;
