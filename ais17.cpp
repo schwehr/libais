@@ -14,7 +14,10 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
   init();
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) { status = AIS_ERR_BAD_BIT_COUNT;  return; }
+  if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   bitset<816> bs;
   status = aivdm_to_bits(bs, nmea_payload);
@@ -54,22 +57,20 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
 
   switch (gnss_type) {
   case 1:  // FALLTHROUGH
-  case 9:
-    {
-      // each corrector is 24+16 bits (no parity bits)
-      if (n-2 != (remain_bits / (24+16))) {
-        std::cerr << "WARNING: Bad bit count\n";
-      }
-      std::cout << "17: bits remain: " << num_bits - 120 << " n: " << n << "\n";
-      for (size_t i = 0; i < n-2; i++) {
-        const size_t start = 120 + i * (24+16);
-        std::cout << "\tscale: " << ubits(bs, start+0, 1) << "\n";
-        std::cout << "\tudre: " << ubits(bs, start+1, 2) << "\n";
-        std::cout << "\tsat_id: " << ubits(bs, start+3, 5) << "\n";
-        std::cout << "\tpseudorange_cor: " << ubits(bs, start+8, 16) << "\n";
-        std::cout << "\trate_cor: " << ubits(bs, start+24, 8) << "\n";
-        std::cout << "\tissue: " << ubits(bs, start+32, 8) << "\n\n";
-      }
+    // Differential GNSS corrections (full set of satellites)
+  case 9: // Subset differential GNSS corrections
+    if (n-2 != (remain_bits / (24+16))) {
+      std::cerr << "WARNING: Bad bit count\n";
+    }
+    std::cout << "17: bits remain: " << num_bits - 120 << " n: " << n << "\n";
+    for (size_t i = 0; i < n-2; i++) {
+      const size_t start = 120 + i * (24+16);
+      std::cout << "\tscale: " << ubits(bs, start+0, 1) << "\n";
+      std::cout << "\tudre: " << ubits(bs, start+1, 2) << "\n";
+      std::cout << "\tsat_id: " << ubits(bs, start+3, 5) << "\n";
+      std::cout << "\tpseudorange_cor: " << ubits(bs, start+8, 16) << "\n";
+      std::cout << "\trate_cor: " << ubits(bs, start+24, 8) << "\n";
+      std::cout << "\tissue: " << ubits(bs, start+32, 8) << "\n\n";
     }
     break;
   case 3:  // Reference station parameters (GPS)
