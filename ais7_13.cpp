@@ -1,6 +1,6 @@
+// ACK to ABM or safety ABM
 
 #include "ais.h"
-
 
 Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
@@ -10,7 +10,7 @@ Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad) {
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-    if (!((40+32*1) == num_bits || (40+32*2) == num_bits || (40+32*3) == num_bits || (40+32*4) == num_bits)) {
+    if (((num_bits-40) % 32) != 0 || num_bits > 168) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
     }
