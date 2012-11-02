@@ -7,7 +7,10 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) {
     assert(pad < 6);
     init();
 
-    if (2 != pad || strlen(nmea_payload) != 71) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    if (pad != 2 || strlen(nmea_payload) != 71) {
+      status = AIS_ERR_BAD_BIT_COUNT;
+      return;
+    }
 
     bitset<426> bs;
     status = aivdm_to_bits(bs, nmea_payload);

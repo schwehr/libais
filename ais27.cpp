@@ -10,7 +10,10 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) {
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-    if (0 != pad || 96 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    if (pad != 0 || num_bits != 96) {
+      status = AIS_ERR_BAD_BIT_COUNT;
+      return;
+    }
 
     bitset<96> bs;
     status = aivdm_to_bits(bs, nmea_payload);
@@ -28,6 +31,7 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) {
     y = sbits(bs, 62, 17) / 600.;
     sog = ubits(bs, 79, 6);
     cog = ubits(bs, 85, 9);
+    // 0 is a current GNSS position.  1 is NOT the current GNSS position
     gnss = !bs[94];
     spare = bs[95];
 }

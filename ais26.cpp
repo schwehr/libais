@@ -43,7 +43,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
     }
 
     commstate_flag = bs[comm_flag_offset];
-    sync_state = ubits(bs, comm_flag_offset+1 , 2);  // Both SOTDMA and TDMA
+    sync_state = ubits(bs, comm_flag_offset+1, 2);  // Both SOTDMA and TDMA
 
 #ifndef NDEBUG
     slot_timeout = -1;
@@ -54,7 +54,8 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
 
     slot_timeout_valid = false;
     received_stations_valid = slot_number_valid = utc_valid = false;
-    slot_offset_valid = slot_increment_valid = slots_to_allocate_valid = keep_flag_valid = false;
+    slot_offset_valid = slot_increment_valid = slots_to_allocate_valid = false;
+    keep_flag_valid = false;
 
 
     if (!commstate_flag) {
@@ -67,21 +68,21 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
           slot_offset_valid = true;
           break;
         case 1:
-          utc_hour = ubits(bs, comm_flag_offset+6 , 5);
-          utc_min = ubits(bs, comm_flag_offset+11 , 7);
-          utc_spare = ubits(bs, comm_flag_offset+18 , 2);
+          utc_hour = ubits(bs, comm_flag_offset+6, 5);
+          utc_min = ubits(bs, comm_flag_offset+11, 7);
+          utc_spare = ubits(bs, comm_flag_offset+18, 2);
           utc_valid = true;
           break;
         case 2:  // FALLTHROUGH
         case 4:  // FALLTHROUGH
         case 6:
-          slot_number = ubits(bs, comm_flag_offset+6 , 14);
+          slot_number = ubits(bs, comm_flag_offset+6, 14);
           slot_number_valid = true;
           break;
         case 3:  // FALLTHROUGH
         case 5:  // FALLTHROUGH
         case 7:
-          received_stations = ubits(bs, comm_flag_offset+6 , 14);
+          received_stations = ubits(bs, comm_flag_offset+6, 14);
           received_stations_valid = true;
           break;
         default:
