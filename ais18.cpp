@@ -38,16 +38,17 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad) {
     raim = bs[147];
     commstate_flag = bs[148];  // 0 SOTDMA, 1 ITDMA
 
-    // TODO(schwehr): set all to -1 and set valids to NOT!
+    received_stations_valid = slot_number_valid = utc_valid = false;
+    slot_offset_valid = slot_increment_valid = slots_to_allocate_valid = false;
+    keep_flag = false;
 
-    if (1 == unit_flag) {
-        // CS - carrier sense - fixed commstate payload of 1100000000000000110
-        int commstate = ubits(bs, 149, 19);
-        if (393222 != commstate) {
-            // TODO(schwehr): is this the right value?
-            // TODO(schwehr): return an error?
-        }
-    } else {
+    // if unit_flag is 1:
+    // CS - carrier sense - fixed commstate payload of 1100000000000000110
+    // TODO(schwehr): What if commstate is not 393222?
+    // commstate = ubits(bs, 149, 19);
+
+    if (0 == unit_flag) {
+        // unit_flag is 0
         sync_state = ubits(bs, 149, 2);
         if (0 == commstate_flag) {
             // SOTDMA
