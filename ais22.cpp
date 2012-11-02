@@ -7,7 +7,10 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad) {
     assert(pad < 6);
     init();
 
-    if (pad != 0 || 28 != std::strlen(nmea_payload)) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    if (pad != 0 || std::strlen(nmea_payload) != 28) {
+      status = AIS_ERR_BAD_BIT_COUNT;
+      return;
+    }
 
     bitset<168> bs;
     status = aivdm_to_bits(bs, nmea_payload);
@@ -39,12 +42,12 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad) {
       pos_valid = false;
       dest_valid = true;
       dest_mmsi_1 = ubits(bs, 69, 30);
-      // TODO(schwehr): save the 5 spare bits
+      // 5 spare bits
       dest_mmsi_2 = ubits(bs, 104, 30);
-      // TODO(schwehr): save the 2nd 5 spare bits
+      // 5 spare bits
     }
 
-    // OUT OF ORDER: addressed is before
+    // OUT OF ORDER: addressed is earlier before
     chan_a_bandwidth = bs[140];
     chan_b_bandwidth = bs[141];
     zone_size = ubits(bs, 142, 3);
