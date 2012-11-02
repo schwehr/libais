@@ -348,7 +348,7 @@ class Ais6_1_20 : public Ais6 {
 };
 ostream& operator<< (ostream &o, const Ais6_1_20 &msg);
 
-
+// TODO(schwehr): Make cargo a class and set all to invalid in constructor
 struct Ais6_1_25_Cargo {
   int code_type;
   bool imdg_valid;  // also set with BC
@@ -364,7 +364,6 @@ struct Ais6_1_25_Cargo {
   bool marpol_cat_valid;
   int marpol_cat;
 };
-
 
 // IMO Circ 289 Dangerous cargo indication 2
 // Replaces 8_1_12?
