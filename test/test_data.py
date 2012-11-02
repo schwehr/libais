@@ -483,7 +483,7 @@ top_level = [
     'result': {'id': 23,
                'interval_raw': 9,
                'mmsi': 2268130,
-               'quiet': 4,
+               'quiet': 0,
                'repeat_indicator': 0,
                'spare': 0,
                'spare2': 0,

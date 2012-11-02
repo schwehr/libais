@@ -30,6 +30,6 @@ Ais23::Ais23(const char *nmea_payload, const size_t pad) {
 
     txrx_mode = ubits(bs, 144, 2);
     interval_raw = ubits(bs, 146, 4);
-    quiet = ubits(bs, 148, 4);
-    spare3 = ubits(bs, 152, 6);
+    quiet = ubits(bs, 150, 4);
+    spare3 = ubits(bs, 154, 6);
 }
