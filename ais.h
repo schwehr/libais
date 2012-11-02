@@ -61,14 +61,18 @@ class AisMsg {
   int repeat_indicator;
   int mmsi;
 
+  // TODO(schwehr): make status private and have accessors.
   bool had_error() const {  return status != AIS_OK;  }
   AIS_STATUS get_error() const {return status;}
   AIS_STATUS status;  // AIS_OK or error code
+
+  // TODO(schwehr): make a constructor and do this in there.
   void init() {
     status = AIS_OK;
   }
 };
 
+// TODO(schwehr): factor out commstate from all messages?
 class Ais1_2_3 : public AisMsg {
  public:
   int nav_status;
@@ -1690,6 +1694,7 @@ AIS_STATUS aivdm_to_bits(bitset<T> &bits, const char *nmea_payload) {
   return AIS_OK;
 }
 
+// TODO(schwehr): turn ubits, sbits, and ais_str into a helper class.
 template<size_t T>
 int ubits(const bitset<T> &bits, const size_t start, const size_t len) {
   assert(len <= 32);
