@@ -17,6 +17,60 @@ using std::endl;
 int main(UNUSED int argc, UNUSED char* argv[]) {
     build_nmea_lookup();
 
+    if (true) {
+      {
+        const vector<size_t> v = delimiters("");
+        assert(v.size() == 0);
+      }
+      {
+        const vector<size_t> v = delimiters("1,2,3");
+        assert(v.size() == 2);
+        assert(v[0] == 1);
+        assert(v[1] == 3);
+      }
+    }
+
+    if (true) {
+      {
+        const vector<string> v = split("");
+        assert(v.size()==1);
+      }
+      {
+        const vector<string> v = split("1,2,3");
+        assert(v.size()==3);
+        assert(v[0] == "1");
+        assert(v[1] == "2");
+        assert(v[2] == "3");
+      }
+      {
+        const vector<string> v = split(",2,");
+        assert(v.size()==3);
+        assert(v[0] == "");
+        assert(v[1] == "2");
+        assert(v[2] == "");
+      }
+      {
+        const vector<string> v = split("1,,3");
+        assert(v.size()==3);
+        assert(v[0] == "1");
+        assert(v[1] == "");
+        assert(v[2] == "3");
+      }
+    }
+
+    if (true)
+    {
+      const string s("!AIVDM,1,1,,B,1EN2?oWP00ER5SLRvNPi9gwl0000,0*51");
+      assert(nth_field(s, 0) == "!AIVDM");
+      assert(nth_field(s, 1) == "1");
+      assert(nth_field(s, 2) == "1");
+      assert(nth_field(s, 3) == "");
+      assert(nth_field(s, 4) == "B");
+      assert(nth_field(s, 5) == "1EN2?oWP00ER5SLRvNPi9gwl0000");
+      assert(nth_field(s, 6) == "0*51");
+      assert(nth_field(s, 7) == "");
+    }
+
     // 1
     if (true) {
         // !AIVDM,1,1,,B,15Mq4J0P01EREODRv4@74gv00HRq,0*72,b003669970,1272412824

@@ -23,8 +23,9 @@ using std::vector;
 #define LIBAIS_VERSION_MAJOR 0
 #define LIBAIS_VERSION_MINOR 11
 
-
-const string nth_field(const string &str, const size_t n, const char c);
+const vector<size_t> delimiters(const string &str, const string &delim_str = ",");
+const vector<string> split(const string &str, const string &delim_str = ",");
+const string nth_field(const string &str, const size_t n, const string &delim_str = ",");
 
 extern bool nmea_ord_initialized;  // If false, call build_nmea_lookup
 bitset<6> reverse(const bitset<6> &bits);

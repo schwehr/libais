@@ -60,7 +60,7 @@ position:
 
 TEST(TestAis1_2_3, AisMsg1) {
     const string m_str("AIVDM,1,1,,B,15Mq4J0P01EREODRv4@74gv00HRq,0*72,b003669970,1272412824");
-    const string body(nth_field(m_str, 5, ','));
+    const string body(nth_field(m_str, 5));
     ASSERT_STREQ("15Mq4J0P01EREODRv4@74gv00HRq", body.c_str());
     Ais1_2_3 m(body.c_str(), 0);
     ASSERT_EQ(AIS_OK, m.get_error());
