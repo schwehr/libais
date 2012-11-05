@@ -166,7 +166,7 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad) {
 
     const int num_sub_areas = static_cast<int>(floor((num_bits - 111)/90.));
     for (int sub_area_idx = 0; sub_area_idx < num_sub_areas; sub_area_idx++) {
-        Ais8_366_22_SubArea *sub_area = ais8_366_22_subarea_factory(bs, 111+90*sub_area_idx);
+        Ais8_366_22_SubArea *sub_area = ais8_366_22_subarea_factory(bs, 111 + 90*sub_area_idx);
         if (sub_area)
           sub_areas.push_back(sub_area);
         else
@@ -188,62 +188,62 @@ Ais8_366_22::~Ais8_366_22() {
 static int scale_multipliers[4] = {1, 10, 100, 1000};
 
 Ais8_366_22_Circle::Ais8_366_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
-    x         = sbits(bs, offset+5, 28) / 600000.;
-    y         = sbits(bs, offset+33, 27) / 600000.;
+    const int scale_factor = ubits(bs, offset + 3, 2);
+    x         = sbits(bs, offset + 5, 28) / 600000.;
+    y         = sbits(bs, offset + 33, 27) / 600000.;
     // TODO(schwehr): precision? And bit counts for radius  and spare?
     // TODO(schwehr): collapse these numbers
-    radius_m  = ubits(bs, offset+60, 12) * scale_multipliers[scale_factor];
-    spare     = ubits(bs, offset+72, 16);
+    radius_m  = ubits(bs, offset + 60, 12) * scale_multipliers[scale_factor];
+    spare     = ubits(bs, offset + 72, 16);
 }
 
 Ais8_366_22_Rect::Ais8_366_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
-    x          = sbits(bs, offset+5, 28) / 600000.;
-    y          = sbits(bs, offset+33, 27) / 600000.;
-    e_dim_m    = ubits(bs, offset+60, 8) * scale_multipliers[scale_factor];
-    n_dim_m    = ubits(bs, offset+68, 8) * scale_multipliers[scale_factor];
-    orient_deg = ubits(bs, offset+76, 9);
-    spare      = ubits(bs, offset+85, 5);
+    const int scale_factor = ubits(bs, offset + 3, 2);
+    x          = sbits(bs, offset + 5, 28) / 600000.;
+    y          = sbits(bs, offset + 33, 27) / 600000.;
+    e_dim_m    = ubits(bs, offset + 60, 8) * scale_multipliers[scale_factor];
+    n_dim_m    = ubits(bs, offset + 68, 8) * scale_multipliers[scale_factor];
+    orient_deg = ubits(bs, offset + 76, 9);
+    spare      = ubits(bs, offset + 85, 5);
 }
 
 Ais8_366_22_Sector::Ais8_366_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
-    x          = sbits(bs, offset+5, 28) / 600000.;
-    y          = sbits(bs, offset+33, 27) / 600000.;
-    radius_m        = ubits(bs, offset+60, 12) * scale_multipliers[scale_factor];
-    left_bound_deg  = ubits(bs, offset+72, 9);
-    right_bound_deg = ubits(bs, offset+81, 9);
+    const int scale_factor = ubits(bs, offset + 3, 2);
+    x          = sbits(bs, offset + 5, 28) / 600000.;
+    y          = sbits(bs, offset + 33, 27) / 600000.;
+    radius_m        = ubits(bs, offset + 60, 12) * scale_multipliers[scale_factor];
+    left_bound_deg  = ubits(bs, offset + 72, 9);
+    right_bound_deg = ubits(bs, offset + 81, 9);
 }
 
 Ais8_366_22_Polyline::Ais8_366_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
+    const int scale_factor = ubits(bs, offset + 3, 2);
     for (size_t i = 0; i < 4; i++) {
-        const int angle = ubits(bs, offset+5+ (i*21), 10);
-        const int dist  = ubits(bs, offset+5+10+ (i*21), 11) * scale_multipliers[scale_factor];
+        const int angle = ubits(bs, offset + 5 + (i*21), 10);
+        const int dist  = ubits(bs, offset + 15 + (i*21), 11) * scale_multipliers[scale_factor];
         if (0 == dist) break;
         angles.push_back(angle);
         dists_m.push_back(dist);
     }
-    spare = bs[offset+89];
+    spare = bs[offset + 89];
 }
 
 // TODO(schwehr): merge with Polyline
 Ais8_366_22_Polygon::Ais8_366_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
+    const int scale_factor = ubits(bs, offset + 3, 2);
     for (size_t i = 0; i < 4; i++) {
-        const int angle = ubits(bs, offset+5+ (i*21), 10);
-        const int dist  = ubits(bs, offset+5+10+ (i*21), 11) * scale_multipliers[scale_factor];
+        const int angle = ubits(bs, offset + 5 + (i*21), 10);
+        const int dist  = ubits(bs, offset + 15 + (i*21), 11) * scale_multipliers[scale_factor];
         if (0 == dist) break;
         angles.push_back(angle);
         dists_m.push_back(dist);
     }
-    spare = bs[offset+89];
+    spare = bs[offset + 89];
 }
 
 Ais8_366_22_Text::Ais8_366_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    text = string(ais_str(bs, offset+3, 84));
-    spare = ubits(bs, offset+87, 3);
+    text = string(ais_str(bs, offset + 3, 84));
+    spare = ubits(bs, offset + 87, 3);
 }
 
 // Call the appropriate constructor

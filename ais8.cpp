@@ -30,7 +30,7 @@ Ais8::Ais8(const char *nmea_payload, const size_t pad) {
 
     // Handle all the byte aligned payload
     for (int i = 0; i < payload_len/8; i++) {
-        const int start = 56+i*8;
+        const int start = 56 + i*8;
         payload.push_back(ubits(bs, start, 8));
     }
 
@@ -309,13 +309,13 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad) {
     Ais8_1_17_Target target;
     const size_t start = 56 + (120 * target_num);
     target.type = ubits(bs, start, 2);
-    target.id = ais_str(bs,  start+2, 42);
-    target.spare = ubits(bs, start+44, 4);
-    target.y = sbits(bs, start+48, 24) / 60000.;  // booo - lat, lon
-    target.x = sbits(bs, start+72, 25) / 60000.;
-    target.cog = ubits(bs, start+97, 9);
-    target.timestamp = ubits(bs, start+106, 6);
-    target.sog = ubits(bs, start+112, 8);
+    target.id = ais_str(bs,  start + 2, 42);
+    target.spare = ubits(bs, start + 44, 4);
+    target.y = sbits(bs, start + 48, 24) / 60000.;  // booo - lat, lon
+    target.x = sbits(bs, start + 72, 25) / 60000.;
+    target.cog = ubits(bs, start + 97, 9);
+    target.timestamp = ubits(bs, start + 106, 6);
+    target.sog = ubits(bs, start + 112, 8);
   }
 }
 
@@ -437,7 +437,7 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) {
     cog = ubits(bs, 106, 7) * 5;
     sog = ubits(bs, 113, 5) * 0.5;
     heading = ubits(bs, 118, 7) *5;  // Assume this is true degrees????
-    pressure = ubits(bs, 125, 11) /10. +900;
+    pressure = ubits(bs, 125, 11) / 10. + 900;
     rel_pressure = ubits(bs, 136, 10) / 10. -50;
     pressure_tendency = ubits(bs, 146, 4);
     wind_dir = ubits(bs, 150, 7) * 5;
@@ -584,7 +584,7 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad) {
     AisPoint pt;
     const size_t start = 117 + 55*waypoint_num;
     pt.x =  sbits(bs, start, 28) / 600000.;
-    pt.y =  sbits(bs, start+28, 27) / 600000.;
+    pt.y =  sbits(bs, start + 28, 27) / 600000.;
     waypoints.push_back(pt);
   }
 }
@@ -625,7 +625,7 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad) {
   text = ais_str(bs, 66, text_bits);
   const size_t spare2_bits = text_bits % 6;
   if (spare2_bits) {
-    const size_t start = 66+text_bits;
+    const size_t start = 66 + text_bits;
     spare2 = ubits(bs, start, spare2_bits);
   } else {
     spare2 = 0;
@@ -829,9 +829,9 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) {
   for (size_t i = 0; i < 4; i++) {
     size_t start = 68 + 25*i;
     guage_ids[i] = ubits(bs, start, 11);
-    const int sign = bs[start+11] ? 1 : -1;  // 0 negative, 1 pos
+    const int sign = bs[start + 11] ? 1 : -1;  // 0 negative, 1 pos
     // ERROR: the spec has a bit listing mistake
-    levels[i] = sign * ubits(bs, start+12, 13);
+    levels[i] = sign * ubits(bs, start + 12, 13);
   }
 }
 

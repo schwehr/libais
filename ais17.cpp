@@ -59,18 +59,18 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
   case 1:  // FALLTHROUGH
     // Differential GNSS corrections (full set of satellites)
   case 9: // Subset differential GNSS corrections
-    if (n-2 != (remain_bits / (24+16))) {
+    if (n - 2 != (remain_bits / (24 + 16))) {
       std::cerr << "WARNING: Bad bit count\n";
     }
     std::cout << "17: bits remain: " << num_bits - 120 << " n: " << n << "\n";
-    for (size_t i = 0; i < n-2; i++) {
-      const size_t start = 120 + i * (24+16);
-      std::cout << "\tscale: " << ubits(bs, start+0, 1) << "\n";
-      std::cout << "\tudre: " << ubits(bs, start+1, 2) << "\n";
-      std::cout << "\tsat_id: " << ubits(bs, start+3, 5) << "\n";
-      std::cout << "\tpseudorange_cor: " << ubits(bs, start+8, 16) << "\n";
-      std::cout << "\trate_cor: " << ubits(bs, start+24, 8) << "\n";
-      std::cout << "\tissue: " << ubits(bs, start+32, 8) << "\n\n";
+    for (size_t i = 0; i < n - 2; i++) {
+      const size_t start = 120 + i * (24 + 16);
+      std::cout << "\tscale: " << ubits(bs, start + 0, 1) << "\n";
+      std::cout << "\tudre: " << ubits(bs, start + 1, 2) << "\n";
+      std::cout << "\tsat_id: " << ubits(bs, start + 3, 5) << "\n";
+      std::cout << "\tpseudorange_cor: " << ubits(bs, start + 8, 16) << "\n";
+      std::cout << "\trate_cor: " << ubits(bs, start + 24, 8) << "\n";
+      std::cout << "\tissue: " << ubits(bs, start + 32, 8) << "\n\n";
     }
     break;
   case 3:  // Reference station parameters (GPS)

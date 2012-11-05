@@ -51,7 +51,7 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
     }
 
     if (extra_bits > 0) {
-        spare2 = ubits(bs, 272+extra_char_bits, extra_bits);
+        spare2 = ubits(bs, 272 + extra_char_bits, extra_bits);
     } else {
         spare2 = 0;
     }

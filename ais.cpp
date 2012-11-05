@@ -7,7 +7,7 @@ const vector<size_t> delimiters(const string &str,
     return r;
   for (size_t off = str.find(delim_str);
       off != string::npos;
-      off = str.find(delim_str, off+1)) {
+      off = str.find(delim_str, off + 1)) {
     r.push_back(off);
   }
   return r;
@@ -23,7 +23,7 @@ const vector<string> split(const string &str, const string &delim_str) {
   r.push_back(str.substr(0, delims[0]));
   if (delims.size() > 1) {
     for (size_t d = 1; d < delims.size(); d++) {
-      const size_t start = delims[d-1]+delim_str.size();
+      const size_t start = delims[d - 1]+delim_str.size();
       const size_t len = delims[d] - start;
       r.push_back(str.substr(start, len));
     }
@@ -46,7 +46,7 @@ const string nth_field(const string &str, const size_t n,
   }
   if (n == delims.size())
     return str.substr(delims[delims.size()-1] + delim_str.size());
-  const size_t start = delims[n-1]+delim_str.size();
+  const size_t start = delims[n - 1]+delim_str.size();
   const size_t len = delims[n] - start;
   return str.substr(start, len);
 }
@@ -71,7 +71,7 @@ const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
 bitset<6> reverse(const bitset<6> &bits) {
   bitset<6> out;
   for (size_t i = 0; i < 6; i++)
-    out[5-i] = bits[i];
+    out[5 - i] = bits[i];
   return out;
 }
 
@@ -84,7 +84,7 @@ void build_nmea_lookup() {
   for (int c = 48; c < 128; c++) {
     int val = c - 48;
     if (val >= 40)
-      val-= 8;
+      val -= 8;
     nmea_ord[c] = reverse(bitset<6>(val));
   }
   nmea_ord_initialized = true;

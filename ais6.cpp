@@ -35,7 +35,7 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) {
 
     // Handle all the byte aligned payload
     for (int i = 0; i < payload_len/8; i++) {
-        const int start = 88+i*8;
+        const int start = 88 + i*8;
         payload.push_back(ubits(bs, start, 8));
     }
     // TODO(schwehr): need to handle spare bits
@@ -87,7 +87,7 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad) {
   if (!spare2_size)
     spare2 = 0;
   else
-    spare2 = ubits(bs, 100+text_size, spare2_size);
+    spare2 = ubits(bs, 100 + text_size, spare2_size);
 }
 
 
@@ -221,7 +221,7 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) {
   for (size_t cap_num = 0; cap_num < 128/2; cap_num++) {
     size_t start = 98 + cap_num * 2;
     capabilities[cap_num] = bs[start];
-    cap_reserved[cap_num] = bs[start+1];
+    cap_reserved[cap_num] = bs[start + 1];
   }
   // spare2 = ubits(bs, 226, 6);  // OR NOT
   // TODO(schwehr): add in the offset of the dest mmsi
@@ -323,14 +323,14 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad) {
     Ais6_1_14_Window w;
     const size_t start = 97 + window_num * 93;
     w.y = sbits(bs, start, 27) / 600000.;
-    w.x = sbits(bs, start+27, 28) / 600000.;
+    w.x = sbits(bs, start + 27, 28) / 600000.;
 
-    w.utc_hour_from = ubits(bs, start+55, 5);
-    w.utc_min_from = ubits(bs, start+60, 6);
-    w.utc_hour_to = ubits(bs, start+66, 5);
-    w.utc_min_to = ubits(bs, start+71, 6);
-    w.cur_dir = ubits(bs, start+77, 9);
-    w.cur_speed  = ubits(bs, start+86, 7) / 10.;
+    w.utc_hour_from = ubits(bs, start + 55, 5);
+    w.utc_min_from = ubits(bs, start + 60, 6);
+    w.utc_hour_to = ubits(bs, start + 66, 5);
+    w.utc_min_to = ubits(bs, start + 71, 6);
+    w.cur_dir = ubits(bs, start + 77, 9);
+    w.cur_speed  = ubits(bs, start + 86, 7) / 10.;
 
     windows.push_back(w);
   }
@@ -441,7 +441,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) {
   // TODO(schwehr): verify multiple of the size of cargos + header
   //   or padded to a slot boundary
   // Allowing a message with no payloads
-  // TODO(schwehr): (num_bits-100) % 17 != 0) is okay
+  // TODO(schwehr): (num_bits - 100) % 17 != 0) is okay
   if (100 > num_bits || num_bits > 576) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -492,33 +492,33 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) {
     switch (cargo.code_type) {
       // No 0
       case 1:  // IMDG Code in packed form
-        cargo.imdg = ubits(bs, start+4, 7);
+        cargo.imdg = ubits(bs, start + 4, 7);
         cargo.imdg_valid = true;
-        cargo.spare = ubits(bs, start+11, 6);
+        cargo.spare = ubits(bs, start + 11, 6);
         cargo.spare_valid = true;
         break;
       case 2:  // IGC Code
-        cargo.un = ubits(bs, start+4, 13);
+        cargo.un = ubits(bs, start + 4, 13);
         cargo.un_valid = true;
         break;
       case 3:  // BC Code
-        cargo.bc = ubits(bs, start+4, 3);
+        cargo.bc = ubits(bs, start + 4, 3);
         cargo.bc_valid = true;
-        cargo.imdg = ubits(bs, start+4+3, 7);
+        cargo.imdg = ubits(bs, start + 7, 7);
         cargo.imdg_valid = true;
-        cargo.spare = ubits(bs, start+4+3+7, 3);
+        cargo.spare = ubits(bs, start + 14, 3);
         cargo.spare_valid = true;
         break;
       case 4:  // MARPOL Annex I
-        cargo.marpol_oil= ubits(bs, start+4, 4);
+        cargo.marpol_oil= ubits(bs, start + 4, 4);
         cargo.marpol_oil_valid = true;
-        cargo.spare = ubits(bs, start+8, 9);
+        cargo.spare = ubits(bs, start + 8, 9);
         cargo.spare_valid = true;
         break;
       case 5:  // MARPOL Annex II IBC
-        cargo.marpol_cat = ubits(bs, start+4, 3);
+        cargo.marpol_cat = ubits(bs, start + 4, 3);
         cargo.marpol_cat_valid = true;
-        cargo.spare = ubits(bs, start+7, 10);
+        cargo.spare = ubits(bs, start + 7, 10);
         cargo.spare_valid = true;
         break;
       // 6: Regional use
@@ -574,13 +574,13 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad) {
     Ais6_1_32_Window w;
     const size_t start = 97 + 88*window_num;
     w.x = sbits(bs, start, 25) / 60000.;
-    w.y = sbits(bs, start+25, 24) / 60000.;
-    w.from_utc_hour = ubits(bs, start+49, 5);
-    w.from_utc_min = ubits(bs, start+54, 6);
-    w.to_utc_hour = ubits(bs, start+60, 5);
-    w.to_utc_min = ubits(bs, start+65, 6);
-    w.cur_dir = ubits(bs, start+71, 9);
-    w.cur_speed = ubits(bs, start+80, 8) / 10.;
+    w.y = sbits(bs, start + 25, 24) / 60000.;
+    w.from_utc_hour = ubits(bs, start + 49, 5);
+    w.from_utc_min = ubits(bs, start + 54, 6);
+    w.to_utc_hour = ubits(bs, start + 60, 5);
+    w.to_utc_min = ubits(bs, start + 65, 6);
+    w.cur_dir = ubits(bs, start + 71, 9);
+    w.cur_speed = ubits(bs, start + 80, 8) / 10.;
     windows.push_back(w);
   }
 }

@@ -152,49 +152,49 @@ static int scale_multipliers[4] = {1, 10, 100, 1000};
 static void decode_xy(const bitset<AIS8_MAX_BITS> &bs, const size_t offset, float &x, float &y) {
     // Offset is the start of the sub area.  Same as the caller's offset
     // This is the same for all but the text subarea
-    // OLD Nav 55: sbits(bs, offset+5, 28) / 600000.;
-    x = sbits(bs, offset+5, 25) / 60000.;
-    y = sbits(bs, offset+30, 24) / 60000.;
+    // OLD Nav 55: sbits(bs, offset + 5, 28) / 600000.;
+    x = sbits(bs, offset + 5, 25) / 60000.;
+    y = sbits(bs, offset + 30, 24) / 60000.;
 }
 
 Ais8_001_22_Circle::Ais8_001_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
+    const int scale_factor = ubits(bs, offset + 3, 2);
     decode_xy(bs, offset, x, y);
-    precision = ubits(bs, offset+54, 3);  // useless
-    radius_m  = ubits(bs, offset+57, 12) * scale_multipliers[scale_factor];
-    spare     = ubits(bs, offset+69, 18);
+    precision = ubits(bs, offset + 54, 3);  // useless
+    radius_m  = ubits(bs, offset + 57, 12) * scale_multipliers[scale_factor];
+    spare     = ubits(bs, offset + 69, 18);
 }
 
 Ais8_001_22_Rect::Ais8_001_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
+    const int scale_factor = ubits(bs, offset + 3, 2);
     decode_xy(bs, offset, x, y);
 
-    precision  = ubits(bs, offset+54, 3);  // useless
-    e_dim_m    = ubits(bs, offset+57, 8) * scale_multipliers[scale_factor];
-    n_dim_m    = ubits(bs, offset+65, 8) * scale_multipliers[scale_factor];
-    orient_deg = ubits(bs, offset+73, 9);
-    spare      = ubits(bs, offset+82, 5);
+    precision  = ubits(bs, offset + 54, 3);  // useless
+    e_dim_m    = ubits(bs, offset + 57, 8) * scale_multipliers[scale_factor];
+    n_dim_m    = ubits(bs, offset + 65, 8) * scale_multipliers[scale_factor];
+    orient_deg = ubits(bs, offset + 73, 9);
+    spare      = ubits(bs, offset + 82, 5);
 }
 
 Ais8_001_22_Sector::Ais8_001_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
+    const int scale_factor = ubits(bs, offset + 3, 2);
     decode_xy(bs, offset, x, y);
 
-    precision       = ubits(bs, offset+54, 3);  // useless
-    radius_m        = ubits(bs, offset+57, 12) * scale_multipliers[scale_factor];
-    left_bound_deg  = ubits(bs, offset+69, 9);
-    right_bound_deg = ubits(bs, offset+78, 9);
+    precision       = ubits(bs, offset + 54, 3);  // useless
+    radius_m        = ubits(bs, offset + 57, 12) * scale_multipliers[scale_factor];
+    left_bound_deg  = ubits(bs, offset + 69, 9);
+    right_bound_deg = ubits(bs, offset + 78, 9);
 }
 
 // Size of one point angle and distance
-static const size_t PT_AD_SIZE = 10+10;
+static const size_t PT_AD_SIZE = 10 + 10;
 
 Ais8_001_22_Polyline::Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
+    const int scale_factor = ubits(bs, offset + 3, 2);
     const int multiplier = scale_multipliers[scale_factor];
     for (size_t i = 0; i < 4; i++) {
-        const int angle = ubits(bs, offset+5+(i*PT_AD_SIZE), 10);
-        const int dist  = ubits(bs, offset+15+(i*PT_AD_SIZE), 10) * multiplier;
+        const int angle = ubits(bs, offset + 5 + (i*PT_AD_SIZE), 10);
+        const int dist  = ubits(bs, offset + 15 + (i*PT_AD_SIZE), 10) * multiplier;
         if (0 == dist) break;
         angles.push_back(angle);
         dists_m.push_back(dist);
@@ -204,11 +204,11 @@ Ais8_001_22_Polyline::Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, cons
 
 // TODO(schwehr): fold into polyline
 Ais8_001_22_Polygon::Ais8_001_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset+3, 2);
+    const int scale_factor = ubits(bs, offset + 3, 2);
     const int multiplier = scale_multipliers[scale_factor];
     for (size_t i = 0; i < 4; i++) {
-        const int angle = ubits(bs, offset+5+ (i*PT_AD_SIZE), 10);
-        const int dist  = ubits(bs, offset+5+10+ (i*PT_AD_SIZE), 10) * multiplier;
+        const int angle = ubits(bs, offset + 5 + (i*PT_AD_SIZE), 10);
+        const int dist  = ubits(bs, offset + 15 + (i*PT_AD_SIZE), 10) * multiplier;
         if (0 == dist) break;
         angles.push_back(angle);
         dists_m.push_back(dist);
@@ -217,7 +217,7 @@ Ais8_001_22_Polygon::Ais8_001_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const 
 }
 
 Ais8_001_22_Text::Ais8_001_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    text = string(ais_str(bs, offset+3, 84));
+    text = string(ais_str(bs, offset + 3, 84));
     // TODO(schwehr): spare?
 }
 
@@ -292,7 +292,7 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
     // Use floor to be able to ignore any spare bits
     const int num_sub_areas = static_cast<int>(floor((num_bits - 111)/87.));
     for (int sub_area_idx = 0; sub_area_idx < num_sub_areas; sub_area_idx++) {
-        const size_t start = 111+AIS8_001_22_SUBAREA_SIZE*sub_area_idx;
+        const size_t start = 111 + AIS8_001_22_SUBAREA_SIZE*sub_area_idx;
         Ais8_001_22_SubArea *sub_area = ais8_001_22_subarea_factory(bs, start);
         if (sub_area) {
             sub_areas.push_back(sub_area);

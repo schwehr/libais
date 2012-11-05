@@ -1699,10 +1699,10 @@ AIS_STATUS aivdm_to_bits(bitset<T> &bits, const char *nmea_payload) {
 template<size_t T>
 int ubits(const bitset<T> &bits, const size_t start, const size_t len) {
   assert(len <= 32);
-  assert(start+len <= T);
+  assert(start + len <= T);
   bitset<32> bs_tmp;
   for (size_t i = 0; i < len; i++)
-    bs_tmp[i] = bits[start+len-i-1];
+    bs_tmp[i] = bits[start + len - i - 1];
   return bs_tmp.to_ulong();
 }
 
@@ -1715,13 +1715,13 @@ typedef union {
 template<size_t T>
 int sbits(bitset<T> bs, const size_t start, const size_t len) {
   assert(len <= 32);
-  assert(start+len <= T);  // TODO(schwehr):  should it just be < ?
+  assert(start + len <= T);  // TODO(schwehr):  should it just be < ?
   bitset<32> bs32;
   // pad 1's to the left if negative
   if (len < 32 && 1 == bs[start] ) bs32.flip();
 
   for (size_t i = 0; i < len; i++)
-    bs32[i] = bs[start+len-i-1];
+    bs32[i] = bs[start + len - i - 1];
 
   long_union val;
   val.ulong_val = bs32.to_ulong();
@@ -1733,12 +1733,12 @@ extern const string bits_to_char_tbl;
 template<size_t T>
 const string ais_str(const bitset<T> &bits, const size_t start,
                      const size_t len) {
-  assert(start+len < T);
+  assert(start + len < T);
   assert(len % 6 == 0);
   const size_t num_char = len / 6;
   string result(num_char, '@');
   for (size_t char_idx = 0; char_idx < num_char; char_idx++) {
-    const int char_num = ubits(bits, start+char_idx*6, 6);
+    const int char_num = ubits(bits, start + char_idx*6, 6);
     result[char_idx] = bits_to_char_tbl[char_num];
   }
   return result;
