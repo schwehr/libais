@@ -21,7 +21,7 @@ using std::string;
 using std::vector;
 
 #define LIBAIS_VERSION_MAJOR 0
-#define LIBAIS_VERSION_MINOR 11
+#define LIBAIS_VERSION_MINOR 12
 
 vector<size_t> delimiters(const string &str, const string &delim_str = ",");
 vector<string> split(const string &str, const string &delim_str = ",");
