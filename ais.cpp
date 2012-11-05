@@ -1,6 +1,6 @@
 #include "ais.h"
 
-const vector<size_t> delimiters(const string &str,
+vector<size_t> delimiters(const string &str,
                                 const string &delim_str) {
   vector<size_t> r;
   if (str.size() == 0)
@@ -13,7 +13,7 @@ const vector<size_t> delimiters(const string &str,
   return r;
 }
 
-const vector<string> split(const string &str, const string &delim_str) {
+vector<string> split(const string &str, const string &delim_str) {
   vector<string> r;
   vector<size_t> delims = delimiters(str, delim_str);
   if (!delims.size()) {
@@ -32,7 +32,7 @@ const vector<string> split(const string &str, const string &delim_str) {
   return r;
 }
 
-const string nth_field(const string &str, const size_t n,
+string nth_field(const string &str, const size_t n,
                        const string &delim_str) {
   const vector<size_t> delims = delimiters(str, delim_str);
   if (n > delims.size()) {
@@ -45,7 +45,7 @@ const string nth_field(const string &str, const size_t n,
       return str;
   }
   if (n == delims.size())
-    return str.substr(delims[delims.size()-1] + delim_str.size());
+    return str.substr(delims[delims.size() - 1] + delim_str.size());
   const size_t start = delims[n - 1]+delim_str.size();
   const size_t len = delims[n] - start;
   return str.substr(start, len);
