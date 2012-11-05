@@ -46,51 +46,51 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad) {
     // CS - carrier sense - fixed commstate payload of 1100000000000000110
     // TODO(schwehr): What if commstate is not 393222?
     // commstate = ubits(bs, 149, 19);
+    if (unit_flag == 1)
+      return;
 
-    if (0 == unit_flag) {
-        // unit_flag is 0
-        sync_state = ubits(bs, 149, 2);
-        if (0 == commstate_flag) {
-            // SOTDMA
-            slot_timeout = ubits(bs, 151, 3);
+    // unit_flag is 0
+    sync_state = ubits(bs, 149, 2);
+    if (0 == commstate_flag) {
+        // SOTDMA
+        slot_timeout = ubits(bs, 151, 3);
 
-            switch (slot_timeout) {
-            case 0:
-                slot_offset = ubits(bs, 154, 14);
-                slot_offset_valid = true;
-                break;
-            case 1:
-                utc_hour = ubits(bs, 154, 5);
-                utc_min = ubits(bs, 159, 7);
-                utc_spare = ubits(bs, 166, 2);
-                utc_valid = true;
-                break;
-            case 2:  // FALLTHROUGH
-            case 4:  // FALLTHROUGH
-            case 6:
-                slot_number = ubits(bs, 154, 14);
-                slot_number_valid = true;
-                break;
-            case 3:  // FALLTHROUGH
-            case 5:  // FALLTHROUGH
-            case 7:
-                received_stations = ubits(bs, 154, 14);
-                received_stations_valid = true;
-                break;
-            default:
-                assert(false);
-            }
-
-        } else {
-            // ITDMA
-            slot_increment = ubits(bs, 151, 13);
-            slot_increment_valid = true;
-
-            slots_to_allocate = ubits(bs, 164, 3);
-            slots_to_allocate_valid = true;
-
-            keep_flag = bs[167];
-            keep_flag_valid = true;
+        switch (slot_timeout) {
+        case 0:
+            slot_offset = ubits(bs, 154, 14);
+            slot_offset_valid = true;
+            break;
+        case 1:
+            utc_hour = ubits(bs, 154, 5);
+            utc_min = ubits(bs, 159, 7);
+            utc_spare = ubits(bs, 166, 2);
+            utc_valid = true;
+            break;
+        case 2:  // FALLTHROUGH
+        case 4:  // FALLTHROUGH
+        case 6:
+            slot_number = ubits(bs, 154, 14);
+            slot_number_valid = true;
+            break;
+        case 3:  // FALLTHROUGH
+        case 5:  // FALLTHROUGH
+        case 7:
+            received_stations = ubits(bs, 154, 14);
+            received_stations_valid = true;
+            break;
+        default:
+            assert(false);
         }
+
+    } else {
+        // ITDMA
+        slot_increment = ubits(bs, 151, 13);
+        slot_increment_valid = true;
+
+        slots_to_allocate = ubits(bs, 164, 3);
+        slots_to_allocate_valid = true;
+
+        keep_flag = bs[167];
+        keep_flag_valid = true;
     }
 }
