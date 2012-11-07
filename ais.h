@@ -23,13 +23,27 @@ using std::vector;
 #define LIBAIS_VERSION_MAJOR 0
 #define LIBAIS_VERSION_MINOR 12
 
-vector<size_t> delimiters(const string &str, const string &delim_str = ",");
-vector<string> split(const string &str, const string &delim_str = ",");
-string nth_field(const string &str, const size_t n, const string &delim_str = ",");
+// Returns vector of the text between the delimiters.  Uses an empty string
+// for empty fields.  Empty string returns a vector of length 1 containing an
+// empty string.
+// Empty delim_str is not allowed.
+vector<string> Split(const string &str, const string &delim_str);
+
+// Returns the text in the nth field starting with the first field being 0.
+// Empty delim_str is not allowed.
+string GetNthField(const string &str, const size_t n, const string &delim_str);
+
+// Returns the number of pad bits in an AIS AIVDM NMEA string.
+// Returns -1 if there is an error.
+int GetPad(const string &nmea_str);
+
+// Returns the armored payload of an AIS AIVDM NMEA string.
+// Returns an empty string if there was an error.
+string GetBody(const string &nmea_str);
 
 extern bool nmea_ord_initialized;  // If false, call build_nmea_lookup
-bitset<6> reverse(const bitset<6> &bits);
-void build_nmea_lookup();
+bitset<6> Reverse(const bitset<6> &bits);
+void BuildNmeaLookup();
 
 static const int MAX_BITS = 1192;
 

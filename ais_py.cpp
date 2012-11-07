@@ -6,8 +6,6 @@
 #include "ais.h"
 #include "ais8_001_22.h"
 
-using namespace std;
-
 PyObject *ais_py_exception;
 const string exception_name("ais.decode.Error");
 
@@ -1544,7 +1542,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
       }
       break;
       // case 366:  // United states
-      //  TODO(schwehr): implement
+      // TODO(schwehr): implement
       //  break;
     default:
         DictSafeSetItem(dict, "parsed", false);
@@ -2210,10 +2208,6 @@ ais27_to_pydict(const char *nmea_payload, const size_t pad) {
 
 static PyObject *
 decode(PyObject *self, PyObject *args) {
-    if (!nmea_ord_initialized) {
-      build_nmea_lookup();
-    }
-
     int _pad;
     const char *nmea_payload;
     // TODO(schwehr): what to do about if no pad bits?  Maybe warn and set to 0?
@@ -2445,7 +2439,7 @@ initais(void)
     }
 
     // Initialize the lookuptable and exception
-    build_nmea_lookup();
+    BuildNmeaLookup();
     // TODO(schwehr): is this cast bad?
     ais_py_exception = PyErr_NewException((char *)"ais.decode.error", 0, 0);
 
