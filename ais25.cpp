@@ -2,22 +2,29 @@
 
 #include "ais.h"
 
-Ais25::Ais25(const char *nmea_payload, const size_t pad) {
+Ais25::Ais25(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
-    init();
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (25 != message_id) {
+      status = AIS_ERR_WRONG_MSG_TYPE;
+      return;
+    }
+#endif
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
     if (num_bits < 40 || num_bits > 168) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     bitset<168> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    message_id = ubits(bs, 0, 6);
-    if (25 != message_id) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
     const bool addressed = bs[38];
     use_app_id = bs[39];
@@ -37,4 +44,5 @@ Ais25::Ais25(const char *nmea_payload, const size_t pad) {
       }
       // TODO(schwehr): deal with payload - probably need to pass in the spare bits
     }
+    status = AIS_OK;
 }

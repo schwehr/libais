@@ -2,10 +2,17 @@
 
 #include "ais.h"
 
-Ais21::Ais21(const char *nmea_payload, const size_t pad) {
+Ais21::Ais21(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad)  {
     assert(nmea_payload);
     assert(pad < 6);
-    init();
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (message_id != 21) {
+      status = AIS_ERR_WRONG_MSG_TYPE;
+      return;
+    }
+#endif
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -16,13 +23,14 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
     }
 
     bitset<360> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
-    message_id = ubits(bs, 0, 6);
-    if (message_id != 21) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
     aton_type = ubits(bs, 38, 5);
     name = ais_str(bs, 43, 120);
     position_accuracy = bs[163];
@@ -55,4 +63,6 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) {
     } else {
         spare2 = 0;
     }
+
+    status = AIS_OK;
 }

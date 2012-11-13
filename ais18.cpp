@@ -2,21 +2,30 @@
 
 #include "ais.h"
 
-Ais18::Ais18(const char *nmea_payload, const size_t pad) {
+Ais18::Ais18(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
-    init();
-
-    if (pad != 0 || strlen(nmea_payload) != 28) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (18 != message_id) {
+      status = AIS_ERR_WRONG_MSG_TYPE;
+      return;
+    }
+#endif
+    if (pad != 0 || strlen(nmea_payload) != 28) {
+      status = AIS_ERR_BAD_BIT_COUNT;
+      return;
+    }
 
     bitset<168> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    message_id = ubits(bs, 0, 6);
-    if (18 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
     spare = ubits(bs, 38, 8);
     sog = ubits(bs, 46, 10) / 10.;
@@ -46,8 +55,10 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad) {
     // CS - carrier sense - fixed commstate payload of 1100000000000000110
     // TODO(schwehr): What if commstate is not 393222?
     // commstate = ubits(bs, 149, 19);
-    if (unit_flag == 1)
+    if (unit_flag == 1) {
+      status = AIS_OK;
       return;
+    }
 
     // unit_flag is 0
     sync_state = ubits(bs, 149, 2);
@@ -93,4 +104,6 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad) {
         keep_flag = bs[167];
         keep_flag_valid = true;
     }
+
+    status = AIS_OK;
 }

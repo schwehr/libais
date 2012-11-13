@@ -507,7 +507,7 @@ PyObject*
 ais6_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
     Ais6 msg(nmea_payload, pad);
-    if (msg.had_error()) {
+    if (msg.had_error() and msg.get_error() != AIS_UNINITIALIZED) {
         PyErr_Format(ais_py_exception, "Ais6: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
     }
@@ -1416,10 +1416,10 @@ ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict, const size_t
 PyObject*
 ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
+    assert(pad < 6);
 
-    // TODO(schwehr): only decode dac/fi and push the header dict sets into the messages to avoid duplication.
     Ais8 msg(nmea_payload, pad);
-    if (msg.had_error()) {
+    if (msg.had_error() and msg.get_error() != AIS_UNINITIALIZED) {
         PyErr_Format(ais_py_exception, "Ais8: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
     }
@@ -1610,12 +1610,16 @@ ais9_to_pydict(const char *nmea_payload, const size_t pad) {
 PyObject*
 ais10_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
+    assert(pad < 6);
+
+    std::cout << "ais10_to_pydict(\"" << nmea_payload << "\"," << pad << ")\n";
     Ais10 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais10: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
     }
 
+    std::cout << "dest: " << msg.dest_mmsi << "\n";
     PyObject *dict = PyDict_New();
     DictSafeSetItem(dict, "id", 10);
     DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);

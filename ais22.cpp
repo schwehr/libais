@@ -2,10 +2,17 @@
 
 #include "ais.h"
 
-Ais22::Ais22(const char *nmea_payload, const size_t pad) {
+Ais22::Ais22(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
-    init();
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (message_id != 22) {
+      status = AIS_ERR_WRONG_MSG_TYPE;
+      return;
+    }
+#endif
 
     if (pad != 0 || std::strlen(nmea_payload) != 28) {
       status = AIS_ERR_BAD_BIT_COUNT;
@@ -13,13 +20,14 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad) {
     }
 
     bitset<168> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
-    message_id = ubits(bs, 0, 6);
-    if (message_id != 22) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
     spare = ubits(bs, 38, 2);
 
     chan_a = ubits(bs, 40, 12);
@@ -53,4 +61,6 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad) {
     zone_size = ubits(bs, 142, 3);
 
     spare2 = ubits(bs, 145, 23);
+
+    status = AIS_OK;
 }

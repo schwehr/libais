@@ -14,68 +14,80 @@ using std::endl;
 
 #define CHECK_ERROR(MSG) if (MSG.had_error()) cerr << "FAILED " << MSG.message_id << ": " << AIS_STATUS_STRINGS[MSG.get_error()] << "\n";
 
+// Temporary until completely switch to gtest.
+void ASSERT_EQ(const int a, const int b, const int line) { 
+  if (a != b)
+    cerr << __FILE__ << ": line " << line << ": assert FAILED.  "<< a << " != " << b << endl;
+  assert(a == b);
+}
+void ASSERT_EQ(const size_t a, const size_t b, const int line) {
+  if (a != b)
+    cerr << __FILE__ << ": line " << line << ": assert FAILED" << endl;
+  assert(a == b);
+}
+void ASSERT_EQ(const bool a, const bool b, const int line) {
+  if (a != b) {
+    cout << __FILE__ << ": line " << line << ": assert FAILED.  "<< a << " != " << b << endl;
+    assert(a == b);
+  }
+}
+
 int main(UNUSED int argc, UNUSED char* argv[]) {
     BuildNmeaLookup();
 
+
     if (true) {
       {
-        const vector<string> v = Split("", ",");
-        assert(v.size()==1);
-      }
-      {
-        const vector<string> v = Split("1,2,3", ",");
-        assert(v.size()==3);
-        assert(v[0] == "1");
-        assert(v[1] == "2");
-        assert(v[2] == "3");
-      }
-      {
-        const vector<string> v = Split(",2,", ",");
-        assert(v.size()==3);
-        assert(v[0] == "");
-        assert(v[1] == "2");
-        assert(v[2] == "");
-      }
-      {
-        const vector<string> v = Split("1,,3", ",");
-        assert(v.size()==3);
-        assert(v[0] == "1");
-        assert(v[1] == "");
-        assert(v[2] == "3");
-      }
-    }
-
-    if (true)
-    {
-      const string s("!AIVDM,1,1,,B,1EN2?oWP00ER5SLRvNPi9gwl0000,0*51");
-      assert(GetNthField(s, 0, ",") == "!AIVDM");
-      assert(GetNthField(s, 1, ",") == "1");
-      assert(GetNthField(s, 2, ",") == "1");
-      assert(GetNthField(s, 3, ",") == "");
-      assert(GetNthField(s, 4, ",") == "B");
-      assert(GetNthField(s, 5, ",") == "1EN2?oWP00ER5SLRvNPi9gwl0000");
-      assert(GetNthField(s, 6, ",") == "0*51");
-      assert(GetNthField(s, 7, ",") == "");
-    }
-
-    // 1
-    if (true) {
         // !AIVDM,1,1,,B,15Mq4J0P01EREODRv4@74gv00HRq,0*72,b003669970,1272412824
-      Ais1_2_3("15Mq4J0P01EREODRv4@74gv00HRq", 0);
-        // !AIVDM,1,1,,B,1EN2?oWP00ER5SLRvNPi9gwl0000,0*51,b003669970,1272412824
+        Ais1_2_3 m("15Mq4J0P01EREODRv4@74gv00HRq", 0);
+        //cout << "m123 status: " << m.had_error() << endl;
+        ASSERT_EQ(m.had_error(), false, __LINE__);
+        ASSERT_EQ(m.message_id, 1, __LINE__);
+        ASSERT_EQ(m.repeat_indicator, 0, __LINE__);
+        ASSERT_EQ(m.mmsi, 366888040, __LINE__);
+        ASSERT_EQ(m.nav_status, 0, __LINE__);
+        ASSERT_EQ(m.rot_raw, -128, __LINE__);
+        ASSERT_EQ(m.rot_over_range, true, __LINE__);
+        // ASSERT_FLOAT_EQ(m.rot, -731.386474609375);
+        // ASSERT_FLOAT_EQ(m.sog, 0.1);
+        ASSERT_EQ(m.position_accuracy, 0, __LINE__);
+        // ASSERT_FLOAT_EQ(m.x, -146.29039001464844);
+        // ASSERT_FLOAT_EQ(m.y, 61.114131927490234);
+        // ASSERT_FLOAT_EQ(m.cog, 181.0);
+        ASSERT_EQ(m.true_heading, 511, __LINE__);
+        ASSERT_EQ(m.timestamp, 0, __LINE__);
+        ASSERT_EQ(m.special_manoeuvre, 0, __LINE__);
+        ASSERT_EQ(m.spare, 0, __LINE__);
+        ASSERT_EQ(m.raim, false, __LINE__);
+        ASSERT_EQ(m.sync_state, 0, __LINE__);
+        ASSERT_EQ(m.slot_number_valid, true, __LINE__);
+        ASSERT_EQ(m.slot_number, 2233, __LINE__);
+        ASSERT_EQ(m.slot_timeout_valid, true, __LINE__);
+        ASSERT_EQ(m.slot_timeout, 6, __LINE__);
+        ASSERT_EQ(m.had_error(), false, __LINE__);
+      }
+      {
+        Ais1_2_3 m("", 0);
+        ASSERT_EQ(m.had_error(), true, __LINE__);
+      }
+
+      // !AIVDM,1,1,,B,1EN2?oWP00ER5SLRvNPi9gwl0000,0*51,b003669970,1272412824
       //Ais1_2_3("", 0);
-        // !AIVDM,1,1,,B,15N3QPPP0dI?uu>@smtj8wv028Rs,0*23,b003669977,1272412827
+      // !AIVDM,1,1,,B,15N3QPPP0dI?uu>@smtj8wv028Rs,0*23,b003669977,1272412827
       //Ais1_2_3("", 0);
-        // !AIVDM,1,1,,B,15N3J`P01tqr<CDJlP1DKSUn0<04,0*43,b003665001,1272412825
+      // !AIVDM,1,1,,B,15N3J`P01tqr<CDJlP1DKSUn0<04,0*43,b003665001,1272412825
       Ais1_2_3("15N3J`P01tqr<CDJlP1DKSUn0<04", 0);
 
-        // Bad sized packets
-        Ais1_2_3("15N3J`P01tqr<CDJlP1DKSUn0<0400000", 0); // too large
-        Ais1_2_3("15N3J`P01tqr<CDJlP1DKSUn", 0); // too small
-        Ais1_2_3("95N3J`P01tqr<CDJlP1DKSUn0<04", 0); // wrong message type in the 1st char
-        Ais1_2_3("1zXYZ[\\]^_tr<CDJlP1DKSUn0<04", 0); // invalid character
+      // Bad sized packets
+      Ais1_2_3("15N3J`P01tqr<CDJlP1DKSUn0<0400000", 0); // too large
+      Ais1_2_3("15N3J`P01tqr<CDJlP1DKSUn", 0); // too small
+      Ais1_2_3("95N3J`P01tqr<CDJlP1DKSUn0<04", 0); // wrong message type in the 1st char
+      Ais1_2_3("1zXYZ[\\]^_tr<CDJlP1DKSUn0<04", 0); // invalid character
 
     }
+
+    // cout << "Early okay\n";
+    // return 0;
 
     // !AIVDM,1,1,,B,4h2E3MQuiq3ILeUjqVMd@sG004IT,0*73,raishub,1342581930
     { Ais4_11 msg("4h2E3MQuiq3ILeUjqVMd@sG004IT,0*73,raishub,1342581930", 0); }
@@ -84,10 +96,8 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     // !AIVDM,2,2,9,B,00000000000,2*2E,raishub,1342579715
     { Ais5 msg("533uwnT00000uCCSS00MD5@Dl4h400000080001c8h<25uAn00Q1C1VRBS0000000000000", 2); }
 
-    ////////////////////////////////////////
-    // 7 and 13
-    ////////////////////////////////////////
 
+    // 7 and 13
     if (true) {
         // Causes bus error
         // !AIVDM,1,1,,A,74i:pT000000,0*52,b003669977,1273190417
@@ -104,19 +114,22 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
         if (msg.had_error()) cerr << "FAILED 7 " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
     }
 
-
     //////////////////////////////////////////////////////////////////////
     // 8 - BBM
     //////////////////////////////////////////////////////////////////////
 
+#if 0
     if (true) {
       // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
       Ais8 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P", 2);
-      if (msg.had_error()) cerr <<"FAILED 8 " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+      if (msg.had_error()) {
+        CHECKPOINT;
+        cerr <<"FAILED 8 52HH" << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+      }
     }
+#endif
 
     ///// 1 11 IMO Met Hydro
-
     if (true) {
       // !AIVDM,1,1,8,A,852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P,2*09,1269959103.21
       Ais8_1_11 msg("852HH<h0BjMv0=v6kWW<0Pb5<0A8h4=:0010000000000000000002>003P", 2);
@@ -161,16 +174,16 @@ bit_len: 578
       if (msg.had_error()) cerr<<"FAILED 8_1_26 " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
     }
 
-
-
     ///// 366 34 - Old Zone Messages - Used up to Summer 2010 in Boston
     // http://schwehr.org/blog/archives/2009-10.html#e2009-10-15T16_52_31.txt
-    {
+    if (false) {
+      // TODO(schwehr): should I implement 366 34 if it is no longer used?
       // Whales observed: !AIVDM,1,1,,B,803OvriK`R0FaqT6gOv763PKLT;0,0*25,d-089,S0392,t204010.00,T10.45701635,r003669945,1255466410,cornell,1255466411.9
-      Ais8_366_22 msg("803OvriK`R0FaqT6gOv763PKLT;0", 0);
+#if 0
+      Ais8_366_34 msg("803OvriK`R0FaqT6gOv763PKLT;0", 0);
       if (msg.had_error()) cerr<<"FAILED 8 366 34 whales" << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
+#endif
     }
-
 
     // 9 - Search and rescue
     if (true) {
@@ -187,6 +200,17 @@ bit_len: 578
     //////////////////////////////////////////////////////////////////////
     // 10 - ":" UTC and date inquery
     //////////////////////////////////////////////////////////////////////
+
+    if (true) {
+      Ais10 m(":4`bLl0p3;Qd", 0);
+      ASSERT_EQ(m.had_error(), false, __LINE__);
+      ASSERT_EQ(m.message_id, 10, __LINE__);
+      ASSERT_EQ(m.repeat_indicator, 0, __LINE__);
+      ASSERT_EQ(m.mmsi, 311074000, __LINE__);
+      ASSERT_EQ(m.spare, 0, __LINE__);
+      ASSERT_EQ(m.dest_mmsi, 235089435, __LINE__);
+      ASSERT_EQ(m.spare2, 0, __LINE__);
+    }
 
     if (true) {
       // !AIVDM,1,1,,B,:5CoIn0kwN0P,0*23,b003669708,1273711619
@@ -339,7 +363,6 @@ bit_len: 578
     // !AIVDM,1,1,,A,D00FEd@04V0@0ET0L0Pp0T,2*4C,rFakeByKurt,1351557873.89
     { Ais20 msg("D00FEd@04V0@0ET0L0Pp0T", 2);  CHECK_ERROR(msg); }
 
-
     // 21 - ATON status report
     if (true) {
       // From OHMEX test at CCOM
@@ -365,7 +388,6 @@ bit_len: 578
       Ais23 msg("G02:KpP1R`sn@291njF00000900", 2);
       if (msg.had_error())  cerr << "FAILED 23: " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
     }
-
 
     // 24 - Class B static data msgs A and B
     if (true) {
@@ -395,6 +417,7 @@ bit_len: 578
       Ais27 msg("KrJN9vb@0?wl20RH", 0);
       if (msg.had_error())  cerr << "FAILED 27: " << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
     }
+
 
     // msg 8 366 22 Zone Broadcast - This message is not good
     if (false) {

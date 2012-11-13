@@ -48,6 +48,7 @@ void BuildNmeaLookup();
 static const int MAX_BITS = 1192;
 
 enum AIS_STATUS {
+  AIS_UNINITIALIZED,
   AIS_OK,
   AIS_ERR_BAD_BIT_COUNT,
   AIS_ERR_WRONG_MSG_TYPE,
@@ -79,12 +80,16 @@ class AisMsg {
   // TODO(schwehr): make status private and have accessors.
   bool had_error() const {  return status != AIS_OK;  }
   AIS_STATUS get_error() const {return status;}
+ protected:
   AIS_STATUS status;  // AIS_OK or error code
 
-  // TODO(schwehr): make a constructor and do this in there.
+  // TODO(schwehr): remove init.
   void init() {
+    assert(false);
     status = AIS_OK;
   }
+  AisMsg() { status = AIS_UNINITIALIZED; }
+  AisMsg(const char *nmea_payload, const size_t pad);
 };
 
 // TODO(schwehr): factor out commstate from all messages?
@@ -218,11 +223,11 @@ class Ais6 : public AisMsg {
   int dac;  // dac+fi = app id
   int fi;
 
-  // If dac/fi is not one we know
-  vector<unsigned char> payload;
-
-  Ais6() {}
+  // TODO(schwehr): how to make Ais6 protected?
   Ais6(const char *nmea_payload, const size_t pad);
+
+ protected:
+  Ais6() {}
 };
 ostream& operator<< (ostream &o, const Ais6 &msg);
 
@@ -474,12 +479,10 @@ class Ais8 : public AisMsg {
   int dac;  // dac+fi = app id
   int fi;
 
-  // If dac/fi not one we know
-  vector<unsigned char> payload;
-
-  Ais8() {}
+  // TODO(schwehr): make Ais8 protected
   Ais8(const char *nmea_payload, const size_t pad);
-  bool decode_header8(const bitset<MAX_BITS> &bs);
+ protected:
+  Ais8() {}
 };
 ostream& operator<< (ostream &o, const Ais8 &msg);
 

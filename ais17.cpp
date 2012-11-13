@@ -8,11 +8,17 @@
 
 #include "ais.h"
 
-Ais17::Ais17(const char *nmea_payload, const size_t pad) {
+Ais17::Ais17(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
   assert(pad < 6);
   assert(nmea_payload);
-  init();
-
+  if (status != AIS_UNINITIALIZED)
+    return;
+#ifndef NDEBUG
+  if (17 != message_id) {
+    status = AIS_ERR_WRONG_MSG_TYPE;
+    return;
+  }
+#endif
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -20,13 +26,14 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
   }
 
   bitset<816> bs;
-  status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;
+  {
+    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+    if (r != AIS_OK) {
+      status = r;
+      return;
+    }
+  }
 
-  message_id = ubits(bs, 0, 6);
-  if (17 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-  repeat_indicator = ubits(bs, 6, 2);
-  mmsi = ubits(bs, 8, 30);
   spare = ubits(bs, 38, 2);
 
   x = sbits(bs, 40, 18) / 600.;
@@ -92,6 +99,8 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
     status = AIS_ERR_BAD_SUB_MSG;
   }
 #endif
+
+  status = AIS_OK;  // TODO(schwehr): not really okay yet
 }
 
 

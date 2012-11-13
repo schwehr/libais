@@ -6,12 +6,6 @@
 
 using namespace std;
 
-TEST(TestAis1_2_3, AisMsg) {
-    AisMsg a;
-    a.init();
-    ASSERT_EQ(AIS_OK, a.get_error());
-}
-
 /* Python:
 import binary
 bv = binary.ais6tobitvec('15Mq4J0P01EREODRv4@74gv00HRq')

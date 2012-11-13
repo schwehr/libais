@@ -61,6 +61,7 @@ const string bits_to_char_tbl="@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";
 
 const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
+  "AIS_UNINITIALIZED",
   "AIS_OK",
   "AIS_ERR_BAD_BIT_COUNT",
   "AIS_ERR_WRONG_MSG_TYPE",
@@ -98,4 +99,30 @@ void BuildNmeaLookup() {
     nmea_ord[c] = Reverse(bitset<6>(val));
   }
   nmea_ord_initialized = true;
+}
+
+AisMsg::AisMsg(const char *nmea_payload, const size_t pad) {
+  assert(nmea_payload);
+  assert(pad < 6);
+  assert(nmea_ord_initialized);
+  status = AIS_UNINITIALIZED;
+
+  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+  if (num_bits < 38) {
+    std::cerr << "AisMsg num_bits " << num_bits << "\n";
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  bitset<42> bs;
+  const string header(nmea_payload, 7);
+  const AIS_STATUS r = aivdm_to_bits(bs, header.c_str());
+  if (r != AIS_OK) {
+    status = r;
+    return;
+  }
+
+  message_id = ubits(bs, 0, 6);
+  repeat_indicator = ubits(bs, 6, 2);
+  mmsi = ubits(bs, 8, 30);
 }

@@ -261,13 +261,19 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs
 // Area Notice class
 //////////////////////////////////////////////////////////////////////
 
-Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
+Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
     assert(nmea_ord_initialized);  // Make sure we have the lookup table built
-    assert(strlen(nmea_payload) >= 33);
 
-    init();
+  if (status != AIS_UNINITIALIZED)
+    return;
+#ifndef NDEBUG
+  if (1 != dac || 22 != fi) {
+    status = AIS_ERR_WRONG_MSG_TYPE;
+    return;
+  }
+#endif
 
     const int num_bits = strlen(nmea_payload) * 6 - pad;
     // TODO(schwehr): make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
@@ -275,10 +281,13 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
     if (198 > num_bits || num_bits > 984) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     bitset<MAX_BITS> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    if (!decode_header8(bs)) return;
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
     link_id = ubits(bs, 56, 10);
     notice_type = ubits(bs, 66, 7);
@@ -305,6 +314,8 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) {
        - text has geometry to go through it all
     */
     // TODO(schwehr): watch out for mandatory spare bits to byte align payload
+    if (status == AIS_UNINITIALIZED)
+      status = AIS_OK;
 }
 
 Ais8_001_22::~Ais8_001_22() {

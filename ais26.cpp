@@ -4,9 +4,16 @@
 
 #include "ais.h"
 
-Ais26::Ais26(const char *nmea_payload, const size_t pad) {
+Ais26::Ais26(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad)  {
     assert(nmea_payload);
-    init();
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (26 != message_id) {
+      status = AIS_ERR_WRONG_MSG_TYPE;
+      return;
+    }
+#endif
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
     const size_t comm_flag_offset = num_bits - 20 + 1;  // TODO(schwehr): check for off by one.
@@ -14,13 +21,13 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
     if (52 > num_bits || num_bits > 1064) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     bitset<1064> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    message_id = ubits(bs, 0, 6);
-    if (26 != message_id) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
     const bool addressed = bs[38];
     use_app_id = bs[39];
@@ -99,4 +106,5 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) {
       keep_flag = bs[comm_flag_offset + 19];
       keep_flag_valid = true;
     }
+    status = AIS_OK;
 }

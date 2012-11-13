@@ -3,24 +3,29 @@
 
 #include "ais.h"
 
-Ais24::Ais24(const char *nmea_payload, const size_t pad) {
+Ais24::Ais24(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
-
-    init();
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (24 != message_id) {
+      status = AIS_ERR_WRONG_MSG_TYPE;
+      return;
+    }
+#endif
 
     const int num_bits = strlen(nmea_payload) * 6 - pad;
     if (160 != num_bits && 168 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     bitset<168> bs;
-
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    message_id = ubits(bs, 0, 6);
-    if (24 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
     part_num = ubits(bs, 38, 2);
 
@@ -48,4 +53,6 @@ Ais24::Ais24(const char *nmea_payload, const size_t pad) {
         status = AIS_ERR_BAD_MSG_CONTENT;
         return;
     }
+
+    status = AIS_OK;
 }

@@ -141,20 +141,31 @@ const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = {
 };
 
 
-Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad) {
+Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
 
-    init();
+  if (status != AIS_UNINITIALIZED)
+    return;
+#ifndef NDEBUG
+  if (366 != dac || 22 != fi) {
+    std::cerr << "arrrg:" << dac << " " << fi << "\n";
+    status = AIS_ERR_WRONG_MSG_TYPE;
+    return;
+  }
+#endif
 
     const int num_bits = (strlen(nmea_payload) * 6) - pad;
     if (208 <= num_bits && num_bits >= 1020) { status = AIS_ERR_BAD_BIT_COUNT; return; }
     bitset<MAX_BITS> bs;
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    if (!decode_header8(bs)) return;
     link_id = ubits(bs, 56, 10);
     notice_type = ubits(bs, 66, 7);
     month = ubits(bs, 73, 4);

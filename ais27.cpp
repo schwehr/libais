@@ -2,11 +2,17 @@
 
 #include "ais.h"
 
-Ais27::Ais27(const char *nmea_payload, const size_t pad) {
+Ais27::Ais27(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
-
-    init();
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (27 != message_id) {
+      status = AIS_ERR_WRONG_MSG_TYPE;
+      return;
+    }
+#endif
 
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -16,13 +22,13 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) {
     }
 
     bitset<96> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    message_id = ubits(bs, 0, 6);
-    if (27 != message_id) {status = AIS_ERR_WRONG_MSG_TYPE; return;}
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
     position_accuracy = bs[38];
     raim = bs[39];
@@ -34,4 +40,6 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) {
     // 0 is a current GNSS position.  1 is NOT the current GNSS position
     gnss = !bs[94];
     spare = bs[95];
+
+    status = AIS_OK;
 }

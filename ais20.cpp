@@ -2,25 +2,31 @@
 
 #include "ais.h"
 
-Ais20::Ais20(const char *nmea_payload, const size_t pad) {
+Ais20::Ais20(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
-
-    init();
-
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (20 != message_id) {
+      status = AIS_ERR_WRONG_MSG_TYPE;
+      return;
+    }
+#endif
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
     if (num_bits < 72 || num_bits > 160) {
       status = AIS_ERR_BAD_BIT_COUNT;  return;
     }
 
     bitset<162> bs;  // 160, but must be 6 bit aligned
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
-    message_id = ubits(bs, 0, 6);
-    if (20 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
     spare = ubits(bs, 38, 2);
 
     offset_1 = ubits(bs, 40, 12);
@@ -31,6 +37,7 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
     if (72 == num_bits) {
       group_valid_2 = group_valid_3 = group_valid_4 = false;
       spare2 = ubits(bs, 70, 2);
+      status = AIS_OK;
       return;
     }
 
@@ -45,6 +52,7 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
     if (num_bits >= 100 && num_bits <=108) {
       group_valid_3 = group_valid_4 = false;
       spare2 = ubits(bs, 100, 4);
+      status = AIS_OK;
       return;
     }
 
@@ -59,6 +67,7 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
     if (num_bits >= 130 && num_bits <= 138) {
       group_valid_4 = false;
       spare2 = ubits(bs, 130, 6);  // Makes the result 8 bit / 1 byte aligned
+      status = AIS_OK;
       return;
     }
 
@@ -69,4 +78,6 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad) {
     incr_4 = ubits(bs, 149, 11);
 
     spare2 = 0;
+
+    status = AIS_OK;
 }

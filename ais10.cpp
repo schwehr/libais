@@ -2,10 +2,18 @@
 
 #include "ais.h"
 
-Ais10::Ais10(const char *nmea_payload, const size_t pad) {
+Ais10::Ais10(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
-    init();
+
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (message_id != 10) {
+        status = AIS_ERR_WRONG_MSG_TYPE;
+        return;
+    }
+#endif
 
     if (pad != 0 || strlen(nmea_payload) != 12) {
       status = AIS_ERR_BAD_BIT_COUNT;
@@ -13,18 +21,23 @@ Ais10::Ais10(const char *nmea_payload, const size_t pad) {
     }
 
     bitset<72> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    message_id = ubits(bs, 0, 6);
-    if (message_id != 10) {
-      status = AIS_ERR_WRONG_MSG_TYPE;
-      return;
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
     }
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
 
     spare = ubits(bs, 38, 2);
     dest_mmsi = ubits(bs, 40, 30);
     spare2 = ubits(bs, 70, 2);
+
+    status = AIS_OK;
+}
+
+ostream& operator<< (ostream &o, const Ais10 &msg) {
+  return o << msg.message_id << ": " << msg.mmsi
+           << " dest=" << msg.dest_mmsi
+           << " " << msg.spare << " " << msg.spare2;
 }

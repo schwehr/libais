@@ -25,17 +25,17 @@ WARN += -Wendif-labels
 WARN += -Wno-sign-compare
 WARN += -Wshadow
 # Requires -O
-WARN += -O -Wuninitialized
+# WARN += -O -Wuninitialized
 
 # Disabled warnings
 #WARN+= -Weffc++
-#WARN+= -Wunreachable-code 
+#WARN+= -Wunreachable-code
 
 DEBUG:= -g3 -DDEBUG=1
-#DEBUG+= -O0
+DEBUG+= -O0
 #DEBUG+= -O
 # DEBUG+= -D_GLIBCXX_DEBUG # Bad things on the mac?  May be a gtest bug.
-DEBUG+= -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCPP_CONCEPT_CHECKS
+# DEBUG+= -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCPP_CONCEPT_CHECKS
 
 OPT:= -O3 -funroll-loops -fexpensive-optimizations -ffast-math
 OPT+= -DNDEBUG

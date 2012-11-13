@@ -1,33 +1,33 @@
 // Since Apr 2010
 
-#include <string>
-#include <cassert>
 #include <cmath>
-#include <cstdlib>
 
 #include "ais.h"
 
-// #include <bitset>
-
-Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) {
+Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
-    assert(nmea_ord_initialized);  // Make sure we have the lookup table built
-    init();
-
-    if (0 != pad || strlen(nmea_payload) != 28) { status = AIS_ERR_BAD_BIT_COUNT; return; }
-
-    bitset<168> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    message_id = ubits(bs, 0, 6);
+    assert(pad < 6);
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
     if (message_id < 1 || message_id > 3) {
         status = AIS_ERR_WRONG_MSG_TYPE;
         return;
     }
+#endif
+    if (0 != pad || strlen(nmea_payload) != 28) {
+      status = AIS_ERR_BAD_BIT_COUNT;
+      return;
+    }
+    bitset<168> bs;
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
     nav_status = ubits(bs, 38, 4);
 
     rot_raw = sbits(bs, 42, 8);
@@ -101,8 +101,9 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) {
         keep_flag = bs[167];
         keep_flag_valid = true;
     }
-}
 
+    status = AIS_OK;
+}
 
 ostream& operator<< (ostream &o, const Ais1_2_3 &msg) {
     return o << msg.message_id << ": " << msg.mmsi;

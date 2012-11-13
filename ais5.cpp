@@ -2,10 +2,16 @@
 
 #include "ais.h"
 
-Ais5::Ais5(const char *nmea_payload, const size_t pad) {
+Ais5::Ais5(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
-    init();
+    if (status != AIS_UNINITIALIZED)
+      return;
+    // TODO(schwehr): only if debugging
+    if (5 != message_id) {
+      status = AIS_ERR_WRONG_MSG_TYPE;
+      return;
+    }
 
     if (pad != 2 || strlen(nmea_payload) != 71) {
       status = AIS_ERR_BAD_BIT_COUNT;
@@ -13,13 +19,13 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) {
     }
 
     bitset<426> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    message_id = ubits(bs, 0, 6);
-    if (5 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
+        return;
+      }
+    }
 
     ais_version = ubits(bs, 38, 2);
     imo_num = ubits(bs, 40, 30);
@@ -41,6 +47,8 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) {
     destination = ais_str(bs, 302, 120);
     dte = bs[422];
     spare = bs[423];
+
+    status = AIS_OK;
 }
 
 

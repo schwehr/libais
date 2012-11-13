@@ -2,12 +2,17 @@
 
 #include "ais.h"
 
-Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad) {
+Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
-
-    init();
-
+    if (status != AIS_UNINITIALIZED)
+      return;
+#ifndef NDEBUG
+    if (message_id != 7 && message_id != 13) {
+        status = AIS_ERR_WRONG_MSG_TYPE;
+        return;
+    }
+#endif
     const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
     if (((num_bits - 40) % 32) != 0 || num_bits > 168) {
@@ -16,21 +21,20 @@ Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad) {
     }
 
     bitset<168> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
-
-    message_id = ubits(bs, 0, 6);
-    if (message_id != 7 && message_id != 13) {
-        status = AIS_ERR_WRONG_MSG_TYPE;
+    {
+      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+      if (r != AIS_OK) {
+        status = r;
         return;
+      }
     }
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
-    spare = ubits(bs, 38, 2);
 
+    spare = ubits(bs, 38, 2);
     const size_t num_acks = (num_bits - 40) / 32;
     for (size_t i = 0; i < num_acks; i++) {
         dest_mmsi.push_back(ubits(bs, 40 + i*32, 30));
         seq_num.push_back(ubits(bs, 40 + i*32 + 30, 2));
     }
+
+    status = AIS_OK;
 }
