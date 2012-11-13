@@ -7,7 +7,12 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad) : AisMsg(nmea_paylo
     assert(pad < 6);
     if (status != AIS_UNINITIALIZED)
       return;
-
+#ifndef NDEBUG
+    if (message_id != 4 && message_id != 11) {
+        status = AIS_ERR_WRONG_MSG_TYPE;
+        return;
+    }
+#endif
     if (0 != pad || strlen(nmea_payload) != 28) { status = AIS_ERR_BAD_BIT_COUNT; return; }
 
     bitset<168> bs;
@@ -17,11 +22,6 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad) : AisMsg(nmea_paylo
         status = r;
         return;
       }
-    }
-
-    if (message_id != 4 && message_id != 11) {
-        status = AIS_ERR_WRONG_MSG_TYPE;
-        return;
     }
 
     year = ubits(bs, 38, 14);

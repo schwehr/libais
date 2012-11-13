@@ -1612,14 +1612,12 @@ ais10_to_pydict(const char *nmea_payload, const size_t pad) {
     assert(nmea_payload);
     assert(pad < 6);
 
-    std::cout << "ais10_to_pydict(\"" << nmea_payload << "\"," << pad << ")\n";
     Ais10 msg(nmea_payload, pad);
     if (msg.had_error()) {
         PyErr_Format(ais_py_exception, "Ais10: %s", AIS_STATUS_STRINGS[msg.get_error()]);
         return 0;
     }
 
-    std::cout << "dest: " << msg.dest_mmsi << "\n";
     PyObject *dict = PyDict_New();
     DictSafeSetItem(dict, "id", 10);
     DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);

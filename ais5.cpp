@@ -7,12 +7,12 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pa
     assert(pad < 6);
     if (status != AIS_UNINITIALIZED)
       return;
-    // TODO(schwehr): only if debugging
+#ifndef NDEBUG
     if (5 != message_id) {
       status = AIS_ERR_WRONG_MSG_TYPE;
       return;
     }
-
+#endif
     if (pad != 2 || strlen(nmea_payload) != 71) {
       status = AIS_ERR_BAD_BIT_COUNT;
       return;
@@ -50,7 +50,6 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pa
 
     status = AIS_OK;
 }
-
 
 ostream& operator<< (ostream& o, const Ais5 &msg) {
     return o << 5 << ": " << msg.mmsi << " \"" << msg.name << "\" "
