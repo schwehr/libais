@@ -4,6 +4,8 @@
 
 #include "ais.h"
 
+using std::abs;
+
 Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
     assert(nmea_payload);
     assert(pad < 6);
