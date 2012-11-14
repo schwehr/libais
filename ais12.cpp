@@ -11,7 +11,8 @@ Ais12::Ais12(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, 
     return;
   }
 #endif
-  // WARNING: the spec says max 1008 bits, but 168 + 4*256 => 1192 bits or 199 characters
+  // WARNING: The ITU 1371 specifications says the maximum number of bits is
+  // 1008, but it appears that the maximum should be 1192.
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits < 72 || num_bits > 1192)  { status = AIS_ERR_BAD_BIT_COUNT; return; }
 

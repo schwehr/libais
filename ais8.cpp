@@ -20,7 +20,7 @@ Ais8::Ais8(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pa
 #endif
 
   // in bits w/o DAC/FI
-  const int payload_len = strlen(nmea_payload)*6 - 46 - pad;
+  const int payload_len = strlen(nmea_payload) * 6 - 46 - pad;
   if (payload_len < 0 || payload_len > 952) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;

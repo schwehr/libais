@@ -11,7 +11,7 @@ Ais14::Ais14(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, 
     return;
   }
 #endif
-  const int num_bits = strlen(nmea_payload)*6 - pad;
+  const int num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits < 46 || num_bits > 1008) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
