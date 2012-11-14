@@ -20,7 +20,6 @@ Ais15::Ais15(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, 
   }
 
   bitset<162> bs;  // 160 / 6 = 26.66
-  status = aivdm_to_bits(bs, nmea_payload);
   {
     const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
     if (r != AIS_OK) {
