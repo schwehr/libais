@@ -48,7 +48,7 @@ void BuildNmeaLookup();
 static const int MAX_BITS = 1192;
 
 enum AIS_STATUS {
-  AIS_UNINITIALIZED,
+  AIS_UNINITIALIZED,  // Message is not yet completely decoded.
   AIS_OK,
   AIS_ERR_BAD_BIT_COUNT,
   AIS_ERR_WRONG_MSG_TYPE,
@@ -88,7 +88,7 @@ class AisMsg {
     assert(false);
     status = AIS_OK;
   }
-  AisMsg() { status = AIS_UNINITIALIZED; }
+  AisMsg() : status(AIS_UNINITIALIZED) {}
   AisMsg(const char *nmea_payload, const size_t pad);
 };
 
