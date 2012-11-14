@@ -6,10 +6,7 @@
 
 #include "ais.h"
 
-
 Ais8::Ais8(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   // Ais8 is used in some apps as a standalone, so be extra
   // careful to make sure we have the lookup table built
   assert(nmea_ord_initialized);
@@ -44,7 +41,6 @@ Ais8::Ais8(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pa
 }
 
 Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -85,10 +81,7 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad) : Ais8(nmea_paylo
   status = AIS_OK;
 }
 
-
 Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-    assert(nmea_payload);
-    assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -98,67 +91,67 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 #endif
 
-    if (strlen(nmea_payload) != 59) {
-      status = AIS_ERR_BAD_BIT_COUNT;
+  if (strlen(nmea_payload) != 59) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  bitset<354> bs;  // 352 + 2 spares to be 6 bit aligned
+  //bitset<MAX_BITS> bs;
+  {
+    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+    if (r != AIS_OK) {
+      status = r;
       return;
     }
+  }
 
-    bitset<354> bs;  // 352 + 2 spares to be 6 bit aligned
-    //bitset<MAX_BITS> bs;
-    {
-      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-      if (r != AIS_OK) {
-        status = r;
-        return;
-      }
-    }
+  y = sbits(bs, 56, 24) / 60000.;
+  x = sbits(bs, 80, 25) / 60000.;
+  day = ubits(bs, 105, 5);
+  hour = ubits(bs, 110, 5);
+  minute = ubits(bs, 115, 6);
+  wind_ave = ubits(bs, 121, 7);
+  wind_gust = ubits(bs, 128, 7);
+  wind_dir = ubits(bs, 135, 9);
+  wind_gust_dir = ubits(bs, 144, 9);
+  air_temp = ubits(bs, 153, 11) / 10. - 60;
+  rel_humid = ubits(bs, 164, 7);
+  dew_point = ubits(bs, 171, 10) / 10. - 20;  // TODO(schwehr): verify
+  air_pres = ubits(bs, 181, 9) + 800;
+  air_pres_trend = ubits(bs, 190, 2);
+  horz_vis = ubits(bs, 192, 8) / 10.;
+  // TODO(schwehr): verify for -10.0 to 30.0
+  water_level = ubits(bs, 200, 9) / 10. - 10;
+  water_level_trend = ubits(bs, 209, 2);
+  surf_cur_speed = ubits(bs, 211, 8) / 10.;
+  surf_cur_dir = ubits(bs, 219, 9);
+  cur_speed_2 = ubits(bs, 228, 8) / 10.;
+  cur_dir_2 = ubits(bs, 236, 9);
+  cur_depth_2 = ubits(bs, 245, 5);
+  cur_speed_3 = ubits(bs, 250, 8) / 10.;
+  cur_dir_3 = ubits(bs, 258, 9);
+  cur_depth_3 = ubits(bs, 267, 5);
 
-    y = sbits(bs, 56, 24) / 60000.;
-    x = sbits(bs, 80, 25) / 60000.;
-    day = ubits(bs, 105, 5);
-    hour = ubits(bs, 110, 5);
-    minute = ubits(bs, 115, 6);
-    wind_ave = ubits(bs, 121, 7);
-    wind_gust = ubits(bs, 128, 7);
-    wind_dir = ubits(bs, 135, 9);
-    wind_gust_dir = ubits(bs, 144, 9);
-    air_temp = ubits(bs, 153, 11) / 10. - 60;
-    rel_humid = ubits(bs, 164, 7);
-    dew_point = ubits(bs, 171, 10) / 10. - 20;  // TODO(schwehr): verify
-    air_pres = ubits(bs, 181, 9) + 800;
-    air_pres_trend = ubits(bs, 190, 2);
-    horz_vis = ubits(bs, 192, 8) / 10.;
-    // TODO(schwehr): verify for -10.0 to 30.0
-    water_level = ubits(bs, 200, 9) / 10. - 10;
-    water_level_trend = ubits(bs, 209, 2);
-    surf_cur_speed = ubits(bs, 211, 8) / 10.;
-    surf_cur_dir = ubits(bs, 219, 9);
-    cur_speed_2 = ubits(bs, 228, 8) / 10.;
-    cur_dir_2 = ubits(bs, 236, 9);
-    cur_depth_2 = ubits(bs, 245, 5);
-    cur_speed_3 = ubits(bs, 250, 8) / 10.;
-    cur_dir_3 = ubits(bs, 258, 9);
-    cur_depth_3 = ubits(bs, 267, 5);
+  wave_height = ubits(bs, 272, 8) / 10.;
+  wave_period = ubits(bs, 280, 6);
+  wave_dir = ubits(bs, 286, 9);
+  swell_height = ubits(bs, 295, 8) / 10.;
+  swell_period = ubits(bs, 303, 6);
+  swell_dir = ubits(bs, 309, 9);
 
-    wave_height = ubits(bs, 272, 8) / 10.;
-    wave_period = ubits(bs, 280, 6);
-    wave_dir = ubits(bs, 286, 9);
-    swell_height = ubits(bs, 295, 8) / 10.;
-    swell_period = ubits(bs, 303, 6);
-    swell_dir = ubits(bs, 309, 9);
+  sea_state = ubits(bs, 318, 4);
+  // TODO(schwehr): verify for -10.0 to +50.0
+  water_temp = ubits(bs, 322, 10) / 10. - 10;
+  precip_type = ubits(bs, 332, 3);
+  salinity = ubits(bs, 335, 9);
+  ice = ubits(bs, 344, 2);
+  // There is no way to know which meaning to attach to the following 6 bits
+  // TODO(schwehr): how to treat this spare vrs water level?
+  spare2 = ubits(bs, 346, 6);
+  extended_water_level = ubits(bs, 346, 6);
 
-    sea_state = ubits(bs, 318, 4);
-    // TODO(schwehr): verify for -10.0 to +50.0
-    water_temp = ubits(bs, 322, 10) / 10. - 10;
-    precip_type = ubits(bs, 332, 3);
-    salinity = ubits(bs, 335, 9);
-    ice = ubits(bs, 344, 2);
-    // There is no way to know which meaning to attach to the following 6 bits
-    // TODO(schwehr): how to treat this spare vrs water level?
-    spare2 = ubits(bs, 346, 6);
-    extended_water_level = ubits(bs, 346, 6);
-
-    status = AIS_OK;
+  status = AIS_OK;
   status = AIS_OK;
 }
 
@@ -167,7 +160,6 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // IMO Circ 289 - Fairway Closed
 // See also Circ 236
 Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -217,8 +209,6 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // IMO Circ 289 - Extended Shipdata - Air gap
 // See also Circ 236
 Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -253,7 +243,6 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // See also Circ 236
 // TODO(schwehr): there might also be an addressed version?
 Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -287,7 +276,6 @@ Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // IMO Circ 289 - VTS Generated/Synthetic Targets
 // See also Circ 236
 Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -334,8 +322,6 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 
 // IMO Circ 289 - Marine traffic signal
 Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -384,8 +370,6 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // IMO Circ 289 - Weather observation report from ship
 // See also Circ 236
 Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -499,7 +483,6 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // IMO Circ 289 - Extended ship static and voyage-related
 // See also Circ 236
 Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -561,8 +544,6 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // IMO Circ 289 - Route information
 // See also Circ 236
 Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -616,7 +597,6 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // IMO Circ 289 - Text description
 // See also Circ 236
 Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -661,7 +641,6 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // IMO Circ 289 - Meteorological and Hydrographic data
 // See also Circ 236
 Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -738,7 +717,6 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
 // Inland ship static and voyage related data
 Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -780,8 +758,6 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) : Ais8(nmea
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
 Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -837,7 +813,6 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) : Ais8(nmea
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
 Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -876,7 +851,6 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) : Ais8(nmea
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
 Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -917,7 +891,6 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad) : Ais8(nmea
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
 Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
