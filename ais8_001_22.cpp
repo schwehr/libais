@@ -4,7 +4,6 @@
 #include "ais.h"
 #include "ais8_001_22.h"
 
-
 // TODO(schwehr): field on class
 const char *ais8_001_22_shape_names[8] = {"Circle/Pt", "Rect", "Sector",
                                           "Polyline", "Polygon", "Text",
@@ -153,107 +152,109 @@ static void decode_xy(const bitset<AIS8_MAX_BITS> &bs, const size_t offset, floa
     // Offset is the start of the sub area.  Same as the caller's offset
     // This is the same for all but the text subarea
     // OLD Nav 55: sbits(bs, offset + 5, 28) / 600000.;
-    x = sbits(bs, offset + 5, 25) / 60000.;
-    y = sbits(bs, offset + 30, 24) / 60000.;
+  x = sbits(bs, offset + 5, 25) / 60000.;
+  y = sbits(bs, offset + 30, 24) / 60000.;
 }
 
 Ais8_001_22_Circle::Ais8_001_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset + 3, 2);
-    decode_xy(bs, offset, x, y);
-    precision = ubits(bs, offset + 54, 3);  // useless
-    radius_m  = ubits(bs, offset + 57, 12) * scale_multipliers[scale_factor];
-    spare     = ubits(bs, offset + 69, 18);
+  const int scale_factor = ubits(bs, offset + 3, 2);
+  decode_xy(bs, offset, x, y);
+  precision = ubits(bs, offset + 54, 3);  // useless
+  radius_m  = ubits(bs, offset + 57, 12) * scale_multipliers[scale_factor];
+  spare     = ubits(bs, offset + 69, 18);
 }
 
 Ais8_001_22_Rect::Ais8_001_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset + 3, 2);
-    decode_xy(bs, offset, x, y);
+  const int scale_factor = ubits(bs, offset + 3, 2);
+  decode_xy(bs, offset, x, y);
 
-    precision  = ubits(bs, offset + 54, 3);  // useless
-    e_dim_m    = ubits(bs, offset + 57, 8) * scale_multipliers[scale_factor];
-    n_dim_m    = ubits(bs, offset + 65, 8) * scale_multipliers[scale_factor];
-    orient_deg = ubits(bs, offset + 73, 9);
-    spare      = ubits(bs, offset + 82, 5);
+  precision  = ubits(bs, offset + 54, 3);  // useless
+  e_dim_m    = ubits(bs, offset + 57, 8) * scale_multipliers[scale_factor];
+  n_dim_m    = ubits(bs, offset + 65, 8) * scale_multipliers[scale_factor];
+  orient_deg = ubits(bs, offset + 73, 9);
+  spare      = ubits(bs, offset + 82, 5);
 }
 
 Ais8_001_22_Sector::Ais8_001_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset + 3, 2);
-    decode_xy(bs, offset, x, y);
+  const int scale_factor = ubits(bs, offset + 3, 2);
+  decode_xy(bs, offset, x, y);
 
-    precision       = ubits(bs, offset + 54, 3);  // useless
-    radius_m        = ubits(bs, offset + 57, 12) * scale_multipliers[scale_factor];
-    left_bound_deg  = ubits(bs, offset + 69, 9);
-    right_bound_deg = ubits(bs, offset + 78, 9);
+  precision       = ubits(bs, offset + 54, 3);  // useless
+  radius_m        = ubits(bs, offset + 57, 12) * scale_multipliers[scale_factor];
+  left_bound_deg  = ubits(bs, offset + 69, 9);
+  right_bound_deg = ubits(bs, offset + 78, 9);
 }
 
 // Size of one point angle and distance
 static const size_t PT_AD_SIZE = 10 + 10;
 
 Ais8_001_22_Polyline::Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset + 3, 2);
-    const int multiplier = scale_multipliers[scale_factor];
-    for (size_t i = 0; i < 4; i++) {
-        const int angle = ubits(bs, offset + 5 + (i*PT_AD_SIZE), 10);
-        const int dist  = ubits(bs, offset + 15 + (i*PT_AD_SIZE), 10) * multiplier;
-        if (0 == dist) break;
-        angles.push_back(angle);
-        dists_m.push_back(dist);
-    }
-    spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
+  const int scale_factor = ubits(bs, offset + 3, 2);
+  const int multiplier = scale_multipliers[scale_factor];
+  for (size_t i = 0; i < 4; i++) {
+    const int angle = ubits(bs, offset + 5 + (i*PT_AD_SIZE), 10);
+    const int dist  = ubits(bs, offset + 15 + (i*PT_AD_SIZE), 10) * multiplier;
+    if (0 == dist)
+      break;
+    angles.push_back(angle);
+    dists_m.push_back(dist);
+  }
+  spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
 }
 
 // TODO(schwehr): fold into polyline
 Ais8_001_22_Polygon::Ais8_001_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const int scale_factor = ubits(bs, offset + 3, 2);
-    const int multiplier = scale_multipliers[scale_factor];
-    for (size_t i = 0; i < 4; i++) {
-        const int angle = ubits(bs, offset + 5 + (i*PT_AD_SIZE), 10);
-        const int dist  = ubits(bs, offset + 15 + (i*PT_AD_SIZE), 10) * multiplier;
-        if (0 == dist) break;
-        angles.push_back(angle);
-        dists_m.push_back(dist);
-    }
-    spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
+  const int scale_factor = ubits(bs, offset + 3, 2);
+  const int multiplier = scale_multipliers[scale_factor];
+  for (size_t i = 0; i < 4; i++) {
+    const int angle = ubits(bs, offset + 5 + (i*PT_AD_SIZE), 10);
+    const int dist  = ubits(bs, offset + 15 + (i*PT_AD_SIZE), 10) * multiplier;
+    if (0 == dist)
+      break;
+    angles.push_back(angle);
+    dists_m.push_back(dist);
+  }
+  spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
 }
 
 Ais8_001_22_Text::Ais8_001_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    text = string(ais_str(bs, offset + 3, 84));
-    // TODO(schwehr): spare?
+  text = string(ais_str(bs, offset + 3, 84));
+  // TODO(schwehr): spare?
 }
 
 // Call the appropriate constructor
 Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-    const Ais8_001_22_AreaShapeEnum area_shape = (Ais8_001_22_AreaShapeEnum)ubits(bs, offset, 3);
-    Ais8_001_22_SubArea *area = NULL;
-    switch (area_shape) {
-    case AIS8_001_22_SHAPE_CIRCLE:
-        area = new Ais8_001_22_Circle(bs, offset);
-        break;
-    case AIS8_001_22_SHAPE_RECT:
-        area = new Ais8_001_22_Rect(bs, offset);
-        return area;
-    case AIS8_001_22_SHAPE_SECTOR:
-        area = new Ais8_001_22_Sector(bs, offset);
-        break;
-    case AIS8_001_22_SHAPE_POLYLINE:
-        area = new Ais8_001_22_Polyline(bs, offset);
-        break;
-    case AIS8_001_22_SHAPE_POLYGON:
-        area = new Ais8_001_22_Polygon(bs, offset);
-        break;
-    case AIS8_001_22_SHAPE_TEXT:
-        area = new Ais8_001_22_Text(bs, offset);
-        break;
-    case AIS8_001_22_SHAPE_RESERVED_6:  // FALLTHROUGH
-    case AIS8_001_22_SHAPE_RESERVED_7:  // FALLTHROUGH
-      // Keep area==0 to indicate error.
-        break;
-    case AIS8_001_22_SHAPE_ERROR:
-        break;
-    default:
-        assert(false);
-    }
+  const Ais8_001_22_AreaShapeEnum area_shape = (Ais8_001_22_AreaShapeEnum)ubits(bs, offset, 3);
+  Ais8_001_22_SubArea *area = NULL;
+  switch (area_shape) {
+  case AIS8_001_22_SHAPE_CIRCLE:
+    area = new Ais8_001_22_Circle(bs, offset);
+    break;
+  case AIS8_001_22_SHAPE_RECT:
+    area = new Ais8_001_22_Rect(bs, offset);
     return area;
+  case AIS8_001_22_SHAPE_SECTOR:
+    area = new Ais8_001_22_Sector(bs, offset);
+    break;
+  case AIS8_001_22_SHAPE_POLYLINE:
+    area = new Ais8_001_22_Polyline(bs, offset);
+    break;
+  case AIS8_001_22_SHAPE_POLYGON:
+    area = new Ais8_001_22_Polygon(bs, offset);
+    break;
+  case AIS8_001_22_SHAPE_TEXT:
+    area = new Ais8_001_22_Text(bs, offset);
+    break;
+  case AIS8_001_22_SHAPE_RESERVED_6:  // FALLTHROUGH
+  case AIS8_001_22_SHAPE_RESERVED_7:  // FALLTHROUGH
+    // Keep area==0 to indicate error.
+    break;
+  case AIS8_001_22_SHAPE_ERROR:
+    break;
+  default:
+    assert(false);
+  }
+  return area;
 }
 
 
@@ -262,9 +263,7 @@ Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs
 //////////////////////////////////////////////////////////////////////
 
 Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-    assert(nmea_payload);
-    assert(pad < 6);
-    assert(nmea_ord_initialized);  // Make sure we have the lookup table built
+  assert(nmea_ord_initialized);  // Make sure we have the lookup table built
 
   if (status != AIS_UNINITIALIZED)
     return;
@@ -275,54 +274,54 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad) : Ais8(nmea
   }
 #endif
 
-    const int num_bits = strlen(nmea_payload) * 6 - pad;
-    // TODO(schwehr): make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
-    // Spec is not byte aligned.  BAD!
-    if (198 > num_bits || num_bits > 984) { status = AIS_ERR_BAD_BIT_COUNT; return; }
-
-    bitset<MAX_BITS> bs;
-    {
-      const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-      if (r != AIS_OK) {
-        status = r;
-        return;
-      }
+  const int num_bits = strlen(nmea_payload) * 6 - pad;
+  // TODO(schwehr): make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
+  // Spec is not byte aligned.  BAD!
+  if (198 > num_bits || num_bits > 984) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+  
+  bitset<MAX_BITS> bs;
+  {
+    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+    if (r != AIS_OK) {
+      status = r;
+      return;
     }
+  }
 
-    link_id = ubits(bs, 56, 10);
-    notice_type = ubits(bs, 66, 7);
-    month = ubits(bs, 73, 4);
-    day = ubits(bs, 77, 5);
-    hour = ubits(bs, 82, 5);
-    minute = ubits(bs, 87, 6);
+  link_id = ubits(bs, 56, 10);
+  notice_type = ubits(bs, 66, 7);
+  month = ubits(bs, 73, 4);
+  day = ubits(bs, 77, 5);
+  hour = ubits(bs, 82, 5);
+  minute = ubits(bs, 87, 6);
 
-    duration_minutes = ubits(bs, 93, 18);
+  duration_minutes = ubits(bs, 93, 18);
 
-    // Use floor to be able to ignore any spare bits
-    const int num_sub_areas = static_cast<int>(floor((num_bits - 111)/87.));
-    for (int sub_area_idx = 0; sub_area_idx < num_sub_areas; sub_area_idx++) {
-        const size_t start = 111 + AIS8_001_22_SUBAREA_SIZE*sub_area_idx;
-        Ais8_001_22_SubArea *sub_area = ais8_001_22_subarea_factory(bs, start);
-        if (sub_area) {
-            sub_areas.push_back(sub_area);
-        } else {
-            status = AIS_ERR_BAD_SUB_SUB_MSG;
-        }
+  // Use floor to be able to ignore any spare bits
+  const int num_sub_areas = static_cast<int>(floor((num_bits - 111)/87.));
+  for (int sub_area_idx = 0; sub_area_idx < num_sub_areas; sub_area_idx++) {
+    const size_t start = 111 + AIS8_001_22_SUBAREA_SIZE*sub_area_idx;
+    Ais8_001_22_SubArea *sub_area = ais8_001_22_subarea_factory(bs, start);
+    if (sub_area) {
+      sub_areas.push_back(sub_area);
+    } else {
+      status = AIS_ERR_BAD_SUB_SUB_MSG;
     }
-    /* TODO(schwehr): inspect the subareas to make sure the are sane.
-       - polyline/polygon have a point first
-       - text has geometry to go through it all
-    */
-    // TODO(schwehr): watch out for mandatory spare bits to byte align payload
-    if (status == AIS_UNINITIALIZED)
-      status = AIS_OK;
+  }
+  /* TODO(schwehr): inspect the subareas to make sure the are sane.
+     - polyline/polygon have a point first
+     - text has geometry to go through it all
+  */
+  // TODO(schwehr): watch out for mandatory spare bits to byte align payload
+  if (status == AIS_UNINITIALIZED)
+    status = AIS_OK;
 }
 
 Ais8_001_22::~Ais8_001_22() {
-    for (size_t i = 0; i < sub_areas.size(); i++) {
-        delete sub_areas[i];
+  for (size_t i = 0; i < sub_areas.size(); i++) {
+    delete sub_areas[i];
 #ifndef NDEBUG
-        sub_areas[i] = 0;
+    sub_areas[i] = NULL;
 #endif
     }
 }

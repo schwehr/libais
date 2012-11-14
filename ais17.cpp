@@ -9,8 +9,6 @@
 #include "ais.h"
 
 Ais17::Ais17(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
-  assert(pad < 6);
-  assert(nmea_payload);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG

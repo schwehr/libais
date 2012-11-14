@@ -245,7 +245,7 @@ Ais8_1_26::~Ais8_1_26() {
   for (size_t i = 0; i < reports.size(); i++) {
     delete reports[i];
 #ifndef NDEBUG
-    reports[i] = 0;
+    reports[i] = NULL;
 #endif
   }
 }

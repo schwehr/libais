@@ -6,8 +6,6 @@
 #include "ais.h"
 
 Ais6::Ais6(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -38,15 +36,9 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pa
   spare = bs[71];
   dac = ubits(bs, 72, 10);
   fi = ubits(bs, 82, 6);
-
-
-  std::cout << message_id << ":" << dac << ":" << fi << "\n";
 }
 
-
 Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -87,10 +79,7 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
   status = AIS_OK;
 }
 
-
 Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -123,10 +112,7 @@ Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
   status = AIS_OK;
 }
 
-
 Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -155,11 +141,8 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
   status = AIS_OK;
 }
 
-
 // IFM 3: Capability interrogation - OLD ITU 1371-1
 Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -191,9 +174,6 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
 // IFM 4: Capability reply - OLD ITU 1371-4
 // TODO(schwehr): WTF?  10 + 128 + 6 == 80  Is this 168 or 232 bits?
 Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
-
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -229,13 +209,9 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
   status = AIS_OK;
 }
 
-
 // IMO Circ 289 - Dangerous cargo
 // See also Circ 236
 Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
-
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -292,9 +268,6 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
 // See also Circ 236
 Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
   // TODO(schwehr): untested - no sample of the correct length yet
-  assert(nmea_payload);
-  assert(pad < 6);
-
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -344,9 +317,6 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
 
 // IMO Circ 289 - Clearance time to enter port
 Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
-
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -387,12 +357,8 @@ Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
   status = AIS_OK;
 }
 
-
 // IMO Circ 289 - Berthing data
 Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
-
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -435,13 +401,9 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
   status = AIS_OK;
 }
 
-
 // IMO Circ 289 - Dangerous cargo indication 2
 // See also Circ 236
 Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
-
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -533,16 +495,11 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
   status = AIS_OK;
 }
 
-
 // TODO(schwehr): 6_1_28 - Modify 8_1_28 once that is debugged
-
 
 // IMO Circ 289 - Tidal window
 // See also Circ 236
 Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
-
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
@@ -589,11 +546,8 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
   status = AIS_OK;
 }
 
-
 // IFM 40: people on board - OLD ITU 1371-4
 Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
   if (status != AIS_UNINITIALIZED)
     return;
 #ifndef NDEBUG
