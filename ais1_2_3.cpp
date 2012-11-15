@@ -45,16 +45,23 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad)
 
   sync_state = ubits(bs, 149, 2);
 
-  // Set all to invalid - this way we don't have to track it in multiple places
-  received_stations = -1;  received_stations_valid = false;
-  slot_number = -1; slot_number_valid = false;
-  utc_hour = utc_min = -1; utc_valid = false;
+  // Set all to invalid.  This way we don't have to track it in multiple places.
+  received_stations = -1;
+  received_stations_valid = false;
+  slot_number = -1;
+  slot_number_valid = false;
+  utc_hour = utc_min = -1;
+  utc_valid = false;
   utc_spare = -1;
-  slot_offset = -1; slot_offset_valid = false;
+  slot_offset = -1;
+  slot_offset_valid = false;
 
-  slot_increment = -1; slot_increment_valid = false;
-  slots_to_allocate = -1;  slots_to_allocate_valid = false;
-  keep_flag = false; keep_flag_valid = false;
+  slot_increment = -1;
+  slot_increment_valid = false;
+  slots_to_allocate = -1;
+  slots_to_allocate_valid = false;
+  keep_flag = false;
+  keep_flag_valid = false;
 
   if (1 == message_id || 2 == message_id) {
     slot_timeout = ubits(bs, 151, 3);

@@ -7,10 +7,9 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad)
   if (status != AIS_UNINITIALIZED)
     return;
 
-
   assert(message_id == 22);
 
-  if (pad != 0 || std::strlen(nmea_payload) != 28) {
+  if (pad != 0 || strlen(nmea_payload) != 28) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }

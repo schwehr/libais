@@ -9,7 +9,7 @@ Ais23::Ais23(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 23);
 
-  if (pad != 2 || 27 != std::strlen(nmea_payload)) {
+  if (pad != 2 || strlen(nmea_payload) != 27) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
