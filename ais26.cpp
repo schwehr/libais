@@ -52,16 +52,25 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad)
 
 #ifndef NDEBUG
   slot_timeout = -1;
-  received_stations = slot_number = utc_hour = utc_min = utc_spare -1;
-  slot_offset = slot_increment = slots_to_allocate = -1;
+  received_stations = -1;
+  slot_number = -1;
+  utc_hour = -1;
+  utc_min = -1;
+  utc_spare = -1;
+  slot_offset = -1;
+  slot_increment = -1;
+  slots_to_allocate = -1;
   keep_flag = false;
 #endif
 
   slot_timeout_valid = false;
-  received_stations_valid = slot_number_valid = utc_valid = false;
-  slot_offset_valid = slot_increment_valid = slots_to_allocate_valid = false;
+  received_stations_valid = false;
+  slot_number_valid = false;
+  utc_valid = false;
+  slot_offset_valid = false;
+  slot_increment_valid = false;
+  slots_to_allocate_valid = false;
   keep_flag_valid = false;
-
 
   if (!commstate_flag) {
     // SOTDMA
