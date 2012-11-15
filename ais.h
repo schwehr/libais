@@ -51,7 +51,6 @@ enum AIS_STATUS {
   AIS_UNINITIALIZED,  // Message is not yet completely decoded.
   AIS_OK,
   AIS_ERR_BAD_BIT_COUNT,
-  // AIS_ERR_WRONG_MSG_TYPE,
   AIS_ERR_BAD_NMEA_CHR,
   AIS_ERR_BAD_PTR,
   AIS_ERR_UNKNOWN_MSG_TYPE,
@@ -80,14 +79,10 @@ class AisMsg {
   // TODO(schwehr): make status private and have accessors.
   bool had_error() const {  return status != AIS_OK;  }
   AIS_STATUS get_error() const {return status;}
+
  protected:
   AIS_STATUS status;  // AIS_OK or error code
 
-  // TODO(schwehr): remove init.
-  void init() {
-    assert(false);
-    status = AIS_OK;
-  }
   AisMsg() : status(AIS_UNINITIALIZED) {}
   AisMsg(const char *nmea_payload, const size_t pad);
 };
