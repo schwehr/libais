@@ -2,27 +2,23 @@
 
 #include "ais.h"
 
-Ais5::Ais5(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
+Ais5::Ais5(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (5 != message_id) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(message_id == 5);
+
   if (pad != 2 || strlen(nmea_payload) != 71) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
   bitset<426> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   ais_version = ubits(bs, 38, 2);

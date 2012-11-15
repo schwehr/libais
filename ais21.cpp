@@ -2,15 +2,12 @@
 
 #include "ais.h"
 
-Ais21::Ais21(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad)  {
+Ais21::Ais21(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad)  {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (message_id != 21) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(message_id == 21);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -21,12 +18,10 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, 
   }
 
   bitset<360> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   aton_type = ubits(bs, 38, 5);

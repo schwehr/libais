@@ -200,18 +200,13 @@ Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const bitset<AIS8_MAX_BI
   return rpt;
 }
 
-Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
-  assert(nmea_payload);
-  assert(pad < 6);
-
+Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 26 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 26);
 
   const int num_bits = strlen(nmea_payload) * 6 - pad;
   if (168 > num_bits || num_bits > 1098) {
@@ -220,8 +215,11 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<MAX_BITS> bs;
-  status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
+  }
 
   const size_t num_sensor_reports = (num_bits - 56) / AIS8_1_26_REPORT_SIZE;
 

@@ -2,15 +2,13 @@
 
 #include "ais.h"
 
-Ais22::Ais22(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
+Ais22::Ais22(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (message_id != 22) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+
+  assert(message_id == 22);
 
   if (pad != 0 || std::strlen(nmea_payload) != 28) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -18,12 +16,10 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, 
   }
 
   bitset<168> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   spare = ubits(bs, 38, 2);

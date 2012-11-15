@@ -6,18 +6,15 @@
 
 #include "ais.h"
 
-Ais8::Ais8(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
+Ais8::Ais8(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
   // Ais8 is used in some apps as a standalone, so be extra
   // careful to make sure we have the lookup table built
   assert(nmea_ord_initialized);
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (8 != message_id) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(message_id == 8);
 
   // in bits w/o DAC/FI
   const int payload_len = strlen(nmea_payload) * 6 - 46 - pad;
@@ -27,12 +24,10 @@ Ais8::Ais8(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pa
   }
 
   bitset<MAX_BITS> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   spare = ubits(bs, 38, 2);
@@ -40,15 +35,13 @@ Ais8::Ais8(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pa
   fi = ubits(bs, 50, 6);
 }
 
-Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 0 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 0);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -58,19 +51,18 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad) : Ais8(nmea_paylo
   }
 
   bitset<MAX_BITS> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   ack_required = bs[56];
   msg_seq = ubits(bs, 57, 11);
 
   const size_t text_size = 6 * ((num_bits - 68)/6);
-  const size_t spare2_size = num_bits - 68 - text_size;  // wrong?  needs to land on 8-bit boundary
+  // wrong?  needs to land on 8-bit boundary
+  const size_t spare2_size = num_bits - 68 - text_size;
   text = ais_str(bs, 68, text_size);
 
   // TODO(schwehr): Is this correct?
@@ -81,15 +73,13 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad) : Ais8(nmea_paylo
   status = AIS_OK;
 }
 
-Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 11 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 11);
 
   if (strlen(nmea_payload) != 59) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -97,13 +87,10 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<354> bs;  // 352 + 2 spares to be 6 bit aligned
-  //bitset<MAX_BITS> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   y = sbits(bs, 56, 24) / 60000.;
@@ -159,15 +146,12 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 
 // IMO Circ 289 - Fairway Closed
 // See also Circ 236
-Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 13 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+  assert(dac == 1);
+  assert(fi == 13);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -177,12 +161,10 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<472> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   reason = ais_str(bs, 56, 120);
@@ -202,21 +184,17 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   status = AIS_OK;
 }
 
-
 // No 8_1_16
-
 
 // IMO Circ 289 - Extended Shipdata - Air gap
 // See also Circ 236
-Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 15 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 15);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -226,12 +204,10 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<72> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   air_draught = ubits(bs, 56, 11) / 10.;
@@ -242,15 +218,13 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // IMO Circ 289 - Number of persons on board
 // See also Circ 236
 // TODO(schwehr): there might also be an addressed version?
-Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 16 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 16);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -260,12 +234,10 @@ Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<72> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   persons = ubits(bs, 56, 13);
@@ -275,15 +247,13 @@ Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 
 // IMO Circ 289 - VTS Generated/Synthetic Targets
 // See also Circ 236
-Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 17 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 17);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   const size_t num_targets = (num_bits - 56) / 120;
@@ -295,12 +265,10 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<536> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   for (size_t target_num = 0; target_num < num_targets; target_num++) {
@@ -321,15 +289,13 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 // No msg 8_1_18
 
 // IMO Circ 289 - Marine traffic signal
-Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 19 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 19);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -340,12 +306,10 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<360> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   link_id = ubits(bs, 56, 10);
@@ -369,15 +333,13 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 
 // IMO Circ 289 - Weather observation report from ship
 // See also Circ 236
-Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 21 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 21);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -387,12 +349,10 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<360> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   type_wx_report = bs[56];
@@ -448,8 +408,8 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
     // TODO(schwehr): change this to celcius
     air_temp_raw = ubits(bs, 195, 10);
     humidity =ubits(bs, 205, 7);
-    water_temp_raw = ubits(bs, 212, 9);  // TODO(schwehr): change this to C.  Jerks.
-    horz_viz = pow(ubits(bs, 221, 6), 2) * 13.073;  // WTF?  the result is meters.
+    water_temp_raw = ubits(bs, 212, 9);  // TODO(schwehr): change this to C
+    horz_viz = pow(ubits(bs, 221, 6), 2) * 13.073;  // m
     wx[0] = ubits(bs, 227, 9);  // current
     wx[1] = ubits(bs, 236, 5);  // past 1
     wx[2] = ubits(bs, 241, 5);  // past 2
@@ -458,7 +418,7 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
     cloud_low_type = ubits(bs, 254, 6);
     cloud_middle_type = ubits(bs, 260, 6);
     cloud_high_type = ubits(bs, 266, 6);
-    alt_lowest_cloud_base = pow(ubits(bs, 272, 7), 2) * 0.16;  // Jerks
+    alt_lowest_cloud_base = pow(ubits(bs, 272, 7), 2) * 0.16;
     wave_period = ubits(bs, 279, 5);  // s
     wave_height = ubits(bs, 284, 6) * 0.5;  // m
     swell_dir = ubits(bs, 290, 6) * 10;
@@ -482,15 +442,13 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 
 // IMO Circ 289 - Extended ship static and voyage-related
 // See also Circ 236
-Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 24 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 1);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -500,12 +458,10 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<360> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   link_id = ubits(bs, 56, 10);
@@ -543,15 +499,13 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 
 // IMO Circ 289 - Route information
 // See also Circ 236
-Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 27 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 1);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   const size_t num_waypoints = (num_bits - 117) / 55;
@@ -563,12 +517,10 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<997> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   link_id = ubits(bs, 56, 10);
@@ -596,15 +548,13 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 
 // IMO Circ 289 - Text description
 // See also Circ 236
-Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 29 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 29);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -614,12 +564,10 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<1032> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   link_id = ubits(bs, 56, 10);
@@ -640,15 +588,13 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 
 // IMO Circ 289 - Meteorological and Hydrographic data
 // See also Circ 236
-Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 31 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 31);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -658,12 +604,10 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
   }
 
   bitset<360> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   x = sbits(bs, 56, 25) / 60000.;
@@ -716,15 +660,13 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad) : Ais8(nmea_pay
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
 // Inland ship static and voyage related data
-Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (200 != dac || 10 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 200);
+  assert(fi == 10);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits != 168) {
@@ -733,12 +675,10 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) : Ais8(nmea
   }
 
   bitset<168> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   eu_id = ais_str(bs, 56, 48);
@@ -757,15 +697,13 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad) : Ais8(nmea
 }
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
-Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (200 != dac || 23 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 200);
+  assert(fi == 23);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -775,12 +713,10 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) : Ais8(nmea
   }
 
   bitset<256> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   utc_year_start = ubits(bs, 56, 9);
@@ -812,15 +748,13 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad) : Ais8(nmea
 
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
-Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (200 != dac || 24 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 200);
+  assert(fi == 24);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -830,12 +764,10 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) : Ais8(nmea
   }
 
   bitset<168> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   ais_str(bs, 56, 12);
@@ -850,15 +782,13 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad) : Ais8(nmea
 }
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
-Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (200 != dac || 40 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 200);
+  assert(fi == 40);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -868,12 +798,10 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad) : Ais8(nmea
   }
 
   bitset<168> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   x = sbits(bs, 56, 28) / 600000.;
@@ -890,15 +818,13 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad) : Ais8(nmea
 
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
-Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (200 != dac || 55 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 200);
+  assert(fi == 55);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -910,12 +836,10 @@ Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad) : Ais8(nmea
   }
 
   bitset<168> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   crew = ubits(bs, 56, 8);

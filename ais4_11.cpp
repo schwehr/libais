@@ -2,27 +2,23 @@
 
 #include "ais.h"
 
-Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
+Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (message_id != 4 && message_id != 11) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
-  if (0 != pad || strlen(nmea_payload) != 28) {
+
+  assert(message_id == 4 || message_id == 11);
+
+  if (pad != 0 || strlen(nmea_payload) != 28) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
   bitset<168> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   year = ubits(bs, 38, 14);

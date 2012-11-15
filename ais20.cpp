@@ -2,27 +2,23 @@
 
 #include "ais.h"
 
-Ais20::Ais20(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
+Ais20::Ais20(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (20 != message_id) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(message_id == 20);
+
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits < 72 || num_bits > 160) {
     status = AIS_ERR_BAD_BIT_COUNT;  return;
   }
 
   bitset<162> bs;  // 160, but must be 6 bit aligned
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   spare = ubits(bs, 38, 2);

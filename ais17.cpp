@@ -8,15 +8,13 @@
 
 #include "ais.h"
 
-Ais17::Ais17(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
+Ais17::Ais17(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (17 != message_id) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(message_id == 17);
+
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -24,12 +22,10 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, 
   }
 
   bitset<816> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   spare = ubits(bs, 38, 2);
@@ -63,7 +59,7 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, 
   switch (gnss_type) {
   case 1:  // FALLTHROUGH
     // Differential GNSS corrections (full set of satellites)
-  case 9: // Subset differential GNSS corrections
+  case 9:  // Subset differential GNSS corrections
     if (n - 2 != (remain_bits / (24 + 16))) {
       std::cerr << "WARNING: Bad bit count\n";
     }

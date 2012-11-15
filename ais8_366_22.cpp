@@ -141,15 +141,13 @@ const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = {
 };
 
 
-Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad) : Ais8(nmea_payload, pad) {
+Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (366 != dac || 22 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 366);
+  assert(fi == 22);
 
   const int num_bits = (strlen(nmea_payload) * 6) - pad;
   if (208 <= num_bits && num_bits >= 1020) {
@@ -158,12 +156,10 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad) : Ais8(nmea
   }
 
   bitset<MAX_BITS> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   link_id = ubits(bs, 56, 10);

@@ -4,28 +4,27 @@
 
 #include "ais.h"
 
-Ais26::Ais26(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad)  {
+Ais26::Ais26(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad)  {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (26 != message_id) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(message_id == 26);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  const size_t comm_flag_offset = num_bits - 20 + 1;  // TODO(schwehr): check for off by one.
+  // TODO(schwehr): check for off by one.
+  const size_t comm_flag_offset = num_bits - 20 + 1;
 
-  if (52 > num_bits || num_bits > 1064) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+  if (52 > num_bits || num_bits > 1064) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   bitset<1064> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   const bool addressed = bs[38];
@@ -45,7 +44,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, 
       dac = ubits(bs, 40, 10);
       fi = ubits(bs, 50, 6);
     }
-    // TODO(schwehr): deal with payload - probably need to pass in the spare bits
+    // TODO(schwehr): Handle the payload.
   }
 
   commstate_flag = bs[comm_flag_offset];

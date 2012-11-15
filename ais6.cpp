@@ -5,15 +5,13 @@
 
 #include "ais.h"
 
-Ais6::Ais6(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
+Ais6::Ais6(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (6 != message_id) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(message_id == 6);
+
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   const int payload_len = num_bits - 46;  // in bits w/o DAC/FI
   if (num_bits < 88 || payload_len < 0 || payload_len > 952) {
@@ -22,12 +20,10 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pa
   }
 
   bitset<MAX_BITS> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   seq = ubits(bs, 38, 2);
@@ -38,15 +34,12 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pa
   fi = ubits(bs, 82, 6);
 }
 
-Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 0 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+  assert(dac == 1);
+  assert(fi == 0);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -56,12 +49,10 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
   }
 
   bitset<1024> bs;  // TODO(schwehr): what is the real max size?
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   ack_required = bs[88];
@@ -79,15 +70,13 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
   status = AIS_OK;
 }
 
-Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 1 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 1);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -97,12 +86,10 @@ Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
   }
 
   bitset<112> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   ack_dac = ubits(bs, 88, 10);
@@ -112,27 +99,23 @@ Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
   status = AIS_OK;
 }
 
-Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 2 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 2);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
   bitset<104> bs;  // TODO(schwehr): what is the real bit count?
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   req_dac = ubits(bs, 88, 10);
@@ -142,27 +125,23 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
 }
 
 // IFM 3: Capability interrogation - OLD ITU 1371-1
-Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 3 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 3);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
   bitset<104> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   req_dac = ubits(bs, 88, 10);
@@ -173,15 +152,12 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
 
 // IFM 4: Capability reply - OLD ITU 1371-4
 // TODO(schwehr): WTF?  10 + 128 + 6 == 80  Is this 168 or 232 bits?
-Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 4 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+  assert(dac == 1);
+  assert(fi == 4);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -189,12 +165,10 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
   if (num_bits != 232) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
   bitset<168> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   ack_dac = ubits(bs, 88, 10);
@@ -211,15 +185,13 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad) : Ais6(nmea_paylo
 
 // IMO Circ 289 - Dangerous cargo
 // See also Circ 236
-Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 12 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 12);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -227,15 +199,11 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
     status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
   bitset<360> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
-
-  if (1 != dac || 12 != fi) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
 
   // TODO(schwehr): add in the offset of the dest mmsi
 
@@ -266,16 +234,14 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
 
 // IMO Circ 289 - Tidal Window
 // See also Circ 236
-Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   // TODO(schwehr): untested - no sample of the correct length yet
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if ( 1 != dac || 14 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 14);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -285,12 +251,10 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
   }
 
   bitset<376> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   utc_month = ubits(bs, 88, 4);
@@ -316,15 +280,13 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
 }
 
 // IMO Circ 289 - Clearance time to enter port
-Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if ( 1 != dac || 18 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 18);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -334,12 +296,10 @@ Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
   }
 
   bitset<360> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   link_id = ubits(bs, 88, 10);
@@ -358,27 +318,26 @@ Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
 }
 
 // IMO Circ 289 - Berthing data
-Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if ( 1 != dac || 20 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 20);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  if (360 != num_bits) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+  if (360 != num_bits) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   bitset<360> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   link_id = ubits(bs, 88, 10);
@@ -403,15 +362,13 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
 
 // IMO Circ 289 - Dangerous cargo indication 2
 // See also Circ 236
-Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if ( 1 != dac || 25 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 25);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -429,12 +386,10 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
   }
 
   bitset<576> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   amount_unit = ubits(bs, 88, 2);
@@ -499,15 +454,13 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
 
 // IMO Circ 289 - Tidal window
 // See also Circ 236
-Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if ( 1 != dac || 32 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 32);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -518,12 +471,10 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
   }
 
   bitset<360> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   utc_month = ubits(bs, 88, 4);
@@ -547,27 +498,23 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad) : Ais6(nmea_pay
 }
 
 // IFM 40: people on board - OLD ITU 1371-4
-Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad) : Ais6(nmea_payload, pad) {
+Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (1 != dac || 40 != fi) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(dac == 1);
+  assert(fi == 40);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 
   bitset<104> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   persons = ubits(bs, 88, 13);

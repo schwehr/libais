@@ -2,27 +2,26 @@
 
 #include "ais.h"
 
-Ais12::Ais12(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
+Ais12::Ais12(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (12 != message_id) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(message_id == 12);
+
   // WARNING: The ITU 1371 specifications says the maximum number of bits is
   // 1008, but it appears that the maximum should be 1192.
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  if (num_bits < 72 || num_bits > 1192)  { status = AIS_ERR_BAD_BIT_COUNT; return; }
+  if (num_bits < 72 || num_bits > 1192)  {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   bitset<MAX_BITS> bs;  // Spec says 1008
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   seq_num = ubits(bs, 38, 2);

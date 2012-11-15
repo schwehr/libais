@@ -123,7 +123,8 @@ ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
 
   Ais1_2_3 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais1_2_3: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais1_2_3: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -147,7 +148,7 @@ ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
   DictSafeSetItem(dict, "raim", msg.raim);
 
   // COMM States
-  DictSafeSetItem(dict, "sync_state", msg.sync_state);  // In both SOTDMA and ITDMA
+  DictSafeSetItem(dict, "sync_state", msg.sync_state);  // Both SOTDMA & ITDMA
 
   // SOTDMA
   if (msg.message_id == 1 || msg.message_id == 2) {
@@ -184,7 +185,8 @@ ais4_11_to_pydict(const char *nmea_payload, const size_t pad) {
 
   Ais4_11 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais4_11: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais4_11: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -235,7 +237,8 @@ ais5_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais5 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais5: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais5: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -269,7 +272,8 @@ ais5_to_pydict(const char *nmea_payload, const size_t pad) {
 
 
 void
-ais6_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_0_append_pydict(const char *nmea_payload, PyObject *dict,
+                       const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -281,7 +285,8 @@ ais6_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 }
 
 void
-ais6_1_1_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_1_append_pydict(const char *nmea_payload, PyObject *dict,
+                       const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -292,7 +297,8 @@ ais6_1_1_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 }
 
 void
-ais6_1_2_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_2_append_pydict(const char *nmea_payload, PyObject *dict,
+                       const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -302,7 +308,8 @@ ais6_1_2_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 }
 
 void
-ais6_1_3_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_3_append_pydict(const char *nmea_payload, PyObject *dict,
+                       const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -312,7 +319,8 @@ ais6_1_3_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 }
 
 void
-ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict,
+                       const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -336,7 +344,8 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 }
 
 void
-ais6_1_40_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_40_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -347,7 +356,8 @@ ais6_1_40_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 
 bool
-ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(pad < 6);
   Ais6_1_12 msg(nmea_payload, pad);
@@ -357,12 +367,12 @@ ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   }
 
   DictSafeSetItem(dict, "last_port", msg.last_port);
-  DictSafeSetItem(dict, "utc_month_dep", msg.utc_month_dep);  // actual time of departure
+  DictSafeSetItem(dict, "utc_month_dep", msg.utc_month_dep);  // actual
   DictSafeSetItem(dict, "utc_day_dep", msg.utc_day_dep);
   DictSafeSetItem(dict, "utc_hour_dep", msg.utc_hour_dep);
   DictSafeSetItem(dict, "utc_min_dep", msg.utc_min_dep);
   DictSafeSetItem(dict, "next_port", msg.next_port);
-  DictSafeSetItem(dict, "utc_month_next", msg.utc_month_next);  // estimated arrival
+  DictSafeSetItem(dict, "utc_month_next", msg.utc_month_next);  // estimated
   DictSafeSetItem(dict, "utc_day_next", msg.utc_day_next);
   DictSafeSetItem(dict, "utc_hour_next", msg.utc_hour_next);
   DictSafeSetItem(dict, "utc_min_next", msg.utc_min_next);
@@ -379,7 +389,8 @@ ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 // IMO Circ 289 - Tidal Window
 void
-ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(pad < 6);
   Ais6_1_14 msg(nmea_payload, pad);  // TODO(schwehr): check for error
@@ -397,7 +408,7 @@ ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   for (size_t w_num = 0; w_num < msg.windows.size(); w_num++) {
     PyObject *window = PyDict_New();
     DictSafeSetItem(window, "y", msg.windows[w_num].x);
-    DictSafeSetItem(window, "x", msg.windows[w_num].y);  // yes, bits are lat, lon
+    DictSafeSetItem(window, "x", msg.windows[w_num].y);  // bits are lat, lon
     DictSafeSetItem(window, "utc_hour_from", msg.windows[w_num].utc_hour_from);
     DictSafeSetItem(window, "utc_min_from", msg.windows[w_num].utc_min_from);
     DictSafeSetItem(window, "utc_hour_to", msg.windows[w_num].utc_hour_to);
@@ -413,7 +424,8 @@ ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 // IMO Circ 289 - Clearance time to enter port
 void
-ais6_1_18_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_18_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(pad < 6);
   Ais6_1_18 msg(nmea_payload, pad);  // TODO(schwehr): check for error
@@ -435,7 +447,8 @@ ais6_1_18_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 // IMO Circ 289 - Berthing data
 void
-ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(pad < 6);
   Ais6_1_20 msg(nmea_payload, pad);  // TODO(schwehr): check for error
@@ -466,7 +479,8 @@ ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 // 6_1_21, 6_1_22, 6_1_23 and 6_1_24 Do not exist (yet?)
 
 void
-ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -481,14 +495,20 @@ ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
   PyObject *cargo_list = PyList_New(msg.cargos.size());
   for (size_t cargo_num = 0; cargo_num < msg.cargos.size(); cargo_num++) {
-    PyObject *cargo_dict = PyDict_New();
-    if (msg.cargos[cargo_num].imdg_valid) DictSafeSetItem(cargo_dict, "imdg", msg.cargos[cargo_num].imdg);
-    if (msg.cargos[cargo_num].spare_valid) DictSafeSetItem(cargo_dict, "spare", msg.cargos[cargo_num].spare);
-    if (msg.cargos[cargo_num].un_valid) DictSafeSetItem(cargo_dict, "un", msg.cargos[cargo_num].un);
-    if (msg.cargos[cargo_num].bc_valid) DictSafeSetItem(cargo_dict, "bc", msg.cargos[cargo_num].bc);
-    if (msg.cargos[cargo_num].marpol_oil_valid) DictSafeSetItem(cargo_dict, "marpol_oil", msg.cargos[cargo_num].marpol_oil);
-    if (msg.cargos[cargo_num].marpol_cat_valid) DictSafeSetItem(cargo_dict, "marpol_cat", msg.cargos[cargo_num].marpol_cat);
-    PyList_SetItem(cargo_list, cargo_num, cargo_dict);
+    PyObject *cargo = PyDict_New();
+    if (msg.cargos[cargo_num].imdg_valid)
+      DictSafeSetItem(cargo, "imdg", msg.cargos[cargo_num].imdg);
+    if (msg.cargos[cargo_num].spare_valid)
+      DictSafeSetItem(cargo, "spare", msg.cargos[cargo_num].spare);
+    if (msg.cargos[cargo_num].un_valid)
+      DictSafeSetItem(cargo, "un", msg.cargos[cargo_num].un);
+    if (msg.cargos[cargo_num].bc_valid)
+      DictSafeSetItem(cargo, "bc", msg.cargos[cargo_num].bc);
+    if (msg.cargos[cargo_num].marpol_oil_valid)
+      DictSafeSetItem(cargo, "marpol_oil", msg.cargos[cargo_num].marpol_oil);
+    if (msg.cargos[cargo_num].marpol_cat_valid)
+      DictSafeSetItem(cargo, "marpol_cat", msg.cargos[cargo_num].marpol_cat);
+    PyList_SetItem(cargo_list, cargo_num, cargo);
   }
   PyDict_SetItem(dict, PyUnicode_FromString("cargos"), cargo_list);
 }
@@ -501,7 +521,8 @@ ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 // 6_1_31
 
 void
-ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -511,17 +532,17 @@ ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   DictSafeSetItem(dict, "utc_day", msg.utc_day);
 
   PyObject *window_list = PyList_New(msg.windows.size());
-  for (size_t window_num = 0; window_num < msg.windows.size(); window_num++) {
-    PyObject *window_dict = PyDict_New();
-    DictSafeSetItem(window_dict, "x", msg.windows[window_num].x);
-    DictSafeSetItem(window_dict, "y", msg.windows[window_num].y);
-    DictSafeSetItem(window_dict, "from_utc_hour", msg.windows[window_num].from_utc_hour);
-    DictSafeSetItem(window_dict, "from_utc_min", msg.windows[window_num].from_utc_min);
-    DictSafeSetItem(window_dict, "to_utc_hour", msg.windows[window_num].to_utc_hour);
-    DictSafeSetItem(window_dict, "to_utc_min", msg.windows[window_num].to_utc_min);
-    DictSafeSetItem(window_dict, "cur_dir", msg.windows[window_num].cur_dir);
-    DictSafeSetItem(window_dict, "cur_speed", msg.windows[window_num].cur_speed);
-    PyList_SetItem(window_list, window_num, window_dict);
+  for (size_t win_num = 0; win_num < msg.windows.size(); win_num++) {
+    PyObject *win = PyDict_New();
+    DictSafeSetItem(win, "x", msg.windows[win_num].x);
+    DictSafeSetItem(win, "y", msg.windows[win_num].y);
+    DictSafeSetItem(win, "from_utc_hour", msg.windows[win_num].from_utc_hour);
+    DictSafeSetItem(win, "from_utc_min", msg.windows[win_num].from_utc_min);
+    DictSafeSetItem(win, "to_utc_hour", msg.windows[win_num].to_utc_hour);
+    DictSafeSetItem(win, "to_utc_min", msg.windows[win_num].to_utc_min);
+    DictSafeSetItem(win, "cur_dir", msg.windows[win_num].cur_dir);
+    DictSafeSetItem(win, "cur_speed", msg.windows[win_num].cur_speed);
+    PyList_SetItem(window_list, win_num, win);
   }
   PyDict_SetItem(dict, PyUnicode_FromString("windows"), window_list);
 }
@@ -531,8 +552,9 @@ PyObject*
 ais6_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais6 msg(nmea_payload, pad);
-  if (msg.had_error() and msg.get_error() != AIS_UNINITIALIZED) {
-    PyErr_Format(ais_py_exception, "Ais6: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+  if (msg.had_error() && msg.get_error() != AIS_UNINITIALIZED) {
+    PyErr_Format(ais_py_exception, "Ais6: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -612,7 +634,8 @@ ais7_13_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais7_13 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais7_13: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais7_13: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -634,7 +657,8 @@ ais7_13_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 void
-ais8_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_0_append_pydict(const char *nmea_payload, PyObject *dict,
+                       const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -650,7 +674,8 @@ ais8_1_0_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pa
 // ais 8_1_[1..10] do not exist
 
 void
-ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -705,7 +730,8 @@ ais8_1_11_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 // 12 is addressed
 
 void
-ais8_1_13_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_13_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -729,7 +755,8 @@ ais8_1_13_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 // 14 is addressed
 
 void
-ais8_1_15_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_15_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -739,7 +766,8 @@ ais8_1_15_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 }
 
 void
-ais8_1_16_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_16_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -749,7 +777,8 @@ ais8_1_16_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 }
 
 void
-ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -773,7 +802,8 @@ ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 // 18 is addressed only
 
 void
-ais8_1_19_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_19_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -796,7 +826,8 @@ ais8_1_19_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 // 20 is addressed
 
 void
-ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -878,19 +909,21 @@ ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 
 void
-ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   Ais8_001_22 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
 
   DictSafeSetItem(dict, "link_id", msg.link_id);
   DictSafeSetItem(dict, "notice_type", msg.notice_type);
-  DictSafeSetItem(dict, "notice_type_str", ais8_001_22_notice_names[msg.notice_type]);
+  DictSafeSetItem(dict, "notice_type_str",
+                  ais8_001_22_notice_names[msg.notice_type]);
 
-  DictSafeSetItem(dict, "month", msg.month);  // WARNING: this is UTC!!!   Not local time
+  DictSafeSetItem(dict, "month", msg.month);  // This is UTC, not local time.
   DictSafeSetItem(dict, "day", msg.day);
   DictSafeSetItem(dict, "hour", msg.hour);
   DictSafeSetItem(dict, "minute", msg.minute);
 
-  PyObject *sub_area_list = PyList_New(msg.sub_areas.size());  // Sub Areas list for python
+  PyObject *sub_area_list = PyList_New(msg.sub_areas.size());
 
   // Loop over sub_areas
   for (size_t i = 0; i < msg.sub_areas.size(); i++) {
@@ -898,7 +931,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
     case AIS8_001_22_SHAPE_CIRCLE:  // or point
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Circle *c = (Ais8_001_22_Circle*)msg.sub_areas[i];
+        Ais8_001_22_Circle *c =
+            reinterpret_cast<Ais8_001_22_Circle*>(msg.sub_areas[i]);
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_CIRCLE);
         if (c->radius_m == 0)
@@ -917,7 +951,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
     case AIS8_001_22_SHAPE_RECT:
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Rect *c = (Ais8_001_22_Rect*)msg.sub_areas[i];
+        Ais8_001_22_Rect *c =
+            reinterpret_cast<Ais8_001_22_Rect*>(msg.sub_areas[i]);
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_RECT);
         DictSafeSetItem(sub_area, "sub_area_type_str", "rect");
@@ -935,7 +970,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
     case AIS8_001_22_SHAPE_SECTOR:
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Sector *c = (Ais8_001_22_Sector*)msg.sub_areas[i];
+        Ais8_001_22_Sector *c =
+            reinterpret_cast<Ais8_001_22_Sector*>(msg.sub_areas[i]);
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_SECTOR);
         DictSafeSetItem(sub_area, "sub_area_type_str", "sector");
@@ -953,7 +989,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
     case AIS8_001_22_SHAPE_POLYLINE:
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Polyline *polyline = (Ais8_001_22_Polyline*)msg.sub_areas[i];
+        Ais8_001_22_Polyline *polyline =
+            reinterpret_cast<Ais8_001_22_Polyline*>(msg.sub_areas[i]);
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_POLYLINE);
         DictSafeSetItem(sub_area, "sub_area_type_str", "polyline");
@@ -962,8 +999,10 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
         PyObject *dist_list = PyList_New(polyline->angles.size());
 
         for (size_t pt_num = 0; pt_num < polyline->angles.size(); pt_num++) {
-          PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polyline->angles[pt_num]));
-          PyList_SetItem(dist_list,  pt_num, PyFloat_FromDouble(polyline->dists_m[pt_num]));
+          PyList_SetItem(angle_list, pt_num,
+                         PyFloat_FromDouble(polyline->angles[pt_num]));
+          PyList_SetItem(dist_list, pt_num,
+                         PyFloat_FromDouble(polyline->dists_m[pt_num]));
         }
 
         DictSafeSetItem(sub_area, "angles", angle_list);
@@ -976,7 +1015,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
     case AIS8_001_22_SHAPE_POLYGON:
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Polygon *polygon = (Ais8_001_22_Polygon*)msg.sub_areas[i];
+        Ais8_001_22_Polygon *polygon =
+            reinterpret_cast<Ais8_001_22_Polygon*>(msg.sub_areas[i]);
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_POLYGON);
         DictSafeSetItem(sub_area, "sub_area_type_str", "polygon");
@@ -985,8 +1025,10 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
         PyObject *dist_list = PyList_New(polygon->angles.size());
 
         for (size_t pt_num = 0; pt_num < polygon->angles.size(); pt_num++) {
-          PyList_SetItem(angle_list, pt_num, PyFloat_FromDouble(polygon->angles[pt_num]));
-          PyList_SetItem(dist_list,  pt_num, PyFloat_FromDouble(polygon->dists_m[pt_num]));
+          PyList_SetItem(angle_list, pt_num,
+                         PyFloat_FromDouble(polygon->angles[pt_num]));
+          PyList_SetItem(dist_list, pt_num,
+                         PyFloat_FromDouble(polygon->dists_m[pt_num]));
         }
 
         DictSafeSetItem(sub_area, "angles", angle_list);
@@ -1000,7 +1042,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       {
         PyObject *sub_area = PyDict_New();
 
-        Ais8_001_22_Text *text = (Ais8_001_22_Text*)msg.sub_areas[i];
+        Ais8_001_22_Text *text =
+            reinterpret_cast<Ais8_001_22_Text*>(msg.sub_areas[i]);
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_TEXT);
         DictSafeSetItem(sub_area, "sub_area_type_str", "text");
 
@@ -1010,7 +1053,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
 
     default:
-      {}  // TODO(schwehr): somehow mark an unknown subarea or raise an exception
+      {}  // TODO(schwehr): Mark an unknown subarea or raise an exception.
     }
   }
   DictSafeSetItem(dict, "sub_areas", sub_area_list);
@@ -1020,7 +1063,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 // IMO Circ 289 - Extended ship static and voyage-related
 void
-ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -1057,8 +1101,9 @@ ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 // no 25 broadcast
 
-static void 
-ais8_1_26_append_pydict_sensor_hdr(PyObject *dict, Ais8_1_26_SensorReport* rpt) {
+static void
+ais8_1_26_append_pydict_sensor_hdr(PyObject *dict,
+                                   Ais8_1_26_SensorReport* rpt) {
   assert(dict);
   assert(rpt);
   DictSafeSetItem(dict, "report_type", rpt->report_type);
@@ -1070,7 +1115,8 @@ ais8_1_26_append_pydict_sensor_hdr(PyObject *dict, Ais8_1_26_SensorReport* rpt) 
 
 // IMO Circ 289 - Environmental
 void
-ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -1087,7 +1133,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       // case AIS8_1_26_SENSOR_ERROR:
     case AIS8_1_26_SENSOR_LOCATION:
       {
-        Ais8_1_26_Location *rpt = (Ais8_1_26_Location *)msg.reports[rpt_num];
+        Ais8_1_26_Location *rpt =
+            reinterpret_cast<Ais8_1_26_Location *>(msg.reports[rpt_num]);
         ais8_1_26_append_pydict_sensor_hdr(rpt_dict, rpt);
         DictSafeSetItem(rpt_dict, "x", rpt->x);
         DictSafeSetItem(rpt_dict, "y", rpt->y);
@@ -1099,14 +1146,16 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
     case AIS8_1_26_SENSOR_STATION:
       {
-        Ais8_1_26_Station *rpt = (Ais8_1_26_Station *)msg.reports[rpt_num];
+        Ais8_1_26_Station *rpt =
+            reinterpret_cast<Ais8_1_26_Station *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "name", rpt->name);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
       }
       break;
     case AIS8_1_26_SENSOR_WIND:
       {
-        Ais8_1_26_Wind *rpt = (Ais8_1_26_Wind *)msg.reports[rpt_num];
+        Ais8_1_26_Wind *rpt =
+            reinterpret_cast<Ais8_1_26_Wind *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "wind_speed", rpt->wind_speed);
         DictSafeSetItem(rpt_dict, "wind_gust", rpt->wind_gust);
         DictSafeSetItem(rpt_dict, "wind_dir", rpt->wind_dir);
@@ -1124,7 +1173,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
     case AIS8_1_26_SENSOR_WATER_LEVEL:
       {
-        Ais8_1_26_WaterLevel *rpt = (Ais8_1_26_WaterLevel *)msg.reports[rpt_num];
+        Ais8_1_26_WaterLevel *rpt =
+            reinterpret_cast<Ais8_1_26_WaterLevel *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "type", rpt->type);
         DictSafeSetItem(rpt_dict, "level", rpt->level);
         DictSafeSetItem(rpt_dict, "trend", rpt->trend);
@@ -1141,7 +1191,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
     case AIS8_1_26_SENSOR_CURR_2D:
       {
-        Ais8_1_26_Curr2D *rpt = (Ais8_1_26_Curr2D *)msg.reports[rpt_num];
+        Ais8_1_26_Curr2D *rpt =
+            reinterpret_cast<Ais8_1_26_Curr2D *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "type", rpt->type);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
 
@@ -1158,8 +1209,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
     case AIS8_1_26_SENSOR_CURR_3D:
       {
-        Ais8_1_26_Curr3D *rpt = (Ais8_1_26_Curr3D *)msg.reports[rpt_num];
-
+        Ais8_1_26_Curr3D *rpt =
+            reinterpret_cast<Ais8_1_26_Curr3D *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "type", rpt->type);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
 
@@ -1178,7 +1229,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
     case AIS8_1_26_SENSOR_HORZ_FLOW:
       {
-        Ais8_1_26_HorzFlow *rpt = (Ais8_1_26_HorzFlow *)msg.reports[rpt_num];
+        Ais8_1_26_HorzFlow *rpt =
+            reinterpret_cast<Ais8_1_26_HorzFlow *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
 
         PyObject *curr_list = PyList_New(3);
@@ -1196,7 +1248,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
     case AIS8_1_26_SENSOR_SEA_STATE:
       {
-        Ais8_1_26_SeaState *rpt = (Ais8_1_26_SeaState *)msg.reports[rpt_num];
+        Ais8_1_26_SeaState *rpt =
+            reinterpret_cast<Ais8_1_26_SeaState *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "swell_height", rpt->swell_height);
         DictSafeSetItem(rpt_dict, "swell_period", rpt->swell_period);
         DictSafeSetItem(rpt_dict, "swell_dir", rpt->swell_dir);
@@ -1214,7 +1267,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
     case AIS8_1_26_SENSOR_SALINITY:
       {
-        Ais8_1_26_Salinity *rpt = (Ais8_1_26_Salinity *)msg.reports[rpt_num];
+        Ais8_1_26_Salinity *rpt =
+            reinterpret_cast<Ais8_1_26_Salinity *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "water_temp", rpt->water_temp);
         DictSafeSetItem(rpt_dict, "conductivity", rpt->conductivity);
         DictSafeSetItem(rpt_dict, "pressure", rpt->pressure);
@@ -1227,15 +1281,18 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
     case AIS8_1_26_SENSOR_WX:
       {
-        Ais8_1_26_Wx *rpt = (Ais8_1_26_Wx *)msg.reports[rpt_num];
+        Ais8_1_26_Wx *rpt =
+            reinterpret_cast<Ais8_1_26_Wx *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "air_temp", rpt->air_temp);
-        DictSafeSetItem(rpt_dict, "air_temp_sensor_type", rpt->air_temp_sensor_type);
+        DictSafeSetItem(rpt_dict, "air_temp_sensor_type",
+                        rpt->air_temp_sensor_type);
         DictSafeSetItem(rpt_dict, "precip", rpt->precip);
         DictSafeSetItem(rpt_dict, "horz_vis", rpt->horz_vis);
         DictSafeSetItem(rpt_dict, "dew_point", rpt->dew_point);
         DictSafeSetItem(rpt_dict, "dew_point_type", rpt->dew_point_type);
         DictSafeSetItem(rpt_dict, "air_pressure", rpt->air_pressure);
-        DictSafeSetItem(rpt_dict, "air_pressure_trend", rpt->air_pressure_trend);
+        DictSafeSetItem(rpt_dict, "air_pressure_trend",
+                        rpt->air_pressure_trend);
         DictSafeSetItem(rpt_dict, "air_pressor_type", rpt->air_pressor_type);
         DictSafeSetItem(rpt_dict, "salinity", rpt->salinity);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
@@ -1243,7 +1300,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
       break;
     case AIS8_1_26_SENSOR_AIR_DRAUGHT:
       {
-        Ais8_1_26_AirDraught *rpt = (Ais8_1_26_AirDraught *)msg.reports[rpt_num];
+        Ais8_1_26_AirDraught *rpt =
+            reinterpret_cast<Ais8_1_26_AirDraught *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "draught", rpt->draught);
         DictSafeSetItem(rpt_dict, "gap", rpt->gap);
         DictSafeSetItem(rpt_dict, "forcast_gap", rpt->forcast_gap);
@@ -1268,7 +1326,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 // IMO Circ 289 - Route information
 void
-ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -1283,11 +1342,12 @@ ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
   DictSafeSetItem(dict, "duration", msg.duration);
 
   PyObject *waypoint_list = PyList_New(msg.waypoints.size());
-  for (size_t waypoint_num = 0; waypoint_num < msg.waypoints.size(); waypoint_num++) {
+  for (size_t point_num = 0; point_num < msg.waypoints.size(); point_num++) {
     PyObject *waypoint = PyList_New(2);
-    PyList_SetItem(waypoint, 0, PyFloat_FromDouble(msg.waypoints[waypoint_num].x));  // TODO(schwehr): Py_DECREF(); ?
-    PyList_SetItem(waypoint, 1, PyFloat_FromDouble(msg.waypoints[waypoint_num].y));  // TODO(schwehr): Py_DECREF(); ?
-    PyList_SetItem(waypoint_list, waypoint_num, waypoint);
+    // TODO(schwehr): Py_DECREF(); ?
+    PyList_SetItem(waypoint, 0, PyFloat_FromDouble(msg.waypoints[point_num].x));
+    PyList_SetItem(waypoint, 1, PyFloat_FromDouble(msg.waypoints[point_num].y));
+    PyList_SetItem(waypoint_list, point_num, waypoint);
   }
   PyDict_SetItem(dict, PyUnicode_FromString("waypoints"), waypoint_list);
 }
@@ -1296,7 +1356,8 @@ ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 // IMO Circ 289 - Text description
 void
-ais8_1_29_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_29_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -1309,7 +1370,8 @@ ais8_1_29_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 // no 30 broadcast
 
 void
-ais8_1_31_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_1_31_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -1361,7 +1423,8 @@ ais8_1_31_append_pydict(const char *nmea_payload, PyObject *dict, const size_t p
 
 // DAC 200 - River Information System
 void
-ais8_200_10_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_200_10_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -1383,7 +1446,8 @@ ais8_200_10_append_pydict(const char *nmea_payload, PyObject *dict, const size_t
 
 // River Information System
 void
-ais8_200_23_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_200_23_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -1414,24 +1478,31 @@ ais8_200_23_append_pydict(const char *nmea_payload, PyObject *dict, const size_t
 
 // River Information System
 void
-ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
   Ais8_200_24 msg(nmea_payload, pad);
-  if (msg.had_error()) return;   // TODO(schwehr): handle errors correctly
+  if (msg.had_error())
+    return;   // TODO(schwehr): handle errors correctly
   DictSafeSetItem(dict, "country", msg.country);
+
   PyObject *id_list = PyList_New(4);
-  for (size_t i = 0; i < 4; i++) PyList_SetItem(id_list, 0, PyInt_FromLong(msg.guage_ids[i]));
+  for (size_t i = 0; i < 4; i++)
+    PyList_SetItem(id_list, 0, PyInt_FromLong(msg.guage_ids[i]));
   DictSafeSetItem(dict, "guage_ids", id_list);
+
   PyObject *level_list = PyList_New(4);
-  for (size_t i = 0; i < 4; i++) PyList_SetItem(level_list, 0, PyFloat_FromDouble(msg.levels[i]));
+  for (size_t i = 0; i < 4; i++)
+    PyList_SetItem(level_list, 0, PyFloat_FromDouble(msg.levels[i]));
   DictSafeSetItem(dict, "levels", level_list);
 }
 
 // River Information System
 void
-ais8_200_40_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_200_40_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -1450,7 +1521,8 @@ ais8_200_40_append_pydict(const char *nmea_payload, PyObject *dict, const size_t
 
 // River Information System
 void
-ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict, const size_t pad) {
+ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
@@ -1460,8 +1532,10 @@ ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict, const size_t
   DictSafeSetItem(dict, "crew", msg.crew);
   DictSafeSetItem(dict, "passengers", msg.passengers);
   DictSafeSetItem(dict, "yet_more_personnel", msg.yet_more_personnel);
+
   PyObject *spare2_list = PyList_New(3);
-  for (size_t i = 0; i < 3; i++) PyList_SetItem(spare2_list, 0,  PyInt_FromLong(msg.spare2[i]));
+  for (size_t i = 0; i < 3; i++)
+    PyList_SetItem(spare2_list, 0,  PyInt_FromLong(msg.spare2[i]));
   DictSafeSetItem(dict, "spare2", spare2_list);
 }
 
@@ -1474,8 +1548,9 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(pad < 6);
 
   Ais8 msg(nmea_payload, pad);
-  if (msg.had_error() and msg.get_error() != AIS_UNINITIALIZED) {
-    PyErr_Format(ais_py_exception, "Ais8: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+  if (msg.had_error() && msg.get_error() != AIS_UNINITIALIZED) {
+    PyErr_Format(ais_py_exception, "Ais8: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -1491,7 +1566,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
   switch (msg.dac) {
   case 1:  // IMO
     switch (msg.fi) {
-      // ITU-R.M.1371-3 IFM messages.  Annex 5, Section 5.  See IMO Circ 289 for recommended usage
+      // See: ITU-R.M.1371-3 IFM messages Annex 5, Section 5 and IMO Circ 289
     case 0:  // Text using 6 bit ascii
       ais8_1_0_append_pydict(nmea_payload, dict, pad);
       break;
@@ -1515,7 +1590,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
       ais8_1_13_append_pydict(nmea_payload, dict, pad);
       break;
       // No 14
-    case 15:  // Extended ship static and voyage related data - not to be used after 1 Jan 2013
+    case 15:  // Extended ship static and voyage - not after 1 Jan 2013
       // TODO(schwehr): untested - no messages found
       ais8_1_15_append_pydict(nmea_payload, dict, pad);
       break;
@@ -1523,13 +1598,14 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     case 16:  // Number of persons on board - not to be used after 1 Jan 2013
       ais8_1_16_append_pydict(nmea_payload, dict, pad);
       break;
-      // 17 has conflicting definition in 1371-1: IFM 17: Ship waypoints (WP) and/or route plan report
-    case 17:  // VTS-generated/synthetic targets - not to be used after 1 Jan 2013
+      // 17 has conflicting definitions in 1371-1: IFM 17: Ship waypoints (WP)
+      // and/or route plan report
+    case 17:  // VTS-generated/synthetic targets - not to be used after Jan 2013
       // TODO(schwehr): untested - no messages found
       ais8_1_17_append_pydict(nmea_payload, dict, pad);
       break;
       // No 18
-      // ITU 1371-1 conflict: IFM 19: Extended ship static and voyage related data
+      // ITU 1371-1 conflict: IFM 19: Extended ship static and voyage
     case 19:  // Marine traffic signal
       // TODO(schwehr): untested - no messages found
       ais8_1_19_append_pydict(nmea_payload, dict, pad);
@@ -1588,7 +1664,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     case 40:  // A-to-N Signal status
       ais8_200_40_append_pydict(nmea_payload, dict, pad);
       break;
-    case 55:  // Inland number of persons on board - why do we need another damn message?
+    case 55:  // Inland number of persons on board
       ais8_200_55_append_pydict(nmea_payload, dict, pad);
       break;
     default:
@@ -1612,7 +1688,8 @@ ais9_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais9 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais9: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais9: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -1726,7 +1803,8 @@ ais14_to_pydict(const char *nmea_payload, const size_t pad) {
   Ais14 msg(nmea_payload, pad);
 
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais14: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais14: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -1748,7 +1826,8 @@ ais15_to_pydict(const char *nmea_payload, const size_t pad) {
   Ais15 msg(nmea_payload, pad);
 
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais15: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais15: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -1782,7 +1861,8 @@ ais16_to_pydict(const char *nmea_payload, const size_t pad) {
   Ais16 msg(nmea_payload, pad);
 
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais16: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais16: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -1813,7 +1893,8 @@ ais17_to_pydict(const char *nmea_payload, const size_t pad) {
   Ais17 msg(nmea_payload, pad);
 
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais17: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais17: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -1836,7 +1917,8 @@ ais18_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais18 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais18: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais18: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -1910,7 +1992,8 @@ ais19_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais19 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais19: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais19: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -1953,7 +2036,8 @@ ais20_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais20 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais20: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais20: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -2018,7 +2102,8 @@ ais21_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais21 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais21: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais21: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -2054,7 +2139,8 @@ ais22_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais22 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais22: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais22: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -2094,7 +2180,8 @@ ais23_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais23 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais23: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais23: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -2127,7 +2214,8 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais24 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais24: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais24: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -2169,7 +2257,8 @@ ais25_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais25 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais25: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais25: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -2195,7 +2284,8 @@ PyObject*
 ais26_to_pydict(const char *nmea_payload, const size_t pad) {
   Ais26 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais26: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais26: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -2241,7 +2331,8 @@ PyObject*
 ais27_to_pydict(const char *nmea_payload, const size_t pad) {
   Ais27 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais26: %s", AIS_STATUS_STRINGS[msg.get_error()]);
+    PyErr_Format(ais_py_exception, "Ais27: %s",
+                 AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
@@ -2271,7 +2362,7 @@ decode(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "si", &nmea_payload, &_pad)) {
     _pad = 0;
     if (!PyArg_ParseTuple(args, "s", &nmea_payload)) {
-      PyErr_Format(ais_py_exception, "ais.decode: expected (string, integer) argument");
+      PyErr_Format(ais_py_exception, "ais.decode: expected (str, int)");
       return NULL;
     }
   }
@@ -2375,7 +2466,7 @@ decode(PyObject *self, PyObject *args) {
     break;
 
   case 'J':  // 26 - Multi slot binary message with comm state
-    result = ais26_to_pydict(nmea_payload, pad);  // TODO(schwehr): handle payloads
+    result = ais26_to_pydict(nmea_payload, pad);  // TODO(schwehr): payloads
     break;
 
   case 'K':  // 27 - Long-range AIS broadcast message
@@ -2383,11 +2474,12 @@ decode(PyObject *self, PyObject *args) {
     break;
 
   case 'L':  // 28 - UNKNOWN
-    PyErr_Format(ais_py_exception, "ais.decode: message 28 (L) not yet handled");
+    PyErr_Format(ais_py_exception, "ais.decode: message 28 (L) not handled");
     break;
 
   default:
-    PyErr_Format(ais_py_exception, "ais.decode: message %c not known", nmea_payload[0]);
+    PyErr_Format(ais_py_exception, "ais.decode: unknown message - %c",
+                 nmea_payload[0]);
   }
 
   return result;
@@ -2488,7 +2580,8 @@ PyObject *module = Py_InitModule("ais", ais_methods);
     INITERROR;
   struct module_state *st = GETSTATE(module);
 
-  st->error = PyErr_NewException((char *)exception_name.c_str(), NULL, NULL);
+  st->error = PyErr_NewException(const_cast<char *>(exception_name.c_str()),
+                                 NULL, NULL);
   if (st->error == NULL) {
     Py_DECREF(module);
     INITERROR;
@@ -2496,8 +2589,8 @@ PyObject *module = Py_InitModule("ais", ais_methods);
 
   // Initialize the lookuptable and exception
   BuildNmeaLookup();
-  // TODO(schwehr): is this cast bad?
-  ais_py_exception = PyErr_NewException((char *)"ais.decode.error", 0, 0);
+  ais_py_exception = PyErr_NewException(const_cast<char *>("ais.decode.error"),
+                                        NULL, NULL);
 
 #if PY_MAJOR_VERSION >= 3
   return module;

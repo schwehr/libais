@@ -2,15 +2,12 @@
 
 #include "ais.h"
 
-Ais27::Ais27(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, pad) {
+Ais27::Ais27(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
   if (status != AIS_UNINITIALIZED)
     return;
-#ifndef NDEBUG
-  if (27 != message_id) {
-    status = AIS_ERR_WRONG_MSG_TYPE;
-    return;
-  }
-#endif
+
+  assert(message_id == 27);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -20,12 +17,10 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad) : AisMsg(nmea_payload, 
   }
 
   bitset<96> bs;
-  {
-    const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
-    if (r != AIS_OK) {
-      status = r;
-      return;
-    }
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
   }
 
   position_accuracy = bs[38];
