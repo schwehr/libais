@@ -316,8 +316,6 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad)
 Ais8_001_22::~Ais8_001_22() {
   for (size_t i = 0; i < sub_areas.size(); i++) {
     delete sub_areas[i];
-#ifndef NDEBUG
     sub_areas[i] = NULL;
-#endif
-    }
+  }
 }

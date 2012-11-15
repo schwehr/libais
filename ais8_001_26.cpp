@@ -242,8 +242,6 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad)
 Ais8_1_26::~Ais8_1_26() {
   for (size_t i = 0; i < reports.size(); i++) {
     delete reports[i];
-#ifndef NDEBUG
     reports[i] = NULL;
-#endif
   }
 }

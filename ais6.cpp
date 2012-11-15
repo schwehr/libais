@@ -58,7 +58,7 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad)
   ack_required = bs[88];
   msg_seq = ubits(bs, 89, 11);
 
-  const size_t text_size = 6 * ((num_bits - 100)/6);
+  const size_t text_size = 6 * ((num_bits - 100) / 6);
   const size_t spare2_size = num_bits - 100 - text_size;
   text =  ais_str(bs, 100, text_size);
 

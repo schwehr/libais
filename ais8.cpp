@@ -139,7 +139,6 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad)
   extended_water_level = ubits(bs, 346, 6);
 
   status = AIS_OK;
-  status = AIS_OK;
 }
 
 // No 8_1_12
