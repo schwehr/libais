@@ -245,7 +245,7 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad)
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  if (376 != num_bits) {
+  if (num_bits != 376) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -328,7 +328,7 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad)
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  if (360 != num_bits) {
+  if (num_bits != 360) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -465,7 +465,7 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad)
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   // TODO(schwehr): might get messages with not all windows
-  if (350 != num_bits) {
+  if (num_bits != 350) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }

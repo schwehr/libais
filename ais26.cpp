@@ -15,7 +15,7 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad)
   // TODO(schwehr): check for off by one.
   const size_t comm_flag_offset = num_bits - 20 + 1;
 
-  if (52 > num_bits || num_bits > 1064) {
+  if (num_bits < 52 || num_bits > 1064) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }

@@ -154,7 +154,7 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad)
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  if (472 != num_bits) {
+  if (num_bits != 472) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -197,7 +197,7 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad)
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  if (72 != num_bits) {
+  if (num_bits != 72) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -320,7 +320,8 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad)
   utc_hour_next = ubits(bs, 242, 5);
   utc_min_next = ubits(bs, 247, 6);
   next_signal = ubits(bs, 253, 5);
-  if (360 != num_bits) return;
+  if (num_bits != 360)
+    return;
   spare2[0] = ubits(bs, 258, 32);
   spare2[1] = ubits(bs, 290, 32);
   spare2[2] = ubits(bs, 322, 32);
@@ -447,7 +448,7 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad)
     return;
 
   assert(dac == 1);
-  assert(fi == 1);
+  assert(fi == 24);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
@@ -504,7 +505,7 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad)
     return;
 
   assert(dac == 1);
-  assert(fi == 1);
+  assert(fi == 27);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   const size_t num_waypoints = (num_bits - 117) / 55;
@@ -757,7 +758,7 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad)
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  if (168 != num_bits) {
+  if (num_bits != 168) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -791,7 +792,7 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad)
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-  if (168 != num_bits) {
+  if (num_bits != 168) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }

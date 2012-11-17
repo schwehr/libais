@@ -36,7 +36,8 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = {
   "(reserved for future use)",  // 22
   "Environmental Caution Area: Storm front (line squall)",  // 23
   "Environmental Caution Area: Hazardous sea ice",  // 24
-  "Environmental Caution Area: Storm warning (storm cell or line of storms)",  // 25
+  "Environmental Caution Area: Storm warning "
+  "(storm cell or line of storms)",  // 25
   "Environmental Caution Area: High wind",  // 26
   "Environmental Caution Area: High waves",  // 27
   "Environmental Caution Area: Restricted visibility (fog, rain, etc.)",  // 28
@@ -94,7 +95,8 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = {
   "Instruction: Contact VTS at this point/juncture",  // 80
   "Instruction: Contact Port Administration at this point/juncture",  // 81
   "Instruction: Do not proceed beyond this point/juncture",  // 82
-  "Instruction: Await instructions prior to proceeding beyond this point/juncture",  // 83
+  "Instruction: Await instructions prior to proceeding beyond "
+  "this point/juncture",  // 83
   "Proceed to this location - await instructions",  // 84
   "Clearance granted - proceed to berth",  // 85
   "(reserved for future use)",  // 86
@@ -125,7 +127,8 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = {
   "(reserved for future use)",  // 111
   "Report from ship: Icing info",  // 112
   "(reserved for future use)",  // 113
-  "Report from ship: Miscellaneous information - define in Associated text field",  // 114
+  "Report from ship: Miscellaneous information - "
+  "define in Associated text field",  // 114
   "(reserved for future use)",  // 115
   "(reserved for future use)",  // 116
   "(reserved for future use)",  // 117
@@ -148,7 +151,8 @@ static int scale_multipliers[4] = {1, 10, 100, 1000};
 // Sub-Areas for the Area Notice class
 //////////////////////////////////////////////////////////////////////
 
-static void decode_xy(const bitset<AIS8_MAX_BITS> &bs, const size_t offset, float &x, float &y) {
+static void decode_xy(const bitset<AIS8_MAX_BITS> &bs, const size_t offset,
+                      float &x, float &y) {
     // Offset is the start of the sub area.  Same as the caller's offset
     // This is the same for all but the text subarea
     // OLD Nav 55: sbits(bs, offset + 5, 28) / 600000.;
@@ -156,7 +160,8 @@ static void decode_xy(const bitset<AIS8_MAX_BITS> &bs, const size_t offset, floa
   y = sbits(bs, offset + 30, 24) / 60000.;
 }
 
-Ais8_001_22_Circle::Ais8_001_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_001_22_Circle::Ais8_001_22_Circle(const bitset<AIS8_MAX_BITS> &bs,
+                                       const size_t offset) {
   const int scale_factor = ubits(bs, offset + 3, 2);
   decode_xy(bs, offset, x, y);
   precision = ubits(bs, offset + 54, 3);  // useless
@@ -164,7 +169,8 @@ Ais8_001_22_Circle::Ais8_001_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const si
   spare     = ubits(bs, offset + 69, 18);
 }
 
-Ais8_001_22_Rect::Ais8_001_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_001_22_Rect::Ais8_001_22_Rect(const bitset<AIS8_MAX_BITS> &bs,
+                                   const size_t offset) {
   const int scale_factor = ubits(bs, offset + 3, 2);
   decode_xy(bs, offset, x, y);
 
@@ -175,12 +181,13 @@ Ais8_001_22_Rect::Ais8_001_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t
   spare      = ubits(bs, offset + 82, 5);
 }
 
-Ais8_001_22_Sector::Ais8_001_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-  const int scale_factor = ubits(bs, offset + 3, 2);
+Ais8_001_22_Sector::Ais8_001_22_Sector(const bitset<AIS8_MAX_BITS> &bs,
+                                       const size_t offset) {
+  const int scale = ubits(bs, offset + 3, 2);
   decode_xy(bs, offset, x, y);
 
-  precision       = ubits(bs, offset + 54, 3);  // useless
-  radius_m        = ubits(bs, offset + 57, 12) * scale_multipliers[scale_factor];
+  precision       = ubits(bs, offset + 54, 3);
+  radius_m        = ubits(bs, offset + 57, 12) * scale_multipliers[scale];
   left_bound_deg  = ubits(bs, offset + 69, 9);
   right_bound_deg = ubits(bs, offset + 78, 9);
 }
@@ -188,7 +195,8 @@ Ais8_001_22_Sector::Ais8_001_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const si
 // Size of one point angle and distance
 static const size_t PT_AD_SIZE = 10 + 10;
 
-Ais8_001_22_Polyline::Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_001_22_Polyline::Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs,
+                                           const size_t offset) {
   const int scale_factor = ubits(bs, offset + 3, 2);
   const int multiplier = scale_multipliers[scale_factor];
   for (size_t i = 0; i < 4; i++) {
@@ -203,7 +211,8 @@ Ais8_001_22_Polyline::Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, cons
 }
 
 // TODO(schwehr): fold into polyline
-Ais8_001_22_Polygon::Ais8_001_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_001_22_Polygon::Ais8_001_22_Polygon(const bitset<AIS8_MAX_BITS> &bs,
+                                         const size_t offset) {
   const int scale_factor = ubits(bs, offset + 3, 2);
   const int multiplier = scale_multipliers[scale_factor];
   for (size_t i = 0; i < 4; i++) {
@@ -217,14 +226,18 @@ Ais8_001_22_Polygon::Ais8_001_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const 
   spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
 }
 
-Ais8_001_22_Text::Ais8_001_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
+Ais8_001_22_Text::Ais8_001_22_Text(const bitset<AIS8_MAX_BITS> &bs,
+                                   const size_t offset) {
   text = string(ais_str(bs, offset + 3, 84));
   // TODO(schwehr): spare?
 }
 
 // Call the appropriate constructor
-Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset) {
-  const Ais8_001_22_AreaShapeEnum area_shape = (Ais8_001_22_AreaShapeEnum)ubits(bs, offset, 3);
+Ais8_001_22_SubArea*
+ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
+                            const size_t offset) {
+  const Ais8_001_22_AreaShapeEnum area_shape =
+      (Ais8_001_22_AreaShapeEnum)ubits(bs, offset, 3);
   Ais8_001_22_SubArea *area = NULL;
   switch (area_shape) {
   case AIS8_001_22_SHAPE_CIRCLE:
@@ -273,9 +286,12 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad)
   assert(fi == 22);
 
   const int num_bits = strlen(nmea_payload) * 6 - pad;
-  // TODO(schwehr): make the bit checks more exact.  Table 11.3, Circ 289 Annex, page 41
+  // TODO(schwehr): Make checks more exact.  Table 11.3, Circ 289 Annex, page 41
   // Spec is not byte aligned.  BAD!
-  if (198 > num_bits || num_bits > 984) { status = AIS_ERR_BAD_BIT_COUNT; return; }
+  if (num_bits < 198 || num_bits > 984) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   bitset<MAX_BITS> bs;
   const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);

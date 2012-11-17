@@ -11,7 +11,7 @@ Ais24::Ais24(const char *nmea_payload, const size_t pad)
   assert(message_id == 24);
 
   const int num_bits = strlen(nmea_payload) * 6 - pad;
-  if (160 != num_bits && 168 != num_bits) {
+  if (num_bits != 160 && num_bits != 168) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -27,7 +27,7 @@ Ais24::Ais24(const char *nmea_payload, const size_t pad)
 
   switch (part_num) {
   case 0:  // Part A
-    if (160 != num_bits) {
+    if (num_bits != 160) {
       status = AIS_ERR_BAD_BIT_COUNT;
       return;
     }
@@ -36,7 +36,7 @@ Ais24::Ais24(const char *nmea_payload, const size_t pad)
     dim_a = dim_b = dim_c = dim_d = spare = -1;
     break;
   case 1:  // Part B
-    if (168 != num_bits) {
+    if (num_bits != 168) {
       status = AIS_ERR_BAD_BIT_COUNT;
       return;
     }
