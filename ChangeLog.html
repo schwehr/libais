@@ -6,7 +6,28 @@
 <body>
 
 <ul> <!-- list of all releases -->
+http://google-styleguide.googlecode.com/svn/trunk/cpplint/
+  
+  <li>0.13 - 2012-11-18
+  <ul>
+   <li>Switch to the Google <a
+  href="http://code.google.com/p/google-styleguide/">C++ style
+  guide</a> and <a href="http://google-styleguide.googlecode.com/svn/trunk/cpplint/">cpplint.py</a></li>
+   <li>Lots of small bugs found in the code review process</li>
+   <li>Message constructors now start as status = AIS_UNINITIALIZED
+  and set to AIS_OK when decoding is done</li>
+   <li>Switched to using initializers to call parent initializers in C++</li>
+   <li>Removed a lot of duplicate and unused code.
+  AIS_ERR_WRONG_MSG_TYPE removed.  More still needs
+  to be removed.</li>
+   <li>Rewrote the C++ NMEA parsing functions: GetBody, GetNthField,
+  GetPad and Split.</li>
+   <li>Switch to using asserts for checks that imply coding errors
+  within the library.</li>
+  </ul>
+  </li>
 
+    
   <li>0.12 - 2012-11-05
   <ul>
    <li>Fix bit count bugs in 8_1_14, 8_1_15, 8_1_27</li>
@@ -16,12 +37,14 @@
    <li>Use std::foo, remove std:: from code</li>
    <li>Documentation for Msg 17</li>
    <li>Testing of Msg 20</li>
-  <ul>
-
+  </ul>
+  </li>
+    
   <li>0.11 - 2012-10-29
   <ul>
    <li>New release because a large binary went out in 0.10</li>
-  <ul>
+  </ul>
+  </li>
 
   <li>0.10 - 2012-10-29
   <ul>
@@ -40,7 +63,8 @@
    <li>Remove lots of dead code</li>
    <li>Pass pad into ais.decode in python, but handle without</li>
   </ul>
-
+  </li>
+  
   <li>0.9 - 2012-10-19
   <ul>
    <li>ais.decode now requires the pad bits in python</li>
@@ -50,12 +74,14 @@
    <li>Implemented AIS messages 6, 9, 10, 12, 15-17, 20-22, 23, 25-27. Still payload work to do.</li>
    <li>Imported rolker's CMakeList.txt</li>
   </ul>
+  </li>
 
   <li>0.8 - 2012-05-12
   <ul>
    <li>MANIFEST.in now has VERSION</li>
    <li>Implemented AIS messages 7, 13, 14, 18, 19, 24</li>
   </ul>
+  </li>
 
   <li>0.7 - 2012-04-30
   <ul>
@@ -63,6 +89,7 @@
    <li>setup.py compliant with pypi</li>
    <li>Added AIS area/zone messages 8:1:22 and 8:366:22</li>
   </ul>
+  </li>
 
   <li>0.6 - 2010-06-17
   <ul>
@@ -72,6 +99,7 @@
     <li>ais.h: started trying to define 8_366_34 - zone msg</li>
     <li>nagios_pg_ais.py: new file - monitor db statios with nagios ssh or snmp</li>
   </ul>
+  </li>
 
   <li>0.5 - 2010-05-25
   <ul>
@@ -96,6 +124,7 @@
     Faster debugging</li>
    <li>vessels.csv: new file - example preloading of vessel names as response ships</li>
  </ul>
+  </li>
 
   <li>0.4 - 2010-05-11
   <ul>
@@ -105,6 +134,7 @@
     <li>nais2py.py: Changed the database table names and structure.  Now vessel_name and vessel_pos</li>
     <li>ais_lut.py: new file with lookup tables to make ais wire codes human readable.</li>
   </ul>
+  </li>
 
   <li>0.3 - 2010-05-10
   <ul>
@@ -115,6 +145,7 @@
     <li>Added message 24</li>
     <li>Fixed python reference counting.  Added XXSafeSetItem functions</li>
    </ul>
+  </li>
 
   <li>0.2 - 2010-05-06
   <ul>
@@ -137,6 +168,7 @@
     <li>test_libais.cpp is not really a test framework, but it does
   try out the pure C++ world.</li>
 </ul>
+  </li>
 
   <li>0.1 - 2010-05-03
   <ul>

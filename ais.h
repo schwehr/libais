@@ -21,7 +21,7 @@ using std::string;
 using std::vector;
 
 #define LIBAIS_VERSION_MAJOR 0
-#define LIBAIS_VERSION_MINOR 12
+#define LIBAIS_VERSION_MINOR 13
 
 // Returns vector of the text between the delimiters.  Uses an empty string
 // for empty fields.  Empty string returns a vector of length 1 containing an

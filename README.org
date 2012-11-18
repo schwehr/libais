@@ -58,3 +58,10 @@ ais.decode('55NBjP01mtGIL@CW;SM<D60P5Ld000000000000P0`<3557l0<50@kk@K5h@00000000
 - IMO Circ 236
 - IMO Circ 289
 - EU RIS
+
+* Hacking
+
+The C++ code was switched to the Google style in November, 2012.
+Indenting should be by 2 spaces.
+
+http://google-styleguide.googlecode.com/svn/trunk/cpplint/
