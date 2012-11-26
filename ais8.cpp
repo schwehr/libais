@@ -571,9 +571,9 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad)
   }
 
   link_id = ubits(bs, 56, 10);
-  size_t text_bits = num_bits - 66;
+  size_t text_bits = ((num_bits - 66) / 6) * 6;
   text = ais_str(bs, 66, text_bits);
-  const size_t spare2_bits = text_bits % 6;
+  const size_t spare2_bits = num_bits - 66 - text_bits;
   if (spare2_bits) {
     const size_t start = 66 + text_bits;
     spare2 = ubits(bs, start, spare2_bits);
