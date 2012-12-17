@@ -64,6 +64,7 @@ SRCS += ais8_001_22.cpp # Area notice
 SRCS += ais8_001_26.cpp # Env Sensors
 # US Specific Messages
 SRCS += ais8_366_22.cpp
+SRCS += ais8_367.cpp
 
 SRCS += ais9.cpp
 SRCS += ais10.cpp

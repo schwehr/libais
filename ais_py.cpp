@@ -923,6 +923,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
   DictSafeSetItem(dict, "hour", msg.hour);
   DictSafeSetItem(dict, "minute", msg.minute);
 
+  DictSafeSetItem(dict, "durations_minutes", msg.minute);
+
   PyObject *sub_area_list = PyList_New(msg.sub_areas.size());
 
   // Loop over sub_areas
@@ -1539,6 +1541,138 @@ ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict,
   DictSafeSetItem(dict, "spare2", spare2_list);
 }
 
+void
+ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
+  Ais8_367_22 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
+
+  DictSafeSetItem(dict, "version", msg.version);
+  DictSafeSetItem(dict, "link_id", msg.link_id);
+  DictSafeSetItem(dict, "notice_type", msg.notice_type);
+  // TODO(schwehr): are 8:1:22 and 8:367:22 tables the same?
+  DictSafeSetItem(dict, "notice_type_str",
+                  ais8_001_22_notice_names[msg.notice_type]);
+
+  DictSafeSetItem(dict, "month", msg.month);  // This is UTC, not local time.
+  DictSafeSetItem(dict, "day", msg.day);
+  DictSafeSetItem(dict, "hour", msg.hour);
+  DictSafeSetItem(dict, "minute", msg.minute);
+
+  DictSafeSetItem(dict, "durations_minutes", msg.duration_minutes);
+
+  PyObject *sub_area_list = PyList_New(msg.sub_areas.size());
+
+  // Loop over sub_areas
+  for (size_t i = 0; i < msg.sub_areas.size(); i++) {
+    switch (msg.sub_areas[i]->getType()) {
+    case AIS8_366_22_SHAPE_CIRCLE:  // or point
+      {
+        PyObject *sub_area = PyDict_New();
+        Ais8_367_22_Circle *c =
+            reinterpret_cast<Ais8_367_22_Circle*>(msg.sub_areas[i]);
+
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_CIRCLE);
+        if (c->radius_m == 0)
+          DictSafeSetItem(sub_area, "sub_area_type_str", "point");
+        else
+          DictSafeSetItem(sub_area, "sub_area_type_str", "circle");
+
+        DictSafeSetItem(sub_area, "x", c->x);
+        DictSafeSetItem(sub_area, "y", c->y);
+        DictSafeSetItem(sub_area, "precision", c->precision);
+        DictSafeSetItem(sub_area, "radius", c->radius_m);
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+    case AIS8_366_22_SHAPE_RECT:
+      {
+        PyObject *sub_area = PyDict_New();
+        Ais8_367_22_Rect *c =
+            reinterpret_cast<Ais8_367_22_Rect*>(msg.sub_areas[i]);
+
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_RECT);
+        DictSafeSetItem(sub_area, "sub_area_type_str", "rect");
+
+        DictSafeSetItem(sub_area, "x", c->x);
+        DictSafeSetItem(sub_area, "y", c->y);
+        DictSafeSetItem(sub_area, "precision", c->precision);
+        DictSafeSetItem(sub_area, "e_dim_m", c->e_dim_m);
+        DictSafeSetItem(sub_area, "n_dim_m", c->n_dim_m);
+        DictSafeSetItem(sub_area, "orient_deg", c->orient_deg);
+
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+    case AIS8_366_22_SHAPE_SECTOR:
+      {
+        PyObject *sub_area = PyDict_New();
+        Ais8_367_22_Sector *c =
+            reinterpret_cast<Ais8_367_22_Sector*>(msg.sub_areas[i]);
+
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_SECTOR);
+        DictSafeSetItem(sub_area, "sub_area_type_str", "sector");
+
+        DictSafeSetItem(sub_area, "x", c->x);
+        DictSafeSetItem(sub_area, "y", c->y);
+        DictSafeSetItem(sub_area, "precision", c->precision);
+        DictSafeSetItem(sub_area, "radius", c->radius_m);
+        DictSafeSetItem(sub_area, "left_bound_deg", c->left_bound_deg);
+        DictSafeSetItem(sub_area, "right_bound_deg", c->right_bound_deg);
+
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+    case AIS8_366_22_SHAPE_POLYLINE:  // FALLTHROUGH
+    case AIS8_366_22_SHAPE_POLYGON:
+      {
+        PyObject *sub_area = PyDict_New();
+        Ais8_367_22_Poly *poly =
+            reinterpret_cast<Ais8_367_22_Poly*>(msg.sub_areas[i]);
+
+        DictSafeSetItem(sub_area, "sub_area_type", msg.sub_areas[i]->getType());
+        if (msg.sub_areas[i]->getType() == AIS8_366_22_SHAPE_POLYLINE)
+          DictSafeSetItem(sub_area, "sub_area_type_str", "polyline");
+        else
+          DictSafeSetItem(sub_area, "sub_area_type_str", "polygon");
+        assert(polyline->angles.size() == poly->dists_m.size());
+        PyObject *angle_list = PyList_New(poly->angles.size());
+        PyObject *dist_list = PyList_New(poly->angles.size());
+
+        for (size_t pt_num = 0; pt_num < poly->angles.size(); pt_num++) {
+          PyList_SetItem(angle_list, pt_num,
+                         PyFloat_FromDouble(poly->angles[pt_num]));
+          PyList_SetItem(dist_list, pt_num,
+                         PyFloat_FromDouble(poly->dists_m[pt_num]));
+        }
+
+        DictSafeSetItem(sub_area, "angles", angle_list);
+        DictSafeSetItem(sub_area, "dists_m", dist_list);
+
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+    case AIS8_366_22_SHAPE_TEXT:
+      {
+        PyObject *sub_area = PyDict_New();
+
+        Ais8_367_22_Text *text =
+            reinterpret_cast<Ais8_367_22_Text*>(msg.sub_areas[i]);
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_TEXT);
+        DictSafeSetItem(sub_area, "sub_area_type_str", "text");
+
+        DictSafeSetItem(sub_area, "text", text->text);
+
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+
+    default:
+      {}  // TODO(schwehr): Mark an unknown subarea or raise an exception.
+    }
+  }
+  DictSafeSetItem(dict, "sub_areas", sub_area_list);
+}
+
 
 // AIS Binary broadcast messages.  There will be a huge number of subtypes
 // If we don't know how to decode it, just return the dac, fi
@@ -1675,6 +1809,16 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     // case 366:  // United states
     // TODO(schwehr): implement
     //  break;
+  case 367:  // United states
+    switch (msg.fi) {
+    case 22:  // USCG Area Notice 2012 v1
+      ais8_367_22_append_pydict(nmea_payload, dict, pad);
+      break;
+    default:
+      DictSafeSetItem(dict, "parsed", false);
+      break;
+    }
+    break;
   default:
     DictSafeSetItem(dict, "parsed", false);
     // TODO(schwehr): raise exception or return standin?

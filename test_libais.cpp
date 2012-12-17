@@ -35,7 +35,6 @@ void ASSERT_EQ(const bool a, const bool b, const int line) {
 int main(UNUSED int argc, UNUSED char* argv[]) {
   BuildNmeaLookup();
 
-
   if (true) {
     {
       // !AIVDM,1,1,,B,15Mq4J0P01EREODRv4@74gv00HRq,0*72,b003669970,1272412824
@@ -184,6 +183,13 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     Ais8_366_34 msg("803OvriK`R0FaqT6gOv763PKLT;0", 0);
     if (msg.had_error()) cerr<<"FAILED 8 366 34 whales" << AIS_STATUS_STRINGS[msg.get_error()] << "\n";
 #endif
+  }
+
+  if (true) {
+    const string nmea("!AIVDM,1,1,0,A,85M:Ih1KmPAU6jAs85`03cJm;1NHQhPFP000,0*19");
+    const string body = GetNthField(nmea, 5, ",");
+    const int pad = GetPad(nmea);
+    Ais8_367_22 msg(body.c_str(), pad);
   }
 
   // 9 - Search and rescue

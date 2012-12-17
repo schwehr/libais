@@ -1235,6 +1235,106 @@ extern const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES];
 // 366 34 - Kurt older whale message 2008-2010
 // TODO(schwehr): Ais8_366_34
 
+class Ais8_367_22_SubArea {
+ public:
+  virtual Ais8_366_22_AreaShapeEnum getType()=0;
+  virtual ~Ais8_367_22_SubArea() { }
+};
+
+Ais8_367_22_SubArea*
+ais8_367_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
+                            const size_t offset);
+
+class Ais8_367_22_Circle : public Ais8_367_22_SubArea {
+ public:
+  float x, y;
+  int precision;
+  int radius_m;
+  unsigned int spare;
+
+  Ais8_367_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  ~Ais8_367_22_Circle() {}
+  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_CIRCLE;}
+};
+
+class Ais8_367_22_Rect : public Ais8_367_22_SubArea {
+ public:
+  float x, y;
+  int precision;
+  int e_dim_m;
+  int n_dim_m;
+  int orient_deg;
+  unsigned int spare;
+
+  Ais8_367_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  ~Ais8_367_22_Rect() {}
+  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_RECT;}
+};
+
+class Ais8_367_22_Sector : public Ais8_367_22_SubArea {
+ public:
+  float x, y;
+  int precision;
+  int radius_m;
+  int left_bound_deg;
+  int right_bound_deg;
+  int spare;
+
+  Ais8_367_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  ~Ais8_367_22_Sector() {}
+  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_SECTOR;}
+};
+
+// Polyline or Polygon
+class Ais8_367_22_Poly : public Ais8_367_22_SubArea {
+ public:
+  Ais8_366_22_AreaShapeEnum shape;
+  float x, y;
+  int precision;
+
+  // Up to 4 points
+  vector<float> angles;
+  vector<float> dists_m;
+  unsigned int spare;
+
+  Ais8_367_22_Poly(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  ~Ais8_367_22_Poly() {}
+  Ais8_366_22_AreaShapeEnum getType() {return shape;}
+};
+
+class Ais8_367_22_Text : public Ais8_367_22_SubArea {
+ public:
+  string text;
+  unsigned int spare;  // 3 bits
+
+  Ais8_367_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  ~Ais8_367_22_Text() {}
+  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_TEXT;}
+};
+
+class Ais8_367_22 : public Ais8 {
+ public:
+  int version;
+  int link_id;
+  int notice_type;
+  int month;
+  int day;
+  int hour;
+  int minute;
+  int duration_minutes;
+  int spare2;
+
+  vector<Ais8_367_22_SubArea *> sub_areas;
+
+  Ais8_367_22(const char *nmea_payload, const size_t pad);
+  ~Ais8_367_22();
+};
+ostream& operator<< (ostream& o, Ais8_367_22 const& msg);
+
+//const size_t AIS8_366_22_NUM_NAMES = 128;
+//extern const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES];
+
+
 class Ais9 : public AisMsg {
  public:
   int alt;  // m above sea level
