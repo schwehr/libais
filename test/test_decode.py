@@ -20,7 +20,6 @@ class AisTopLevelDecoders(unittest.TestCase):
       body = ''.join([line.split(',')[5] for line in entry['nmea']])
       pad = int(entry['nmea'][-1].split('*')[0][-1])
       msg = ais.decode(body, pad)
-      print msg
       self.assertDictEqual(msg, entry['result'])
 
 
