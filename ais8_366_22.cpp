@@ -1,6 +1,6 @@
 // Defined sort of by Nav55, but being tweaked by the USCG and
 // will hopefully become a RTCM standard.  Also hoping that this
-// will be harmonized with the IMO Circ 289
+// will be harmonized with the IMO Circ 289.
 
 #include <cmath>
 
