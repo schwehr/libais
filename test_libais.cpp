@@ -40,7 +40,6 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     {
       // !AIVDM,1,1,,B,15Mq4J0P01EREODRv4@74gv00HRq,0*72,b003669970,1272412824
       Ais1_2_3 m("15Mq4J0P01EREODRv4@74gv00HRq", 0);
-      //cout << "m123 status: " << m.had_error() << endl;
       ASSERT_EQ(m.had_error(), false, __LINE__);
       ASSERT_EQ(m.message_id, 1, __LINE__);
       ASSERT_EQ(m.repeat_indicator, 0, __LINE__);
@@ -86,9 +85,6 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
     Ais1_2_3("1zXYZ[\\]^_tr<CDJlP1DKSUn0<04", 0); // invalid character
 
   }
-
-  // cout << "Early okay\n";
-  // return 0;
 
   // !AIVDM,1,1,,B,4h2E3MQuiq3ILeUjqVMd@sG004IT,0*73,raishub,1342581930
   { Ais4_11 msg("4h2E3MQuiq3ILeUjqVMd@sG004IT,0*73,raishub,1342581930", 0); }
@@ -296,15 +292,15 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
   // 17 - GNSS differential ITU-R.M.823
   // GNSS Type 9
   // !AIVDM,1,1,,A,A0475rQ?6<`Rp2Jp0W4`0OlCu1d=w1Cj<AKrU?8T,0*6E,raishub,1351296064
-  { Ais17 msg("A0475rQ?6<`Rp2Jp0W4`0OlCu1d=w1Cj<AKrU?8T",0);  CHECK_ERROR(msg);  /* cout << msg << "\n"; */ }
+  { Ais17 msg("A0475rQ?6<`Rp2Jp0W4`0OlCu1d=w1Cj<AKrU?8T",0);  CHECK_ERROR(msg); }
   // !AIVDM,1,1,,A,A04<g?i:7Tcip2KB0wpf1h1?04H`wit0:jgwsh0U,0*38,raishub,1351296064
-  { Ais17 msg("A04<g?i:7Tcip2KB0wpf1h1?04H`wit0:jgwsh0U",0);  CHECK_ERROR(msg);  /* cout << msg << "\n"; */ }
+  { Ais17 msg("A04<g?i:7Tcip2KB0wpf1h1?04H`wit0:jgwsh0U",0);  CHECK_ERROR(msg); }
   // !AIVDM,1,1,,A,A0476CQb3Qba02Jt>i0`4wpsump@wJon:@Ov5OMH,0*20,raishub,1351297125
-  { Ais17 msg("A0476CQb3Qba02Jt>i0`4wpsump@wJon:@Ov5OMH",0);  CHECK_ERROR(msg);  /* cout << msg << "\n"; */ }
+  { Ais17 msg("A0476CQb3Qba02Jt>i0`4wpsump@wJon:@Ov5OMH",0);  CHECK_ERROR(msg); }
   // !AIVDM,1,1,,A,A@4<gWQ;`8cl82K@GMd`4wmd5RP7w48HHiOu:QEI,0*28,raishub,1351297354
-  { Ais17 msg("A@4<gWQ;`8cl82K@GMd`4wmd5RP7w48HHiOu:QEI",0);  CHECK_ERROR(msg); /* cout << msg << "\n"; */ }
+  { Ais17 msg("A@4<gWQ;`8cl82K@GMd`4wmd5RP7w48HHiOu:QEI",0);  CHECK_ERROR(msg); }
   // !AIVDM,1,1,,A,A0476CQb3Qba02JtGtP`0Oo101d6wFL0@hgvCwpV,0*58,raishub,1351297831
-  { Ais17 msg("A0476CQb3Qba02JtGtP`0Oo101d6wFL0@hgvCwpV",0);  CHECK_ERROR(msg); /* cout << msg << "\n"; */ }
+  { Ais17 msg("A0476CQb3Qba02JtGtP`0Oo101d6wFL0@hgvCwpV",0);  CHECK_ERROR(msg); }
 
   // 18 - Class B
   // !AIVDM,1,1,,A,B5N3SRP0FFJFC`4:CQDFKwiP200>,0*75,b003669952,1272413103
