@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages, Extension
 
-version = file('VERSION').readline().strip()
+version = open('VERSION').readline().strip()
 
 ais_module = Extension('ais',
                     sources = ['ais_py.cpp',
@@ -43,10 +43,10 @@ setup (name = 'libais',
        author='Kurt Schwehr',
        author_email='schwehr@gmail.com',
        url='https://github.com/schwehr/libais',
-       license='LGPL v3+',
+       license='Apache 2.0',
        ext_modules = [ais_module],
        classifiers=[
-            'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
+            'License :: OSI Approved :: Apache Software License',
             'Topic :: System :: Networking',
             'Development Status :: 4 - Beta',
             'Intended Audience :: Science/Research',
