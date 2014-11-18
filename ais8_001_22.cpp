@@ -107,7 +107,7 @@ const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = {
   "Information: Position of icebreakers",  // 91
   "Information: Location of response units",  // 92
   "VTS active target",  // 93
-  "Rouge or suspicious vessel",  // 94
+  "Rogue or suspicious vessel",  // 94
   "Vessel requesting non-distress assistance",  // 95
   "Chart Feature: Sunken vessel",  // 96
   "Chart Feature: Submerged object",  // 97
