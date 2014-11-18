@@ -11,29 +11,28 @@ CXXFLAGS :=
 CXXFLAGS := 
 
 WARN := -Wall
-#WARN += -Wimplicit 
-#WARN += -pedantic # long long
-WARN += -W 
-WARN += -Wredundant-decls
-#WARN += -Werror
-#WARN += -Wmissing-prototypes
-WARN += -Wunknown-pragmas
-WARN += -Wunused
-WARN += -Wunused
-WARN += -Wendif-labels
-#WARN += -Wnewline-eof
+WARN += -Wextra
 WARN += -Wno-sign-compare
-WARN += -Wshadow
-# Requires -O
-# WARN += -O -Wuninitialized
+# WARN += -Werror
 
 # Disabled warnings
-#WARN+= -Weffc++
-#WARN+= -Wunreachable-code
+# WARN += -pedantic  # long long
+# WARN += -W
+# WARN += -Weffc++
+# WARN += -Wendif-labels
+# WARN += -Wimplicit 
+# WARN += -Wmissing-prototypes
+# WARN += -Wnewline-eof
+# WARN += -Wredundant-decls
+# WARN += -Wshadow
+# WARN += -Wuninitialized  # Requires -O to work.
+# WARN += -Wunknown-pragmas
+# WARN += -Wunreachable-code
+# WARN += -Wunused
 
-DEBUG:= -g3 -DDEBUG=1
-DEBUG+= -O0
-#DEBUG+= -O
+DEBUG := -g3 -DDEBUG=1
+DEBUG += -O0
+# DEBUG+= -O
 # DEBUG+= -D_GLIBCXX_DEBUG # Bad things on the mac?  May be a gtest bug.
 # DEBUG+= -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCPP_CONCEPT_CHECKS
 

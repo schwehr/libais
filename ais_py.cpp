@@ -1637,8 +1637,8 @@ ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict,
 
   PyObject *id_list = PyList_New(4);
   for (size_t i = 0; i < 4; i++)
-    PyList_SetItem(id_list, 0, PyInt_FromLong(msg.guage_ids[i]));
-  DictSafeSetItem(dict, "guage_ids", id_list);
+    PyList_SetItem(id_list, 0, PyInt_FromLong(msg.gauge_ids[i]));
+  DictSafeSetItem(dict, "gauge_ids", id_list);
 
   PyObject *level_list = PyList_New(4);
   for (size_t i = 0; i < 4; i++)

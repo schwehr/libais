@@ -1404,7 +1404,7 @@ class Ais8_200_23 : public Ais8 {
 class Ais8_200_24 : public Ais8 {
  public:
   string country;
-  int guage_ids[4];
+  int gauge_ids[4];
   float levels[4];  // m
 
   Ais8_200_24(const char *nmea_payload, const size_t pad);
