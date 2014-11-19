@@ -35,8 +35,7 @@ const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = {
   "(reserved for future use)",  // 22
   "Environmental Caution Area: Storm front (line squall)",  // 23
   "Environmental Caution Area: Hazardous sea ice",  // 24
-  "Environmental Caution Area: Storm warning "
-  "(storm cell or line of storms)",  // 25
+  "Environmental Caution Area: Storm warning (cell or line of storms)",  // 25
   "Environmental Caution Area: High wind",  // 26
   "Environmental Caution Area: High waves",  // 27
   "Environmental Caution Area: Restricted visibility (fog, rain, etc.)",  // 28
@@ -126,8 +125,7 @@ const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = {
   "(reserved for future use)",  // 111
   "Report from ship: Icing info",  // 112
   "(reserved for future use)",  // 113
-  "Report from ship: Miscellaneous information – "
-  "define in Associated text field",  // 114
+  "Report from ship: Misc information - see associated text field",  // 114
   "(reserved for future use)",  // 115
   "(reserved for future use)",  // 116
   "(reserved for future use)",  // 117
