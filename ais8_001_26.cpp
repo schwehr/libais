@@ -29,12 +29,12 @@ Ais8_1_26_Wind::Ais8_1_26_Wind(const bitset<AIS8_MAX_BITS> &bs,
   wind_dir = ubits(bs, offset + 14, 9);
   wind_gust_dir = ubits(bs, offset + 23, 9);
   sensor_type = ubits(bs, offset + 32, 3);
-  wind_forcast = ubits(bs, offset + 35, 7);
-  wind_gust_forcast = ubits(bs, offset + 42, 7);  // knots
-  wind_dir_forcast = ubits(bs, offset + 49, 9);
-  utc_day_forcast = ubits(bs, offset + 58, 5);
-  utc_hour_forcast = ubits(bs, offset + 63, 5);
-  utc_min_forcast = ubits(bs, offset + 68, 6);
+  wind_forecast = ubits(bs, offset + 35, 7);
+  wind_gust_forecast = ubits(bs, offset + 42, 7);  // knots
+  wind_dir_forecast = ubits(bs, offset + 49, 9);
+  utc_day_forecast = ubits(bs, offset + 58, 5);
+  utc_hour_forecast = ubits(bs, offset + 63, 5);
+  utc_min_forecast = ubits(bs, offset + 68, 6);
   duration = ubits(bs, offset + 74, 8);
   spare = ubits(bs, offset + 82, 3);
 }
@@ -46,11 +46,11 @@ Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const bitset<AIS8_MAX_BITS> &bs,
   trend = ubits(bs, offset + 17, 2);
   vdatum = ubits(bs, offset + 19, 5);
   sensor_type = ubits(bs, offset + 24, 3);
-  forcast_type = bs[offset + 27];
-  level_forcast = sbits(bs, offset + 28, 16) / 100.;
-  utc_day_forcast = ubits(bs, offset + 44, 5);
-  utc_hour_forcast = ubits(bs, offset + 49, 5);
-  utc_min_forcast = ubits(bs, offset + 54, 6);
+  forecast_type = bs[offset + 27];
+  level_forecast = sbits(bs, offset + 28, 16) / 100.;
+  utc_day_forecast = ubits(bs, offset + 44, 5);
+  utc_hour_forecast = ubits(bs, offset + 49, 5);
+  utc_min_forecast = ubits(bs, offset + 54, 6);
   duration = ubits(bs, offset + 60, 8);
   spare = ubits(bs, offset + 68, 17);
 }
@@ -142,10 +142,10 @@ Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const bitset<AIS8_MAX_BITS> &bs,
   draught = ubits(bs, offset, 13) / 100.;
   gap = ubits(bs, offset + 13, 13) / 10.;
   trend = ubits(bs, offset + 26, 2);
-  forcast_gap = ubits(bs, offset + 28, 13) / 10.;
-  utc_day_forcast = ubits(bs, offset + 41, 5);
-  utc_hour_forcast = ubits(bs, offset + 46, 5);
-  utc_min_forcast = ubits(bs, offset + 51, 6);
+  forecast_gap = ubits(bs, offset + 28, 13) / 10.;
+  utc_day_forecast = ubits(bs, offset + 41, 5);
+  utc_hour_forecast = ubits(bs, offset + 46, 5);
+  utc_min_forecast = ubits(bs, offset + 51, 6);
   spare = ubits(bs, offset + 57, 28);
 }
 

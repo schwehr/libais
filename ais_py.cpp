@@ -1275,12 +1275,12 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
         DictSafeSetItem(rpt_dict, "wind_dir", rpt->wind_dir);
         DictSafeSetItem(rpt_dict, "wind_gust_dir", rpt->wind_gust_dir);
         DictSafeSetItem(rpt_dict, "sensor_type", rpt->sensor_type);
-        DictSafeSetItem(rpt_dict, "wind_forcast", rpt->wind_forcast);
-        DictSafeSetItem(rpt_dict, "wind_gust_forcast", rpt->wind_gust_forcast);
-        DictSafeSetItem(rpt_dict, "wind_dir_forcast", rpt->wind_dir_forcast);
-        DictSafeSetItem(rpt_dict, "utc_day_forcast", rpt->utc_day_forcast);
-        DictSafeSetItem(rpt_dict, "utc_hour_forcast", rpt->utc_hour_forcast);
-        DictSafeSetItem(rpt_dict, "utc_min_forcast", rpt->utc_min_forcast);
+        DictSafeSetItem(rpt_dict, "wind_forecast", rpt->wind_forecast);
+        DictSafeSetItem(rpt_dict, "wind_gust_forecast", rpt->wind_gust_forecast);
+        DictSafeSetItem(rpt_dict, "wind_dir_forecast", rpt->wind_dir_forecast);
+        DictSafeSetItem(rpt_dict, "utc_day_forecast", rpt->utc_day_forecast);
+        DictSafeSetItem(rpt_dict, "utc_hour_forecast", rpt->utc_hour_forecast);
+        DictSafeSetItem(rpt_dict, "utc_min_forecast", rpt->utc_min_forecast);
         DictSafeSetItem(rpt_dict, "duration", rpt->duration);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
       }
@@ -1294,11 +1294,11 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
         DictSafeSetItem(rpt_dict, "trend", rpt->trend);
         DictSafeSetItem(rpt_dict, "vdatum", rpt->vdatum);
         DictSafeSetItem(rpt_dict, "sensor_type", rpt->sensor_type);
-        DictSafeSetItem(rpt_dict, "forcast_type", rpt->forcast_type);
-        DictSafeSetItem(rpt_dict, "level_forcast", rpt->level_forcast);
-        DictSafeSetItem(rpt_dict, "utc_day_forcast", rpt->utc_day_forcast);
-        DictSafeSetItem(rpt_dict, "utc_hour_forcast", rpt->utc_hour_forcast);
-        DictSafeSetItem(rpt_dict, "utc_min_forcast", rpt->utc_min_forcast);
+        DictSafeSetItem(rpt_dict, "forecast_type", rpt->forecast_type);
+        DictSafeSetItem(rpt_dict, "level_forecast", rpt->level_forecast);
+        DictSafeSetItem(rpt_dict, "utc_day_forecast", rpt->utc_day_forecast);
+        DictSafeSetItem(rpt_dict, "utc_hour_forecast", rpt->utc_hour_forecast);
+        DictSafeSetItem(rpt_dict, "utc_min_forecast", rpt->utc_min_forecast);
         DictSafeSetItem(rpt_dict, "duration", rpt->duration);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
       }
@@ -1418,11 +1418,11 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
             reinterpret_cast<Ais8_1_26_AirDraught *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "draught", rpt->draught);
         DictSafeSetItem(rpt_dict, "gap", rpt->gap);
-        DictSafeSetItem(rpt_dict, "forcast_gap", rpt->forcast_gap);
+        DictSafeSetItem(rpt_dict, "forecast_gap", rpt->forecast_gap);
         DictSafeSetItem(rpt_dict, "int trend", rpt->trend);
-        DictSafeSetItem(rpt_dict, "int utc_day_forcast", rpt->utc_day_forcast);
-        DictSafeSetItem(rpt_dict, "utc_hour_forcast", rpt->utc_hour_forcast);
-        DictSafeSetItem(rpt_dict, "utc_min_forcast", rpt->utc_min_forcast);
+        DictSafeSetItem(rpt_dict, "int utc_day_forecast", rpt->utc_day_forecast);
+        DictSafeSetItem(rpt_dict, "utc_hour_forecast", rpt->utc_hour_forecast);
+        DictSafeSetItem(rpt_dict, "utc_min_forecast", rpt->utc_min_forecast);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
       }
       break;

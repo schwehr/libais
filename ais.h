@@ -1094,9 +1094,9 @@ class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
   int wind_speed, wind_gust;  // knots
   int wind_dir, wind_gust_dir;
   int sensor_type;
-  int wind_forcast, wind_gust_forcast;  // knots
-  int wind_dir_forcast;
-  int utc_day_forcast, utc_hour_forcast, utc_min_forcast;
+  int wind_forecast, wind_gust_forecast;  // knots
+  int wind_dir_forecast;
+  int utc_day_forecast, utc_hour_forecast, utc_min_forecast;
   int duration;
   int spare;
 
@@ -1112,11 +1112,11 @@ class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
   int trend;
   int vdatum;
   int sensor_type;
-  int forcast_type;
-  float level_forcast;
-  int utc_day_forcast;
-  int utc_hour_forcast;
-  int utc_min_forcast;
+  int forecast_type;
+  float level_forecast;
+  int utc_day_forecast;
+  int utc_hour_forecast;
+  int utc_min_forecast;
   int duration;  // minutes
   int spare;
 
@@ -1228,9 +1228,9 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
  public:
-  float draught, gap, forcast_gap;
+  float draught, gap, forecast_gap;
   int trend;
-  int utc_day_forcast, utc_hour_forcast, utc_min_forcast;
+  int utc_day_forecast, utc_hour_forecast, utc_min_forecast;
   int spare;
 
   Ais8_1_26_AirDraught(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
