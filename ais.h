@@ -1,34 +1,56 @@
 // -*- c++ -*-
 
-// TODO(schwehr): should all messages just use MAX_BITS or should it be set for each message?
-// TODO(schwehr): create an archive of messages to do not decode.  Can libais be made to safely decode any of them?
+// TODO(schwehr): should all messages just use MAX_BITS or should it
+//                be set for each message?
+// TODO(schwehr): create an archive of messages to do not decode.  Can
+//                libais be made to safely decode any of them?
 
 #ifndef AIS_H
 #define AIS_H
 
 #include <bitset>
-#include <string>
 #include <cassert>
-#include <vector>
 #include <cstring>
+#include <string>
 #include <iostream>
+#include <vector>
+
+using std::bitset;
+using std::ostream;
+using std::string;
+using std::vector;
 
 #define LIBAIS_VERSION_MAJOR 0
-#define LIBAIS_VERSION_MINOR 11
+#define LIBAIS_VERSION_MINOR 14
 
-const std::string nth_field(const std::string &str, const size_t n, const char c);
+// Returns vector of the text between the delimiters.  Uses an empty string
+// for empty fields.  Empty string returns a vector of length 1 containing an
+// empty string.
+// Empty delim_str is not allowed.
+vector<string> Split(const string &str, const string &delim_str);
 
-extern bool nmea_ord_initialized;  // If this is false, you need to call build_nmea_lookup.
+// Returns the text in the nth field starting with the first field being 0.
+// Empty delim_str is not allowed.
+string GetNthField(const string &str, const size_t n, const string &delim_str);
+
+// Returns the number of pad bits in an AIS AIVDM NMEA string.
+// Returns -1 if there is an error.
+int GetPad(const string &nmea_str);
+
+// Returns the armored payload of an AIS AIVDM NMEA string.
+// Returns an empty string if there was an error.
+string GetBody(const string &nmea_str);
+
+extern bool nmea_ord_initialized;  // If false, call build_nmea_lookup
+bitset<6> Reverse(const bitset<6> &bits);
+void BuildNmeaLookup();
 
 static const int MAX_BITS = 1192;
 
-
-void build_nmea_lookup();
-
 enum AIS_STATUS {
+  AIS_UNINITIALIZED,  // Message is not yet completely decoded.
   AIS_OK,
   AIS_ERR_BAD_BIT_COUNT,
-  AIS_ERR_WRONG_MSG_TYPE,
   AIS_ERR_BAD_NMEA_CHR,
   AIS_ERR_BAD_PTR,
   AIS_ERR_UNKNOWN_MSG_TYPE,
@@ -44,8 +66,340 @@ enum AIS_STATUS {
 
 extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
 
+// Designated Area Codes (DAC) / Maritime Identification Digits define
+// which country controls a subset of the submessage spaces within
+// AIS "binary" messages 6, 8, 25, and 26.  See:
+//   http://www.itu.int/online/mms/glad/cga_mids.sh?lng=E
+//   http://en.wikipedia.org/w/index.php?title=Maritime_identification_digits
+// River Information System (RIS):
+//   ECE-TRANS-SC3-2006-10r-RIS.pdf
+
+enum Dac {
+  AIS_DAC_0_TEST = 0,
+  AIS_DAC_1_INTERNATIONAL,
+  AIS_DAC_200_RIS = 201,
+  AIS_DAC_201_ALBANIA = 201,
+  AIS_DAC_202_ANDORRA = 202,
+  AIS_DAC_203_AUSTRIA = 203,
+  AIS_DAC_204_AZORES = 204,
+  AIS_DAC_205_BELGIUM = 205,
+  AIS_DAC_206_BELARUS = 206,
+  AIS_DAC_207_BULGARIA = 207,
+  AIS_DAC_208_VATICAN_CITY_STATE = 208,
+  AIS_DAC_209_CYPRUS = 209,
+  AIS_DAC_210_CYPRUS = 210,
+  AIS_DAC_211_GERMANY = 211,
+  AIS_DAC_212_CYPRUS = 212,
+  AIS_DAC_213_GEORGIA = 213,
+  AIS_DAC_214_MOLDOVA = 214,
+  AIS_DAC_215_MALTA = 215,
+  AIS_DAC_218_GERMANY = 218,
+  AIS_DAC_219_DENMARK = 219,
+  AIS_DAC_220_DENMARK = 220,
+  AIS_DAC_224_SPAIN = 224,
+  AIS_DAC_225_SPAIN = 225,
+  AIS_DAC_226_FRANCE = 226,
+  AIS_DAC_227_FRANCE = 227,
+  AIS_DAC_228_FRANCE = 228,
+  AIS_DAC_230_FINLAND = 230,
+  AIS_DAC_231_FAROE_ISLANDS = 231,
+  AIS_DAC_232_UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND = 232,
+  AIS_DAC_233_UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND = 233,
+  AIS_DAC_234_UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND = 234,
+  AIS_DAC_235_UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND = 235,
+  AIS_DAC_236_GIBRALTAR = 236,
+  AIS_DAC_237_GREECE = 237,
+  AIS_DAC_238_CROATIA = 238,
+  AIS_DAC_239_GREECE = 239,
+  AIS_DAC_240_GREECE = 240,
+  AIS_DAC_242_MOROCCO = 242,
+  AIS_DAC_243_HUNGARY = 243,
+  AIS_DAC_244_NETHERLANDS = 244,
+  AIS_DAC_245_NETHERLANDS = 245,
+  AIS_DAC_246_NETHERLANDS = 246,
+  AIS_DAC_247_ITALY = 247,
+  AIS_DAC_248_MALTA = 248,
+  AIS_DAC_249_MALTA = 249,
+  AIS_DAC_250_IRELAND = 250,
+  AIS_DAC_251_ICELAND = 251,
+  AIS_DAC_252_LIECHTENSTEIN = 252,
+  AIS_DAC_253_LUXEMBOURG = 253,
+  AIS_DAC_254_MONACO = 254,
+  AIS_DAC_255_MADEIRA = 255,
+  AIS_DAC_256_MALTA = 256,
+  AIS_DAC_257_NORWAY = 257,
+  AIS_DAC_258_NORWAY = 258,
+  AIS_DAC_259_NORWAY = 259,
+  AIS_DAC_261_POLAND = 261,
+  AIS_DAC_262_MONTENEGRO = 262,
+  AIS_DAC_263_PORTUGAL = 263,
+  AIS_DAC_264_ROMANIA = 264,
+  AIS_DAC_265_SWEDEN = 265,
+  AIS_DAC_266_SWEDEN = 266,
+  AIS_DAC_267_SLOVAKIA = 267,
+  AIS_DAC_268_SAN_MARINO = 268,
+  AIS_DAC_269_SWITZERLAND = 269,
+  AIS_DAC_270_CZECH_REPUBLIC = 270,
+  AIS_DAC_271_TURKEY = 271,
+  AIS_DAC_272_UKRAINE = 272,
+  AIS_DAC_273_RUSSIAN_FEDERATION = 273,
+  AIS_DAC_274_MACEDONIA = 274,
+  AIS_DAC_275_LATVIA = 275,
+  AIS_DAC_276_ESTONIA = 276,
+  AIS_DAC_277_LITHUANIA = 277,
+  AIS_DAC_278_SLOVENIA = 278,
+  AIS_DAC_279_SERBIA = 279,
+  AIS_DAC_301_ANGUILLA = 301,
+  AIS_DAC_303_ALASKA = 303,
+  AIS_DAC_304_ANTIGUA_AND_BARBUDA = 304,
+  AIS_DAC_306_NETHERLANDS_ANTILLES = 306,
+  AIS_DAC_307_ARUBA = 307,
+  AIS_DAC_308_BAHAMAS = 308,
+  AIS_DAC_309_BAHAMAS = 309,
+  AIS_DAC_310_BERMUDA = 310,
+  AIS_DAC_311_BAHAMAS = 311,
+  AIS_DAC_312_BELIZE = 312,
+  AIS_DAC_314_BARBADOS = 314,
+  AIS_DAC_316_CANADA = 316,
+  AIS_DAC_319_CAYMAN_ISLANDS = 319,
+  AIS_DAC_321_COSTA_RICA = 321,
+  AIS_DAC_323_CUBA = 323,
+  AIS_DAC_325_DOMINICA = 325,
+  AIS_DAC_327_DOMINICAN_REPUBLIC = 327,
+  AIS_DAC_329_GUADELOUPE = 329,
+  AIS_DAC_330_GRENADA = 330,
+  AIS_DAC_331_GREENLAND = 331,
+  AIS_DAC_332_GUATEMALA = 332,
+  AIS_DAC_334_HONDURAS = 334,
+  AIS_DAC_336_HAITI = 336,
+  AIS_DAC_338_UNITED_STATES_OF_AMERICA = 338,
+  AIS_DAC_339_JAMAICA = 339,
+  AIS_DAC_341_SAINT_KITTS_AND_NEVIS = 341,
+  AIS_DAC_343_SAINT_LUCIA = 343,
+  AIS_DAC_345_MEXICO = 345,
+  AIS_DAC_347_MARTINIQUE = 347,
+  AIS_DAC_348_MONTSERRAT = 348,
+  AIS_DAC_350_NICARAGUA = 350,
+  AIS_DAC_351_PANAMA = 351,
+  AIS_DAC_352_PANAMA = 352,
+  AIS_DAC_353_PANAMA = 353,
+  AIS_DAC_354_PANAMA = 354,
+  AIS_DAC_355_PANAMA = 355,
+  AIS_DAC_356_PANAMA = 356,
+  AIS_DAC_357_PANAMA = 357,
+  AIS_DAC_358_PUERTO_RICO = 358,
+  AIS_DAC_359_EL_SALVADOR = 359,
+  AIS_DAC_361_SAINT_PIERRE_AND_MIQUELON = 361,
+  AIS_DAC_362_TRINIDAD_AND_TOBAGO = 362,
+  AIS_DAC_364_TURKS_AND_CAICOS_ISLANDS = 364,
+  AIS_DAC_366_UNITED_STATES_OF_AMERICA = 366,
+  AIS_DAC_367_UNITED_STATES_OF_AMERICA = 367,
+  AIS_DAC_368_UNITED_STATES_OF_AMERICA = 368,
+  AIS_DAC_369_UNITED_STATES_OF_AMERICA = 369,
+  AIS_DAC_371_PANAMA = 371,
+  AIS_DAC_372_PANAMA = 372,
+  AIS_DAC_375_SAINT_VINCENT_AND_THE_GRENADINES = 375,
+  AIS_DAC_376_SAINT_VINCENT_AND_THE_GRENADINES = 376,
+  AIS_DAC_377_SAINT_VINCENT_AND_THE_GRENADINES = 377,
+  AIS_DAC_378_BRITISH_VIRGIN_ISLANDS = 378,
+  AIS_DAC_379_UNITED_STATES_VIRGIN_ISLANDS = 379,
+  AIS_DAC_401_AFGHANISTAN = 401,
+  AIS_DAC_403_SAUDI_ARABIA = 403,
+  AIS_DAC_405_BANGLADESH = 405,
+  AIS_DAC_408_BAHRAIN = 408,
+  AIS_DAC_410_BHUTAN = 410,
+  AIS_DAC_413_CHINA = 413,
+  AIS_DAC_416_TAIWAN = 416,
+  AIS_DAC_417_SRI_LANKA = 417,
+  AIS_DAC_419_INDIA = 419,
+  AIS_DAC_422_IRAN = 422,
+  AIS_DAC_423_AZERBAIJANI_REPUBLIC = 423,
+  AIS_DAC_425_IRAQ = 425,
+  AIS_DAC_428_ISRAEL = 428,
+  AIS_DAC_431_JAPAN = 431,
+  AIS_DAC_432_JAPAN = 432,
+  AIS_DAC_434_TURKMENISTAN = 434,
+  AIS_DAC_436_KAZAKHSTAN = 436,
+  AIS_DAC_438_JORDAN = 438,
+  AIS_DAC_440_KOREA = 440,
+  AIS_DAC_441_KOREA = 441,
+  AIS_DAC_443_PALESTINIAN_AUTHORITY = 443,
+  AIS_DAC_445_DEMOCRATIC_PEOPLES_REPUBLIC_OF_KOREA = 445,
+  AIS_DAC_447_KUWAIT = 447,
+  AIS_DAC_450_LEBANON = 450,
+  AIS_DAC_455_MALDIVES = 455,
+  AIS_DAC_457_MONGOLIA = 457,
+  AIS_DAC_459_NEPAL = 459,
+  AIS_DAC_461_OMAN = 461,
+  AIS_DAC_463_PAKISTAN = 463,
+  AIS_DAC_466_QATAR = 466,
+  AIS_DAC_468_SYRIAN_ARAB_REPUBLIC = 468,
+  AIS_DAC_470_UNITED_ARAB_EMIRATES = 470,
+  AIS_DAC_473_YEMEN = 473,
+  AIS_DAC_475_YEMEN = 475,
+  AIS_DAC_477_HONG_KONG = 477,
+  AIS_DAC_501_ADELIE_LAND = 501,
+  AIS_DAC_503_AUSTRALIA = 503,
+  AIS_DAC_506_MYANMAR = 506,
+  AIS_DAC_508_BRUNEI_DARUSSALAM = 508,
+  AIS_DAC_510_MICRONESIA = 510,
+  AIS_DAC_511_PALAU = 511,
+  AIS_DAC_512_NEW_ZEALAND = 512,
+  AIS_DAC_514_CAMBODIA = 514,
+  AIS_DAC_515_CAMBODIA = 515,
+  AIS_DAC_516_CHRISTMAS_ISLAND = 516,
+  AIS_DAC_518_COOK_ISLANDS = 518,
+  AIS_DAC_520_FIJI = 520,
+  AIS_DAC_523_COCOS_ISLANDS = 523,
+  AIS_DAC_525_INDONESIA = 525,
+  AIS_DAC_529_KIRIBATI = 529,
+  AIS_DAC_531_LAO_PEOPLES_DEMOCRATIC_REPUBLIC = 531,
+  AIS_DAC_533_MALAYSIA = 533,
+  AIS_DAC_536_NORTHERN_MARIANA_ISLANDS = 536,
+  AIS_DAC_538_MARSHALL_ISLANDS = 538,
+  AIS_DAC_540_NEW_CALEDONIA = 540,
+  AIS_DAC_542_NIUE = 542,
+  AIS_DAC_544_NAURU = 544,
+  AIS_DAC_546_FRENCH_POLYNESIA = 546,
+  AIS_DAC_548_PHILIPPINES = 548,
+  AIS_DAC_553_PAPUA_NEW_GUINEA = 553,
+  AIS_DAC_555_PITCAIRN_ISLAND = 555,
+  AIS_DAC_557_SOLOMON_ISLANDS = 557,
+  AIS_DAC_559_AMERICAN_SAMOA = 559,
+  AIS_DAC_561_SAMOA = 561,
+  AIS_DAC_563_SINGAPORE = 563,
+  AIS_DAC_564_SINGAPORE = 564,
+  AIS_DAC_567_THAILAND = 567,
+  AIS_DAC_570_TONGA = 570,
+  AIS_DAC_572_TUVALU = 572,
+  AIS_DAC_574_VIETNAM = 574,
+  AIS_DAC_576_VANUATU = 576,
+  AIS_DAC_578_WALLIS_AND_FUTUNA_ISLANDS = 578,
+  AIS_DAC_601_SOUTH_AFRICA = 601,
+  AIS_DAC_603_ANGOLA = 603,
+  AIS_DAC_605_ALGERIA = 605,
+  AIS_DAC_607_SAINT_PAUL_AND_AMSTERDAM_ISLANDS = 607,
+  AIS_DAC_608_ASCENSION_ISLAND = 608,
+  AIS_DAC_609_BURUNDI = 609,
+  AIS_DAC_610_BENIN = 610,
+  AIS_DAC_611_BOTSWANA = 611,
+  AIS_DAC_612_CENTRAL_AFRICAN_REPUBLIC = 612,
+  AIS_DAC_613_CAMEROON = 613,
+  AIS_DAC_615_CONGO = 615,
+  AIS_DAC_616_COMOROS = 616,
+  AIS_DAC_617_CAPE_VERDE = 617,
+  AIS_DAC_618_CROZET_ARCHIPELAGO = 618,
+  AIS_DAC_619_COTE_DIVOIRE = 619,
+  AIS_DAC_621_DJIBOUTI = 621,
+  AIS_DAC_622_EGYPT = 622,
+  AIS_DAC_624_ETHIOPIA = 624,
+  AIS_DAC_625_ERITREA = 625,
+  AIS_DAC_626_GABONESE_REPUBLIC = 626,
+  AIS_DAC_627_GHANA = 627,
+  AIS_DAC_629_GAMBIA = 629,
+  AIS_DAC_630_GUINEABISSAU = 630,
+  AIS_DAC_631_EQUATORIAL_GUINEA = 631,
+  AIS_DAC_632_GUINEA = 632,
+  AIS_DAC_633_BURKINA_FASO = 633,
+  AIS_DAC_634_KENYA = 634,
+  AIS_DAC_635_KERGUELEN_ISLANDS = 635,
+  AIS_DAC_636_LIBERIA = 636,
+  AIS_DAC_637_LIBERIA = 637,
+  AIS_DAC_642_SOCIALIST_PEOPLES_LIBYAN_ARAB_JAMAHIRIYA = 642,
+  AIS_DAC_644_LESOTHO = 644,
+  AIS_DAC_645_MAURITIUS = 645,
+  AIS_DAC_647_MADAGASCAR = 647,
+  AIS_DAC_649_MALI = 649,
+  AIS_DAC_650_MOZAMBIQUE = 650,
+  AIS_DAC_654_MAURITANIA = 654,
+  AIS_DAC_655_MALAWI = 655,
+  AIS_DAC_656_NIGER = 656,
+  AIS_DAC_657_NIGERIA = 657,
+  AIS_DAC_659_NAMIBIA = 659,
+  AIS_DAC_660_REUNION = 660,
+  AIS_DAC_661_RWANDESE_REPUBLIC = 661,
+  AIS_DAC_662_SUDAN = 662,
+  AIS_DAC_663_SENEGAL = 663,
+  AIS_DAC_664_SEYCHELLES = 664,
+  AIS_DAC_665_SAINT_HELENA = 665,
+  AIS_DAC_666_SOMALI_DEMOCRATIC_REPUBLIC = 666,
+  AIS_DAC_667_SIERRA_LEONE = 667,
+  AIS_DAC_668_SAOTOMEANDPRINCIPE = 668,
+  AIS_DAC_669_SWAZILAND = 669,
+  AIS_DAC_670_CHAD = 670,
+  AIS_DAC_671_TOGOLESE_REPUBLIC = 671,
+  AIS_DAC_672_TUNISIA = 672,
+  AIS_DAC_674_TANZANIA = 674,
+  AIS_DAC_675_UGANDA = 675,
+  AIS_DAC_676_DEMOCRATIC_REPUBLIC_OF_THE_CONGO = 676,
+  AIS_DAC_677_TANZANIA = 677,
+  AIS_DAC_678_ZAMBIA = 678,
+  AIS_DAC_679_ZIMBABWE = 679,
+  AIS_DAC_701_ARGENTINE_REPUBLIC = 701,
+  AIS_DAC_710_BRAZIL = 710,
+  AIS_DAC_720_BOLIVIA = 720,
+  AIS_DAC_725_CHILE = 725,
+  AIS_DAC_730_COLOMBIA = 730,
+  AIS_DAC_735_ECUADOR = 735,
+  AIS_DAC_740_FALKLAND_ISLANDS = 740,
+  AIS_DAC_745_GUIANA = 745,
+  AIS_DAC_750_GUYANA = 750,
+  AIS_DAC_755_PARAGUAY = 755,
+  AIS_DAC_760_PERU = 760,
+  AIS_DAC_765_SURINAME = 765,
+  AIS_DAC_770_URUGUAY = 770,
+  AIS_DAC_775_VENEZUELA = 775
+};
+
+// Functional Identifiers (FI) are individual messages within a
+// specific DAC.  An FI in one DAC has nothing to do with an FI in
+// another DAC.
+enum AIS_FI {
+  AIS_FI_6_1_0_TEXT = 0,
+  AIS_FI_6_1_1_ACK = 1,
+  AIS_FI_6_1_2_FI_INTERROGATE = 2,
+  AIS_FI_6_1_3_CAPABILITY_INTERROGATE = 3,
+  AIS_FI_6_1_4_CAPABILITY_REPLY = 4,
+  AIS_FI_6_1_12_DANGEROUS_CARGO = 12,
+  AIS_FI_6_1_14_TIDAL_WINDOW = 14,
+  AIS_FI_6_1_16_VTS_TARGET = 16,
+  AIS_FI_6_1_18_ENTRY_TIME = 18,
+  AIS_FI_6_1_20_BERTHING = 20,
+  AIS_FI_6_1_25_DANGEROUS_CARGO = 25,
+  AIS_FI_6_1_28_ROUTE = 28,
+  AIS_FI_6_1_30_TEXT = 30,
+  AIS_FI_6_1_32_TIDAL_WINDOW = 32,
+  AIS_FI_6_1_40_PERSONS_ON_BOARD = 40,
+  AIS_FI_6_200_21_RIS_VTS_ETA = 21,
+  AIS_FI_6_200_22_RIS_VTS_RTA = 22,
+  AIS_FI_6_200_55_RIS_VTS_SAR = 55,
+
+  AIS_FI_8_1_0_TEXT = 0,
+  AIS_FI_8_1_11_MET_HYDRO = 11,
+  AIS_FI_8_1_13_FAIRWAY_CLOSED = 13,
+  AIS_FI_8_1_15_SHIP_AND_VOYAGE = 15,
+  AIS_FI_8_1_16_PERSONS_ON_BOARD = 16,
+  AIS_FI_8_1_17_VTS_TARGET = 17,
+  AIS_FI_8_1_19_TRAFFIC_SIGNAL = 19,
+  AIS_FI_8_1_21_WEATHER_OBS = 21,
+  AIS_FI_8_1_22_AREA_NOTICE = 22,
+  AIS_FI_8_1_24_SHIP_AND_VOYAGE = 24,
+  AIS_FI_8_1_26_SENSOR = 26,
+  AIS_FI_8_1_27_ROUTE = 27,
+  AIS_FI_8_1_29_TEXT = 29,
+  AIS_FI_8_1_31_MET_HYDRO = 31,
+  AIS_FI_8_1_40_PERSONS_ON_BOARD = 40,
+  AIS_FI_8_200_10_RIS_SHIP_AND_VOYAGE = 10,
+  AIS_FI_8_200_23_RIS_EMMA_WARNING = 23,
+  AIS_FI_8_200_24_RIS_WATERLEVEL = 24,
+  AIS_FI_8_200_40_RIS_ATON_SIGNAL_STATUS = 40,
+  AIS_FI_8_200_55_RIS_PERSONS_ON_BOARD= 50,
+  AIS_FI_8_366_22_AREA_NOTICE = 22,  // USCG.
+  AIS_FI_8_367_22_AREA_NOTICE = 22,  // USCG.
+};
+
 struct AisPoint {
-  float x, y;
+  float x, y;  // TODO(schwehr): change all x, y to lng_deg, lat_deg.
 };
 
 class AisMsg {
@@ -54,14 +408,18 @@ class AisMsg {
   int repeat_indicator;
   int mmsi;
 
-  bool had_error() {  return status != AIS_OK;  }
-  AIS_STATUS get_error() {return status;}
+  // TODO(schwehr): make status private and have accessors.
+  bool had_error() const {  return status != AIS_OK;  }
+  AIS_STATUS get_error() const {return status;}
+
+ protected:
   AIS_STATUS status;  // AIS_OK or error code
-  void init() {
-    status = AIS_OK;
-  }
+
+  AisMsg() : status(AIS_UNINITIALIZED) {}
+  AisMsg(const char *nmea_payload, const size_t pad);
 };
 
+// TODO(schwehr): factor out commstate from all messages?
 class Ais1_2_3 : public AisMsg {
  public:
   int nav_status;
@@ -90,7 +448,7 @@ class Ais1_2_3 : public AisMsg {
   int slot_number;
   bool slot_number_valid;
 
-  bool utc_valid;  // Only means that the values are set.  Can still have
+  bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
@@ -110,7 +468,7 @@ class Ais1_2_3 : public AisMsg {
 
   Ais1_2_3(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais1_2_3 const& a);
+ostream& operator<< (ostream &o, const Ais1_2_3 &msg);
 
 // 4 bsreport and 11 utc date response
 class Ais4_11 : public AisMsg {
@@ -139,7 +497,7 @@ class Ais4_11 : public AisMsg {
   int slot_number;
   bool slot_number_valid;
 
-  bool utc_valid;  // Only means that the values are set.  Can still have
+  bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
@@ -150,15 +508,14 @@ class Ais4_11 : public AisMsg {
   // **NO** ITDMA
   Ais4_11(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais4_11 const& msg);
-
+ostream& operator<< (ostream &o, const Ais4_11 &msg);
 
 class Ais5 : public AisMsg {
  public:
   int ais_version;
   int imo_num;
-  std::string callsign;
-  std::string name;
+  string callsign;
+  string name;
   int type_and_cargo;
   int dim_a;
   int dim_b;
@@ -170,13 +527,13 @@ class Ais5 : public AisMsg {
   int eta_hour;
   int eta_minute;
   float draught;  // present static draft. m
-  std::string destination;
+  string destination;
   int dte;
   int spare;
 
   Ais5(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais5 const& msg);
+ostream& operator<< (ostream &o, const Ais5 &msg);
 
 // Addessed binary message (ABM)
 const size_t AIS6_MAX_BITS = MAX_BITS;
@@ -184,8 +541,6 @@ const size_t AIS6_MAX_BITS = MAX_BITS;
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
  public:
-  Ais6() {}
-
   static const int MAX_BITS = AIS6_MAX_BITS;
 
   int seq;  // sequence number
@@ -194,41 +549,28 @@ class Ais6 : public AisMsg {
   int spare;
   int dac;  // dac+fi = app id
   int fi;
-  std::vector<unsigned char> payload;  // If dac/fi (app id is now one we know).  without dac/fi
 
+  // TODO(schwehr): how to make Ais6 protected?
   Ais6(const char *nmea_payload, const size_t pad);
+
+ protected:
+  Ais6() {}
 };
-std::ostream& operator<< (std::ostream& o, Ais6 const& msg);
+ostream& operator<< (ostream &o, const Ais6 &msg);
 
-#if 0
-template<size_t T>
-bool decode_header6(const std::bitset<T> &bs, Ais6 &msg) {
-  msg.message_id = ubits(bs, 0, 6);
-  if (6 != msg.message_id) { msg.status = AIS_ERR_WRONG_MSG_TYPE; return false; }
-  msg.repeat_indicator = ubits(bs, 6, 2);
-  msg.mmsi = ubits(bs, 8, 30);
-  msg.seq = ubits(bs, 38, 2);
-  msg.mmsi_dest = ubits(bs, 40, 30);
-  msg.retransmit = !bs[70];
-  msg.spare = bs[71];
-  msg.dac = ubits(bs, 72, 10);
-  msg.fi = ubits(bs, 82, 6);
-}
-#endif
-
-// Text message - ITU 1371-1 - this is OLD
+// Text message.  ITU 1371-1
 class Ais6_1_0 : public Ais6 {
  public:
   bool ack_required;
   int msg_seq;
-  std::string text;
+  string text;
   int spare2;
 
   Ais6_1_0(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_0 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_0 &msg);
 
-// ITU 1371-1 - this is OLD
+// Application ack.  ITU 1371-1
 class Ais6_1_1 : public Ais6 {
  public:
   int ack_dac;
@@ -237,10 +579,9 @@ class Ais6_1_1 : public Ais6 {
 
   Ais6_1_1(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_1 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_1 &msg);
 
-
-// ITU 1371-1 - this is OLD
+// Interrogation for a DAC/FI.  ITU 1371-1
 class Ais6_1_2 : public Ais6 {
  public:
   int req_dac;
@@ -249,10 +590,9 @@ class Ais6_1_2 : public Ais6 {
 
   Ais6_1_2(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_2 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_2 &msg);
 
-
-// capability interogation - ITU 1371-1 - this is OLD
+// Capability interogation.  ITU 1371-1
 class Ais6_1_3 : public Ais6 {
  public:
   int req_dac;
@@ -260,10 +600,9 @@ class Ais6_1_3 : public Ais6 {
 
   Ais6_1_3(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_3 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_3 &msg);
 
-
-// Capability interogation reply - ITU 1371-1 - this is OLD
+// Capability interogation reply.  ITU 1371-1
 class Ais6_1_4 : public Ais6 {
  public:
   int ack_dac;
@@ -273,9 +612,9 @@ class Ais6_1_4 : public Ais6 {
 
   Ais6_1_4(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_4 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_4 &msg);
 
-// Number of Persons ITU 1371-1 - this is OLD
+// Number of persons on board.  ITU 1371-1
 class Ais6_1_40 : public Ais6 {
  public:
   int persons;
@@ -283,20 +622,20 @@ class Ais6_1_40 : public Ais6 {
 
   Ais6_1_40(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_40 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_40 &msg);
 
-
-// IMO Circ 236 Dangerous cargo indication - Not to be transmitted after 2012-Jan-01
+// IMO Circ 236 Dangerous cargo indication
+// Not to be transmitted after 2012-Jan-01
 class Ais6_1_12 : public Ais6 {
  public:
-  std::string last_port;
+  string last_port;
   int utc_month_dep;  // actual time of departure
   int utc_day_dep, utc_hour_dep, utc_min_dep;
-  std::string next_port;
+  string next_port;
   int utc_month_next;  // estimated arrival
   int utc_day_next, utc_hour_next, utc_min_next;
-  std::string main_danger;
-  std::string imo_cat;
+  string main_danger;
+  string imo_cat;
   int un;
   int value;  // TODO(schwehr): units?
   int value_unit;
@@ -304,11 +643,11 @@ class Ais6_1_12 : public Ais6 {
 
   Ais6_1_12(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_12 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_12 &msg);
 
 
 struct Ais6_1_14_Window {
-  float y, x;  // yes, bits are lat, lon
+  float y, x;
   int utc_hour_from, utc_min_from;
   int utc_hour_to, utc_min_to;
   int cur_dir;
@@ -316,15 +655,16 @@ struct Ais6_1_14_Window {
 };
 
 
-// IMO Circ 236 Tidal window - Not to be transmitted after 2012-Jan-01
+// IMO Circ 236 Tidal window
+// Not to be transmitted after 2012-Jan-01
 class Ais6_1_14 : public Ais6 {
  public:
   int utc_month, utc_day;
-  std::vector<Ais6_1_14_Window> windows;
+  vector<Ais6_1_14_Window> windows;
 
   Ais6_1_14(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_14 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_14 &msg);
 
 
 // IMO Circ 289 Clearance time to enter port
@@ -332,13 +672,13 @@ class Ais6_1_18 : public Ais6 {
  public:
   int link_id;
   int utc_month, utc_day, utc_hour, utc_min;
-  std::string port_berth, dest;
+  string port_berth, dest;
   float x, y;
   int spare2[2];  // 32 bits per spare
 
   Ais6_1_18(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_18 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_18 &msg);
 
 
 // IMO Circ 289 Berthing data
@@ -352,14 +692,14 @@ class Ais6_1_20 : public Ais6 {
   bool services_known;
   // TODO(schwehr): enum of service types
   int services[26];
-  std::string name;
+  string name;
   float x, y;
 
   Ais6_1_20(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_20 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_20 &msg);
 
-
+// TODO(schwehr): Make cargo a class and set all to invalid in constructor
 struct Ais6_1_25_Cargo {
   int code_type;
   bool imdg_valid;  // also set with BC
@@ -376,7 +716,6 @@ struct Ais6_1_25_Cargo {
   int marpol_cat;
 };
 
-
 // IMO Circ 289 Dangerous cargo indication 2
 // Replaces 8_1_12?
 class Ais6_1_25 : public Ais6 {
@@ -384,43 +723,21 @@ class Ais6_1_25 : public Ais6 {
   int amount_unit;
   int amount;
 
-  std::vector<Ais6_1_25_Cargo> cargos;  // 0 to 17 cargo entries
+  vector<Ais6_1_25_Cargo> cargos;  // 0 to 17 cargo entries
 
   Ais6_1_25(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_25 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_25 &msg);
 
 
 // TODO(schwehr): addressed sensor report 6_1_26
-
-// IMO Circ 289 Route information
-class Ais6_1_28 : public Ais6 {
- public:
-  int link_id;
-  int sender_type, route_type;
-  int utc_month_start, utc_day_start, utc_hour_start, utc_min_start;
-  int duration;
-  std::vector<AisPoint> waypoints;
-
-  Ais6_1_28(const char *nmea_payload, const size_t pad);
-};
-std::ostream& operator<< (std::ostream& o, Ais6_1_28 const& msg);
-
-
-// IMO Circ 289 Text description
-class Ais6_1_30 : public Ais6 {
- public:
-  int link_id;
-  std::string text;
-
-  Ais6_1_30(const char *nmea_payload, const size_t pad);
-};
-std::ostream& operator<< (std::ostream& o, Ais6_1_30 const& msg);
-
+// TODO(schwehr): IMO Circ 289 Route information 6_1_28.
+// TODO(schwehr): IMO Circ 289 Text description 6_1_30.
 
 // IMO Circ 289
-// could use the same struct for for 8_1_14, but x and y are bit wise different.
-// two structs hints that things are not the same bitwise.
+// Warning: The bit encoding for 6_1_14_Window and 6_1_32 on
+//   the wire has x and y in a different order.
+// TODO(schwehr): Reuse Ais6_1_14_Window
 struct Ais6_1_32_Window {
   float x, y;
   int from_utc_hour, from_utc_min;
@@ -429,16 +746,17 @@ struct Ais6_1_32_Window {
   float cur_speed;  // knots
 };
 
+
 // IMO Circ 289 Tidal window
 class Ais6_1_32 : public Ais6 {
  public:
   int utc_month;
   int utc_day;
-  std::vector<Ais6_1_32_Window> windows;
+  vector<Ais6_1_32_Window> windows;
 
   Ais6_1_32(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais6_1_32 const& msg);
+ostream& operator<< (ostream &o, const Ais6_1_32 &msg);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -448,14 +766,12 @@ class Ais7_13 : public AisMsg {
  public:
   int spare;
 
-  std::vector<int> dest_mmsi;
-  std::vector<int> seq_num;
+  vector<int> dest_mmsi;
+  vector<int> seq_num;
 
   Ais7_13(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais7_13 const& msg);
-
-// 366 34 - Kurt older whale message 2008-2010
+ostream& operator<< (ostream &o, const Ais7_13 &msg);
 
 const size_t AIS8_MAX_BITS = 1192;
 
@@ -467,47 +783,35 @@ class Ais8 : public AisMsg {
   int dac;  // dac+fi = app id
   int fi;
 
-  std::vector<unsigned char> payload;  // If dac/fi (app id is now one we know).  without dac/fi
-
+  // TODO(schwehr): make Ais8 protected
+  Ais8(const char *nmea_payload, const size_t pad);
+ protected:
   Ais8() {}
-  Ais8(const char *nmea_payload);  // TODO(schwehr): pad
-  bool decode_header8(const std::bitset<MAX_BITS> &bs);
 };
-std::ostream& operator<< (std::ostream& o, Ais8 const& msg);
+ostream& operator<< (ostream &o, const Ais8 &msg);
 
-// Text telegram ITU 1371-1 - this is OLD
+// Text telegram ITU 1371-1
 class Ais8_1_0 : public Ais8 {
  public:
   bool ack_required;
   int msg_seq;
-  std::string text;
+  string text;
   int spare2;
 
   Ais8_1_0(const char *nmea_payload, size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_0 const& msg);
+ostream& operator<< (ostream &o, const Ais8_1_0 &msg);
 
 // 8_1_1 No message
 // 8_1_2 No message
 // 8_1_3 No message
 // 8_1_4 No message
 
-
-// Persons on board ITU 1371-1 - this is OLD
-class Ais8_1_40 : public Ais8 {
- public:
-  int persons;
-  int spare2;
-  Ais8_1_40(const char *nmea_payload, size_t pad);
-};
-std::ostream& operator<< (std::ostream& o, Ais8_1_40 const& msg);
-
-
 // IMO Circ 289 met hydro - Not to be transmitted after 2013-Jan-01
 // See also IMO Circ 236
 class Ais8_1_11 : public Ais8 {
  public:
-  float x, y;  // warning... appears in the bit stream as y,x
+  float y, x;
   int day;
   int hour;
   int minute;
@@ -547,13 +851,13 @@ class Ais8_1_11 : public Ais8 {
 
   Ais8_1_11(const char *nmea_payload, size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_11 const& msg);
+ostream& operator<< (ostream &o, const Ais8_1_11 &msg);
 
 
 // IMO Circ 236 Fairway closed - Not to be transmitted after 2012-Jan-01
 class Ais8_1_13 : public Ais8 {
  public:
-  std::string reason, location_from, location_to;
+  string reason, location_from, location_to;
   int radius;
   int units;
   // TODO(schwehr): utc?  warning: day/month out of order
@@ -563,10 +867,10 @@ class Ais8_1_13 : public Ais8 {
 
   Ais8_1_13(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_13 const& msg);
+ostream& operator<< (ostream &o, const Ais8_1_13 &msg);
 
-
-// IMO Circ 236 Extended ship static and voyage data - Not to be transmitted after 2012-Jan-01
+// IMO Circ 236 Extended ship static and voyage data
+// Not to be transmitted after 2012-Jan-01
 class Ais8_1_15 : public Ais8 {
  public:
   float air_draught;
@@ -574,8 +878,7 @@ class Ais8_1_15 : public Ais8 {
 
   Ais8_1_15(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_15 const& msg);
-
+ostream& operator<< (ostream &o, const Ais8_1_15 &msg);
 
 // IMO Circ 236 Number of persons on board
 class Ais8_1_16 : public Ais8 {
@@ -585,14 +888,13 @@ class Ais8_1_16 : public Ais8 {
 
   Ais8_1_16(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_16 const& msg);
-
+ostream& operator<< (ostream &o, const Ais8_1_16 &msg);
 
 struct Ais8_1_17_Target {
   int type;
-  std::string id;
+  string id;
   int spare;
-  float x, y;  // bits are lat, lon
+  float y, x;
   int cog;
   int timestamp;
   int sog;
@@ -601,31 +903,29 @@ struct Ais8_1_17_Target {
 // IMO Circ 236 VTS Generated/synthetic targets
 class Ais8_1_17 : public Ais8 {
  public:
-  std::vector<Ais8_1_17_Target> targets;
+  vector<Ais8_1_17_Target> targets;
 
   Ais8_1_17(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_17 const& msg);
-
+ostream& operator<< (ostream &o, const Ais8_1_17 &msg);
 
 // No 8_1_18
-
 
 // IMO Circ 289 Marine traffic signal
 class Ais8_1_19 : public Ais8 {
  public:
   int link_id;
-  std::string name;
+  string name;
   float x, y;  // funny bit count
   int status;
   int signal;
   int utc_hour_next, utc_min_next;
   int next_signal;
-  int spare2[4];  // Arrrrrr.  102 wasted bits that could be corrupted.
+  int spare2[4];
 
   Ais8_1_19(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_19 const& msg);
+ostream& operator<< (ostream &o, const Ais8_1_19 &msg);
 
 // No message 8_1_20
 
@@ -635,7 +935,7 @@ class Ais8_1_21 : public Ais8 {
   int type_wx_report;
 
   // TYPE 0
-  std::string location;
+  string location;
   float x, y;  // 25, 24 bits
   int utc_day, utc_hour, utc_min;
   // wx - use wx[0]
@@ -671,7 +971,7 @@ class Ais8_1_21 : public Ais8 {
   float wind_speed_rel;  // m/s
   float wind_gust_speed;  // m/s
   int wind_gust_dir;
-  int air_temp_raw;  // TODO(schwehr): Seriously?  Convert this to C.  Kelvin does not make send
+  int air_temp_raw;  // TODO(schwehr): Convert this to C.  Kelvin makes no sense
   // humidity defined in type 0
   // sea_temp_k
   int water_temp_raw;  // TODO(schwehr): fix this
@@ -700,27 +1000,25 @@ class Ais8_1_21 : public Ais8 {
 
   Ais8_1_21(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_21 const& msg);
-
+ostream& operator<< (ostream &o, const Ais8_1_21 &msg);
 
 // SEE ais8_001_22.h for Area notice
 
 // No message 8_1_23
-
 
 // IMO Circ 289 Extended ship static and voyage-related
 class Ais8_1_24 : public Ais8 {
  public:
   int link_id;
   float air_draught;  // m
-  std::string last_port, next_ports[2];
+  string last_port, next_ports[2];
 
   // TODO(schwehr): enum list of param types
   int solas_status[26];  // 0 NA, 1 operational, 2 SNAFU, 3 no data
   int ice_class;
   int shaft_power;  // horses
   int vhf;
-  std::string lloyds_ship_type;
+  string lloyds_ship_type;
   int gross_tonnage;
   int laden_ballast;
   int heavy_oil, light_oil, diesel;
@@ -730,10 +1028,9 @@ class Ais8_1_24 : public Ais8 {
 
   Ais8_1_24(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_24 const& msg);
+ostream& operator<< (ostream &o, const Ais8_1_24 &msg);
 
-
-// No message 8_1_15
+// No message 8_1_25
 
 const size_t AIS8_1_26_REPORT_SIZE = 112;
 
@@ -767,8 +1064,9 @@ class Ais8_1_26_SensorReport {
   virtual ~Ais8_1_26_SensorReport() {}
 };
 
-
-Ais8_1_26_SensorReport* ais8_1_26_sensor_report_factory(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+Ais8_1_26_SensorReport*
+ais8_1_26_sensor_report_factory(const bitset<AIS8_MAX_BITS> &bs,
+                                const size_t offset);
 
 class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
  public:
@@ -776,17 +1074,17 @@ class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
   int owner, timeout;
   int spare;
 
-  Ais8_1_26_Location(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Location(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Location() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_LOCATION;}
 };
 
 class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
  public:
-  std::string name;
+  string name;
   int spare;
 
-  Ais8_1_26_Station(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Station(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Station() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_STATION;}
 };
@@ -796,13 +1094,13 @@ class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
   int wind_speed, wind_gust;  // knots
   int wind_dir, wind_gust_dir;
   int sensor_type;
-  int wind_forcast, wind_gust_forcast;  // knots
-  int wind_dir_forcast;
-  int utc_day_forcast, utc_hour_forcast, utc_min_forcast;
+  int wind_forecast, wind_gust_forecast;  // knots
+  int wind_dir_forecast;
+  int utc_day_forecast, utc_hour_forecast, utc_min_forecast;
   int duration;
   int spare;
 
-  Ais8_1_26_Wind(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Wind(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Wind() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WIND;}
 };
@@ -814,14 +1112,15 @@ class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
   int trend;
   int vdatum;
   int sensor_type;
-  int forcast_type;
-  float level_forcast;
-  int utc_day_forcast;
-  int utc_hour_forcast;
-  int utc_min_forcast;
+  int forecast_type;
+  float level_forecast;
+  int utc_day_forecast;
+  int utc_hour_forecast;
+  int utc_min_forecast;
   int duration;  // minutes
   int spare;
-  Ais8_1_26_WaterLevel(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+
+  Ais8_1_26_WaterLevel(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_WaterLevel() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WATER_LEVEL;}
 };
@@ -838,7 +1137,7 @@ class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
   int type;
   int spare;
 
-  Ais8_1_26_Curr2D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Curr2D(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Curr2D() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_2D;}
 };
@@ -854,7 +1153,7 @@ class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
   int type;
   int spare;
 
-  Ais8_1_26_Curr3D(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Curr3D(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Curr3D() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_3D;}
 };
@@ -870,7 +1169,7 @@ class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
   Ais8_1_26_HorzFlow_Current currents[2];
   int spare;
 
-  Ais8_1_26_HorzFlow(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_HorzFlow(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_HorzFlow() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_HORZ_FLOW;}
 };
@@ -888,7 +1187,7 @@ class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
   int wave_sensor_type;
   float salinity;
 
-  Ais8_1_26_SeaState(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_SeaState(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_SeaState() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SEA_STATE;}
 };
@@ -903,7 +1202,7 @@ class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
   int sensor_type;
   int spare[2];
 
-  Ais8_1_26_Salinity(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Salinity(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Salinity() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SALINITY;}
 };
@@ -922,19 +1221,19 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
   float salinity;  // 0/00 ppt
   int spare;
 
-  Ais8_1_26_Wx(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Wx(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_Wx() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WX;}
 };
 
 class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
  public:
-  float draught, gap, forcast_gap;
+  float draught, gap, forecast_gap;
   int trend;
-  int utc_day_forcast, utc_hour_forcast, utc_min_forcast;
+  int utc_day_forecast, utc_hour_forecast, utc_min_forecast;
   int spare;
 
-  Ais8_1_26_AirDraught(const std::bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_AirDraught(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   Ais8_1_26_AirDraught() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_AIR_DRAUGHT;}
 };
@@ -942,12 +1241,12 @@ class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
 // IMO Circ 289 Environmental
 class Ais8_1_26 : public Ais8 {
  public:
-  std::vector<Ais8_1_26_SensorReport *> reports;
+  vector<Ais8_1_26_SensorReport *> reports;
 
   Ais8_1_26(const char *nmea_payload, const size_t pad);
   ~Ais8_1_26();
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_26 const& msg);
+ostream& operator<< (ostream &o, const Ais8_1_26 &msg);
 
 
 // IMO Circ 289 Route information
@@ -957,11 +1256,11 @@ class Ais8_1_27 : public Ais8 {
   int sender_type, route_type;
   int utc_month, utc_day, utc_hour, utc_min;
   int duration;
-  std::vector<AisPoint> waypoints;
+  vector<AisPoint> waypoints;
 
   Ais8_1_27(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_27 const& msg);
+ostream& operator<< (ostream &o, const Ais8_1_27 &msg);
 
 
 //  No message 8_1_28
@@ -971,12 +1270,12 @@ std::ostream& operator<< (std::ostream& o, Ais8_1_27 const& msg);
 class Ais8_1_29 : public Ais8 {
  public:
   int link_id;
-  std::string text;
+  string text;
   int spare2;
 
   Ais8_1_29(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_29 const& msg);
+ostream& operator<< (ostream &o, const Ais8_1_29 &msg);
 
 
 // No message 8_1_30
@@ -1029,14 +1328,15 @@ class Ais8_1_31 : public Ais8 {
 
   Ais8_1_31(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais8_1_31 const& msg);
+ostream& operator<< (ostream &o, const Ais8_1_31 &msg);
 
+// TODO(schwehr): Persons on board ITU 1371-1 8_1_40.
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
 // Inland ship static and voyage related data
 class Ais8_200_10 : public Ais8 {
  public:
-  std::string eu_id;  // European Vessel ID - 8 characters
+  string eu_id;  // European Vessel ID - 8 characters
   float length, beam;  // m
   int ship_type;
   int haz_cargo;
@@ -1044,6 +1344,7 @@ class Ais8_200_10 : public Ais8 {
   int loaded;
   int speed_qual, course_qual, heading_qual;  // sensor quality
   int spare2;
+
   Ais8_200_10(const char *nmea_payload, const size_t pad);
 };
 
@@ -1072,9 +1373,10 @@ class Ais8_200_23 : public Ais8 {
 // Water Level
 class Ais8_200_24 : public Ais8 {
  public:
-  std::string country;
-  int guage_ids[4];
+  string country;
+  int gauge_ids[4];
   float levels[4];  // m
+
   Ais8_200_24(const char *nmea_payload, const size_t pad);
 };
 
@@ -1088,6 +1390,7 @@ class Ais8_200_40 : public Ais8 {
   int status_raw;
   // TODO(schwehr): int status[9];  // WTF is the encoding for this?
   int spare2;
+
   Ais8_200_40(const char *nmea_payload, const size_t pad);
 };
 
@@ -1098,31 +1401,141 @@ class Ais8_200_55 : public Ais8 {
   int passengers;
   int yet_more_personnel;  // WTF?  Like a maid or waiter?
   int spare2[3];  // JERKS... why 51 spare bits?
+
   Ais8_200_55(const char *nmea_payload, const size_t pad);
 };
 
-
-// New IMO Circ 289 Area notice broadcast is DAC 1, FI 22
-// US will use the RTCM Regional Message.  DAC 366, FI 22
-// Hopefully, the two shall become the same.  -kds 10/2010
-#include "ais8_366_22.h"
-
-
-// Old Zone message for SBNMS / Boston right whales
-#if 0
-class Ais8_366_34 : public Ais8 {
- public:
-  int zone_id;
-  int zone_type;
-  int day;
-  int hour;
-  int minute;
-  int dur_min;  // duration in minutes
-
-  Ais8_366_34(const char *nmea_payload, const size_t pad);
+enum Ais8_366_22_AreaShapeEnum {
+    AIS8_366_22_SHAPE_ERROR = -1,
+    AIS8_366_22_SHAPE_CIRCLE = 0,
+    AIS8_366_22_SHAPE_RECT = 1,
+    AIS8_366_22_SHAPE_SECTOR = 2,
+    AIS8_366_22_SHAPE_POLYLINE = 3,
+    AIS8_366_22_SHAPE_POLYGON = 4,
+    AIS8_366_22_SHAPE_TEXT = 5,
+    AIS8_366_22_SHAPE_RESERVED_6 = 6,
+    AIS8_366_22_SHAPE_RESERVED_7 = 7
 };
-std::ostream& operator<< (std::ostream& o, Ais8_366_34 const& msg);
-#endif
+
+extern const char *shape_names[8];
+
+class Ais8_366_22_SubArea {
+ public:
+    virtual Ais8_366_22_AreaShapeEnum getType()=0;
+    virtual ~Ais8_366_22_SubArea() { }
+};
+
+Ais8_366_22_SubArea*
+ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
+                            const size_t offset);
+
+// or Point if radius is 0
+class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
+ public:
+    float x, y;
+    // TODO(schwehr): int precision
+    int radius_m;
+    unsigned int spare;
+
+    Ais8_366_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    ~Ais8_366_22_Circle() {}
+    Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_CIRCLE;}
+};
+
+class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
+ public:
+    float x, y;  // longitude and latitude
+    // TODO(schwehr): int precision
+    int e_dim_m;  // East dimension in meters
+    int n_dim_m;
+    int orient_deg;  // Orientation in degrees from true north
+    unsigned int spare;  // 5 bits
+
+    Ais8_366_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    ~Ais8_366_22_Rect() {}
+    Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_RECT;}
+};
+
+class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
+ public:
+    float x, y;
+    // TODO(schwehr): int precision
+    int radius_m;
+    int left_bound_deg;
+    int right_bound_deg;
+    // TODO(schwehr): spare?
+
+    Ais8_366_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    ~Ais8_366_22_Sector() {}
+    Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_SECTOR;}
+};
+
+// Or Waypoint
+// Must have a point before on the VDL, but pulled together here.
+class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
+ public:
+    float x, y;  // longitude and latitude
+    // TODO(schwehr): precision
+
+    // Up to 4 points
+    vector<float> angles;
+    vector<float> dists_m;
+    unsigned int spare;
+
+    Ais8_366_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    ~Ais8_366_22_Polyline() {}
+    Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYLINE;}
+};
+
+class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
+ public:
+    float x, y;  // longitude and latitude
+    // TODO(schwehr): precision?
+
+    // Up to 4 points in a first message, but aggregated if multiple sub areas
+    vector<float> angles;
+    vector<float> dists_m;
+    unsigned int spare;
+
+    Ais8_366_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    ~Ais8_366_22_Polygon() {}
+    Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYGON;}
+};
+
+class Ais8_366_22_Text : public Ais8_366_22_SubArea {
+ public:
+    string text;
+    unsigned int spare;  // 3 bits
+
+    Ais8_366_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    ~Ais8_366_22_Text() {}
+    Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_TEXT;}
+};
+
+class Ais8_366_22 : public Ais8 {
+ public:
+    // Common block at the front
+    int link_id;  // 10 bit id to match up text blocks
+    int notice_type;  // area_type / Notice Description
+    int month;  // These really are in utc
+    int day;
+    int utc_hour;
+    int utc_minute;
+    int duration_minutes;  // Time from the start until the notice expires
+    // 1 or more sub messages
+
+    vector<Ais8_366_22_SubArea *> sub_areas;
+
+  Ais8_366_22(const char *nmea_payload, const size_t pad);
+    ~Ais8_366_22();
+};
+ostream& operator<< (ostream& o, Ais8_366_22 const& msg);
+
+const size_t AIS8_366_22_NUM_NAMES = 128;
+extern const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES];
+
+// 366 34 - Kurt older whale message 2008-2010
+// TODO(schwehr): Ais8_366_34
 
 class Ais9 : public AisMsg {
  public:
@@ -1153,7 +1566,7 @@ class Ais9 : public AisMsg {
   int slot_number;
   bool slot_number_valid;
 
-  bool utc_valid;  // Only means that the values are set.  Can still have
+  bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
@@ -1173,7 +1586,7 @@ class Ais9 : public AisMsg {
 
   Ais9(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais9 const& msg);
+ostream& operator<< (ostream &o, const Ais9 &msg);
 
 // 10 ":" - UTC and date inquiry
 class Ais10 : public AisMsg {
@@ -1184,7 +1597,7 @@ class Ais10 : public AisMsg {
 
   Ais10(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais10 const& msg);
+ostream& operator<< (ostream &o, const Ais10 &msg);
 
 // 11 ';' - See 4_11
 
@@ -1195,11 +1608,11 @@ class Ais12 : public AisMsg {
   int dest_mmsi;
   bool retransmitted;
   int spare;
-  std::string text;
+  string text;
 
   Ais12(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
+ostream& operator<< (ostream &o, const Ais12 &msg);
 
 // 13 '=' - See 7
 
@@ -1207,13 +1620,12 @@ std::ostream& operator<< (std::ostream& o, Ais12 const& msg);
 class Ais14 : public AisMsg {
  public:
   int spare;
-  std::string text;
+  string text;
   int expected_num_spare_bits;  // The bits in the nmea_payload not used
+
   Ais14(const char *nmea_payload, const size_t pad);
 };
-
-std::ostream& operator<< (std::ostream& o, Ais14 const& msg);
-
+ostream& operator<< (ostream &o, const Ais14 &msg);
 
 // ? - Interrogation
 class Ais15 : public AisMsg {
@@ -1235,7 +1647,7 @@ class Ais15 : public AisMsg {
 
   Ais15(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais15 const& msg);
+ostream& operator<< (ostream &o, const Ais15 &msg);
 
 // @ - Assigned mode command
 class Ais16 : public AisMsg {
@@ -1251,19 +1663,9 @@ class Ais16 : public AisMsg {
 
   Ais16(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais16 const& msg);
+ostream& operator<< (ostream &o, const Ais16 &msg);
 
 // ITU-R M.823  http://www.itu.int/rec/R-REC-M.823/en
-#if 0
-struct GnssCorrection17 {
-  int msg_type;
-  int station_id;
-  int z_cnt;
-  int health;
-  // TODO(schwehr): DGNSS data word - what is their word size?
-};
-#endif
-
 // A - GNSS broacast - TODO(schwehr): only partially coded
 class Ais17 : public AisMsg {
  public:
@@ -1280,7 +1682,7 @@ class Ais17 : public AisMsg {
 
   Ais17(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais17 const& msg);
+ostream& operator<< (ostream &o, const Ais17 &msg);
 
 
 // B - Class B position report
@@ -1314,7 +1716,7 @@ class Ais18 : public AisMsg {
   int slot_number;
   bool slot_number_valid;
 
-  bool utc_valid;  // Only means that the values are set.  Can still have
+  bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
@@ -1334,9 +1736,7 @@ class Ais18 : public AisMsg {
 
   Ais18(const char *nmea_payload, const size_t pad);
 };
-
-std::ostream& operator<< (std::ostream& o, Ais18 const& msg);
-
+ostream& operator<< (ostream &o, const Ais18 &msg);
 
 // C - Class B extended ship and position
 class Ais19 : public AisMsg {
@@ -1349,7 +1749,7 @@ class Ais19 : public AisMsg {
   int true_heading;
   int timestamp;
   int spare2;
-  std::string name;
+  string name;
   int type_and_cargo;
   int dim_a;
   int dim_b;
@@ -1363,7 +1763,7 @@ class Ais19 : public AisMsg {
 
   Ais19(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais19 const& msg);
+ostream& operator<< (ostream &o, const Ais19 &msg);
 
 // 'D' - Data link management
 // TODO(schwehr): consider a vector
@@ -1396,13 +1796,13 @@ class Ais20 : public AisMsg {
 
   Ais20(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais20 const& msg);
+ostream& operator<< (ostream &o, const Ais20 &msg);
 
 // 'E' - Aids to navigation report
 class Ais21 : public AisMsg {
  public:
   int aton_type;
-  std::string name;
+  string name;
   int position_accuracy;
   float x, y;
   int dim_a;
@@ -1422,7 +1822,7 @@ class Ais21 : public AisMsg {
 
   Ais21(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais21 const& msg);
+ostream& operator<< (ostream &o, const Ais21 &msg);
 
 // 'F' - Channel Management
 class Ais22 : public AisMsg {
@@ -1451,7 +1851,7 @@ class Ais22 : public AisMsg {
 
   Ais22(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais22 const& msg);
+ostream& operator<< (ostream &o, const Ais22 &msg);
 
 // 'G' - Group Assignment Command
 class Ais23 : public AisMsg {
@@ -1471,22 +1871,20 @@ class Ais23 : public AisMsg {
 
   Ais23(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais23 const& msg);
-
+ostream& operator<< (ostream &o, const Ais23 &msg);
 
 // Class B Static Data report
-// TODO(schwehr): This is structure differently than other conditional sections.  Narmalize
 class Ais24 : public AisMsg {
  public:
   int part_num;
 
   // Part A
-  std::string name;
+  string name;
 
   // Part B
   int type_and_cargo;
-  std::string vendor_id;
-  std::string callsign;
+  string vendor_id;
+  string callsign;
   int dim_a;
   int dim_b;
   int dim_c;
@@ -1495,25 +1893,28 @@ class Ais24 : public AisMsg {
 
   Ais24(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais24 const& msg);
+ostream& operator<< (ostream &o, const Ais24 &msg);
 
-// 'I' - Single slot binary message - addressed or broadcast - TODO(schwehr): handle payload
+// 'I' - Single slot binary message - addressed or broadcast
+// TODO(schwehr): handle payload
 class Ais25 : public AisMsg {
  public:
   bool use_app_id;  // if false, payload is unstructured binary.
 
   bool dest_mmsi_valid;
   int dest_mmsi;  // only valid if addressed
-  // TODO(schwehr): std::vector<unsigned char> payload;  // If unstructured.  Yuck.
+  // If unstructured:
+  // TODO(schwehr): vector<unsigned char> payload;
 
-  int dac;  // valid it use_app_id
+  int dac;  // valid if use_app_id is true
   int fi;
 
   Ais25(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais25 const& msg);
+ostream& operator<< (ostream &o, const Ais25 &msg);
 
-// 'J' - Multi slot binary message with comm state - TODO(schwehr): handle payload
+// 'J' - Multi slot binary message with comm state
+// TODO(schwehr): handle payload
 class Ais26 : public AisMsg {
  public:
   bool use_app_id;  // if false, payload is unstructured binary
@@ -1524,7 +1925,7 @@ class Ais26 : public AisMsg {
   int dac;  // valid it use_app_id
   int fi;
 
-  // TODO(schwehr): std::vector<unsigned char> payload;  // If unstructured.  Yuck.
+  // TODO(schwehr): vector<unsigned char> payload;  // If unstructured.  Yuck.
 
   int commstate_flag;  // 0 - SOTDMA, 1 - TDMA
 
@@ -1540,7 +1941,7 @@ class Ais26 : public AisMsg {
   int slot_number;
   bool slot_number_valid;
 
-  bool utc_valid;  // Only means that the values are set.  Can still have
+  bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
@@ -1560,7 +1961,7 @@ class Ais26 : public AisMsg {
 
   Ais26(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais26 const& msg);
+ostream& operator<< (ostream &o, const Ais26 &msg);
 
 // K - Long-range position report - e.g. for satellite receivers
 class Ais27 : public AisMsg {
@@ -1576,48 +1977,48 @@ class Ais27 : public AisMsg {
 
   Ais27(const char *nmea_payload, const size_t pad);
 };
-std::ostream& operator<< (std::ostream& o, Ais27 const& a);
+ostream& operator<< (ostream &o, const Ais27 &msg);
 
 //////////////////////////////////////////////////////////////////////
 // Support templates for decoding
 //////////////////////////////////////////////////////////////////////
 
-extern std::bitset<6> nmea_ord[128];
+extern bitset<6> nmea_ord[128];
 
 template<size_t T>
-AIS_STATUS aivdm_to_bits(std::bitset<T> &bits, const char *nmea_payload) {
+AIS_STATUS aivdm_to_bits(bitset<T> &bits, const char *nmea_payload) {
   assert(nmea_payload);
   if (strlen(nmea_payload) > T/6) {
 #ifndef NDEBUG
-    std::cerr << "ERROR: message longer than max allowed size (" << T/6 << "): found "
-              << strlen(nmea_payload) << " characters in "
+    std::cerr << "ERROR: message longer than max allowed size (" << T/6
+              << "): found " << strlen(nmea_payload) << " characters in "
               << nmea_payload << std::endl;
 #endif
     return AIS_ERR_MSG_TOO_LONG;
   }
-  for (size_t char_idx = 0; nmea_payload[char_idx] != '\0' && char_idx < T/6; char_idx++) {
-    int c = static_cast<int>(nmea_payload[char_idx]);
+  for (size_t idx = 0; nmea_payload[idx] != '\0' && idx < T/6; idx++) {
+    int c = static_cast<int>(nmea_payload[idx]);
     if (c < 48 || c > 119 || (c >= 88 && c <= 95)) {
       return AIS_ERR_BAD_NMEA_CHR;
     }
-    const std::bitset<6> bs_for_char = nmea_ord[ c ];
+    const bitset<6> bs_for_char = nmea_ord[ c ];
     for (size_t offset = 0; offset < 6; offset++) {
-      bits[char_idx*6 + offset] = bs_for_char[offset];
+      bits[idx*6 + offset] = bs_for_char[offset];
     }
   }
   return AIS_OK;
 }
 
+// TODO(schwehr): turn ubits, sbits, and ais_str into a helper class.
 template<size_t T>
-int ubits(const std::bitset<T> &bits, const size_t start, const size_t len) {
+int ubits(const bitset<T> &bits, const size_t start, const size_t len) {
   assert(len <= 32);
-  assert(start+len <= T);
-  std::bitset<32> bs_tmp;
+  assert(start + len <= T);
+  bitset<32> bs_tmp;
   for (size_t i = 0; i < len; i++)
-    bs_tmp[i] = bits[start+len-i-1];
+    bs_tmp[i] = bits[start + len - i - 1];
   return bs_tmp.to_ulong();
 }
-
 
 // TODO(schwehr): do not use long
 typedef union {
@@ -1626,33 +2027,35 @@ typedef union {
 } long_union;
 
 template<size_t T>
-int sbits(std::bitset<T> bs, const size_t start, const size_t len) {
+int sbits(bitset<T> bs, const size_t start, const size_t len) {
   assert(len <= 32);
-  assert(start+len <= T);  // TODO(schwehr):  should it just be < ?
-  std::bitset<32> bs32;
-  if (len < 32 && 1 == bs[start] ) bs32.flip();  // pad 1's to the left if negative
+  assert(start + len <= T);  // TODO(schwehr):  should it just be < ?
+  bitset<32> bs32;
+  // pad 1's to the left if negative
+  if (len < 32 && 1 == bs[start] ) bs32.flip();
 
   for (size_t i = 0; i < len; i++)
-    bs32[i] = bs[start+len-i-1];
+    bs32[i] = bs[start + len - i - 1];
 
   long_union val;
   val.ulong_val = bs32.to_ulong();
   return val.long_val;
 }
 
-extern const std::string bits_to_char_tbl;
+extern const string bits_to_char_tbl;
 
 template<size_t T>
-const std::string ais_str(const std::bitset<T> &bits, const size_t start, const size_t len) {
-  assert(start+len < T);
+const string ais_str(const bitset<T> &bits, const size_t start,
+                     const size_t len) {
+  assert(start + len < T);
   assert(len % 6 == 0);
   const size_t num_char = len / 6;
-  std::string result(num_char, '@');
+  string result(num_char, '@');
   for (size_t char_idx = 0; char_idx < num_char; char_idx++) {
-    const int char_num = ubits(bits, start+char_idx*6, 6);
+    const int char_num = ubits(bits, start + char_idx*6, 6);
     result[char_idx] = bits_to_char_tbl[char_num];
   }
   return result;
 }
 
-#endif
+#endif  // AIS_H_

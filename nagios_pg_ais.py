@@ -8,7 +8,7 @@ __version__ = '$Revision: 13787 $'.split()[1]
 __revision__  = __version__ # For pylint
 __date__ = '$Date: 2010-05-25 14:27:19 -0400 (Tue, 25 May 2010) $'.split()[1]
 __copyright__ = '2010'
-__license__   = 'LGPL v3'
+__license__   = 'Apache 2.0'
 __contact__   = 'kurt at ccom.unh.edu'
 
 import psycopg2 # Bummer... not yet ready for python 3.1

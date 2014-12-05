@@ -431,7 +431,7 @@ top_level = [
                'reservations': [{'incr': 4, 'num_slots': 2, 'offset': 1, 'timeout': 3},
                                 {'incr': 7, 'num_slots': 6, 'offset': 5, 'timeout': 2},
                                 {'incr': 9, 'num_slots': 3, 'offset': 8, 'timeout': 4},
-                                {'incr': 0, 'num_slots': 0, 'offset': 0, 'timeout': 0}],
+                                ],
                'spare': 0}
       },
 
@@ -483,7 +483,7 @@ top_level = [
     'result': {'id': 23,
                'interval_raw': 9,
                'mmsi': 2268130,
-               'quiet': 4,
+               'quiet': 0,
                'repeat_indicator': 0,
                'spare': 0,
                'spare2': 0,

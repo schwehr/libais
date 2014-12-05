@@ -1,39 +1,34 @@
-#include <iostream>
-#include <bitset>
-#include <cassert>
+// ACK to ABM or safety ABM
 
 #include "ais.h"
 
+Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
+  if (status != AIS_UNINITIALIZED)
+    return;
 
-Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad) {
-    assert(nmea_payload);
-    assert(pad < 6);
+  assert(message_id == 7 || message_id == 13);
 
-    init();
+  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
-    const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+  if (((num_bits - 40) % 32) != 0 || num_bits > 168) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
-    if (!((40+32*1) == num_bits || (40+32*2) == num_bits || (40+32*3) == num_bits || (40+32*4) == num_bits)) {
-        status = AIS_ERR_BAD_BIT_COUNT;
-        return;
-    }
+  bitset<168> bs;
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
+  }
 
-    std::bitset<168> bs;
-    status = aivdm_to_bits(bs, nmea_payload);
-    if (had_error()) return;
+  spare = ubits(bs, 38, 2);
+  const size_t num_acks = (num_bits - 40) / 32;
+  for (size_t i = 0; i < num_acks; i++) {
+    dest_mmsi.push_back(ubits(bs, 40 + i*32, 30));
+    seq_num.push_back(ubits(bs, 40 + i*32 + 30, 2));
+  }
 
-    message_id = ubits(bs, 0, 6);
-    if (message_id != 7 && message_id != 13) {
-        status = AIS_ERR_WRONG_MSG_TYPE;
-        return;
-    }
-    repeat_indicator = ubits(bs, 6, 2);
-    mmsi = ubits(bs, 8, 30);
-    spare = ubits(bs, 38, 2);
-
-    const size_t num_acks = (num_bits - 40) / 32;
-    for (size_t i = 0; i < num_acks; i++) {
-        dest_mmsi.push_back(ubits(bs, 40+i*32, 30));
-        seq_num.push_back(ubits(bs, 40+i*32+30, 2));
-    }
+  status = AIS_OK;
 }

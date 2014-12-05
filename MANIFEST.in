@@ -1,9 +1,9 @@
 include AUTHOR.txt
 include ChangeLog.html
 include CMakeLists.txt
-include COPYING.LESSER
-include LICENSE.txt
+include LICENSE
 include Makefile-custom
+include README.org
 include TODO.org
 include VERSION
 include ais.h ais8_001_22.h ais8_366_22.h

@@ -1,0 +1,67 @@
+* Introduction
+
+Library for decoding maritime Automatic Identification System messages.
+
+* See Also
+
+http://en.wikipedia.org/wiki/Automatic_Identification_System
+
+Other open source AIS projects:
+
+- http://en.wikipedia.org/wiki/Gpsd
+- http://www.freeais.org/ - does this actually decode AIS?
+- http://github.com/DaMSA/AisLib
+- http://github.com/schwehr/noaadata
+- https://github.com/schwehr/ais-areanotice-py
+- https://github.com/OpenCPN/OpenCPN
+- https://github.com/bcl/aisparser
+
+* Building
+
+** Building with legacy Makefile
+
+#+BEGIN_SRC sh
+make -f Makefile-custom test
+#+END_SRC
+
+** Building with python
+
+#+BEGIN_SRC sh
+python setup.py build
+python setup.py install
+#+END_SRC
+
+** Building with CMake
+
+#+BEGIN_SRC sh
+cmake .
+make
+#+END_SRC
+
+* Usage
+
+#+BEGIN_SRC sh
+ipython
+#+END_SRC
+
+#+BEGIN_SRC python
+import ais
+ais.decode('15PIIv7P00D5i9HNn2Q3G?wB0t0I', 0)
+ais.decode('402u=TiuaA000r5UJ`H4`?7000S:', 0)
+ais.decode('55NBjP01mtGIL@CW;SM<D60P5Ld000000000000P0`<3557l0<50@kk@K5h@00000000000', 0)
+#+END_SRC
+
+* AIS Specification Documents
+
+- ITU-1371, ITU-1371-{1,2,3,4]
+- http://www.e-navigation.nl/asm
+- IMO Circ 236
+- IMO Circ 289
+- EU RIS
+
+* Hacking
+
+The C++ code was switched to the Google style in November, 2012.
+Indenting should be by 2 spaces.
+
+http://google-styleguide.googlecode.com/svn/trunk/cpplint/

@@ -1,28 +1,33 @@
 // A - GNSS broacast -
 // TODO(schwehr): only partially coded - need to finish
 // http://www.itu.int/rec/R-REC-M.823/en
+// http://www.iala-aism.org/iala/publications/documentspdf/doc_348_eng.pdf
 
 // In 823, 30 bit words = 24 bits data followed by 6 parity bits.
 // Parity bits are left out of the AIS payload?
 
 #include "ais.h"
 
-Ais17::Ais17(const char *nmea_payload, const size_t pad) {
-  assert(pad < 6);
-  assert(nmea_payload);
-  init();
+Ais17::Ais17(const char *nmea_payload, const size_t pad)
+    : AisMsg(nmea_payload, pad) {
+  if (status != AIS_UNINITIALIZED)
+    return;
+
+  assert(message_id == 17);
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-  if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) { status = AIS_ERR_BAD_BIT_COUNT;  return; }
+  if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
-  std::bitset<816> bs;
-  status = aivdm_to_bits(bs, nmea_payload);
-  if (had_error()) return;
+  bitset<816> bs;
+  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  if (r != AIS_OK) {
+    status = r;
+    return;
+  }
 
-  message_id = ubits(bs, 0, 6);
-  if (17 != message_id) { status = AIS_ERR_WRONG_MSG_TYPE; return; }
-  repeat_indicator = ubits(bs, 6, 2);
-  mmsi = ubits(bs, 8, 30);
   spare = ubits(bs, 38, 2);
 
   x = sbits(bs, 40, 18) / 600.;
@@ -53,22 +58,20 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
 
   switch (gnss_type) {
   case 1:  // FALLTHROUGH
-  case 9:
-    {
-      // each corrector is 24+16 bits (no parity bits)
-      if (n-2 != (remain_bits / (24+16))) {
-        std::cerr << "WARNING: Bad bit count\n";
-      }
-      std::cout << "17: bits remain: " << num_bits - 120 << " n: " << n << "\n";
-      for (size_t i = 0; i < n-2; i++) {
-        const size_t start = 120 + i * (24+16);
-        std::cout << "\tscale: " << ubits(bs, start+0, 1) << "\n";
-        std::cout << "\tudre: " << ubits(bs, start+1, 2) << "\n";
-        std::cout << "\tsat_id: " << ubits(bs, start+3, 5) << "\n";
-        std::cout << "\tpseudorange_cor: " << ubits(bs, start+8, 16) << "\n";
-        std::cout << "\trate_cor: " << ubits(bs, start+24, 8) << "\n";
-        std::cout << "\tissue: " << ubits(bs, start+32, 8) << "\n\n";
-      }
+    // Differential GNSS corrections (full set of satellites)
+  case 9:  // Subset differential GNSS corrections
+    if (n - 2 != (remain_bits / (24 + 16))) {
+      std::cerr << "WARNING: Bad bit count\n";
+    }
+    std::cout << "17: bits remain: " << num_bits - 120 << " n: " << n << "\n";
+    for (size_t i = 0; i < n - 2; i++) {
+      const size_t start = 120 + i * (24 + 16);
+      std::cout << "\tscale: " << ubits(bs, start + 0, 1) << "\n";
+      std::cout << "\tudre: " << ubits(bs, start + 1, 2) << "\n";
+      std::cout << "\tsat_id: " << ubits(bs, start + 3, 5) << "\n";
+      std::cout << "\tpseudorange_cor: " << ubits(bs, start + 8, 16) << "\n";
+      std::cout << "\trate_cor: " << ubits(bs, start + 24, 8) << "\n";
+      std::cout << "\tissue: " << ubits(bs, start + 32, 8) << "\n\n";
     }
     break;
   case 3:  // Reference station parameters (GPS)
@@ -90,9 +93,12 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad) {
     status = AIS_ERR_BAD_SUB_MSG;
   }
 #endif
+
+  status = AIS_OK;  // TODO(schwehr): not really okay yet
 }
 
-std::ostream& operator<< (std::ostream& o, Ais17 const& m) {
+
+ostream& operator<< (ostream &o, const Ais17 &m) {
     return o << "[" << m.message_id << "]: " << m.mmsi
              << " (" << m.x << ", " << m.y << ") t:"
              << m.gnss_type << ", z:" << m.z_cnt
