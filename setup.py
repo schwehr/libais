@@ -4,7 +4,7 @@ from setuptools import setup, find_packages, Extension
 
 version = file('VERSION').readline().strip()
 
-ais_module = Extension('ais',
+ais_module = Extension('_ais',
                     sources = ['ais_py.cpp',
                                'ais.cpp',
                                'ais1_2_3.cpp', # Class A position

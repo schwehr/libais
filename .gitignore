@@ -6,3 +6,8 @@ build
 nohup.out
 foo*
 test_libais
+*~
+*.egg-info
+*core*
+_ais.so
+dist
