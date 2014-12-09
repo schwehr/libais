@@ -4,21 +4,29 @@ import ais
 import sys
 import json
 import ais.compatibility.gpsd
+import ais.stream
 
-
-buf = []
-for row in sys.stdin:
-    buf.append(row)
-    body = ''.join([line.split(',')[5] for line in buf])
-    pad = int(buf[-1].split('*')[0][-1])
-    try:
-        msg = ais.decode(body, pad)
-    except:
-        pass
+args = {}
+files = []
+for arg in sys.argv[1:]:
+    if arg.startswith("--"):
+        arg = arg[2:]
+        if '=' in arg:
+            arg, value = arg.split("=", 1)
+            args[arg] = value
+        else:
+            args[arg] = True
     else:
-        json.dump(ais.compatibility.gpsd.mangle(msg), sys.stdout)
-        sys.stdout.write("\n")
+        files.append(arg)
 
-    del buf[:]
-        
- 
+if len(files) != 1 or "help" in args:
+    print """Usage: aisdecode [OPTIONS] < INFILE.nmea > OUTFILE.json
+Available opptions:
+    --gpsd Use gpsd compatible output
+"""
+
+for msg in ais.stream.decode(sys.stdin):
+    if args.get("gpsd", False):
+        msg = ais.compatibility.gpsd.mangle(msg)
+    json.dump(msg, sys.stdout)
+    sys.stdout.write("\n")
