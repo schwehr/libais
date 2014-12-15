@@ -69,6 +69,15 @@ class Mangler(object):
 
     #### Type 5: Static and Voyage Related Data  #####
 
+    def mangle__shipname(self, res, msg):
+        res['shipname'] = msg['shipname'].strip("@").strip()
+
+    def mangle__destination(self, res, msg):
+        res['destination'] = msg['destination'].strip("@").strip()
+
+    def mangle__callsign(self, res, msg):
+        res['callsign'] = msg['callsign'].strip("@").strip()
+
     def mangle__dim_a(self, res, msg):
         res['to_bow'] = msg['dim_a']
 
@@ -87,6 +96,12 @@ class Mangler(object):
     def mangle__eta_hour(self, res, msg): pass
     def mangle__eta_minute(self, res, msg): pass
     def mangle__eta_month(self, res, msg): pass
+
+    def mangle__imo_num(self, res, msg):
+        res['imo'] = msg['imo_num']
+
+    def mangle__type_and_cargo(self, res, msg):
+        res['shiptype'] = self.ship_types[msg['type_and_cargo']]
 
     #### Type 6: Binary Addressed Message ####
 
@@ -158,7 +173,7 @@ class Mangler(object):
         res['aid_type'] = self.aton_types[msg['aton_type']]
 
     def mangle__name(self, res, msg):
-        res['name'] = msg['name'].rstrip("@")
+        res['name'] = msg['name'].strip("@").strip()
 
     def mangle__off_pos(self, res, msg):
         res['off_position'] = msg['off_pos']
@@ -270,5 +285,107 @@ class Mangler(object):
         15: "default (also used by AIS-SART, MOB-AIS and EPIRB-AIS under test)"
         }
 
+    ship_types = {
+        0: "Not available (default)",
+        1: "Reserved for future use",
+        2: "Reserved for future use",
+        3: "Reserved for future use",
+        4: "Reserved for future use",
+        5: "Reserved for future use",
+        6: "Reserved for future use",
+        7: "Reserved for future use",
+        8: "Reserved for future use",
+        9: "Reserved for future use",
+        10: "Reserved for future use",
+        11: "Reserved for future use",
+        12: "Reserved for future use",
+        13: "Reserved for future use",
+        14: "Reserved for future use",
+        15: "Reserved for future use",
+        16: "Reserved for future use",
+        17: "Reserved for future use",
+        18: "Reserved for future use",
+        19: "Reserved for future use",
+        20: "Wing in ground (WIG), all ships of this type",
+        21: "Wing in ground (WIG), Hazardous category A",
+        22: "Wing in ground (WIG), Hazardous category B",
+        23: "Wing in ground (WIG), Hazardous category C",
+        24: "Wing in ground (WIG), Hazardous category D",
+        25: "Wing in ground (WIG), Reserved for future use",
+        26: "Wing in ground (WIG), Reserved for future use",
+        27: "Wing in ground (WIG), Reserved for future use",
+        28: "Wing in ground (WIG), Reserved for future use",
+        29: "Wing in ground (WIG), Reserved for future use",
+        30: "Fishing",
+        31: "Towing",
+        32: "Towing: length exceeds 200m or breadth exceeds 25m",
+        33: "Dredging or underwater ops",
+        34: "Diving ops",
+        35: "Military ops",
+        36: "Sailing",
+        37: "Pleasure Craft",
+        38: "Reserved",
+        39: "Reserved",
+        40: "High speed craft (HSC), all ships of this type",
+        41: "High speed craft (HSC), Hazardous category A",
+        42: "High speed craft (HSC), Hazardous category B",
+        43: "High speed craft (HSC), Hazardous category C",
+        44: "High speed craft (HSC), Hazardous category D",
+        45: "High speed craft (HSC), Reserved for future use",
+        46: "High speed craft (HSC), Reserved for future use",
+        47: "High speed craft (HSC), Reserved for future use",
+        48: "High speed craft (HSC), Reserved for future use",
+        49: "High speed craft (HSC), No additional information",
+        50: "Pilot Vessel",
+        51: "Search and Rescue vessel",
+        52: "Tug",
+        53: "Port Tender",
+        54: "Anti-pollution equipment",
+        55: "Law Enforcement",
+        56: "Spare - Local Vessel",
+        57: "Spare - Local Vessel",
+        58: "Medical Transport",
+        59: "Noncombatant ship according to RR Resolution No. 18",
+        60: "Passenger, all ships of this type",
+        61: "Passenger, Hazardous category A",
+        62: "Passenger, Hazardous category B",
+        63: "Passenger, Hazardous category C",
+        64: "Passenger, Hazardous category D",
+        65: "Passenger, Reserved for future use",
+        66: "Passenger, Reserved for future use",
+        67: "Passenger, Reserved for future use",
+        68: "Passenger, Reserved for future use",
+        69: "Passenger, No additional information",
+        70: "Cargo, all ships of this type",
+        71: "Cargo, Hazardous category A",
+        72: "Cargo, Hazardous category B",
+        73: "Cargo, Hazardous category C",
+        74: "Cargo, Hazardous category D",
+        75: "Cargo, Reserved for future use",
+        76: "Cargo, Reserved for future use",
+        77: "Cargo, Reserved for future use",
+        78: "Cargo, Reserved for future use",
+        79: "Cargo, No additional information",
+        80: "Tanker, all ships of this type",
+        81: "Tanker, Hazardous category A",
+        82: "Tanker, Hazardous category B",
+        83: "Tanker, Hazardous category C",
+        84: "Tanker, Hazardous category D",
+        85: "Tanker, Reserved for future use",
+        86: "Tanker, Reserved for future use",
+        87: "Tanker, Reserved for future use",
+        88: "Tanker, Reserved for future use",
+        89: "Tanker, No additional information",
+        90: "Other Type, all ships of this type",
+        91: "Other Type, Hazardous category A",
+        92: "Other Type, Hazardous category B",
+        93: "Other Type, Hazardous category C",
+        94: "Other Type, Hazardous category D",
+        95: "Other Type, Reserved for future use",
+        96: "Other Type, Reserved for future use",
+        97: "Other Type, Reserved for future use",
+        98: "Other Type, Reserved for future use",
+        99: "Other Type, no additional information"
+        }
 
 mangle = Mangler()
