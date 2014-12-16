@@ -56,7 +56,7 @@ class Mangler(object):
     #### Type 4: Base Station Report ####
 
     def mangle__year(self, res, msg):
-        res['eta'] = "%04d-%02d-%02dT%02d:%02d:%02dZ" % (msg['year'], msg['month'], msg['day'], msg['hour'], msg['minute'], msg['second'])
+        res['timestamp'] = "%04d-%02d-%02dT%02d:%02d:%02dZ" % (msg['year'], msg['month'], msg['day'], msg['hour'], msg['minute'], msg['second'])
 
     def mangle__month(self, res, msg): pass
     def mangle__day(self, res, msg): pass
