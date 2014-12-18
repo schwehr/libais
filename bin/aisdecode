@@ -2,11 +2,19 @@
 
 import ais
 import sys
-import json
 import ais.compatibility.gpsd
 import ais.stream
 
-args = {}
+try:
+    import json
+except:
+    json = None
+try:
+    import msgpack
+except:
+    msgpack = None
+
+args = {"encoding": "json"}
 files = []
 for arg in sys.argv[1:]:
     if arg.startswith("--"):
@@ -23,10 +31,21 @@ if "help" in args:
     print """Usage: aisdecode [OPTIONS] < INFILE.nmea > OUTFILE.json
 Available opptions:
     --gpsd Use gpsd compatible output
+    --encoding=msgpack msgpack Use msgpack encoding
+    --encoding=json Use json encoding (default)
 """
+    sys.exit(0)
+
+if args['encoding'] == 'json':
+    def write(msg):
+        json.dump(msg, sys.stdout)
+        sys.stdout.write("\n")
+
+if args['encoding'] == 'msgpack':
+    def write(msg):
+        msgpack.pack(msg, sys.stdout)
 
 for msg in ais.stream.decode(sys.stdin):
     if args.get("gpsd", False):
         msg = ais.compatibility.gpsd.mangle(msg)
-    json.dump(msg, sys.stdout)
-    sys.stdout.write("\n")
+    write(msg)
