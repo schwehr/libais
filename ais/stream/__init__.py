@@ -172,13 +172,18 @@ def normalize(nmea=sys.stdin,
             errorcb(inst)
 
 def decode(nmea=sys.stdin,
-           errorcb = errorPrinter, **kw):
+           errorcb = errorPrinter,
+           keep_nmea = False,
+           **kw):
     """Decodes a stream of AIS messages. Takes the same arguments as normalize."""
 
     for line in normalize(nmea = nmea, errorcb=errorcb, **kw):
         body = ''.join(line.split(',')[5])
         pad = int(line.split('*')[0][-1])
         try:
-            yield _ais.decode(body, pad)
+            res = _ais.decode(body, pad)
+            if keep_nmea:
+                res['nmea'] = line
+            yield res
         except Exception, e:
             errorcb(e)
