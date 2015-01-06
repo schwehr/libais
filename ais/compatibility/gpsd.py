@@ -2,10 +2,16 @@ class Mangler(object):
     def __call__(self, msg):
         res = {}
         self.mangle(res, msg)
+        method = 'mangle__%s' % (msg['id'],)
+        if hasattr(self, method):
+            getattr(self, method)(res, msg)
         for key in msg:
-            method = 'mangle__' + key
-            if hasattr(self, method):
-                getattr(self, method)(res, msg)
+            method1 = 'mangle__%s__%s' % (key, msg['id'])
+            method2 = 'mangle__%s' % (key,)
+            if hasattr(self, method1):
+                getattr(self, method1)(res, msg)
+            elif hasattr(self, method2):
+                getattr(self, method2)(res, msg)
             else:
                 res[key] = msg[key]
         return res
@@ -15,7 +21,8 @@ class Mangler(object):
         res['device'] = "stdin"
         res['scaled'] = True
         if msg['id'] in (1, 2, 3):
-            res['status'] = self.nav_statuses[15]
+            res['status'] = '15'
+            res['status_text'] = self.nav_statuses[15]
             res['heading'] = 511
 
     def mangle__id(self, res, msg):
@@ -27,7 +34,8 @@ class Mangler(object):
         res['course'] = msg['cog']
 
     def mangle__nav_status(self, res, msg):
-        res['status'] = self.nav_statuses[msg['nav_status']]
+        res['status'] = str(msg['nav_status'])
+        res['status_text'] = self.nav_statuses[msg['nav_status']]
 
     def mangle__position_accuracy(self, res, msg):
         res['accuracy'] = msg['position_accuracy'] == 1
@@ -35,10 +43,18 @@ class Mangler(object):
     def mangle__repeat_indicator(self, res, msg):
         res['repeat'] = msg['repeat_indicator']
 
-    # rot, rot_over_range, slot_timeout
+    def mangle__rot_over_range(self, res, msg): pass
+    def mangle__rot(self, res, msg):
+        if msg['rot_over_range']:
+            res['turn'] = 'nan'
+        else:
+            res['turn'] = msg['rot']
 
     def mangle__sog(self, res, msg):
         res['speed'] = msg['sog']
+
+    def mangle__special_manoeuvre(self, res, msg):
+        res['maneuver'] = msg['special_manoeuvre']
 
     # spare, special_manoeuvre, sync_state, timestamp
 
@@ -65,12 +81,13 @@ class Mangler(object):
     def mangle__second(self, res, msg): pass
 
     def mangle__fix_type(self, res, msg):
-        res['epfd'] = self.fix_types.get(msg['fix_type'], self.fix_types[0])
+        res['epfd'] = msg['fix_type']
+        res['epfd_text'] = self.fix_types.get(msg['fix_type'], self.fix_types[0])
 
     #### Type 5: Static and Voyage Related Data  #####
 
-    def mangle__shipname(self, res, msg):
-        res['shipname'] = msg['shipname'].strip("@").strip()
+    def mangle__name(self, res, msg):
+        res['shipname'] = msg['name'].strip("@").strip()
 
     def mangle__destination(self, res, msg):
         res['destination'] = msg['destination'].strip("@").strip()
@@ -101,7 +118,8 @@ class Mangler(object):
         res['imo'] = msg['imo_num']
 
     def mangle__type_and_cargo(self, res, msg):
-        res['shiptype'] = self.ship_types[msg['type_and_cargo']]
+        res['shiptype'] = msg['type_and_cargo']
+        res['shiptype_text'] = self.ship_types[msg['type_and_cargo']]
 
     #### Type 6: Binary Addressed Message ####
 
@@ -112,6 +130,20 @@ class Mangler(object):
         res['seqno'] = msg['seq']
 
     # Note: retransmit has different values for the same message from gpsd... bug?
+
+    #### Type 7: Binary Acknowledge ####
+
+    def mangle__7(self, res, msg):
+        res.update(
+            dict(
+                mmsi1=0,
+                mmsi2=0,
+                mmsi3=0,
+                mmsi4=0))
+
+    def mangle__acks(self, res, msg):
+        for idx, (mmsi, dummy) in enumerate(msg['acks']):
+            res['mmsi%s' % (idx+1,)] = mmsi
 
     #### Type 8: Binary Broadcast Message ####
 
@@ -124,6 +156,92 @@ class Mangler(object):
 
     def mangle__timestamp(self, res, msg):
         res['second'] = msg['timestamp']
+
+
+    #### Type 12: Addressed Safety-Related Message ####
+
+    def mangle__seq_num(self, res, msg):
+        res['seqno'] = msg['seq_num']
+
+    def mangle__retransmitted(self, res, msg):
+        res['retransmit'] = msg['retransmitted']
+
+    #### Type 13: Safety-Related Acknowledgement ####
+
+    def mangle__13(self, res, msg):
+        res.update(
+            dict(
+                mmsi1=0,
+                mmsi2=0,
+                mmsi3=0,
+                mmsi4=0))
+
+    #### Type 15: Interrogation ####
+
+    def mangle__15(self, res, msg):
+        res.update(
+            dict(
+                mmsi1=0,
+                offset1_1=0,
+                type1_1=0,
+                offset1_2=0,
+                type1_2=0,
+                mmsi2=0,
+                offset2_1=0,
+                type2_1=0,
+                offset2_2=0,
+                type2_2=0
+                ))
+
+    def mangle__mmsi_1(self, res, msg):
+        res['mmsi1'] = msg['mmsi_1']
+    def mangle__mmsi_2(self, res, msg):
+        res['mmsi2'] = msg['mmsi_2']
+
+    def mangle__slot_offset_1_1(self, res, msg):
+        res['offset1_1'] = msg['slot_offset_1_1']
+    def mangle__slot_offset_1_2(self, res, msg):
+        res['offset1_2'] = msg['slot_offset_1_2']
+
+    def mangle__msg_1_1(self, res, msg):
+        res['type1_1'] = msg['msg_1_1']
+    def mangle__dest_msg_1_2(self, res, msg):
+        res['type1_2'] = msg['dest_msg_1_2']
+
+    def mangle__msg_2_1(self, res, msg):
+        res['type2_1'] = msg['msg_2_1']
+    def mangle__dest_msg_2_2(self, res, msg):
+        res['type2_2'] = msg['dest_msg_2_2']
+
+    #### Type 16: Assignment Mode Command ####
+
+    def mangle__16(self, res, msg):
+        res.update(
+            dict(
+                increment1=0,
+                offset1=0,
+                mmsi1=0,
+                increment2=0,
+                offset2=0,
+                mmsi2=0))
+
+    def mangle__inc_a(self, res, msg):
+        res['increment1'] = msg['inc_a']
+
+    def mangle__dest_mmsi_a(self, res, msg):
+        res['mmsi1'] = msg['dest_mmsi_a']
+
+    def mangle__offset_a(self, res, msg):
+        res['offset1'] = msg['offset_a']
+
+    def mangle__inc_b(self, res, msg):
+        res['increment2'] = msg['inc_b']
+
+    def mangle__dest_mmsi_b(self, res, msg):
+        res['mmsi2'] = msg['dest_mmsi_b']
+
+    def mangle__offset_b(self, res, msg):
+        res['offset2'] = msg['offset_b']
 
     #### Type 17: DGNSS Broadcast Binary Message ####
 
@@ -170,9 +288,13 @@ class Mangler(object):
     #### Type 21: Aid-to-Navigation Report ####
 
     def mangle__aton_type(self, res, msg):
-        res['aid_type'] = self.aton_types[msg['aton_type']]
+        res['aid_type'] = msg['aton_type']
+        res['aid_type_text'] = self.aton_types[msg['aton_type']]
 
-    def mangle__name(self, res, msg):
+    def mangle__aton_status(self, res, msg):
+        res['regional'] = msg['aton_status']
+
+    def mangle__name__21(self, res, msg):
         res['name'] = msg['name'].strip("@").strip()
 
     def mangle__off_pos(self, res, msg):
@@ -208,7 +330,7 @@ class Mangler(object):
     def mangle__x2(self, res, msg):
         res['sw_lon'] = msg['x2']
 
-    def mangle__y1(self, res, msg):
+    def mangle__y2(self, res, msg):
         res['sw_lat'] = msg['y2']
 
     def mangle__y1(self, res, msg):
@@ -217,7 +339,36 @@ class Mangler(object):
     def mangle__zone_size(self, res, msg):
         res['zonesize'] = msg['zone_size']
 
+
+    #### Type 23: Group Assignment Command ####
+
+    def mangle__station_type(self, res, msg):
+        res['stationtype'] = msg['station_type']
+        res['stationtype_text'] = self.station_types[msg['station_type']]
+
+    def mangle__interval_raw(self, res, msg):
+        res['interval'] = msg['interval_raw']
+
     #### Mappings ####
+
+    station_types = {
+        0: 'All types of mobiles',
+        1: 'Reserved for future use',
+        2: 'All types of Class B mobile stations',
+        3: 'SAR airborne mobile station',
+        4: 'Aid to Navigation station',
+        5: 'Class B shipborne mobile station (IEC62287 only)',
+        6: 'Regional use and inland waterways',
+        7: 'Regional use and inland waterways',
+        8: 'Regional use and inland waterways',
+        9: 'Regional use and inland waterways',
+        10: 'Reserved for future use',
+        11: 'Reserved for future use',
+        12: 'Reserved for future use',
+        13: 'Reserved for future use',
+        14: 'Reserved for future use',
+        15: 'Reserved for future use'
+        }
 
     aton_types = {
         0: "Default, Type of Aid to Navigation not specified",
