@@ -731,31 +731,8 @@ ostream& operator<< (ostream &o, const Ais6_1_25 &msg);
 
 
 // TODO(schwehr): addressed sensor report 6_1_26
-
-// IMO Circ 289 Route information
-class Ais6_1_28 : public Ais6 {
- public:
-  int link_id;
-  int sender_type, route_type;
-  int utc_month_start, utc_day_start, utc_hour_start, utc_min_start;
-  int duration;
-  vector<AisPoint> waypoints;
-
-  Ais6_1_28(const char *nmea_payload, const size_t pad);
-};
-ostream& operator<< (ostream &o, const Ais6_1_28 &msg);
-
-
-// IMO Circ 289 Text description
-class Ais6_1_30 : public Ais6 {
- public:
-  int link_id;
-  string text;
-
-  Ais6_1_30(const char *nmea_payload, const size_t pad);
-};
-ostream& operator<< (ostream &o, const Ais6_1_30 &msg);
-
+// TODO(schwehr): IMO Circ 289 Route information 6_1_28.
+// TODO(schwehr): IMO Circ 289 Text description 6_1_30.
 
 // IMO Circ 289
 // Warning: The bit encoding for 6_1_14_Window and 6_1_32 on
@@ -829,15 +806,6 @@ ostream& operator<< (ostream &o, const Ais8_1_0 &msg);
 // 8_1_2 No message
 // 8_1_3 No message
 // 8_1_4 No message
-
-// Persons on board ITU 1371-1
-class Ais8_1_40 : public Ais8 {
- public:
-  int persons;
-  int spare2;
-  Ais8_1_40(const char *nmea_payload, size_t pad);
-};
-ostream& operator<< (ostream &o, const Ais8_1_40 &msg);
 
 // IMO Circ 289 met hydro - Not to be transmitted after 2013-Jan-01
 // See also IMO Circ 236
@@ -1128,9 +1096,9 @@ class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
   int wind_speed, wind_gust;  // knots
   int wind_dir, wind_gust_dir;
   int sensor_type;
-  int wind_forcast, wind_gust_forcast;  // knots
-  int wind_dir_forcast;
-  int utc_day_forcast, utc_hour_forcast, utc_min_forcast;
+  int wind_forecast, wind_gust_forecast;  // knots
+  int wind_dir_forecast;
+  int utc_day_forecast, utc_hour_forecast, utc_min_forecast;
   int duration;
   int spare;
 
@@ -1146,11 +1114,11 @@ class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
   int trend;
   int vdatum;
   int sensor_type;
-  int forcast_type;
-  float level_forcast;
-  int utc_day_forcast;
-  int utc_hour_forcast;
-  int utc_min_forcast;
+  int forecast_type;
+  float level_forecast;
+  int utc_day_forecast;
+  int utc_hour_forecast;
+  int utc_min_forecast;
   int duration;  // minutes
   int spare;
 
@@ -1262,9 +1230,9 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
  public:
-  float draught, gap, forcast_gap;
+  float draught, gap, forecast_gap;
   int trend;
-  int utc_day_forcast, utc_hour_forcast, utc_min_forcast;
+  int utc_day_forecast, utc_hour_forecast, utc_min_forecast;
   int spare;
 
   Ais8_1_26_AirDraught(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
@@ -1364,6 +1332,8 @@ class Ais8_1_31 : public Ais8 {
 };
 ostream& operator<< (ostream &o, const Ais8_1_31 &msg);
 
+// TODO(schwehr): Persons on board ITU 1371-1 8_1_40.
+
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
 // Inland ship static and voyage related data
 class Ais8_200_10 : public Ais8 {
@@ -1406,7 +1376,7 @@ class Ais8_200_23 : public Ais8 {
 class Ais8_200_24 : public Ais8 {
  public:
   string country;
-  int guage_ids[4];
+  int gauge_ids[4];
   float levels[4];  // m
 
   Ais8_200_24(const char *nmea_payload, const size_t pad);

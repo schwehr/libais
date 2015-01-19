@@ -773,7 +773,7 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad)
   ais_str(bs, 56, 12);
   for (size_t i = 0; i < 4; i++) {
     size_t start = 68 + 25*i;
-    guage_ids[i] = ubits(bs, start, 11);
+    gauge_ids[i] = ubits(bs, start, 11);
     const int sign = bs[start + 11] ? 1 : -1;  // 0 negative, 1 pos
     // ERROR: the spec has a bit listing mistake
     levels[i] = sign * ubits(bs, start + 12, 13);
