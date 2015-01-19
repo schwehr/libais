@@ -1,7 +1,6 @@
 // Since 2010-05-19
 // Binary Broadcast Message (BBM) - 8
 
-#include <cmath>
 #include <iomanip>
 
 #include "ais.h"
@@ -401,15 +400,17 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad)
     wind_dir = ubits(bs, 150, 7) * 5;
     wind_speed_ms = ubits(bs, 157, 8) * 0.5;  // m/s
     wind_dir_rel = ubits(bs, 165, 7) * 5;
-    wind_speed_rel= ubits(bs, 172, 8) * 0.5;  // m/s
+    wind_speed_rel = ubits(bs, 172, 8) * 0.5;  // m/s
     wind_gust_speed = ubits(bs, 180, 8) * 0.5;  // m/s
     wind_gust_dir = ubits(bs, 188, 7) * 5;
     // 0C = 273.15 Kelvin
     // TODO(schwehr): change this to celcius
     air_temp_raw = ubits(bs, 195, 10);
-    humidity =ubits(bs, 205, 7);
+    humidity = ubits(bs, 205, 7);
     water_temp_raw = ubits(bs, 212, 9);  // TODO(schwehr): change this to C
-    horz_viz = pow(ubits(bs, 221, 6), 2) * 13.073;  // m
+
+    auto pow2 = [](unsigned int val) { return val * val; };
+    horz_viz = pow2(ubits(bs, 221, 6)) * 13.073;  // m
     wx[0] = ubits(bs, 227, 9);  // current
     wx[1] = ubits(bs, 236, 5);  // past 1
     wx[2] = ubits(bs, 241, 5);  // past 2
@@ -418,7 +419,7 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad)
     cloud_low_type = ubits(bs, 254, 6);
     cloud_middle_type = ubits(bs, 260, 6);
     cloud_high_type = ubits(bs, 266, 6);
-    alt_lowest_cloud_base = pow(ubits(bs, 272, 7), 2) * 0.16;
+    alt_lowest_cloud_base = pow2(ubits(bs, 272, 7)) * 0.16;
     wave_period = ubits(bs, 279, 5);  // s
     wave_height = ubits(bs, 284, 6) * 0.5;  // m
     swell_dir = ubits(bs, 290, 6) * 10;
