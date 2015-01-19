@@ -1020,8 +1020,10 @@ class Ais8_1_21 : public Ais8 {
   // swell_dir
   // swell_period
   // swell_height
-  int swell_dir_2, swell_period_2, swell_height_2;
-  float ice_thickness;  // network is cm, storing m
+  int swell_dir_2;
+  int swell_period_2;
+  float swell_height_2;
+  float ice_thickness;  // Network is cm, storing m.
   int ice_accretion;
   int ice_accretion_cause;
   int sea_ice_concentration;
