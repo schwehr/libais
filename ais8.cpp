@@ -625,7 +625,7 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad)
   air_temp = sbits(bs, 154, 11) / 10.;  // C
   rel_humid = ubits(bs, 165, 7);
   dew_point = sbits(bs, 172, 10)/ 10.;  // TODO(schwehr): How is this mapped?
-  air_pres = ubits(bs, 182, 9);
+  air_pres = (ubits(bs, 182, 9) + 800) / 100.0;  // Pa
   air_pres_trend = ubits(bs, 191, 2);
 
   horz_vis = ubits(bs, 193, 8) / 10.;  // NM

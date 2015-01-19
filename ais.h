@@ -1300,7 +1300,7 @@ class Ais8_1_31 : public Ais8 {
   float air_temp;  // C
   int rel_humid;
   float dew_point;
-  int air_pres;
+  float air_pres;  // Pascals (Pa).
   int air_pres_trend;
   float horz_vis;  // NM
   float water_level;  // m
