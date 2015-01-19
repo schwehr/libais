@@ -4,11 +4,12 @@ VERSION:=${shell cat VERSION}
 #CXX:=g++-fsf-4.4 -m32
 
 CXXFLAGS :=
-#CXXFLAGS += -O3 -funroll-loops -fexpensive-optimizations -DNDEBUG
-#CXXFLAGS += -ffast-math 
+CXXFLAGS += -std=c++11
 
-#CXXFLAGS := -g3 -O0 -m32
-CXXFLAGS := 
+# CXXFLAGS += -O3 -funroll-loops -fexpensive-optimizations -DNDEBUG
+# CXXFLAGS += -ffast-math 
+
+# CXXFLAGS += -g3 -O0 -m32
 
 WARN := -Wall
 WARN += -Wextra
