@@ -47,7 +47,7 @@ void BuildNmeaLookup();
 
 static const int MAX_BITS = 1192;
 
-// Note: Needs to be kept in sync with AIS_STATUS_STRINGS list in ais.cpp
+// Note: Needs to be kept in sync with AIS_STATUS_STRINGS list in ais.cpp.
 enum AIS_STATUS {
   AIS_UNINITIALIZED,  // Message is not yet completely decoded.
   AIS_OK,

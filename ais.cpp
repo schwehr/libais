@@ -60,7 +60,7 @@ string GetBody(const string &nmea_str) {
 const string bits_to_char_tbl="@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";
 
-// Note: Needs to be kept in sync with enum AIS_STATUS list in ais.h
+// Note: Needs to be kept in sync with enum AIS_STATUS list in ais.h.
 const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
   "AIS_UNINITIALIZED",
   "AIS_OK",
@@ -74,7 +74,7 @@ const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
   "AIS_ERR_BAD_MSG_CONTENT",
   "AIS_ERR_MSG_TOO_LONG",
   "AIS_ERR_BAD_SUB_MSG",
-  "AIS_ERR_BAD_SUB_SUB_MSG"
+  "AIS_ERR_BAD_SUB_SUB_MSG",
 };
 
 bitset<6> Reverse(const bitset<6> &bits) {
