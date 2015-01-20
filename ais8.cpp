@@ -130,7 +130,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad)
   // TODO(schwehr): verify for -10.0 to +50.0
   water_temp = ubits(bs, 322, 10) / 10. - 10;
   precip_type = ubits(bs, 332, 3);
-  salinity = ubits(bs, 335, 9);
+  salinity = ubits(bs, 335, 9) / 10.0;  // Part per mil (1/1000).
   ice = ubits(bs, 344, 2);
   // There is no way to know which meaning to attach to the following 6 bits
   // TODO(schwehr): how to treat this spare vrs water level?

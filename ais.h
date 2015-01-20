@@ -844,7 +844,7 @@ class Ais8_1_11 : public Ais8 {
   int sea_state;  // beaufort scale
   float water_temp;
   int precip_type;
-  float salinity;
+  float salinity;  // Part per mil (1/1000).
   int ice;  // yes/no/undef/unknown
   int spare2;
   int extended_water_level;  // OHMEX uses this for extra water level precision
