@@ -427,10 +427,10 @@ class Ais1_2_3 : public AisMsg {
   bool rot_over_range;
   int rot_raw;
   float rot;
-  float sog;
+  float sog;  // Knots.
   int position_accuracy;
   float x, y;
-  float cog;
+  float cog;  // Degrees.
   int true_heading;
   int timestamp;
   int special_manoeuvre;
@@ -1973,8 +1973,8 @@ class Ais27 : public AisMsg {
   bool raim;
   int nav_status;
   float x, y;
-  int sog;
-  int cog;
+  float sog;  // Knots.
+  float cog;  // Degrees.
   bool gnss;  // warning: bits in AIS are flipped sense
   int spare;
 

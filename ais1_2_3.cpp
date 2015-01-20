@@ -32,11 +32,11 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad)
   rot = pow((rot_raw/4.733), 2);
   if (rot_raw < 0) rot = -rot;
 
-  sog = ubits(bs, 50, 10) / 10.;
+  sog = ubits(bs, 50, 10) / 10.0;  // Knots.
   position_accuracy = bs[60];
   x = sbits(bs, 61, 28) / 600000.;
   y = sbits(bs, 89, 27) / 600000.;
-  cog = ubits(bs, 116, 12) / 10.;
+  cog = ubits(bs, 116, 12) / 10.0;  // Degrees.
   true_heading = ubits(bs, 128, 9);
   timestamp = ubits(bs, 137, 6);
   special_manoeuvre = ubits(bs, 143, 2);
