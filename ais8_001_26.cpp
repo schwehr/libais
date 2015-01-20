@@ -130,7 +130,7 @@ Ais8_1_26_Wx::Ais8_1_26_Wx(const bitset<AIS8_MAX_BITS> &bs,
   horz_vis = ubits(bs, offset + 16, 8) / 10.;
   dew_point = sbits(bs, offset + 24, 10) / 10.;
   dew_point_type = ubits(bs, offset + 34, 3);
-  air_pressure = ubits(bs, offset + 37, 9);
+  air_pressure = (ubits(bs, offset + 37, 9) + 800) / 100.0;  // Pa.
   air_pressure_trend = ubits(bs, offset + 46, 2);
   air_pressor_type = ubits(bs, offset + 48, 3);
   salinity = ubits(bs, offset + 51, 9) / 10.;

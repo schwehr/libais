@@ -1217,7 +1217,7 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
   float horz_vis;  // nm
   float dew_point;  // C
   int dew_point_type;
-  int air_pressure;  // hPa
+  float air_pressure;  // Pascals (Pa).
   int air_pressure_trend;
   int air_pressor_type;
   float salinity;  // 0/00 ppt
