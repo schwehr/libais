@@ -222,7 +222,7 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 26);
 
-  const int num_bits = strlen(nmea_payload) * 6 - pad;
+  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (168 > num_bits || num_bits > 1098) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;

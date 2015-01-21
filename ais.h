@@ -2014,7 +2014,9 @@ AIS_STATUS aivdm_to_bits(bitset<T> &bits, const char *nmea_payload) {
 
 // TODO(schwehr): turn ubits, sbits, and ais_str into a helper class.
 template<size_t T>
-int ubits(const bitset<T> &bits, const size_t start, const size_t len) {
+unsigned int ubits(const bitset<T> &bits,
+                   const size_t start,
+                   const size_t len) {
   assert(len <= 32);
   assert(start + len <= T);
   bitset<32> bs_tmp;
