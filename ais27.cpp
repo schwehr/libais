@@ -28,8 +28,8 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad)
   nav_status = ubits(bs, 40, 4);
   x = sbits(bs, 44, 18) / 600.;
   y = sbits(bs, 62, 17) / 600.;
-  sog = ubits(bs, 79, 6) / 10.0;  // Knots.
-  cog = ubits(bs, 85, 9) / 10.0;  // Degrees.
+  sog = ubits(bs, 79, 6);  // Knots.
+  cog = ubits(bs, 85, 9);  // Degrees.
   // 0 is a current GNSS position.  1 is NOT the current GNSS position
   gnss = !bs[94];
   spare = bs[95];

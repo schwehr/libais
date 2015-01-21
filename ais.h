@@ -1973,8 +1973,8 @@ class Ais27 : public AisMsg {
   bool raim;
   int nav_status;
   float x, y;
-  float sog;  // Knots.
-  float cog;  // Degrees.
+  int sog;  // Knots.
+  int cog;  // Degrees.
   bool gnss;  // warning: bits in AIS are flipped sense
   int spare;
 
