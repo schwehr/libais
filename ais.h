@@ -394,7 +394,7 @@ enum AIS_FI {
   AIS_FI_8_200_23_RIS_EMMA_WARNING = 23,
   AIS_FI_8_200_24_RIS_WATERLEVEL = 24,
   AIS_FI_8_200_40_RIS_ATON_SIGNAL_STATUS = 40,
-  AIS_FI_8_200_55_RIS_PERSONS_ON_BOARD= 50,
+  AIS_FI_8_200_55_RIS_PERSONS_ON_BOARD = 50,
   AIS_FI_8_366_22_AREA_NOTICE = 22,  // USCG.
   AIS_FI_8_367_22_AREA_NOTICE = 22,  // USCG.
 };
@@ -1424,7 +1424,7 @@ extern const char *shape_names[8];
 
 class Ais8_366_22_SubArea {
  public:
-    virtual Ais8_366_22_AreaShapeEnum getType()=0;
+    virtual Ais8_366_22_AreaShapeEnum getType() = 0;
     virtual ~Ais8_366_22_SubArea() { }
 };
 
@@ -2047,13 +2047,14 @@ int sbits(bitset<T> bs, const size_t start, const size_t len) {
   return val.long_val;
 }
 
-extern const string bits_to_char_tbl;
+extern const char bits_to_char_tbl[];
 
 template<size_t T>
 const string ais_str(const bitset<T> &bits, const size_t start,
                      const size_t len) {
   assert(start + len < T);
   assert(len % 6 == 0);
+  assert(bits_to_char_tbl);
   const size_t num_char = len / 6;
   string result(num_char, '@');
   for (size_t char_idx = 0; char_idx < num_char; char_idx++) {

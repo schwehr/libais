@@ -57,7 +57,7 @@ string GetBody(const string &nmea_str) {
 }
 
 // for decoding str bits inside of a binary message
-const string bits_to_char_tbl="@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const char bits_to_char_tbl[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";
 
 // Note: Needs to be kept in sync with enum AIS_STATUS list in ais.h.

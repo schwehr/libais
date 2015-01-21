@@ -1,7 +1,4 @@
 // -*- c++ -*-
-// Way complicated
-// Since 2011-Feb-03
-
 
 /*
   Design notes:
@@ -14,13 +11,16 @@
   extend the message class to separately reassemble that polyline and polygon.
  */
 
-const size_t AIS8_001_22_NUM_NAMES=128;
-const size_t AIS8_001_22_SUBAREA_SIZE=87;
+#ifndef LIBAIS_AIS8_001_22_H_
+#define LIBAIS_AIS8_001_22_H_
+
+const size_t AIS8_001_22_NUM_NAMES = 128;
+const size_t AIS8_001_22_SUBAREA_SIZE = 87;
 extern const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES];
 
 enum Ais8_001_22_AreaShapeEnum {
   AIS8_001_22_SHAPE_ERROR = -1,
-  AIS8_001_22_SHAPE_CIRCLE = 0, // OR Point
+  AIS8_001_22_SHAPE_CIRCLE = 0,  // OR Point.
   AIS8_001_22_SHAPE_RECT = 1,
   AIS8_001_22_SHAPE_SECTOR = 2,
   AIS8_001_22_SHAPE_POLYLINE = 3,
@@ -42,16 +42,18 @@ class Ais8_001_22_SubArea {
   virtual ~Ais8_001_22_SubArea() {}
 };
 
-Ais8_001_22_SubArea* ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+Ais8_001_22_SubArea*
+ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
+                            const size_t offset);
 
 // or Point if radius is 0
 class Ais8_001_22_Circle : public Ais8_001_22_SubArea {
  public:
-  float x,y; // longitude and latitude
-  // Going to assume that the precision is load of crap
-  int precision; // How many decimal places for x and y.  Track it, but it's useless in my opinion
+  float x, y;  // Longitude and latitude.
+  // Going to assume that the precision is not useful.
+  int precision;  // How many decimal places for x and y.
   int radius_m;
-  unsigned int spare; // 18 bits
+  unsigned int spare;  // 18 bits.
 
   Ais8_001_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   ~Ais8_001_22_Circle() {}
@@ -60,12 +62,12 @@ class Ais8_001_22_Circle : public Ais8_001_22_SubArea {
 
 class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
  public:
-  float x,y; // longitude and latitude
-  int precision; // How many decimal places for x and y.  Useless
-  int e_dim_m; // East dimension in meters
+  float x, y;  // Longitude and latitude.
+  int precision;  // How many decimal places for x and y.  Useless.
+  int e_dim_m;  // East dimension in meters.
   int n_dim_m;
-  int orient_deg; // Orientation in degrees from true north
-  unsigned int spare; // 5 bits
+  int orient_deg;  // Orientation in degrees from true north.
+  unsigned int spare;  // 5 bits.
 
   Ais8_001_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   ~Ais8_001_22_Rect() {}
@@ -74,9 +76,9 @@ class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
 
 class Ais8_001_22_Sector : public Ais8_001_22_SubArea {
  public:
-  float x,y; // longitude and latitude
-  // TODO(schwehr): precision in IMO, but not RTCM.  Double check
-  int precision; // How many decimal places for x and y
+  float x, y;  // Longitude and latitude.
+  // TODO(schwehr): precision in IMO, but not RTCM.  Double check.
+  int precision;  // How many decimal places for x and y?
   int radius_m;
   int left_bound_deg;
   int right_bound_deg;
@@ -91,12 +93,12 @@ class Ais8_001_22_Sector : public Ais8_001_22_SubArea {
 // TODO(schwehr): do I bring in the prior point x,y, precision?
 class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
  public:
-  // TODO(schwehr): int precision; // How many decimal places for x and y.  FIX: in IMO
+  // TODO(schwehr): int precision; // How many decimal places for x and y.
 
   // Up to 4 points
   vector<float> angles;
   vector<float> dists_m;
-  unsigned int spare; // 2 bit
+  unsigned int spare;  // 2 bit.
 
   Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
   ~Ais8_001_22_Polyline() {}
@@ -107,7 +109,7 @@ class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
 // into one polygon if there are more than one?
 class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
  public:
-  // TODO(schwehr): int precision; // How many decimal places for x and y.  FIX: in IMO
+  // TODO(schwehr): int precision; // How many decimal places for x and y.
 
   // Up to 4 points in a first message, but aggregated if multiple sub areas
   vector<float> angles;
@@ -136,13 +138,13 @@ class Ais8_001_22_Text : public Ais8_001_22_SubArea {
 
 class Ais8_001_22 : public Ais8 {
  public:
-  int link_id; // 10 bit id to match up text blocks
-  int notice_type; // area_type / Notice Description
-  int month; // These are in UTC
-  int day;   // UTC!
-  int hour;  // UTC!
+  int link_id;  // 10 bit id to match up text blocks.
+  int notice_type;  // Area type / Notice Description.
+  int month;  // These are in UTC.
+  int day;
+  int hour;
   int minute;
-  int duration_minutes; // Time from the start until the notice expires
+  int duration_minutes;  // Time from the start until the notice expires.
 
   // 1 or more sub messages
   vector<Ais8_001_22_SubArea *> sub_areas;
@@ -160,3 +162,5 @@ class Ais8_001_22 : public Ais8 {
   */
 };
 ostream& operator<< (ostream& o, Ais8_001_22 const& msg);
+
+#endif  // LIBAIS_AIS8_001_22_H_

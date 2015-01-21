@@ -1,5 +1,3 @@
-// Since 2010-May-14
-
 #include "ais.h"
 
 Ais9::Ais9(const char *nmea_payload, const size_t pad)

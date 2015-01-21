@@ -428,7 +428,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad)
         cargo.spare_valid = true;
         break;
       case 4:  // MARPOL Annex I
-        cargo.marpol_oil= ubits(bs, start + 4, 4);
+        cargo.marpol_oil = ubits(bs, start + 4, 4);
         cargo.marpol_oil_valid = true;
         cargo.spare = ubits(bs, start + 8, 9);
         cargo.spare_valid = true;
