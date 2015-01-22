@@ -104,11 +104,11 @@ void BuildNmeaLookup() {
   nmea_ord_initialized = true;
 }
 
-AisMsg::AisMsg(const char *nmea_payload, const size_t pad) {
+AisMsg::AisMsg(const char *nmea_payload, const size_t pad)
+ : status(AIS_UNINITIALIZED) {
   assert(nmea_payload);
   assert(pad < 6);
   assert(nmea_ord_initialized);
-  status = AIS_UNINITIALIZED;
 
   const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits < 38) {
