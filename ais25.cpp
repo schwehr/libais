@@ -9,7 +9,6 @@ Ais25::Ais25(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 25);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits < 40 || num_bits > 168) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;

@@ -9,7 +9,7 @@ Ais19::Ais19(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 19);
 
-  if (pad != 0 || strlen(nmea_payload) != 52) {
+  if (pad != 0 || num_chars != 52) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }

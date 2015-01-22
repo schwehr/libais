@@ -11,7 +11,6 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 26);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   // TODO(schwehr): check for off by one.
   const size_t comm_flag_offset = num_bits - 20 + 1;
 

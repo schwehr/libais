@@ -9,8 +9,6 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 27);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (pad != 0 || num_bits != 96) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;

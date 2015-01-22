@@ -16,7 +16,8 @@ Ais8::Ais8(const char *nmea_payload, const size_t pad)
   assert(message_id == 8);
 
   // in bits w/o DAC/FI
-  const int payload_len = strlen(nmea_payload) * 6 - 46 - pad;
+  // TODO(schwehr): Verify if this is 46 or 56 (accumulated bits below).
+  const int payload_len = num_bits - 46;
   if (payload_len < 0 || payload_len > 952) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -41,8 +42,6 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad)
 
   assert(dac == 1);
   assert(fi == 0);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (56 > num_bits || num_bits > 1024) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -80,7 +79,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 11);
 
-  if (strlen(nmea_payload) != 59) {
+  if (num_chars != 59) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -151,8 +150,6 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 13);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (num_bits != 472) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -194,8 +191,6 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 15);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (num_bits != 72) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -224,8 +219,6 @@ Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 16);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (num_bits != 72) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -253,7 +246,6 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 17);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   const size_t num_targets = (num_bits - 56) / 120;
   const size_t extra_bits = (num_bits - 56) % 120;
 
@@ -294,8 +286,6 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad)
 
   assert(dac == 1);
   assert(fi == 19);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   // Some people transmit without the idiodic spare padding
   if (num_bits != 258 && num_bits != 360) {
@@ -339,8 +329,6 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad)
 
   assert(dac == 1);
   assert(fi == 21);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (num_bits != 360) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -451,8 +439,6 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 24);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (num_bits != 360) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -508,7 +494,6 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 27);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   const size_t num_waypoints = (num_bits - 117) / 55;
   const size_t extra_bits = (num_bits - 117) % 55;
 
@@ -557,8 +542,6 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 29);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (72 > num_bits || num_bits > 1032) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -596,8 +579,6 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad)
 
   assert(dac == 1);
   assert(fi == 31);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (num_bits != 360) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -669,7 +650,6 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad)
   assert(dac == 200);
   assert(fi == 10);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits != 168) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -705,8 +685,6 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad)
 
   assert(dac == 200);
   assert(fi == 23);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (num_bits != 256) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -757,8 +735,6 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad)
   assert(dac == 200);
   assert(fi == 24);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (num_bits != 168) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -790,8 +766,6 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad)
 
   assert(dac == 200);
   assert(fi == 40);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (num_bits != 168) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -826,8 +800,6 @@ Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad)
 
   assert(dac == 200);
   assert(fi == 55);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   // People might get smart and leave out the 51 spare bits
   // TODO(schwehr): do we have any cases of that?

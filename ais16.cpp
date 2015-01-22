@@ -12,8 +12,7 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad)
   // 96 or 144 bits
   // 168 bits violates the spec but is common
   // TODO(schwehr): check the pad
-  const int num_char = std::strlen(nmea_payload);
-  if (num_char != 16 && num_char != 24 && num_char != 28) {
+  if (num_chars != 16 && num_chars != 24 && num_chars != 28) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -30,7 +29,7 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad)
   dest_mmsi_a = ubits(bs, 40, 30);
   offset_a = ubits(bs, 70, 12);
   inc_a = ubits(bs, 82, 10);
-  if (num_char == 16) {
+  if (num_chars == 16) {
     dest_mmsi_b = -1;
     offset_b = -1;
     inc_b = -1;

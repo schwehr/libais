@@ -12,7 +12,6 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 6);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   const int payload_len = num_bits - 46;  // in bits w/o DAC/FI
   if (num_bits < 88 || payload_len < 0 || payload_len > 952) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -40,8 +39,6 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad)
     return;
   assert(dac == 1);
   assert(fi == 0);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (88 > num_bits || num_bits > 936) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -78,8 +75,6 @@ Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 1);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (num_bits != 112) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -107,9 +102,10 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 2);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
-  if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
+  if (num_bits != 104) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   bitset<104> bs;  // TODO(schwehr): what is the real bit count?
   const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
@@ -133,9 +129,10 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 3);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
-  if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
+  if (num_bits != 104) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   bitset<104> bs;
   const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
@@ -159,10 +156,11 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 4);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   // TODO(schwehr): num_bits for 6_1_4.  226 bits?
-  if (num_bits != 232) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
+  if (num_bits != 232) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   bitset<168> bs;
   const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
@@ -193,10 +191,10 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 12);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (num_bits != 360) {
-    status = AIS_ERR_BAD_BIT_COUNT; return;  }
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   bitset<360> bs;
   const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
@@ -243,8 +241,6 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 14);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (num_bits != 376) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -288,8 +284,6 @@ Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 18);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   if (num_bits != 360) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -325,8 +319,6 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad)
 
   assert(dac == 1);
   assert(fi == 20);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (num_bits != 360) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -369,8 +361,6 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad)
 
   assert(dac == 1);
   assert(fi == 25);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   // TODO(schwehr): verify multiple of the size of cargos + header
   //   or padded to a slot boundary
@@ -462,8 +452,6 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 32);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   // TODO(schwehr): might get messages with not all windows
   if (num_bits != 350) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -505,8 +493,6 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad)
 
   assert(dac == 1);
   assert(fi == 40);
-
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
 
   if (num_bits != 104) { status = AIS_ERR_BAD_BIT_COUNT; return;  }
 

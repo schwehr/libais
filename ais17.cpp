@@ -15,7 +15,6 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 17);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;

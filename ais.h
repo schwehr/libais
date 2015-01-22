@@ -429,12 +429,14 @@ class AisMsg {
 
   // TODO(schwehr): make status private and have accessors.
   bool had_error() const {  return status != AIS_OK;  }
-  AIS_STATUS get_error() const {return status;}
+  AIS_STATUS get_error() const { return status; }
 
  protected:
   AIS_STATUS status;  // AIS_OK or error code
+  int num_chars;  // Number of characters in the nmea_payload.
+  size_t num_bits;  // Number of bits in the nmea_payload.
 
-  AisMsg() : status(AIS_UNINITIALIZED) {}
+  AisMsg() : status(AIS_UNINITIALIZED), num_chars(0), num_bits(0) {}
   AisMsg(const char *nmea_payload, const size_t pad);
 };
 

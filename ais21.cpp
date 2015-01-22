@@ -9,8 +9,6 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 21);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
-
   // TODO(schwehr): make this more careful than 272-360
   if (num_bits < 272 || num_bits > 360) {
     status = AIS_ERR_BAD_BIT_COUNT;

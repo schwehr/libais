@@ -110,7 +110,8 @@ AisMsg::AisMsg(const char *nmea_payload, const size_t pad)
   assert(pad < 6);
   assert(nmea_ord_initialized);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
+  num_chars = strlen(nmea_payload);
+  num_bits = num_chars * 6 - pad;
   if (num_bits < 38) {
     std::cerr << "AisMsg num_bits " << num_bits << "\n";
     status = AIS_ERR_BAD_BIT_COUNT;

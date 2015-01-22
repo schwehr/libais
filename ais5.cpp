@@ -9,7 +9,7 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 5);
 
-  if (pad != 2 || strlen(nmea_payload) != 71) {
+  if (pad != 2 || num_chars != 71) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }

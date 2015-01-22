@@ -9,7 +9,7 @@ Ais10::Ais10(const char *nmea_payload, const size_t pad)
 
   assert(message_id == 10);
 
-  if (pad != 0 || strlen(nmea_payload) != 12) {
+  if (pad != 0 || num_chars != 12) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }

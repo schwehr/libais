@@ -283,7 +283,6 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 22);
 
-  const size_t num_bits = strlen(nmea_payload) * 6 - pad;
   // TODO(schwehr): Make checks more exact.  Table 11.3, Circ 289 Annex, page 41
   // Spec is not byte aligned.  BAD!
   if (num_bits < 198 || num_bits > 984) {
