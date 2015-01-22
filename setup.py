@@ -4,7 +4,7 @@ from setuptools import setup, find_packages, Extension
 
 version = open('VERSION').readline().strip()
 
-ais_module = Extension('ais',
+ais_module = Extension('_ais',
                     sources = ['ais_py.cpp',
                                'ais.cpp',
                                'ais1_2_3.cpp', # Class A position
@@ -55,4 +55,5 @@ setup (name = 'libais',
             'Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator',
             'Topic :: Scientific/Engineering :: GIS',
     ],
+       scripts = ["bin/aisdecode"]
        )

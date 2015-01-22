@@ -51,6 +51,12 @@ ais.decode('402u=TiuaA000r5UJ`H4`?7000S:', 0)
 ais.decode('55NBjP01mtGIL@CW;SM<D60P5Ld000000000000P0`<3557l0<50@kk@K5h@00000000000', 0)
 #+END_SRC
 
+#+BEGIN_SRC python
+import ais
+import ais.compatibility.gpsd
+ais.compatibility.gpsd.mangle(ais.decode('55NBjP01mtGIL@CW;SM<D60P5Ld000000000000P0`<3557l0<50@kk@K5h@00000000000', 0))
+#+END_SRC
+
 * AIS Specification Documents
 
 - ITU-1371, ITU-1371-{1,2,3,4]

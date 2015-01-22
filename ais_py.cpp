@@ -2635,9 +2635,9 @@ static PyMethodDef ais_methods[] = {
 
 #if 0
   PyMODINIT_FUNC
-  initais(void) {
+  init_ais(void) {
     PyObject *mod;
-    mod = Py_InitModule("ais", ais_methods);
+    mod = Py_InitModule("_ais", ais_methods);
     if (mod == NULL) {
       cerr << "UNABLE TO LOAD MODULE";
       return;
@@ -2688,7 +2688,7 @@ static int ais_clear(PyObject *m) {
 
 static struct PyModuleDef moduledef = {
   PyModuleDef_HEAD_INIT,
-  "ais",
+  "_ais",
   NULL,
   sizeof(struct module_state),
   ais_methods,
@@ -2710,13 +2710,13 @@ PyInit_ais(void)
 #define INITERROR return
 
 void
-initais(void)
+init_ais(void)
 #endif
   {
 #if PY_MAJOR_VERSION >= 3
 PyObject *module = PyModule_Create(&moduledef);
 #else
-PyObject *module = Py_InitModule("ais", ais_methods);
+PyObject *module = Py_InitModule("_ais", ais_methods);
 #endif
 
   if (module == NULL)
