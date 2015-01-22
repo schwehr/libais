@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# Based on ais_normalize.py from https://github.com/schwehr/noaadata
-# NOTE: GPL v3 license (check with Kurt if he can relicense this)
-
 import sys
 import traceback
 
@@ -170,6 +166,7 @@ def normalize(nmea=sys.stdin,
             buffers[bufferSlot].append(newPacket)
         except Exception, inst:
             errorcb(inst)
+
 
 def decode(nmea=sys.stdin,
            errorcb = errorPrinter,

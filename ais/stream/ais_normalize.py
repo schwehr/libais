@@ -1,23 +1,10 @@
 #!/usr/bin/env python
-__version__ = '$Revision: 13936 $'.split()[1]
-__date__ = '$Date: 2010-06-09 21:13:20 -0400 (Wed, 09 Jun 2010) $'.split()[1]
-__author__ = 'Kurt Schwehr'
-__doc__='''
-Normalize AIS messages so that each message takes exactly one line.
+
+"""Normalize AIS messages so that each message takes exactly one line.
 
 Hopefully should be able to handle streams with multiple receivers if they have
 proper "r" or "b" tagged station names.  -t is needed for the USCG feed
 for some reason.
-
-@requires: U{epydoc<http://epydoc.sourceforge.net/>} > 3.0alpha3
-@requires: U{BitVector<http://cheeseshop.python.org/pypi/BitVector>}
-
-@author: '''+__author__+'''
-@version: ''' + __version__ +'''
-@var __date__: Date of last svn commit
-@undocumented: __version__ __author__ __doc__ parser
-@status: under development
-@license: GPL v2
 
 @todo: report on the number of message fragments that got dropped
 @todo: allow for a single receiver and no uscg station
@@ -26,9 +13,8 @@ for some reason.
 @bug: The code currently thinks that all parts must be received in the same timestamp (second)
 @todo: Allow the parts to be separated by one (or two?) seconds for the messages that go over timestamp boundaries between parts.
 
-@todo: use the normalize class!!!!
-
-'''
+@todo: Use the normalize class!
+"""
 
 import sys
 import traceback
@@ -185,7 +171,7 @@ def assembleAisNmeaMessages(infile=sys.stdin,
 
 if __name__=='__main__':
         from optparse import OptionParser
-        parser = OptionParser(usage="%prog [options] file1.ais [file2.ais ...]",version="%prog "+__version__)
+        parser = OptionParser(usage="%prog [options] file1.ais [file2.ais ...]")
 
         parser.add_option('-a','--allow-unknown',dest='allowUnknown'
                           ,default=False
