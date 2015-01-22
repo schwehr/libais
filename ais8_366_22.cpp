@@ -270,26 +270,20 @@ ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
                             const size_t offset) {
   const Ais8_366_22_AreaShapeEnum area_shape =
       (Ais8_366_22_AreaShapeEnum)ubits(bs, offset, 3);
-  Ais8_366_22_SubArea *area = NULL;
+
   switch (area_shape) {
   case AIS8_366_22_SHAPE_CIRCLE:
-    area = new Ais8_366_22_Circle(bs, offset);
-    break;
+    return new Ais8_366_22_Circle(bs, offset);
   case AIS8_366_22_SHAPE_RECT:
-    area = new Ais8_366_22_Rect(bs, offset);
-    return area;
+    return new Ais8_366_22_Rect(bs, offset);
   case AIS8_366_22_SHAPE_SECTOR:
-    area = new Ais8_366_22_Sector(bs, offset);
-    break;
+    return new Ais8_366_22_Sector(bs, offset);
   case AIS8_366_22_SHAPE_POLYLINE:
-    area = new Ais8_366_22_Polyline(bs, offset);
-    break;
+    return new Ais8_366_22_Polyline(bs, offset);
   case AIS8_366_22_SHAPE_POLYGON:
-    area = new Ais8_366_22_Polygon(bs, offset);
-    break;
+    return new Ais8_366_22_Polygon(bs, offset);
   case AIS8_366_22_SHAPE_TEXT:
-    area = new Ais8_366_22_Text(bs, offset);
-    break;
+    return new Ais8_366_22_Text(bs, offset);
   case AIS8_366_22_SHAPE_RESERVED_6:  // FALLTHROUGH
   case AIS8_366_22_SHAPE_RESERVED_7:  // FALLTHROUGH
     // Leave area as 0 to indicate error
@@ -299,5 +293,5 @@ ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
   default:
     assert(false);
   }
-  return area;
+  return NULL;
 }

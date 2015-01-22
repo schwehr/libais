@@ -107,6 +107,19 @@ DictSafeSetItem(PyObject *dict, const string &key, PyObject *val_obj) {
 extern "C" {
 
 PyObject *
+ais_msg_to_pydict(const AisMsg* msg) {
+  assert(msg);
+
+  PyObject *dict = PyDict_New();
+  DictSafeSetItem(dict, "id", msg->message_id);
+  DictSafeSetItem(dict, "repeat_indicator", msg->repeat_indicator);
+  DictSafeSetItem(dict, "mmsi", msg->mmsi);
+
+  return dict;
+}
+
+
+PyObject *
 ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
 
@@ -117,10 +130,7 @@ ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "nav_status", msg.nav_status);
   DictSafeSetItem(dict, "rot_over_range", msg.rot_over_range);
@@ -179,10 +189,7 @@ ais4_11_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "year", msg.year);
   DictSafeSetItem(dict, "month", msg.month);
@@ -231,11 +238,7 @@ ais5_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "ais_version", msg.ais_version);
   DictSafeSetItem(dict, "imo_num", msg.imo_num);
@@ -600,10 +603,8 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", 6);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
+
   DictSafeSetItem(dict, "seq", msg.seq);
   DictSafeSetItem(dict, "mmsi_dest", msg.mmsi_dest);
   DictSafeSetItem(dict, "retransmit", msg.retransmit);
@@ -687,10 +688,7 @@ ais7_13_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   PyObject *list = PyList_New(msg.dest_mmsi.size());
   for (size_t i = 0; i < msg.dest_mmsi.size(); i++) {
@@ -999,7 +997,6 @@ ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict,
 
   return AIS_OK;
 }
-
 
 
 AIS_STATUS
@@ -1714,10 +1711,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", 8);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
   DictSafeSetItem(dict, "spare", msg.spare);
   DictSafeSetItem(dict, "dac", msg.dac);
   DictSafeSetItem(dict, "fi", msg.fi);
@@ -1837,10 +1831,7 @@ ais9_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", 9);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "alt", msg.alt);
   DictSafeSetItem(dict, "sog", msg.sog);
@@ -1895,10 +1886,7 @@ ais10_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", 10);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "spare", msg.spare);
   DictSafeSetItem(dict, "dest_mmsi", msg.dest_mmsi);
@@ -1915,15 +1903,12 @@ ais12_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
   Ais12 msg(nmea_payload, pad);
   if (msg.had_error()) {
-    PyErr_Format(ais_py_exception, "Ais9: %s",
+    PyErr_Format(ais_py_exception, "Ais12: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", 12);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "seq_num", msg.seq_num);
   DictSafeSetItem(dict, "dest_mmsi", msg.dest_mmsi);
@@ -1951,10 +1936,7 @@ ais14_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
   DictSafeSetItem(dict, "spare", msg.spare);
 
   DictSafeSetItem(dict, "text", msg.text);
@@ -1974,10 +1956,7 @@ ais15_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "spare", msg.spare);
   DictSafeSetItem(dict, "mmsi_1", msg.mmsi_1);
@@ -2009,10 +1988,7 @@ ais16_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "spare", msg.spare);
   DictSafeSetItem(dict, "dest_mmsi_a", msg.dest_mmsi_a);
@@ -2041,10 +2017,7 @@ ais17_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "spare", msg.spare);
   DictSafeSetItem(dict, "x", msg.x);
@@ -2065,10 +2038,7 @@ ais18_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "spare", msg.spare);
   DictSafeSetItem(dict, "sog", msg.sog);
@@ -2140,10 +2110,7 @@ ais19_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "spare", msg.spare);
   DictSafeSetItem(dict, "sog", msg.sog);
@@ -2184,10 +2151,7 @@ ais20_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
   DictSafeSetItem(dict, "spare", msg.spare);
 
   int list_size = 1;
@@ -2250,10 +2214,7 @@ ais21_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
   DictSafeSetItem(dict, "spare", msg.spare);
 
   DictSafeSetItem(dict, "aton_type", msg.aton_type);
@@ -2287,10 +2248,7 @@ ais22_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
   DictSafeSetItem(dict, "spare", msg.spare);
 
   DictSafeSetItem(dict, "chan_a", msg.chan_a);
@@ -2328,10 +2286,7 @@ ais23_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
   DictSafeSetItem(dict, "spare", msg.spare);
 
   DictSafeSetItem(dict, "x1", msg.x1);
@@ -2362,10 +2317,7 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "part_num", msg.part_num);
 
@@ -2405,10 +2357,7 @@ ais25_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   // TODO(schwehr) use_app_id
   if (msg.dest_mmsi_valid) DictSafeSetItem(dict, "dest_mmsi", msg.dest_mmsi);
@@ -2432,10 +2381,7 @@ ais26_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   if (msg.dest_mmsi_valid) DictSafeSetItem(dict, "dest_mmsi", msg.dest_mmsi);
   if (msg.use_app_id) {
@@ -2479,10 +2425,7 @@ ais27_to_pydict(const char *nmea_payload, const size_t pad) {
     return NULL;
   }
 
-  PyObject *dict = PyDict_New();
-  DictSafeSetItem(dict, "id", msg.message_id);
-  DictSafeSetItem(dict, "repeat_indicator", msg.repeat_indicator);
-  DictSafeSetItem(dict, "mmsi", msg.mmsi);
+  PyObject *dict = ais_msg_to_pydict(&msg);
 
   DictSafeSetItem(dict, "position_accuracy", msg.position_accuracy);
   DictSafeSetItem(dict, "raim", msg.raim);
@@ -2510,7 +2453,6 @@ decode(PyObject *self, PyObject *args) {
     }
   }
   const size_t pad = _pad;
-  PyObject *result = 0;
 
   // The grand dispatcher
   switch (nmea_payload[0]) {
@@ -2518,103 +2460,80 @@ decode(PyObject *self, PyObject *args) {
   case '1':  // FALLTHROUGH
   case '2':  // FALLTHROUGH
   case '3':
-    result = ais1_2_3_to_pydict(nmea_payload, pad);
-    break;
+    return ais1_2_3_to_pydict(nmea_payload, pad);
 
   case '4':  // FALLTHROUGH - 4 - Basestation report
   case ';':  //  11 - UTC date response
-    result = ais4_11_to_pydict(nmea_payload, pad);
-    break;
+    return ais4_11_to_pydict(nmea_payload, pad);
 
   case '5':  // 5 - Ship and Cargo
-    result = ais5_to_pydict(nmea_payload, pad);
-    break;
+    return ais5_to_pydict(nmea_payload, pad);
 
   case '6':  // 6 - Addressed binary message
-    result = ais6_to_pydict(nmea_payload, pad);
-    break;
+    return ais6_to_pydict(nmea_payload, pad);
 
   case '7':  // FALLTHROUGH - 7 - ACK for addressed binary message
   case '=':  // 13 - ASRM Ack  (safety message)
-    result = ais7_13_to_pydict(nmea_payload, pad);
-    break;
+    return ais7_13_to_pydict(nmea_payload, pad);
 
   case '8':  // 8 - Binary broadcast message (BBM)
-    result = ais8_to_pydict(nmea_payload, pad);
-    break;
+    return ais8_to_pydict(nmea_payload, pad);
 
   case '9':  // 9 - SAR Position
-    result = ais9_to_pydict(nmea_payload, pad);
-    break;
+    return ais9_to_pydict(nmea_payload, pad);
 
   case ':':  // 10 - UTC Query
-    result = ais10_to_pydict(nmea_payload, pad);
-    break;
+    return ais10_to_pydict(nmea_payload, pad);
 
     // ':' 11 - See 4
 
   case '<':  // 12 - ASRM
-    result = ais12_to_pydict(nmea_payload, pad);
-    break;
+    return ais12_to_pydict(nmea_payload, pad);
 
     // 13 - See 7
 
   case '>':  // 14 - SRBM - Safety broadcast
-    result = ais14_to_pydict(nmea_payload, pad);
-    break;
+    return ais14_to_pydict(nmea_payload, pad);
 
   case '?':  // 15 - Interrogation
-    result = ais15_to_pydict(nmea_payload, pad);
-    break;
+    return ais15_to_pydict(nmea_payload, pad);
 
   case '@':  // 16 - Assigned mode command
-    result = ais16_to_pydict(nmea_payload, pad);
-    break;
+    return ais16_to_pydict(nmea_payload, pad);
 
   case 'A':  // 17 - GNSS broadcast
-    result = ais17_to_pydict(nmea_payload, pad);
-    break;
+    return ais17_to_pydict(nmea_payload, pad);
 
   case 'B':  // 18 - Position, Class B
-    result = ais18_to_pydict(nmea_payload, pad);
-    break;
+    return ais18_to_pydict(nmea_payload, pad);
 
   case 'C':  // 19 - Position and ship, Class B
-    result = ais19_to_pydict(nmea_payload, pad);
-    break;
+    return ais19_to_pydict(nmea_payload, pad);
 
   case 'D':  // 20 - Data link management
-    result = ais20_to_pydict(nmea_payload, pad);
-    break;
+    return ais20_to_pydict(nmea_payload, pad);
 
   case 'E':  // 21 - Aids to navigation report
-    result = ais21_to_pydict(nmea_payload, pad);
-    break;
+    return ais21_to_pydict(nmea_payload, pad);
 
   case 'F':  // 22 - Channel Management
-    result = ais22_to_pydict(nmea_payload, pad);
-    break;
+    return ais22_to_pydict(nmea_payload, pad);
 
   case 'G':  // 23 - Group Assignment Command
-    result = ais23_to_pydict(nmea_payload, pad);
-    break;
+    return ais23_to_pydict(nmea_payload, pad);
 
   case 'H':  // 24 - Static data report
-    result = ais24_to_pydict(nmea_payload, pad);
-    break;
+    return ais24_to_pydict(nmea_payload, pad);
 
   case 'I':  // 25 - Single slot binary message - addressed or broadcast
     // TODO(schwehr): handle payloads
-    result = ais25_to_pydict(nmea_payload, pad);
-    break;
+    return ais25_to_pydict(nmea_payload, pad);
 
   case 'J':  // 26 - Multi slot binary message with comm state
-    result = ais26_to_pydict(nmea_payload, pad);  // TODO(schwehr): payloads
-    break;
+    return ais26_to_pydict(nmea_payload, pad);  // TODO(schwehr): payloads
 
   case 'K':  // 27 - Long-range AIS broadcast message
-    result = ais27_to_pydict(nmea_payload, pad);
-    break;
+    return ais27_to_pydict(nmea_payload, pad);
 
   case 'L':  // 28 - UNKNOWN
     PyErr_Format(ais_py_exception, "ais.decode: message 28 (L) not handled");
@@ -2625,7 +2544,7 @@ decode(PyObject *self, PyObject *args) {
                  nmea_payload[0]);
   }
 
-  return result;
+  return nullptr;
 }
 
 static PyMethodDef ais_methods[] = {
