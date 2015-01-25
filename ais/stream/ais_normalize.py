@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """Normalize AIS messages so that each message takes exactly one line.
 
 Hopefully should be able to handle streams with multiple receivers if they have
@@ -51,10 +50,10 @@ def assembleAisNmeaMessages(infile=sys.stdin,
 
     for line in infile:
       try:
-        line = line.strip()+'\n'  # Get rid of DOS issues - FIX: do I really want this line???
+        line = line.strip() + '\n'  # Get rid of DOS issues.
         line_num += 1
         if len(line) < 7 or line[3:6] not in ('VDM|VDO'):
-            o.write (line)  # Pass non AIS wireless message straight through
+            o.write(line)  # Pass non AIS wireless message straight through.
             continue
 
         if validateChecksum and not isChecksumValid(line):
@@ -67,32 +66,32 @@ def assembleAisNmeaMessages(infile=sys.stdin,
         fields = line.split(',')
 
         if len(fields) < 6:
-            sys.stderr.write('ERROR line '+str(line_num)+': not enough fields in line...\n')
-            sys.stderr.write('  Found '+str(len(fields))+', but need at least 6\n')
-            sys.stderr.write('  '+line)
+            sys.stderr.write('ERROR line ' + str(line_num) + ': not enough fields in line...\n')
+            sys.stderr.write('  Found ' + str(len(fields)) + ', but need at least 6\n')
+            sys.stderr.write('  ' + line)
             continue
 
         totNumSentences = int(fields[1]) # Total nmea lines that compose this message 1..9 (numPackets)
-        if 1 == totNumSentences:            # Easy case
+        if 1 == totNumSentences:  # Easy case
             o.write (line)
             continue
 
-        sentenceNum = int(fields[2])    # Message sequence number 1..9 (packetNum)
-        payload     = fields[5]         # AIS binary data encoded in whacky ways
-        timestamp   = fields[-1].strip()        # Seconds since Epoch UTC.  Always the last field
+        sentenceNum = int(fields[2])  # Message sequence number 1..9 (packetNum)
+        payload = fields[5]  # AIS binary data encoded in whacky ways
+        timestamp = fields[-1].strip()  # Seconds since Epoch UTC.  Always the last field
 
-        station = None  # USCG Receive Stations        #if None==station:
+        station = None  # USCG receive stations.
         for i in range(len(fields)-1,5,-1):
-            if 0<len(fields[i]) and fields[i][0] in ('r','b'):
+            if 0 < len(fields[i]) and fields[i][0] in ('r','b'):
                 station = fields[i]
-                break # Found it so ditch the for loop
+                break  # Found it so ditch the for loop
 
-        if None==station and options.allowUnknown:
-            station='UNKNOWN'
+        if None == station and options.allowUnknown:
+            station = 'UNKNOWN'
 
         if None == station:
-            sys.stderr.write('ERROR line '+str(line_num)+': No station found... skipping\n')
-            sys.stderr.write('  '+line)
+            sys.stderr.write('ERROR line ' + str(line_num) + ': No station found... skipping\n')
+            sys.stderr.write('  ' + line)
             continue
 
         if treatABequal:
@@ -108,12 +107,13 @@ def assembleAisNmeaMessages(infile=sys.stdin,
         if totNumSentences == sentenceNum:
             # Finished a message
             if bufferSlot not in buffers:
-                if verbose: print 'Do not have the preceeding packets for line'
-                if verbose: print '  ',line
+                if verbose:
+                    print 'Do not have the preceeding packets for line'
+                    print '  ',line
                 continue
             buffers[bufferSlot].append(newPacket)
-            parts = buffers[bufferSlot] # Now have all the pieces
-            del buffers[bufferSlot] # Clear out the used packets to save memory
+            parts = buffers[bufferSlot]  # Now have all the pieces.
+            del buffers[bufferSlot]  # Clear out used packets to save memory.
 
             # Sanity check
             ok = True
@@ -129,9 +129,9 @@ def assembleAisNmeaMessages(infile=sys.stdin,
                         ok = False
                         break
                 if ts1 > ts2+window or ts1 < ts2-window:
-                    sys.stderr.write('ERROR: timestamps not all the same for '+str(timestamp)+'\n')
-                    sys.stderr.write('  ** '+line+'\n')
-                    sys.stderr.write('  parts:'+str(parts)+'\n')
+                    sys.stderr.write('ERROR: timestamps not all the same for ' + str(timestamp) + '\n')
+                    sys.stderr.write('  ** ' + line + '\n')
+                    sys.stderr.write('  parts:' + str(parts) + '\n')
                     ok=False
                     break
             if not ok: continue
@@ -139,20 +139,20 @@ def assembleAisNmeaMessages(infile=sys.stdin,
             payload=''.join([p[0] for p in parts])
 
             # Try to mirror the packet as much as possible... same seqId and channel
-            checksumed_str = ','.join((fields[0],'1,1',fields[3],fields[4],payload, fields[6].split('*')[0]+'*'))
+            checksumed_str = ','.join((fields[0],'1,1',fields[3],fields[4],payload, fields[6].split('*')[0] + '*'))
             if ts1 == 0:
                 # allowed missing timestamp and it is missing
                 if len(fields[7:-1]) == 0:
                     out_str = checksumed_str + checksumStr(checksumed_str)
                 else:
-                    out_str = checksumed_str + checksumStr(checksumed_str) +',' + ','.join(fields[7:-1])
+                    out_str = checksumed_str + checksumStr(checksumed_str) + ',' + ','.join(fields[7:-1])
             else:
-                out_str = checksumed_str + checksumStr(checksumed_str) +',' + ','.join(fields[7:])
+                out_str = checksumed_str + checksumStr(checksumed_str) + ',' + ','.join(fields[7:])
 
             if not isChecksumValid(out_str):
                 print >> sys.stderr, 'ERROR: Invalid checksum in constructed 1 liner:\t',line,
                 print >> sys.stderr, 'Checksum expected:',checksumStr(checksumed_str)
-            o.write(out_str.strip()+'\n')           # FIX: Why do I have to do this last strip???
+            o.write(out_str.strip() + '\n')  # FIX: Why do I have to do this last strip?
 
             continue
 
@@ -160,9 +160,9 @@ def assembleAisNmeaMessages(infile=sys.stdin,
       except Exception, inst:
           # Catch all exceptions
           sys.stderr.write('ERROR... some exception for this line:\n')
-          sys.stderr.write('\t'+line.strip()+'\n')
-          sys.stderr.write(str(type(inst))+'\n')
-          sys.stderr.write( str(inst)+'\n')
+          sys.stderr.write('\t' + line.strip() + '\n')
+          sys.stderr.write(str(type(inst)) + '\n')
+          sys.stderr.write( str(inst) + '\n')
           traceback.print_exc(file=sys.stderr)
 
 
@@ -199,11 +199,6 @@ if __name__=='__main__':
         parser.add_option('-p','--pass-invalid-checksums',default=False, action='store_true',
                           help = 'Pass messages with invalid checksums.  Multiline messages will get n valid checksum')
 
-#         parser.add_option('-s','--strip-decimal',dest='stripDecimalTime'
-#                           ,default=False
-#                           ,action='store_true'
-#                           ,help='Drop the fractional portion of the trailing timestamp')
-
         parser.add_option('-v','--verbose',dest='verbose',default=False,action='store_true',
                 help='Make the output verbose')
 
@@ -227,7 +222,7 @@ if __name__=='__main__':
         for filename in args:
 
             if options.verbose:
-                sys.stderr.write('processing file: '+filename+'\n')
+                sys.stderr.write('processing file: ' + filename + '\n')
 
             assembleAisNmeaMessages(
                 file(filename),

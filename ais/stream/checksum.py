@@ -28,11 +28,13 @@ def checksumStr(data):
     if data[-1]=='*': data = data[:-1]
     if data[-3]=='*': data = data[:-3]
     # FIX: rename sum to not shadown builting function
-    sum=0
-    for c in data: sum = sum ^ ord(c)
-    sumHex = "%x" % sum
-    if len(sumHex)==1: sumHex = '0'+sumHex
-    return sumHex.upper()
+    checksum = 0
+    for c in data:
+      checksum = checksum ^ ord(c)
+    sum_hex = "%x" % checksum
+    if len(sum_hex) == 1:
+      sum_hex = '0' + sum_hex
+    return sum_hex.upper()
 
 
 def isChecksumValid(nmeaStr, allowTailData=True):
@@ -54,13 +56,14 @@ def isChecksumValid(nmeaStr, allowTailData=True):
     """
 
     if allowTailData:
-	match = nmeaChecksumRE.search(nmeaStr)
-	if not match: return False
-	nmeaStr = nmeaStr[:match.end()]
+        match = nmeaChecksumRE.search(nmeaStr)
+        if not match:
+            return False
+        nmeaStr = nmeaStr[:match.end()]
 
     if nmeaStr[-3]!='*':
-	return False  # Bad string without proper checksum.
+        return False  # Bad string without proper checksum.
     checksum=nmeaStr[-2:]
-    if checksum.upper()==checksumStr(nmeaStr).upper():
+    if checksum.upper() == checksumStr(nmeaStr).upper():
         return True
     return False

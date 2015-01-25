@@ -1,4 +1,7 @@
+"""Convert libais message dictionaries to GPSD JSON."""
+
 class Mangler(object):
+
     def __call__(self, msg):
         res = {}
         self.mangle(res, msg)
@@ -17,8 +20,8 @@ class Mangler(object):
         return res
 
     def mangle(self, res, msg):
-        res['class'] = "AIS"
-        res['device'] = "stdin"
+        res['class'] = 'AIS'
+        res['device'] = 'stdin'
         res['scaled'] = True
         if msg['id'] in (1, 2, 3):
             res['status'] = '15'
@@ -72,7 +75,7 @@ class Mangler(object):
     #### Type 4: Base Station Report ####
 
     def mangle__year(self, res, msg):
-        res['timestamp'] = "%04d-%02d-%02dT%02d:%02d:%02dZ" % (msg['year'], msg['month'], msg['day'], msg['hour'], msg['minute'], msg['second'])
+        res['timestamp'] = '%04d-%02d-%02dT%02d:%02d:%02dZ' % (msg['year'], msg['month'], msg['day'], msg['hour'], msg['minute'], msg['second'])
 
     def mangle__month(self, res, msg): pass
     def mangle__day(self, res, msg): pass
@@ -87,13 +90,13 @@ class Mangler(object):
     #### Type 5: Static and Voyage Related Data  #####
 
     def mangle__name(self, res, msg):
-        res['shipname'] = msg['name'].strip("@").strip()
+        res['shipname'] = msg['name'].strip('@').strip()
 
     def mangle__destination(self, res, msg):
-        res['destination'] = msg['destination'].strip("@").strip()
+        res['destination'] = msg['destination'].strip('@').strip()
 
     def mangle__callsign(self, res, msg):
-        res['callsign'] = msg['callsign'].strip("@").strip()
+        res['callsign'] = msg['callsign'].strip('@').strip()
 
     def mangle__dim_a(self, res, msg):
         res['to_bow'] = msg['dim_a']
@@ -108,7 +111,7 @@ class Mangler(object):
         res['to_starboard'] = msg['dim_d']
 
     def mangle__eta_day(self, res, msg):
-        res['eta'] = "%02d-%02dT%02d:%02dZ" % (msg['eta_month'], msg['eta_day'], msg['eta_hour'], msg['eta_minute'])
+        res['eta'] = '%02d-%02dT%02d:%02dZ' % (msg['eta_month'], msg['eta_day'], msg['eta_hour'], msg['eta_minute'])
 
     def mangle__eta_hour(self, res, msg): pass
     def mangle__eta_minute(self, res, msg): pass
@@ -295,7 +298,7 @@ class Mangler(object):
         res['regional'] = msg['aton_status']
 
     def mangle__name__21(self, res, msg):
-        res['name'] = msg['name'].strip("@").strip()
+        res['name'] = msg['name'].strip('@').strip()
 
     def mangle__off_pos(self, res, msg):
         res['off_position'] = msg['off_pos']
@@ -303,7 +306,6 @@ class Mangler(object):
     def mangle__virtual_aton(self, res, msg):
         res['virtual_aid'] = msg['virtual_aton']
 
-    
     #### Type 22: Channel Management ####
 
     def mangle__chan_a(self, res, msg):
@@ -371,172 +373,172 @@ class Mangler(object):
         }
 
     aton_types = {
-        0: "Default, Type of Aid to Navigation not specified",
-        1: "Reference point",
-        2: "RACON (radar transponder marking a navigation hazard)",
-        3: "Fixed structure off shore, such as oil platforms, wind farms, rigs.",
-        4: "Spare, Reserved for future use.",
-        5: "Light, without sectors",
-        6: "Light, with sectors",
-        7: "Leading Light Front",
-        8: "Leading Light Rear",
-        9: "Beacon, Cardinal N",
-        10: "Beacon, Cardinal E",
-        11: "Beacon, Cardinal S",
-        12: "Beacon, Cardinal W",
-        13: "Beacon, Port hand",
-        14: "Beacon, Starboard hand",
-        15: "Beacon, Preferred Channel port hand",
-        16: "Beacon, Preferred Channel starboard hand",
-        17: "Beacon, Isolated danger",
-        18: "Beacon, Safe water",
-        19: "Beacon, Special mark",
-        20: "Cardinal Mark N",
-        21: "Cardinal Mark E",
-        22: "Cardinal Mark S",
-        23: "Cardinal Mark W",
-        24: "Port hand Mark",
-        25: "Starboard hand Mark",
-        26: "Preferred Channel Port hand",
-        27: "Preferred Channel Starboard hand",
-        28: "Isolated danger",
-        29: "Safe Water",
-        30: "Special Mark",
-        31: "Light Vessel / LANBY / Rigs"
+        0: 'Default, Type of Aid to Navigation not specified',
+        1: 'Reference point',
+        2: 'RACON (radar transponder marking a navigation hazard)',
+        3: 'Fixed structure off shore, such as oil platforms, wind farms, rigs.',
+        4: 'Spare, Reserved for future use.',
+        5: 'Light, without sectors',
+        6: 'Light, with sectors',
+        7: 'Leading Light Front',
+        8: 'Leading Light Rear',
+        9: 'Beacon, Cardinal N',
+        10: 'Beacon, Cardinal E',
+        11: 'Beacon, Cardinal S',
+        12: 'Beacon, Cardinal W',
+        13: 'Beacon, Port hand',
+        14: 'Beacon, Starboard hand',
+        15: 'Beacon, Preferred Channel port hand',
+        16: 'Beacon, Preferred Channel starboard hand',
+        17: 'Beacon, Isolated danger',
+        18: 'Beacon, Safe water',
+        19: 'Beacon, Special mark',
+        20: 'Cardinal Mark N',
+        21: 'Cardinal Mark E',
+        22: 'Cardinal Mark S',
+        23: 'Cardinal Mark W',
+        24: 'Port hand Mark',
+        25: 'Starboard hand Mark',
+        26: 'Preferred Channel Port hand',
+        27: 'Preferred Channel Starboard hand',
+        28: 'Isolated danger',
+        29: 'Safe Water',
+        30: 'Special Mark',
+        31: 'Light Vessel / LANBY / Rigs'
     }
 
     fix_types = {
-        0: "Undefined",
-        1: "GPS",
-        2: "GLONASS",
-        3: "Combined GPS/GLONASS",
-        4: "Loran-C",
-        5: "Chayka",
-        6: "Integrated navigation system",
-        7: "Surveyed",
-        8: "Galileo"
+        0: 'Undefined',
+        1: 'GPS',
+        2: 'GLONASS',
+        3: 'Combined GPS/GLONASS',
+        4: 'Loran-C',
+        5: 'Chayka',
+        6: 'Integrated navigation system',
+        7: 'Surveyed',
+        8: 'Galileo'
     }
 
     nav_statuses = {
-        0: "under way using engine",
-        1: "at anchor",
-        2: "not under command",
-        3: "restricted maneuverability",
-        4: "constrained by her draught",
-        5: "moored",
-        6: "aground",
-        7: "engaged in fishing",
-        8: "under way sailing",
-        9: "reserved for future amendment of navigational status for ships carrying DG, HS, or MP, or IMO hazard or pollutant category C, high speed craft (HSC)",
-        10: "reserved for future amendment of navigational status for ships carrying dangerous goods (DG), harmful substances (HS) or marine pollutants (MP), or IMO hazard or pollutant category A, wing in ground (WIG)",
-        11: "power-driven vessel towing astern (regional use)",
-        12: "power-driven vessel pushing ahead or towing alongside (regional use)",
-        13: "reserved for future use",
-        14: "AIS-SART (active), MOB-AIS, EPIRB-AIS",
-        15: "default (also used by AIS-SART, MOB-AIS and EPIRB-AIS under test)"
+        0: 'under way using engine',
+        1: 'at anchor',
+        2: 'not under command',
+        3: 'restricted maneuverability',
+        4: 'constrained by her draught',
+        5: 'moored',
+        6: 'aground',
+        7: 'engaged in fishing',
+        8: 'under way sailing',
+        9: 'reserved for future amendment of navigational status for ships carrying DG, HS, or MP, or IMO hazard or pollutant category C, high speed craft (HSC)',
+        10: 'reserved for future amendment of navigational status for ships carrying dangerous goods (DG), harmful substances (HS) or marine pollutants (MP), or IMO hazard or pollutant category A, wing in ground (WIG)',
+        11: 'power-driven vessel towing astern (regional use)',
+        12: 'power-driven vessel pushing ahead or towing alongside (regional use)',
+        13: 'reserved for future use',
+        14: 'AIS-SART (active), MOB-AIS, EPIRB-AIS',
+        15: 'default (also used by AIS-SART, MOB-AIS and EPIRB-AIS under test)'
         }
 
     ship_types = {
-        0: "Not available (default)",
-        1: "Reserved for future use",
-        2: "Reserved for future use",
-        3: "Reserved for future use",
-        4: "Reserved for future use",
-        5: "Reserved for future use",
-        6: "Reserved for future use",
-        7: "Reserved for future use",
-        8: "Reserved for future use",
-        9: "Reserved for future use",
-        10: "Reserved for future use",
-        11: "Reserved for future use",
-        12: "Reserved for future use",
-        13: "Reserved for future use",
-        14: "Reserved for future use",
-        15: "Reserved for future use",
-        16: "Reserved for future use",
-        17: "Reserved for future use",
-        18: "Reserved for future use",
-        19: "Reserved for future use",
-        20: "Wing in ground (WIG), all ships of this type",
-        21: "Wing in ground (WIG), Hazardous category A",
-        22: "Wing in ground (WIG), Hazardous category B",
-        23: "Wing in ground (WIG), Hazardous category C",
-        24: "Wing in ground (WIG), Hazardous category D",
-        25: "Wing in ground (WIG), Reserved for future use",
-        26: "Wing in ground (WIG), Reserved for future use",
-        27: "Wing in ground (WIG), Reserved for future use",
-        28: "Wing in ground (WIG), Reserved for future use",
-        29: "Wing in ground (WIG), Reserved for future use",
-        30: "Fishing",
-        31: "Towing",
-        32: "Towing: length exceeds 200m or breadth exceeds 25m",
-        33: "Dredging or underwater ops",
-        34: "Diving ops",
-        35: "Military ops",
-        36: "Sailing",
-        37: "Pleasure Craft",
-        38: "Reserved",
-        39: "Reserved",
-        40: "High speed craft (HSC), all ships of this type",
-        41: "High speed craft (HSC), Hazardous category A",
-        42: "High speed craft (HSC), Hazardous category B",
-        43: "High speed craft (HSC), Hazardous category C",
-        44: "High speed craft (HSC), Hazardous category D",
-        45: "High speed craft (HSC), Reserved for future use",
-        46: "High speed craft (HSC), Reserved for future use",
-        47: "High speed craft (HSC), Reserved for future use",
-        48: "High speed craft (HSC), Reserved for future use",
-        49: "High speed craft (HSC), No additional information",
-        50: "Pilot Vessel",
-        51: "Search and Rescue vessel",
-        52: "Tug",
-        53: "Port Tender",
-        54: "Anti-pollution equipment",
-        55: "Law Enforcement",
-        56: "Spare - Local Vessel",
-        57: "Spare - Local Vessel",
-        58: "Medical Transport",
-        59: "Noncombatant ship according to RR Resolution No. 18",
-        60: "Passenger, all ships of this type",
-        61: "Passenger, Hazardous category A",
-        62: "Passenger, Hazardous category B",
-        63: "Passenger, Hazardous category C",
-        64: "Passenger, Hazardous category D",
-        65: "Passenger, Reserved for future use",
-        66: "Passenger, Reserved for future use",
-        67: "Passenger, Reserved for future use",
-        68: "Passenger, Reserved for future use",
-        69: "Passenger, No additional information",
-        70: "Cargo, all ships of this type",
-        71: "Cargo, Hazardous category A",
-        72: "Cargo, Hazardous category B",
-        73: "Cargo, Hazardous category C",
-        74: "Cargo, Hazardous category D",
-        75: "Cargo, Reserved for future use",
-        76: "Cargo, Reserved for future use",
-        77: "Cargo, Reserved for future use",
-        78: "Cargo, Reserved for future use",
-        79: "Cargo, No additional information",
-        80: "Tanker, all ships of this type",
-        81: "Tanker, Hazardous category A",
-        82: "Tanker, Hazardous category B",
-        83: "Tanker, Hazardous category C",
-        84: "Tanker, Hazardous category D",
-        85: "Tanker, Reserved for future use",
-        86: "Tanker, Reserved for future use",
-        87: "Tanker, Reserved for future use",
-        88: "Tanker, Reserved for future use",
-        89: "Tanker, No additional information",
-        90: "Other Type, all ships of this type",
-        91: "Other Type, Hazardous category A",
-        92: "Other Type, Hazardous category B",
-        93: "Other Type, Hazardous category C",
-        94: "Other Type, Hazardous category D",
-        95: "Other Type, Reserved for future use",
-        96: "Other Type, Reserved for future use",
-        97: "Other Type, Reserved for future use",
-        98: "Other Type, Reserved for future use",
-        99: "Other Type, no additional information"
+        0: 'Not available (default)',
+        1: 'Reserved for future use',
+        2: 'Reserved for future use',
+        3: 'Reserved for future use',
+        4: 'Reserved for future use',
+        5: 'Reserved for future use',
+        6: 'Reserved for future use',
+        7: 'Reserved for future use',
+        8: 'Reserved for future use',
+        9: 'Reserved for future use',
+        10: 'Reserved for future use',
+        11: 'Reserved for future use',
+        12: 'Reserved for future use',
+        13: 'Reserved for future use',
+        14: 'Reserved for future use',
+        15: 'Reserved for future use',
+        16: 'Reserved for future use',
+        17: 'Reserved for future use',
+        18: 'Reserved for future use',
+        19: 'Reserved for future use',
+        20: 'Wing in ground (WIG), all ships of this type',
+        21: 'Wing in ground (WIG), Hazardous category A',
+        22: 'Wing in ground (WIG), Hazardous category B',
+        23: 'Wing in ground (WIG), Hazardous category C',
+        24: 'Wing in ground (WIG), Hazardous category D',
+        25: 'Wing in ground (WIG), Reserved for future use',
+        26: 'Wing in ground (WIG), Reserved for future use',
+        27: 'Wing in ground (WIG), Reserved for future use',
+        28: 'Wing in ground (WIG), Reserved for future use',
+        29: 'Wing in ground (WIG), Reserved for future use',
+        30: 'Fishing',
+        31: 'Towing',
+        32: 'Towing: length exceeds 200m or breadth exceeds 25m',
+        33: 'Dredging or underwater ops',
+        34: 'Diving ops',
+        35: 'Military ops',
+        36: 'Sailing',
+        37: 'Pleasure Craft',
+        38: 'Reserved',
+        39: 'Reserved',
+        40: 'High speed craft (HSC), all ships of this type',
+        41: 'High speed craft (HSC), Hazardous category A',
+        42: 'High speed craft (HSC), Hazardous category B',
+        43: 'High speed craft (HSC), Hazardous category C',
+        44: 'High speed craft (HSC), Hazardous category D',
+        45: 'High speed craft (HSC), Reserved for future use',
+        46: 'High speed craft (HSC), Reserved for future use',
+        47: 'High speed craft (HSC), Reserved for future use',
+        48: 'High speed craft (HSC), Reserved for future use',
+        49: 'High speed craft (HSC), No additional information',
+        50: 'Pilot Vessel',
+        51: 'Search and Rescue vessel',
+        52: 'Tug',
+        53: 'Port Tender',
+        54: 'Anti-pollution equipment',
+        55: 'Law Enforcement',
+        56: 'Spare - Local Vessel',
+        57: 'Spare - Local Vessel',
+        58: 'Medical Transport',
+        59: 'Noncombatant ship according to RR Resolution No. 18',
+        60: 'Passenger, all ships of this type',
+        61: 'Passenger, Hazardous category A',
+        62: 'Passenger, Hazardous category B',
+        63: 'Passenger, Hazardous category C',
+        64: 'Passenger, Hazardous category D',
+        65: 'Passenger, Reserved for future use',
+        66: 'Passenger, Reserved for future use',
+        67: 'Passenger, Reserved for future use',
+        68: 'Passenger, Reserved for future use',
+        69: 'Passenger, No additional information',
+        70: 'Cargo, all ships of this type',
+        71: 'Cargo, Hazardous category A',
+        72: 'Cargo, Hazardous category B',
+        73: 'Cargo, Hazardous category C',
+        74: 'Cargo, Hazardous category D',
+        75: 'Cargo, Reserved for future use',
+        76: 'Cargo, Reserved for future use',
+        77: 'Cargo, Reserved for future use',
+        78: 'Cargo, Reserved for future use',
+        79: 'Cargo, No additional information',
+        80: 'Tanker, all ships of this type',
+        81: 'Tanker, Hazardous category A',
+        82: 'Tanker, Hazardous category B',
+        83: 'Tanker, Hazardous category C',
+        84: 'Tanker, Hazardous category D',
+        85: 'Tanker, Reserved for future use',
+        86: 'Tanker, Reserved for future use',
+        87: 'Tanker, Reserved for future use',
+        88: 'Tanker, Reserved for future use',
+        89: 'Tanker, No additional information',
+        90: 'Other Type, all ships of this type',
+        91: 'Other Type, Hazardous category A',
+        92: 'Other Type, Hazardous category B',
+        93: 'Other Type, Hazardous category C',
+        94: 'Other Type, Hazardous category D',
+        95: 'Other Type, Reserved for future use',
+        96: 'Other Type, Reserved for future use',
+        97: 'Other Type, Reserved for future use',
+        98: 'Other Type, Reserved for future use',
+        99: 'Other Type, no additional information'
         }
 
 mangle = Mangler()

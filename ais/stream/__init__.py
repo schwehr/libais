@@ -1,14 +1,20 @@
+# Based on ais_normalize.py from https://github.com/schwehr/noaadata
+
 import sys
 import traceback
 
-from .checksum import isChecksumValid, checksumStr # Needed for checksums
-import _ais
+from ais import _ais
+from .checksum import checksumStr
+from .checksum import isChecksumValid
+
 
 def errorPrinter(e):
     sys.stderr.write("%s\n" % e)
 
+
 def errorRaiser(e):
     raise e
+
 
 class StreamError(Exception):
     description = "Stream error"
@@ -18,19 +24,24 @@ class StreamError(Exception):
     def __str__(self):
         return "%(description)s: %(line_num)s: %(line)s" % self.kw
 
+
 class InvalidChecksumError(StreamError):
     description = "Invalid checksum"
+
 
 class InvalidChecksumInConstructedError(StreamError):
     description = "Invalid checksum in constructed one-liner"
 
+
 class NoStationFoundError(StreamError):
     description = "No station found"
+
 
 class TooFewFieldsError(StreamError):
     description = "Too few fields"
     def __str__(self):
         return "%(description)s, got %(fields)s but needed 6: %(line_num)s: %(line)s" % self.kw
+
 
 class DifferingTimestampsError(StreamError):
     description = "Timestamps not all the same"
@@ -58,14 +69,13 @@ def normalize(nmea=sys.stdin,
         print 'Need to make a faster version that does not worry about the extra args and stations dict'
         assert False
 
-
     buffers = {} # Put partial messages in a queue by station so that they can be reassembled
     line_num = 0
     invalid_checksums = 0
 
     for idx, line in enumerate(nmea):
         try:
-            line = line.strip()+'\n'  # Get rid of DOS issues - FIX: do I really want this line???
+            line = line.strip() + '\n'  # Get rid of DOS issues.
             line_num += 1
             if len(line) < 7 or line[3:6] not in ('VDM|VDO'):
                 yield line
@@ -94,7 +104,7 @@ def normalize(nmea=sys.stdin,
 
             station = None  # USCG Receive Stations        #if None==station:
             for i in range(len(fields)-1,5,-1):
-                if 0<len(fields[i]) and fields[i][0] in ('r','b'):
+                if 0 < len(fields[i]) and fields[i][0] in ('r','b'):
                     station = fields[i]
                     break # Found it so ditch the for loop
 
@@ -118,8 +128,9 @@ def normalize(nmea=sys.stdin,
             if totNumSentences == sentenceNum:
                 # Finished a message
                 if bufferSlot not in buffers:
-                    if verbose: print 'Do not have the preceeding packets for line'
-                    if verbose: print '  ',line
+                    if verbose:
+                         print 'Do not have the preceeding packets for line'
+                         print '  ',line
                     continue
                 buffers[bufferSlot].append(newPacket)
                 parts = buffers[bufferSlot] # Now have all the pieces
@@ -144,7 +155,7 @@ def normalize(nmea=sys.stdin,
                         break
                 if not ok: continue
 
-                payload=''.join([p[0] for p in parts])
+                payload = ''.join([p[0] for p in parts])
 
                 # Try to mirror the packet as much as possible... same seqId and channel
                 checksumed_str = ','.join((fields[0],'1,1',fields[3],fields[4],payload, fields[6].split('*')[0]+'*'))
