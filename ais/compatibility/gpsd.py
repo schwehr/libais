@@ -122,7 +122,10 @@ class Mangler(object):
 
     def mangle__type_and_cargo(self, res, msg):
         res['shiptype'] = msg['type_and_cargo']
-        res['shiptype_text'] = self.ship_types[msg['type_and_cargo']]
+        try:
+            res['shiptype_text'] = self.ship_types[msg['type_and_cargo']]
+        except KeyError:
+            res['shiptype_text'] = '%d - Unknown' % msg['type_and_cargo']
 
     #### Type 6: Binary Addressed Message ####
 
