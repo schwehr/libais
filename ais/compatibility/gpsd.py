@@ -443,29 +443,36 @@ class Mangler(object):
       7: 'Surveyed',
       8: 'Galileo'}
 
+  # Match the output of gpsd 3.11.
   nav_statuses = {
-      0: 'under way using engine',
-      1: 'at anchor',
-      2: 'not under command',
-      3: 'restricted maneuverability',
-      4: 'constrained by her draught',
-      5: 'moored',
-      6: 'aground',
-      7: 'engaged in fishing',
-      8: 'under way sailing',
-      9: 'reserved for future amendment of navigational status for ships '
-         'carrying DG, HS, or MP, or IMO hazard or pollutant category C, '
-         'high speed craft (HSC)',
-      10: 'reserved for future amendment of navigational status for ships '
-          'carrying dangerous goods (DG), harmful substances (HS) or marine '
-          'pollutants (MP), or IMO hazard or pollutant category A, wing in '
-          'ground (WIG)',
-      11: 'power-driven vessel towing astern (regional use)',
-      12: 'power-driven vessel pushing ahead or towing alongside '
-          '(regional use)',
-      13: 'reserved for future use',
-      14: 'AIS-SART (active), MOB-AIS, EPIRB-AIS',
-      15: 'default (also used by AIS-SART, MOB-AIS and EPIRB-AIS under test)'}
+      0: 'Under way using engine',
+      1: 'At anchor',
+      2: 'Not under command',
+      3: 'Restricted manoeuverability',  # Maneuverability.
+      4: 'Constrained by her draught',
+      5: 'Moored',
+      6: 'Aground',
+      7: 'Engaged in fishing',
+      8: 'Under way sailing',
+      # Reserved for future amendment of navigational status for ships
+      # carrying DG, HS, or MP, or IMO hazard or pollutant category C,
+      # high speed craft (HSC).
+      9: 'Reserved for HSC',
+      # Reserved for future amendment of navigational status for ships
+      # carrying dangerous goods (DG), harmful substances (HS) or marine
+      # pollutants (MP), or IMO hazard or pollutant category A, wing in
+      # ground (WIG).
+      10: 'Reserved for WIG',
+      # Power-driven vessel towing astern (regional use).
+      11: 'Reserved',
+      # Power-driven vessel pushing ahead or towing alongside (regional use).
+      12: 'Reserved',
+      # Reserved for future use.
+      13: 'Reserved',
+      # AIS-SART (active), MOB-AIS, EPIRB-AIS,
+      14: 'Reserved',
+      # Default (also used by AIS-SART, MOB-AIS and EPIRB-AIS under test).
+      15: 'Not defined'}
 
   ship_types = {
       0: 'Not available (default)',
