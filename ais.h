@@ -1849,7 +1849,7 @@ class Ais23 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais23 &msg);
 
-// Class B Static Data report
+// 'H' - Class B Static Data report
 class Ais24 : public AisMsg {
  public:
   int part_num;
