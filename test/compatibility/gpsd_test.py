@@ -20,7 +20,7 @@ class GpsdTest(unittest.TestCase):
         'type': 1,
         'repeat': 0,
         'mmsi': 412371205,
-        'status': '15',
+        'status': 15,
         'status_text': 'Not defined',
         'turn': 0,
         'speed': 0.5,

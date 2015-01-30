@@ -39,7 +39,7 @@ class Mangler(object):
     res['course'] = msg['cog']
 
   def mangle__nav_status(self, res, msg):
-    res['status'] = str(msg['nav_status'])
+    res['status'] = msg['nav_status']
     res['status_text'] = self.nav_statuses[msg['nav_status']]
 
   def mangle__position_accuracy(self, res, msg):
