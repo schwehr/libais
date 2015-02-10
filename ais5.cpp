@@ -3,9 +3,10 @@
 #include "ais.h"
 
 Ais5::Ais5(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad) {
-  if (status != AIS_UNINITIALIZED)
-    return;
+    : AisMsg(nmea_payload, pad), ais_version(0), imo_num(0),
+      type_and_cargo(0), dim_a(0), dim_b(0), dim_c(0), dim_d(0),
+      fix_type(0), eta_month(0), eta_day(0), eta_hour(0), eta_minute(0),
+      draught(0.0), dte(0), spare(0) {
 
   assert(message_id == 5);
 
@@ -14,31 +15,32 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<426> bs;
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
 
-  ais_version = ubits(bs, 38, 2);
-  imo_num = ubits(bs, 40, 30);
-  callsign = ais_str(bs, 70, 42);
+  bs.SeekTo(38);
+  ais_version = bs.ToUnsignedInt(38, 2);
+  imo_num = bs.ToUnsignedInt(40, 30);
+  callsign = bs.ToString(70, 42);
 
-  name = ais_str(bs, 112, 120);
+  name = bs.ToString(112, 120);
 
-  type_and_cargo = ubits(bs, 232, 8);
-  dim_a = ubits(bs, 240, 9);
-  dim_b = ubits(bs, 249, 9);
-  dim_c = ubits(bs, 258, 6);
-  dim_d = ubits(bs, 264, 6);
-  fix_type = ubits(bs, 270, 4);
-  eta_month = ubits(bs, 274, 4);
-  eta_day = ubits(bs, 278, 5);
-  eta_hour = ubits(bs, 283, 5);
-  eta_minute = ubits(bs, 288, 6);
-  draught = ubits(bs, 294, 8) / 10.;
-  destination = ais_str(bs, 302, 120);
+  type_and_cargo = bs.ToUnsignedInt(232, 8);
+  dim_a = bs.ToUnsignedInt(240, 9);
+  dim_b = bs.ToUnsignedInt(249, 9);
+  dim_c = bs.ToUnsignedInt(258, 6);
+  dim_d = bs.ToUnsignedInt(264, 6);
+  fix_type = bs.ToUnsignedInt(270, 4);
+  eta_month = bs.ToUnsignedInt(274, 4);
+  eta_day = bs.ToUnsignedInt(278, 5);
+  eta_hour = bs.ToUnsignedInt(283, 5);
+  eta_minute = bs.ToUnsignedInt(288, 6);
+  draught = bs.ToUnsignedInt(294, 8) / 10.;
+  destination = bs.ToString(302, 120);
   dte = bs[422];
   spare = bs[423];
 

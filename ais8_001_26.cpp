@@ -6,159 +6,159 @@
 
 #include "ais.h"
 
-Ais8_1_26_Location::Ais8_1_26_Location(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_Location::Ais8_1_26_Location(const AisBitset &bs,
                                        const size_t offset) {
-  x = sbits(bs, offset, 28) / 600000.;
-  y = sbits(bs, offset + 28, 27) / 600000.;
-  z = ubits(bs, offset + 55, 11) / 10.;
-  owner = ubits(bs, offset + 66, 4);
-  timeout = ubits(bs, offset + 70, 3);
-  spare = ubits(bs, offset + 73, 12);
+  x = bs.ToInt(offset, 28) / 600000.;
+  y = bs.ToInt(offset + 28, 27) / 600000.;
+  z = bs.ToUnsignedInt(offset + 55, 11) / 10.;
+  owner = bs.ToUnsignedInt(offset + 66, 4);
+  timeout = bs.ToUnsignedInt(offset + 70, 3);
+  spare = bs.ToUnsignedInt(offset + 73, 12);
 }
 
-Ais8_1_26_Station::Ais8_1_26_Station(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_Station::Ais8_1_26_Station(const AisBitset &bs,
                                      const size_t offset) {
-  name = ais_str(bs, offset, 84);
-  spare = ubits(bs, offset + 84, 1);
+  name = bs.ToString(offset, 84);
+  spare = bs.ToUnsignedInt(offset + 84, 1);
 }
 
-Ais8_1_26_Wind::Ais8_1_26_Wind(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_Wind::Ais8_1_26_Wind(const AisBitset &bs,
                                const size_t offset) {
-  wind_speed = ubits(bs, offset, 7);
-  wind_gust  = ubits(bs, offset + 7, 7);  // knots
-  wind_dir = ubits(bs, offset + 14, 9);
-  wind_gust_dir = ubits(bs, offset + 23, 9);
-  sensor_type = ubits(bs, offset + 32, 3);
-  wind_forecast = ubits(bs, offset + 35, 7);
-  wind_gust_forecast = ubits(bs, offset + 42, 7);  // knots
-  wind_dir_forecast = ubits(bs, offset + 49, 9);
-  utc_day_forecast = ubits(bs, offset + 58, 5);
-  utc_hour_forecast = ubits(bs, offset + 63, 5);
-  utc_min_forecast = ubits(bs, offset + 68, 6);
-  duration = ubits(bs, offset + 74, 8);
-  spare = ubits(bs, offset + 82, 3);
+  wind_speed = bs.ToUnsignedInt(offset, 7);
+  wind_gust  = bs.ToUnsignedInt(offset + 7, 7);  // knots
+  wind_dir = bs.ToUnsignedInt(offset + 14, 9);
+  wind_gust_dir = bs.ToUnsignedInt(offset + 23, 9);
+  sensor_type = bs.ToUnsignedInt(offset + 32, 3);
+  wind_forecast = bs.ToUnsignedInt(offset + 35, 7);
+  wind_gust_forecast = bs.ToUnsignedInt(offset + 42, 7);  // knots
+  wind_dir_forecast = bs.ToUnsignedInt(offset + 49, 9);
+  utc_day_forecast = bs.ToUnsignedInt(offset + 58, 5);
+  utc_hour_forecast = bs.ToUnsignedInt(offset + 63, 5);
+  utc_min_forecast = bs.ToUnsignedInt(offset + 68, 6);
+  duration = bs.ToUnsignedInt(offset + 74, 8);
+  spare = bs.ToUnsignedInt(offset + 82, 3);
 }
 
-Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const AisBitset &bs,
                                            const size_t offset) {
   type = bs[offset];
-  level = sbits(bs, offset + 1, 16) / 100.;
-  trend = ubits(bs, offset + 17, 2);
-  vdatum = ubits(bs, offset + 19, 5);
-  sensor_type = ubits(bs, offset + 24, 3);
+  level = bs.ToInt(offset + 1, 16) / 100.;
+  trend = bs.ToUnsignedInt(offset + 17, 2);
+  vdatum = bs.ToUnsignedInt(offset + 19, 5);
+  sensor_type = bs.ToUnsignedInt(offset + 24, 3);
   forecast_type = bs[offset + 27];
-  level_forecast = sbits(bs, offset + 28, 16) / 100.;
-  utc_day_forecast = ubits(bs, offset + 44, 5);
-  utc_hour_forecast = ubits(bs, offset + 49, 5);
-  utc_min_forecast = ubits(bs, offset + 54, 6);
-  duration = ubits(bs, offset + 60, 8);
-  spare = ubits(bs, offset + 68, 17);
+  level_forecast = bs.ToInt(offset + 28, 16) / 100.;
+  utc_day_forecast = bs.ToUnsignedInt(offset + 44, 5);
+  utc_hour_forecast = bs.ToUnsignedInt(offset + 49, 5);
+  utc_min_forecast = bs.ToUnsignedInt(offset + 54, 6);
+  duration = bs.ToUnsignedInt(offset + 60, 8);
+  spare = bs.ToUnsignedInt(offset + 68, 17);
 }
 
-Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const AisBitset &bs,
                                    const size_t offset) {
   for (size_t idx = 0; idx < 3; idx++) {
     size_t start = offset + idx * 26;
-    currents[idx].speed = ubits(bs, start, 8) / 10.;
-    currents[idx].dir = ubits(bs, start + 8, 9);
-    currents[idx].depth = ubits(bs, start + 17, 9);
+    currents[idx].speed = bs.ToUnsignedInt(start, 8) / 10.;
+    currents[idx].dir = bs.ToUnsignedInt(start + 8, 9);
+    currents[idx].depth = bs.ToUnsignedInt(start + 17, 9);
   }
-  type = ubits(bs, offset + 78, 3);
-  spare = ubits(bs, offset + 81, 4);
+  type = bs.ToUnsignedInt(offset + 78, 3);
+  spare = bs.ToUnsignedInt(offset + 81, 4);
 }
 
-Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const AisBitset &bs,
                                    const size_t offset) {
   for (size_t idx = 0; idx < 2; idx++) {
     size_t start = offset + idx * 33;
-    currents[idx].north = ubits(bs, start, 8) / 10.;
-    currents[idx].east = ubits(bs, start + 8, 8) / 10.;
-    currents[idx].up = ubits(bs, start + 16, 8) / 10.;
-    currents[idx].depth = ubits(bs, start + 24, 9);
+    currents[idx].north = bs.ToUnsignedInt(start, 8) / 10.;
+    currents[idx].east = bs.ToUnsignedInt(start + 8, 8) / 10.;
+    currents[idx].up = bs.ToUnsignedInt(start + 16, 8) / 10.;
+    currents[idx].depth = bs.ToUnsignedInt(start + 24, 9);
   }
-  type = ubits(bs, offset + 66, 3);
-  spare = ubits(bs, offset + 69, 16);
+  type = bs.ToUnsignedInt(offset + 66, 3);
+  spare = bs.ToUnsignedInt(offset + 69, 16);
 }
 
-Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const AisBitset &bs,
                                        const size_t offset) {
   for (size_t idx = 0; idx < 2; idx++) {
     size_t start = offset + idx * 42;
-    currents[idx].bearing = ubits(bs, start, 9);
-    currents[idx].dist = ubits(bs, start + 9, 7);
-    currents[idx].speed = ubits(bs, start + 16, 8) / 10.;
-    currents[idx].dir = ubits(bs, start + 24, 9);
-    currents[idx].level = ubits(bs, start + 33, 9);
+    currents[idx].bearing = bs.ToUnsignedInt(start, 9);
+    currents[idx].dist = bs.ToUnsignedInt(start + 9, 7);
+    currents[idx].speed = bs.ToUnsignedInt(start + 16, 8) / 10.;
+    currents[idx].dir = bs.ToUnsignedInt(start + 24, 9);
+    currents[idx].level = bs.ToUnsignedInt(start + 33, 9);
   }
   spare = bs[offset + 84];
 }
 
-Ais8_1_26_SeaState::Ais8_1_26_SeaState(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_SeaState::Ais8_1_26_SeaState(const AisBitset &bs,
                                        const size_t offset) {
-  swell_height = ubits(bs, offset, 8) / 10.;
-  swell_period = ubits(bs, offset + 8, 6);
-  swell_dir = ubits(bs, offset + 14, 9);
-  sea_state = ubits(bs, offset + 23, 4);
-  swell_sensor_type = ubits(bs, offset + 27, 3);
-  water_temp = sbits(bs, offset + 30, 10) / 10.;
-  water_temp_depth = ubits(bs, offset + 40, 7) / 10.;
-  water_sensor_type = ubits(bs, offset + 47, 3);
-  wave_height = ubits(bs, offset + 50, 8) / 10.;
-  wave_period = ubits(bs, offset + 58, 6);
-  wave_dir = ubits(bs, offset + 64, 9);
-  wave_sensor_type = ubits(bs, offset + 73, 3);
-  salinity = ubits(bs, offset + 76, 9) / 10.;
+  swell_height = bs.ToUnsignedInt(offset, 8) / 10.;
+  swell_period = bs.ToUnsignedInt(offset + 8, 6);
+  swell_dir = bs.ToUnsignedInt(offset + 14, 9);
+  sea_state = bs.ToUnsignedInt(offset + 23, 4);
+  swell_sensor_type = bs.ToUnsignedInt(offset + 27, 3);
+  water_temp = bs.ToInt(offset + 30, 10) / 10.;
+  water_temp_depth = bs.ToUnsignedInt(offset + 40, 7) / 10.;
+  water_sensor_type = bs.ToUnsignedInt(offset + 47, 3);
+  wave_height = bs.ToUnsignedInt(offset + 50, 8) / 10.;
+  wave_period = bs.ToUnsignedInt(offset + 58, 6);
+  wave_dir = bs.ToUnsignedInt(offset + 64, 9);
+  wave_sensor_type = bs.ToUnsignedInt(offset + 73, 3);
+  salinity = bs.ToUnsignedInt(offset + 76, 9) / 10.;
 }
 
-Ais8_1_26_Salinity::Ais8_1_26_Salinity(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_Salinity::Ais8_1_26_Salinity(const AisBitset &bs,
                                        const size_t offset) {
-  water_temp = ubits(bs, offset, 10) / 10. - 10;
-  conductivity = ubits(bs, offset + 10, 10) / 100.;
-  pressure = ubits(bs, offset + 20, 16) / 10.;
-  salinity = ubits(bs, offset + 36, 9) / 10.;
-  salinity_type = ubits(bs, offset + 45, 2);
-  sensor_type = ubits(bs, offset + 47, 3);
-  spare[0] = ubits(bs, offset + 50, 32);
-  spare[1] = ubits(bs, offset + 82, 3);
+  water_temp = bs.ToUnsignedInt(offset, 10) / 10. - 10;
+  conductivity = bs.ToUnsignedInt(offset + 10, 10) / 100.;
+  pressure = bs.ToUnsignedInt(offset + 20, 16) / 10.;
+  salinity = bs.ToUnsignedInt(offset + 36, 9) / 10.;
+  salinity_type = bs.ToUnsignedInt(offset + 45, 2);
+  sensor_type = bs.ToUnsignedInt(offset + 47, 3);
+  spare[0] = bs.ToUnsignedInt(offset + 50, 32);
+  spare[1] = bs.ToUnsignedInt(offset + 82, 3);
 }
 
-Ais8_1_26_Wx::Ais8_1_26_Wx(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_Wx::Ais8_1_26_Wx(const AisBitset &bs,
                            const size_t offset) {
-  air_temp = sbits(bs, offset, 11) / 10.;
-  air_temp_sensor_type = ubits(bs, offset + 11, 3);
-  precip = ubits(bs, offset + 14, 2);
-  horz_vis = ubits(bs, offset + 16, 8) / 10.;
-  dew_point = sbits(bs, offset + 24, 10) / 10.;
-  dew_point_type = ubits(bs, offset + 34, 3);
-  air_pressure = (ubits(bs, offset + 37, 9) + 800) / 100.0;  // Pa.
-  air_pressure_trend = ubits(bs, offset + 46, 2);
-  air_pressor_type = ubits(bs, offset + 48, 3);
-  salinity = ubits(bs, offset + 51, 9) / 10.;
-  spare = ubits(bs, offset + 60, 25);
+  air_temp = bs.ToInt(offset, 11) / 10.;
+  air_temp_sensor_type = bs.ToUnsignedInt(offset + 11, 3);
+  precip = bs.ToUnsignedInt(offset + 14, 2);
+  horz_vis = bs.ToUnsignedInt(offset + 16, 8) / 10.;
+  dew_point = bs.ToInt(offset + 24, 10) / 10.;
+  dew_point_type = bs.ToUnsignedInt(offset + 34, 3);
+  air_pressure = (bs.ToUnsignedInt(offset + 37, 9) + 800) / 100.0;  // Pa.
+  air_pressure_trend = bs.ToUnsignedInt(offset + 46, 2);
+  air_pressor_type = bs.ToUnsignedInt(offset + 48, 3);
+  salinity = bs.ToUnsignedInt(offset + 51, 9) / 10.;
+  spare = bs.ToUnsignedInt(offset + 60, 25);
 }
 
-Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const AisBitset &bs,
                                            const size_t offset) {
-  draught = ubits(bs, offset, 13) / 100.;
-  gap = ubits(bs, offset + 13, 13) / 10.;
-  trend = ubits(bs, offset + 26, 2);
-  forecast_gap = ubits(bs, offset + 28, 13) / 10.;
-  utc_day_forecast = ubits(bs, offset + 41, 5);
-  utc_hour_forecast = ubits(bs, offset + 46, 5);
-  utc_min_forecast = ubits(bs, offset + 51, 6);
-  spare = ubits(bs, offset + 57, 28);
+  draught = bs.ToUnsignedInt(offset, 13) / 100.;
+  gap = bs.ToUnsignedInt(offset + 13, 13) / 10.;
+  trend = bs.ToUnsignedInt(offset + 26, 2);
+  forecast_gap = bs.ToUnsignedInt(offset + 28, 13) / 10.;
+  utc_day_forecast = bs.ToUnsignedInt(offset + 41, 5);
+  utc_hour_forecast = bs.ToUnsignedInt(offset + 46, 5);
+  utc_min_forecast = bs.ToUnsignedInt(offset + 51, 6);
+  spare = bs.ToUnsignedInt(offset + 57, 28);
 }
 
 Ais8_1_26_SensorReport*
-ais8_1_26_sensor_report_factory(const bitset<AIS8_MAX_BITS> &bs,
+ais8_1_26_sensor_report_factory(const AisBitset &bs,
                                 const size_t offset) {
   const Ais8_1_26_SensorEnum rpt_type =
-      (Ais8_1_26_SensorEnum)ubits(bs, offset, 4);
+      (Ais8_1_26_SensorEnum)bs.ToUnsignedInt(offset, 4);
 
   // WARNING: out of order decoding
   // Only get the report header if we can decode the type
   const size_t rpt_start = offset + 27;  // skip tp after site_id
-
+  bs.SeekTo(rpt_start);
   Ais8_1_26_SensorReport *rpt = NULL;
   switch (rpt_type) {
   case AIS8_1_26_SENSOR_LOCATION:
@@ -207,18 +207,16 @@ ais8_1_26_sensor_report_factory(const bitset<AIS8_MAX_BITS> &bs,
     return rpt;
 
   rpt->report_type = rpt_type;
-  rpt->utc_day = ubits(bs, offset + 4, 5);
-  rpt->utc_hr = ubits(bs, offset + 9, 5);
-  rpt->utc_min = ubits(bs, offset + 14, 6);
-  rpt->site_id = ubits(bs, offset + 20, 7);
+  bs.SeekTo(offset + 4);
+  rpt->utc_day = bs.ToUnsignedInt(offset + 4, 5);
+  rpt->utc_hr = bs.ToUnsignedInt(offset + 9, 5);
+  rpt->utc_min = bs.ToUnsignedInt(offset + 14, 6);
+  rpt->site_id = bs.ToUnsignedInt(offset + 20, 7);
   return rpt;
 }
 
 Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad)
     : Ais8(nmea_payload, pad) {
-  if (status != AIS_UNINITIALIZED)
-    return;
-
   assert(dac == 1);
   assert(fi == 26);
 
@@ -227,8 +225,8 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<MAX_BITS> bs;
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
@@ -241,6 +239,7 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad)
 
   for (size_t report_idx = 0; report_idx < num_sensor_reports; report_idx++) {
     const size_t start = 56 + report_idx * AIS8_1_26_REPORT_SIZE;
+    bs.SeekTo(start);
     Ais8_1_26_SensorReport *sensor = ais8_1_26_sensor_report_factory(bs, start);
     if (sensor) {
         reports.push_back(sensor);
@@ -252,6 +251,7 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad)
     status = AIS_OK;
 }
 
+// TODO(schwehr): Use unique_ptr to manage memory.
 Ais8_1_26::~Ais8_1_26() {
   for (size_t i = 0; i < reports.size(); i++) {
     delete reports[i];

@@ -1,12 +1,11 @@
 // @ - Assigned mode command
+// TODO(schwehr): Use valid flags rather than negative numbers.
 
 #include "ais.h"
 
 Ais16::Ais16(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad) {
-  if (status != AIS_UNINITIALIZED)
-    return;
-
+    : AisMsg(nmea_payload, pad), dest_mmsi_a(0), offset_a(0), inc_a(0),
+      dest_mmsi_b(0), offset_b(0), inc_b(0), spare2(0) {
   assert(message_id == 16);
 
   // 96 or 144 bits
@@ -17,31 +16,32 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<168> bs;
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
 
-  spare = ubits(bs, 38, 2);
+  bs.SeekTo(38);
+  spare = bs.ToUnsignedInt(38, 2);
 
-  dest_mmsi_a = ubits(bs, 40, 30);
-  offset_a = ubits(bs, 70, 12);
-  inc_a = ubits(bs, 82, 10);
+  dest_mmsi_a = bs.ToUnsignedInt(40, 30);
+  offset_a = bs.ToUnsignedInt(70, 12);
+  inc_a = bs.ToUnsignedInt(82, 10);
   if (num_chars == 16) {
     dest_mmsi_b = -1;
     offset_b = -1;
     inc_b = -1;
-    spare2 = ubits(bs, 92, 4);
+    spare2 = bs.ToUnsignedInt(92, 4);
 
     status = AIS_OK;
     return;
   }
 
-  dest_mmsi_b = ubits(bs, 92, 30);
-  offset_b = ubits(bs, 122, 12);
-  inc_b = ubits(bs, 134, 10);
+  dest_mmsi_b = bs.ToUnsignedInt(92, 30);
+  offset_b = bs.ToUnsignedInt(122, 12);
+  inc_b = bs.ToUnsignedInt(134, 10);
   spare2 = -1;
 
   status = AIS_OK;

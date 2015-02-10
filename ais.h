@@ -5,9 +5,10 @@
 // TODO(schwehr): create an archive of messages to do not decode.  Can
 //                libais be made to safely decode any of them?
 
-#ifndef AIS_H
-#define AIS_H
+#ifndef LIBAIS_AIS_H_
+#define LIBAIS_AIS_H_
 
+#include <array>
 #include <bitset>
 #include <cassert>
 #include <cstring>
@@ -41,11 +42,6 @@ int GetPad(const string &nmea_str);
 // Returns an empty string if there was an error.
 string GetBody(const string &nmea_str);
 
-extern bool nmea_ord_initialized;  // If false, call build_nmea_lookup
-bitset<6> Reverse(const bitset<6> &bits);
-void BuildNmeaLookup();
-
-static const int MAX_BITS = 1192;
 
 // Note: Needs to be kept in sync with AIS_STATUS_STRINGS list in ais.cpp.
 enum AIS_STATUS {
@@ -370,6 +366,8 @@ enum Dac {
   AIS_DAC_775_VENEZUELA = 775
 };
 
+class AisBitset;
+
 struct AisPoint {
   float x, y;  // TODO(schwehr): change all x, y to lng_deg, lat_deg.
 };
@@ -383,6 +381,8 @@ class AisMsg {
   // TODO(schwehr): make status private and have accessors.
   bool had_error() const {  return status != AIS_OK;  }
   AIS_STATUS get_error() const { return status; }
+
+  virtual ~AisMsg() {}
 
  protected:
   AIS_STATUS status;  // AIS_OK or error code
@@ -509,14 +509,9 @@ class Ais5 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais5 &msg);
 
-// Addessed binary message (ABM)
-const size_t AIS6_MAX_BITS = MAX_BITS;
-
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
  public:
-  static const int MAX_BITS = AIS6_MAX_BITS;
-
   int seq;  // sequence number
   int mmsi_dest;
   bool retransmit;
@@ -580,23 +575,13 @@ ostream& operator<< (ostream &o, const Ais6_1_3 &msg);
 class Ais6_1_4 : public Ais6 {
  public:
   int ack_dac;
-  int capabilities[64];
-  int cap_reserved[64];
+  std::array<int, 64> capabilities;
+  std::array<int, 64> cap_reserved;
   int spare2;
 
   Ais6_1_4(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais6_1_4 &msg);
-
-// Number of persons on board.  ITU 1371-1
-class Ais6_1_40 : public Ais6 {
- public:
-  int persons;
-  int spare2;
-
-  Ais6_1_40(const char *nmea_payload, const size_t pad);
-};
-ostream& operator<< (ostream &o, const Ais6_1_40 &msg);
 
 // IMO Circ 236 Dangerous cargo indication
 // Not to be transmitted after 2012-Jan-01
@@ -620,7 +605,8 @@ class Ais6_1_12 : public Ais6 {
 ostream& operator<< (ostream &o, const Ais6_1_12 &msg);
 
 
-struct Ais6_1_14_Window {
+class Ais6_1_14_Window {
+ public:
   float y, x;
   int utc_hour_from, utc_min_from;
   int utc_hour_to, utc_min_to;
@@ -648,7 +634,7 @@ class Ais6_1_18 : public Ais6 {
   int utc_month, utc_day, utc_hour, utc_min;
   string port_berth, dest;
   float x, y;
-  int spare2[2];  // 32 bits per spare
+  std::array<int, 2> spare2;  // 32 bits per spare
 
   Ais6_1_18(const char *nmea_payload, const size_t pad);
 };
@@ -665,7 +651,7 @@ class Ais6_1_20 : public Ais6 {
   int utc_month, utc_day, utc_hour, utc_min;
   bool services_known;
   // TODO(schwehr): enum of service types
-  int services[26];
+  std::array<int, 26> services;
   string name;
   float x, y;
 
@@ -673,8 +659,8 @@ class Ais6_1_20 : public Ais6 {
 };
 ostream& operator<< (ostream &o, const Ais6_1_20 &msg);
 
-// TODO(schwehr): Make cargo a class and set all to invalid in constructor
-struct Ais6_1_25_Cargo {
+class Ais6_1_25_Cargo {
+ public:
   int code_type;
   bool imdg_valid;  // also set with BC
   int imdg;
@@ -688,6 +674,9 @@ struct Ais6_1_25_Cargo {
   int marpol_oil;
   bool marpol_cat_valid;
   int marpol_cat;
+
+  Ais6_1_25_Cargo();
+  // TODO(schwehr): Add a constructor from an AisBitset.
 };
 
 // IMO Circ 289 Dangerous cargo indication 2
@@ -703,8 +692,7 @@ class Ais6_1_25 : public Ais6 {
 };
 ostream& operator<< (ostream &o, const Ais6_1_25 &msg);
 
-
-// TODO(schwehr): addressed sensor report 6_1_26
+// TODO(schwehr): Addressed sensor report 6_1_26.
 // TODO(schwehr): IMO Circ 289 Route information 6_1_28.
 // TODO(schwehr): IMO Circ 289 Text description 6_1_30.
 
@@ -712,12 +700,15 @@ ostream& operator<< (ostream &o, const Ais6_1_25 &msg);
 // Warning: The bit encoding for 6_1_14_Window and 6_1_32 on
 //   the wire has x and y in a different order.
 // TODO(schwehr): Reuse Ais6_1_14_Window
-struct Ais6_1_32_Window {
+class Ais6_1_32_Window {
+ public:
   float x, y;
   int from_utc_hour, from_utc_min;
   int to_utc_hour, to_utc_min;
   int cur_dir;
   float cur_speed;  // knots
+
+  Ais6_1_32_Window();
 };
 
 
@@ -732,6 +723,15 @@ class Ais6_1_32 : public Ais6 {
 };
 ostream& operator<< (ostream &o, const Ais6_1_32 &msg);
 
+// Number of persons on board.  ITU 1371-1
+class Ais6_1_40 : public Ais6 {
+ public:
+  int persons;
+  int spare2;
+
+  Ais6_1_40(const char *nmea_payload, const size_t pad);
+};
+ostream& operator<< (ostream &o, const Ais6_1_40 &msg);
 
 //////////////////////////////////////////////////////////////////////
 
@@ -747,8 +747,6 @@ class Ais7_13 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais7_13 &msg);
 
-const size_t AIS8_MAX_BITS = 1192;
-
 // AIS Binary Broadcast message ... parent to many
 class Ais8 : public AisMsg {
  public:
@@ -759,6 +757,7 @@ class Ais8 : public AisMsg {
 
   // TODO(schwehr): make Ais8 protected
   Ais8(const char *nmea_payload, const size_t pad);
+
  protected:
   Ais8() {}
 };
@@ -831,12 +830,21 @@ ostream& operator<< (ostream &o, const Ais8_1_11 &msg);
 // IMO Circ 236 Fairway closed - Not to be transmitted after 2012-Jan-01
 class Ais8_1_13 : public Ais8 {
  public:
-  string reason, location_from, location_to;
+  string reason;
+  string location_from;
+  string location_to;
   int radius;
   int units;
   // TODO(schwehr): utc?  warning: day/month out of order
-  int day_from, month_from, hour_from, minute_from;
-  int day_to, month_to, hour_to, minute_to;
+  int day_from;
+  int month_from;
+  int hour_from;
+  int minute_from;
+
+  int day_to;
+  int month_to;
+  int hour_to;
+  int minute_to;
   int spare2;
 
   Ais8_1_13(const char *nmea_payload, const size_t pad);
@@ -864,7 +872,8 @@ class Ais8_1_16 : public Ais8 {
 };
 ostream& operator<< (ostream &o, const Ais8_1_16 &msg);
 
-struct Ais8_1_17_Target {
+class Ais8_1_17_Target {
+ public:
   int type;
   string id;
   int spare;
@@ -872,6 +881,8 @@ struct Ais8_1_17_Target {
   int cog;
   int timestamp;
   int sog;
+
+  Ais8_1_17_Target();
 };
 
 // IMO Circ 236 VTS Generated/synthetic targets
@@ -893,9 +904,10 @@ class Ais8_1_19 : public Ais8 {
   float x, y;  // funny bit count
   int status;
   int signal;
-  int utc_hour_next, utc_min_next;
+  int utc_hour_next;
+  int utc_min_next;
   int next_signal;
-  int spare2[4];
+  std::array<int, 4> spare2;
 
   Ais8_1_19(const char *nmea_payload, const size_t pad);
 };
@@ -987,17 +999,20 @@ class Ais8_1_24 : public Ais8 {
  public:
   int link_id;
   float air_draught;  // m
-  string last_port, next_ports[2];
+  string last_port;
+  std::array<std::string, 2> next_ports;
 
   // TODO(schwehr): enum list of param types
-  int solas_status[26];  // 0 NA, 1 operational, 2 SNAFU, 3 no data
+  std::array<int, 26> solas_status;  // 0 NA, 1 operational, 2 SNAFU, 3 no data
   int ice_class;
   int shaft_power;  // horses
   int vhf;
   string lloyds_ship_type;
   int gross_tonnage;
   int laden_ballast;
-  int heavy_oil, light_oil, diesel;
+  int heavy_oil;
+  int light_oil;
+  int diesel;
   int bunker_oil;  // tonnes
   int persons;
   int spare2;
@@ -1041,7 +1056,7 @@ class Ais8_1_26_SensorReport {
 };
 
 Ais8_1_26_SensorReport*
-ais8_1_26_sensor_report_factory(const bitset<AIS8_MAX_BITS> &bs,
+ais8_1_26_sensor_report_factory(const AisBitset &bs,
                                 const size_t offset);
 
 class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
@@ -1050,7 +1065,7 @@ class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
   int owner, timeout;
   int spare;
 
-  Ais8_1_26_Location(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Location(const AisBitset &bs, const size_t offset);
   Ais8_1_26_Location() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_LOCATION;}
 };
@@ -1060,7 +1075,7 @@ class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
   string name;
   int spare;
 
-  Ais8_1_26_Station(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Station(const AisBitset &bs, const size_t offset);
   Ais8_1_26_Station() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_STATION;}
 };
@@ -1076,7 +1091,7 @@ class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
   int duration;
   int spare;
 
-  Ais8_1_26_Wind(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Wind(const AisBitset &bs, const size_t offset);
   Ais8_1_26_Wind() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WIND;}
 };
@@ -1096,12 +1111,13 @@ class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
   int duration;  // minutes
   int spare;
 
-  Ais8_1_26_WaterLevel(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_WaterLevel(const AisBitset &bs, const size_t offset);
   Ais8_1_26_WaterLevel() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WATER_LEVEL;}
 };
 
-struct Ais8_1_26_Curr2D_Current {
+class Ais8_1_26_Curr2D_Current {
+ public:
   float speed;  // knots
   int dir;
   int depth;  // m
@@ -1113,12 +1129,13 @@ class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
   int type;
   int spare;
 
-  Ais8_1_26_Curr2D(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Curr2D(const AisBitset &bs, const size_t offset);
   Ais8_1_26_Curr2D() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_2D;}
 };
 
-struct Ais8_1_26_Curr3D_Current {
+class Ais8_1_26_Curr3D_Current {
+ public:
   float north, east, up;
   int depth;  // m
 };
@@ -1129,12 +1146,13 @@ class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
   int type;
   int spare;
 
-  Ais8_1_26_Curr3D(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Curr3D(const AisBitset &bs, const size_t offset);
   Ais8_1_26_Curr3D() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_3D;}
 };
 
-struct Ais8_1_26_HorzFlow_Current {
+class Ais8_1_26_HorzFlow_Current {
+ public:
   int bearing, dist;  // deg, m
   float speed;  // knots
   int dir, level;  // deg, m
@@ -1145,7 +1163,7 @@ class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
   Ais8_1_26_HorzFlow_Current currents[2];
   int spare;
 
-  Ais8_1_26_HorzFlow(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_HorzFlow(const AisBitset &bs, const size_t offset);
   Ais8_1_26_HorzFlow() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_HORZ_FLOW;}
 };
@@ -1163,7 +1181,7 @@ class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
   int wave_sensor_type;
   float salinity;
 
-  Ais8_1_26_SeaState(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_SeaState(const AisBitset &bs, const size_t offset);
   Ais8_1_26_SeaState() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SEA_STATE;}
 };
@@ -1178,7 +1196,7 @@ class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
   int sensor_type;
   int spare[2];
 
-  Ais8_1_26_Salinity(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Salinity(const AisBitset &bs, const size_t offset);
   Ais8_1_26_Salinity() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SALINITY;}
 };
@@ -1197,7 +1215,7 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
   float salinity;  // 0/00 ppt
   int spare;
 
-  Ais8_1_26_Wx(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_Wx(const AisBitset &bs, const size_t offset);
   Ais8_1_26_Wx() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WX;}
 };
@@ -1209,7 +1227,7 @@ class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
   int utc_day_forecast, utc_hour_forecast, utc_min_forecast;
   int spare;
 
-  Ais8_1_26_AirDraught(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_1_26_AirDraught(const AisBitset &bs, const size_t offset);
   Ais8_1_26_AirDraught() {}
   Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_AIR_DRAUGHT;}
 };
@@ -1229,8 +1247,12 @@ ostream& operator<< (ostream &o, const Ais8_1_26 &msg);
 class Ais8_1_27 : public Ais8 {
  public:
   int link_id;
-  int sender_type, route_type;
-  int utc_month, utc_day, utc_hour, utc_min;
+  int sender_type;
+  int route_type;
+  int utc_month;
+  int utc_day;
+  int utc_hour;
+  int utc_min;
   int duration;
   vector<AisPoint> waypoints;
 
@@ -1318,7 +1340,10 @@ class Ais8_200_10 : public Ais8 {
   int haz_cargo;
   float draught;
   int loaded;
-  int speed_qual, course_qual, heading_qual;  // sensor quality
+  // Sensor quality.
+  int speed_qual;
+  int course_qual;
+  int heading_qual;
   int spare2;
 
   Ais8_200_10(const char *nmea_payload, const size_t pad);
@@ -1350,8 +1375,8 @@ class Ais8_200_23 : public Ais8 {
 class Ais8_200_24 : public Ais8 {
  public:
   string country;
-  int gauge_ids[4];
-  float levels[4];  // m
+  std::array<int, 4> gauge_ids;
+  std::array<float, 4> levels;  // m
 
   Ais8_200_24(const char *nmea_payload, const size_t pad);
 };
@@ -1375,8 +1400,8 @@ class Ais8_200_55 : public Ais8 {
  public:
   int crew;
   int passengers;
-  int yet_more_personnel;  // WTF?  Like a maid or waiter?
-  int spare2[3];  // JERKS... why 51 spare bits?
+  int yet_more_personnel;
+  std::array<int, 3> spare2;  // 51 spare bits.
 
   Ais8_200_55(const char *nmea_payload, const size_t pad);
 };
@@ -1402,7 +1427,7 @@ class Ais8_366_22_SubArea {
 };
 
 Ais8_366_22_SubArea*
-ais8_366_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
+ais8_366_22_subarea_factory(const AisBitset &bs,
                             const size_t offset);
 
 // or Point if radius is 0
@@ -1413,7 +1438,7 @@ class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
     int radius_m;
     unsigned int spare;
 
-    Ais8_366_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Circle(const AisBitset &bs, const size_t offset);
     ~Ais8_366_22_Circle() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_CIRCLE;}
 };
@@ -1427,7 +1452,7 @@ class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
     int orient_deg;  // Orientation in degrees from true north
     unsigned int spare;  // 5 bits
 
-    Ais8_366_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Rect(const AisBitset &bs, const size_t offset);
     ~Ais8_366_22_Rect() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_RECT;}
 };
@@ -1441,7 +1466,7 @@ class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
     int right_bound_deg;
     // TODO(schwehr): spare?
 
-    Ais8_366_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Sector(const AisBitset &bs, const size_t offset);
     ~Ais8_366_22_Sector() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_SECTOR;}
 };
@@ -1458,7 +1483,7 @@ class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
     vector<float> dists_m;
     unsigned int spare;
 
-    Ais8_366_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Polyline(const AisBitset &bs, const size_t offset);
     ~Ais8_366_22_Polyline() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYLINE;}
 };
@@ -1473,7 +1498,7 @@ class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
     vector<float> dists_m;
     unsigned int spare;
 
-    Ais8_366_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Polygon(const AisBitset &bs, const size_t offset);
     ~Ais8_366_22_Polygon() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYGON;}
 };
@@ -1483,7 +1508,7 @@ class Ais8_366_22_Text : public Ais8_366_22_SubArea {
     string text;
     unsigned int spare;  // 3 bits
 
-    Ais8_366_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+    Ais8_366_22_Text(const AisBitset &bs, const size_t offset);
     ~Ais8_366_22_Text() {}
     Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_TEXT;}
 };
@@ -1956,84 +1981,57 @@ class Ais27 : public AisMsg {
 ostream& operator<< (ostream &o, const Ais27 &msg);
 
 //////////////////////////////////////////////////////////////////////
-// Support templates for decoding
+// Support class for decoding
 //////////////////////////////////////////////////////////////////////
+static const int MAX_BITS = 1192;
 
-extern bitset<6> nmea_ord[128];
+class AisBitset : protected bitset<MAX_BITS> {
+ public:
+  AisBitset();
 
-template<size_t T>
-AIS_STATUS aivdm_to_bits(bitset<T> &bits, const char *nmea_payload) {
-  assert(nmea_payload);
-  if (strlen(nmea_payload) > T/6) {
-#ifndef NDEBUG
-    std::cerr << "ERROR: message longer than max allowed size (" << T/6
-              << "): found " << strlen(nmea_payload) << " characters in "
-              << nmea_payload << std::endl;
-#endif
-    return AIS_ERR_MSG_TOO_LONG;
-  }
-  for (size_t idx = 0; nmea_payload[idx] != '\0' && idx < T/6; idx++) {
-    int c = static_cast<int>(nmea_payload[idx]);
-    if (c < 48 || c > 119 || (c >= 88 && c <= 95)) {
-      return AIS_ERR_BAD_NMEA_CHR;
-    }
-    const bitset<6> bs_for_char = nmea_ord[ c ];
-    for (size_t offset = 0; offset < 6; offset++) {
-      bits[idx*6 + offset] = bs_for_char[offset];
-    }
-  }
-  return AIS_OK;
-}
+  AIS_STATUS ParseNmeaPayload(const char *nmea_payload, int pad);
 
-// TODO(schwehr): turn ubits, sbits, and ais_str into a helper class.
-template<size_t T>
-unsigned int ubits(const bitset<T> &bits,
-                   const size_t start,
-                   const size_t len) {
-  assert(len <= 32);
-  assert(start + len <= T);
-  bitset<32> bs_tmp;
-  for (size_t i = 0; i < len; i++)
-    bs_tmp[i] = bits[start + len - i - 1];
-  return bs_tmp.to_ulong();
-}
+  int GetNumBits() const { return num_bits; }
+  int GetNumChars() const { return num_chars; }
+  int GetRemaining() const { return num_bits - current_position; }
 
-// TODO(schwehr): do not use long
-typedef union {
-  long long_val;
-  unsigned long ulong_val;
-} long_union;
+  const AisBitset& SeekRelative(int d) const;
+  const AisBitset& SeekTo(size_t pos) const;
 
-template<size_t T>
-int sbits(bitset<T> bs, const size_t start, const size_t len) {
-  assert(len <= 32);
-  assert(start + len <= T);  // TODO(schwehr):  should it just be < ?
-  bitset<32> bs32;
-  // pad 1's to the left if negative
-  if (len < 32 && 1 == bs[start] ) bs32.flip();
+  bool operator[](size_t pos) const;
 
-  for (size_t i = 0; i < len; i++)
-    bs32[i] = bs[start + len - i - 1];
+  unsigned int ToUnsignedInt(const size_t start, const size_t len) const;
+  int ToInt(const size_t start, const size_t len) const;
+  string ToString(const size_t start, const size_t len) const;
 
-  long_union val;
-  val.ulong_val = bs32.to_ulong();
-  return val.long_val;
-}
+  // Visible for testing.
+  static bitset<6> Reverse(const bitset<6> &bits);
 
-extern const char bits_to_char_tbl[];
+ protected:
+  // TODO(schwehr): do not use long
+  typedef union {
+    long long_val;
+    unsigned long ulong_val;
+  } long_union;
 
-template<size_t T>
-const string ais_str(const bitset<T> &bits, const size_t start,
-                     const size_t len) {
-  assert(start + len < T);
-  assert(len % 6 == 0);
-  const size_t num_char = len / 6;
-  string result(num_char, '@');
-  for (size_t char_idx = 0; char_idx < num_char; char_idx++) {
-    const int char_num = ubits(bits, start + char_idx*6, 6);
-    result[char_idx] = bits_to_char_tbl[char_num];
-  }
-  return result;
-}
+  int num_bits;
+  int num_chars;
 
-#endif  // AIS_H_
+  static bool nmea_ord_initialized_;
+  static bitset<6> nmea_ord_[128];
+  static const char bits_to_char_tbl_[];
+
+  static void InitNmeaOrd();
+
+ private:
+  // This will help uncover dicontinuities when querying sequential bits, i.e.
+  // when we query a bit sequence that is not in direct succession of the
+  // previous one. In the future, we may use this to automatically determine
+  // the next read location.
+  // This field is also used to determine the number of remaining bits after the
+  // last read position.
+  mutable int current_position;
+};
+
+
+#endif  // LIBAIS_AIS_H_

@@ -3,10 +3,10 @@
 #include "ais.h"
 
 Ais19::Ais19(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad) {
-  if (status != AIS_UNINITIALIZED)
-    return;
-
+    : AisMsg(nmea_payload, pad), spare(0), sog(0.0), position_accuracy(0),
+      cog(0.0), true_heading(0), timestamp(0), spare2(0), type_and_cargo(0),
+      dim_a(0), dim_b(0), dim_c(0), dim_d(0), fix_type(0), raim(false), dte(0),
+      assigned_mode(0), spare3(0) {
   assert(message_id == 19);
 
   if (pad != 0 || num_chars != 52) {
@@ -14,38 +14,39 @@ Ais19::Ais19(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<312> bs;
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
 
-  spare = ubits(bs, 38, 8);
-  sog = ubits(bs, 46, 10) / 10.;
+  bs.SeekTo(38);
+  spare = bs.ToUnsignedInt(38, 8);
+  sog = bs.ToUnsignedInt(46, 10) / 10.;
 
   position_accuracy = bs[56];
-  x = sbits(bs, 57, 28) / 600000.;
-  y = sbits(bs, 85, 27) / 600000.;
+  x = bs.ToInt(57, 28) / 600000.;
+  y = bs.ToInt(85, 27) / 600000.;
 
-  cog = ubits(bs, 112, 12) / 10.;
-  true_heading = ubits(bs, 124, 9);
-  timestamp = ubits(bs, 133, 6);
-  spare2 = ubits(bs, 139, 4);
+  cog = bs.ToUnsignedInt(112, 12) / 10.;
+  true_heading = bs.ToUnsignedInt(124, 9);
+  timestamp = bs.ToUnsignedInt(133, 6);
+  spare2 = bs.ToUnsignedInt(139, 4);
 
-  name = ais_str(bs, 143, 120);
+  name = bs.ToString(143, 120);
 
-  type_and_cargo = ubits(bs, 263, 8);
-  dim_a = ubits(bs, 271, 9);
-  dim_b = ubits(bs, 280, 9);
-  dim_c = ubits(bs, 289, 6);
-  dim_d = ubits(bs, 295, 6);
+  type_and_cargo = bs.ToUnsignedInt(263, 8);
+  dim_a = bs.ToUnsignedInt(271, 9);
+  dim_b = bs.ToUnsignedInt(280, 9);
+  dim_c = bs.ToUnsignedInt(289, 6);
+  dim_d = bs.ToUnsignedInt(295, 6);
 
-  fix_type = ubits(bs, 301, 4);
+  fix_type = bs.ToUnsignedInt(301, 4);
   raim = bs[305];
   dte = bs[306];
   assigned_mode = bs[307];
-  spare3 = ubits(bs, 308, 4);
+  spare3 = bs.ToUnsignedInt(308, 4);
 
   status = AIS_OK;
 }

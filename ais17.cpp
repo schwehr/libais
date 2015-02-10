@@ -9,10 +9,8 @@
 #include "ais.h"
 
 Ais17::Ais17(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad) {
-  if (status != AIS_UNINITIALIZED)
-    return;
-
+    : AisMsg(nmea_payload, pad), spare(0), spare2(0), gnss_type(0), z_cnt(0),
+      station(0), seq(0) {
   assert(message_id == 17);
 
   if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) {
@@ -20,18 +18,19 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<816> bs;
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
 
-  spare = ubits(bs, 38, 2);
+  bs.SeekTo(38);
+  spare = bs.ToUnsignedInt(38, 2);
 
-  x = sbits(bs, 40, 18) / 600.;
-  y = sbits(bs, 58, 17) / 600.;
-  spare2 = ubits(bs, 75, 5);
+  x = bs.ToInt(40, 18) / 600.;
+  y = bs.ToInt(58, 17) / 600.;
+  spare2 = bs.ToUnsignedInt(75, 5);
 
   // Spec states that there might be no data.
   if (num_bits == 80) {
@@ -39,61 +38,16 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  gnss_type = ubits(bs, 80, 6);
-  station = ubits(bs, 86, 10);
-  z_cnt = ubits(bs, 96, 13);
-  seq = ubits(bs, 109, 3);
-#if 0
-  // TODO(schwehr): work in progress
-  const unsigned int n = ubits(bs, 112, 5);
-#endif
-  health = ubits(bs, 117, 3);
+  gnss_type = bs.ToUnsignedInt(80, 6);
+  station = bs.ToUnsignedInt(86, 10);
+  z_cnt = bs.ToUnsignedInt(96, 13);
+  seq = bs.ToUnsignedInt(109, 3);
+  bs.SeekRelative(5);
+  health = bs.ToUnsignedInt(117, 3);
 
-#if 0
-  // TODO(schwehr): work in progress
+  // TODO(schwehr): Implement parsing the payload.
 
-  // 2 of the n used above
-  const size_t remain_bits = num_bits - 120;
-
-  switch (gnss_type) {
-  case 1:  // FALLTHROUGH
-    // Differential GNSS corrections (full set of satellites)
-  case 9:  // Subset differential GNSS corrections
-    if (n - 2 != (remain_bits / (24 + 16))) {
-      std::cerr << "WARNING: Bad bit count\n";
-    }
-    std::cout << "17: bits remain: " << num_bits - 120 << " n: " << n << "\n";
-    for (size_t i = 0; i < n - 2; i++) {
-      const size_t start = 120 + i * (24 + 16);
-      std::cout << "\tscale: " << ubits(bs, start + 0, 1) << "\n";
-      std::cout << "\tudre: " << ubits(bs, start + 1, 2) << "\n";
-      std::cout << "\tsat_id: " << ubits(bs, start + 3, 5) << "\n";
-      std::cout << "\tpseudorange_cor: " << ubits(bs, start + 8, 16) << "\n";
-      std::cout << "\trate_cor: " << ubits(bs, start + 24, 8) << "\n";
-      std::cout << "\tissue: " << ubits(bs, start + 32, 8) << "\n\n";
-    }
-    break;
-  case 3:  // Reference station parameters (GPS)
-  case 4:  // Reference station datum
-  case 5:  // Constallation health
-  case 6:  // Null frame
-  case 7:  // Ceacon almanac
-  case 16:  // Special message - text
-  case 27:  // GPS or GLONASS - Radio Beacon almanac
-  case 31:  // Might match GPS 1 - Differential GLONASS
-  case 34:  // Might match GPS 6 - Differential GLONASS - same as 31
-  case 32:  // Might match GPS 3 - Ref station GLONASS
-  case 33:  // Might match GPS 5 - Constellation health GLONASS
-  case 35:  // Might match GPS 7 - Beacon almanac (GLONASS)
-  case 36:  // Might match GPS 16 - Special GLONASS MESSAGE
-    status = AIS_ERR_MSG_SUB_NOT_IMPLEMENTED;
-    break;
-  default:
-    status = AIS_ERR_BAD_SUB_MSG;
-  }
-#endif
-
-  status = AIS_OK;  // TODO(schwehr): not really okay yet
+  status = AIS_OK;  // TODO(schwehr): not really okay yet.
 }
 
 

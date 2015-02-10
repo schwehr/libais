@@ -3,9 +3,7 @@
 #include "ais.h"
 
 Ais14::Ais14(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad) {
-  if (status != AIS_UNINITIALIZED)
-    return;
+    : AisMsg(nmea_payload, pad), spare(0), expected_num_spare_bits(0) {
 
   assert(message_id == 14);
 
@@ -14,17 +12,18 @@ Ais14::Ais14(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<1008> bs;  // 424 + 2 spare bits => 71 characters
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;  // 424 + 2 spare bits => 71 characters
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
 
-  spare = ubits(bs, 38, 2);
+  bs.SeekTo(38);
+  spare = bs.ToUnsignedInt(38, 2);
 
   const int num_char = (num_bits - 40) / 6;
-  text = ais_str(bs, 40, num_char * 6);
+  text = bs.ToString(40, num_char * 6);
   expected_num_spare_bits = num_bits - 40 - num_char*60;
   // TODO(schwehr): fix processing of spare bits if any
 

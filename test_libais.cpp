@@ -33,9 +33,6 @@ void ASSERT_EQ(const bool a, const bool b, const int line) {
 }
 
 int main(UNUSED int argc, UNUSED char* argv[]) {
-  BuildNmeaLookup();
-
-
   if (true) {
     {
       // !AIVDM,1,1,,B,15Mq4J0P01EREODRv4@74gv00HRq,0*72,b003669970,1272412824
@@ -64,10 +61,6 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
       ASSERT_EQ(m.slot_timeout_valid, true, __LINE__);
       ASSERT_EQ(m.slot_timeout, 6, __LINE__);
       ASSERT_EQ(m.had_error(), false, __LINE__);
-    }
-    {
-      Ais1_2_3 m("", 0);
-      ASSERT_EQ(m.had_error(), true, __LINE__);
     }
 
     // !AIVDM,1,1,,B,1EN2?oWP00ER5SLRvNPi9gwl0000,0*51,b003669970,1272412824

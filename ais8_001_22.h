@@ -11,8 +11,8 @@
   extend the message class to separately reassemble that polyline and polygon.
  */
 
-#ifndef LIBAIS_AIS8_001_22_H_
-#define LIBAIS_AIS8_001_22_H_
+#ifndef THIRD_PARTY_LIBAIS_AIS8_001_22_H_
+#define THIRD_PARTY_LIBAIS_AIS8_001_22_H_
 
 const size_t AIS8_001_22_NUM_NAMES = 128;
 const size_t AIS8_001_22_SUBAREA_SIZE = 87;
@@ -43,7 +43,7 @@ class Ais8_001_22_SubArea {
 };
 
 Ais8_001_22_SubArea*
-ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
+ais8_001_22_subarea_factory(const AisBitset &bs,
                             const size_t offset);
 
 // or Point if radius is 0
@@ -55,7 +55,7 @@ class Ais8_001_22_Circle : public Ais8_001_22_SubArea {
   int radius_m;
   unsigned int spare;  // 18 bits.
 
-  Ais8_001_22_Circle(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_001_22_Circle(const AisBitset &bs, const size_t offset);
   ~Ais8_001_22_Circle() {}
   Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_CIRCLE;}
 };
@@ -69,7 +69,7 @@ class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
   int orient_deg;  // Orientation in degrees from true north.
   unsigned int spare;  // 5 bits.
 
-  Ais8_001_22_Rect(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_001_22_Rect(const AisBitset &bs, const size_t offset);
   ~Ais8_001_22_Rect() {}
   Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_RECT;}
 };
@@ -83,7 +83,7 @@ class Ais8_001_22_Sector : public Ais8_001_22_SubArea {
   int left_bound_deg;
   int right_bound_deg;
 
-  Ais8_001_22_Sector(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_001_22_Sector(const AisBitset &bs, const size_t offset);
   ~Ais8_001_22_Sector() {}
   Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_SECTOR;}
 };
@@ -100,7 +100,7 @@ class Ais8_001_22_Polyline : public Ais8_001_22_SubArea {
   vector<float> dists_m;
   unsigned int spare;  // 2 bit.
 
-  Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_001_22_Polyline(const AisBitset &bs, const size_t offset);
   ~Ais8_001_22_Polyline() {}
   Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYLINE;}
 };
@@ -116,7 +116,7 @@ class Ais8_001_22_Polygon : public Ais8_001_22_SubArea {
   vector<float> dists_m;
   unsigned int spare;  // 2 bit
 
-  Ais8_001_22_Polygon(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_001_22_Polygon(const AisBitset &bs, const size_t offset);
   ~Ais8_001_22_Polygon() {}
   Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_POLYGON;}
 };
@@ -127,7 +127,7 @@ class Ais8_001_22_Text : public Ais8_001_22_SubArea {
   string text;
   // TODO(schwehr): spare?
 
-  Ais8_001_22_Text(const bitset<AIS8_MAX_BITS> &bs, const size_t offset);
+  Ais8_001_22_Text(const AisBitset &bs, const size_t offset);
   ~Ais8_001_22_Text() {}
   Ais8_001_22_AreaShapeEnum getType() const {return AIS8_001_22_SHAPE_TEXT;}
 };
@@ -163,4 +163,4 @@ class Ais8_001_22 : public Ais8 {
 };
 ostream& operator<< (ostream& o, Ais8_001_22 const& msg);
 
-#endif  // LIBAIS_AIS8_001_22_H_
+#endif  // THIRD_PARTY_LIBAIS_AIS8_001_22_H_

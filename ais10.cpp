@@ -3,9 +3,7 @@
 #include "ais.h"
 
 Ais10::Ais10(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad) {
-  if (status != AIS_UNINITIALIZED)
-    return;
+    : AisMsg(nmea_payload, pad), spare(0), dest_mmsi(0), spare2(0) {
 
   assert(message_id == 10);
 
@@ -14,16 +12,17 @@ Ais10::Ais10(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<72> bs;
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
 
-  spare = ubits(bs, 38, 2);
-  dest_mmsi = ubits(bs, 40, 30);
-  spare2 = ubits(bs, 70, 2);
+  bs.SeekTo(38);
+  spare = bs.ToUnsignedInt(38, 2);
+  dest_mmsi = bs.ToUnsignedInt(40, 30);
+  spare2 = bs.ToUnsignedInt(70, 2);
 
   status = AIS_OK;
 }

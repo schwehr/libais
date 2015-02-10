@@ -3,9 +3,8 @@
 #include "ais.h"
 
 Ais12::Ais12(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad) {
-  if (status != AIS_UNINITIALIZED)
-    return;
+    : AisMsg(nmea_payload, pad), seq_num(0), dest_mmsi(0), retransmitted(false),
+      spare(0) {
 
   assert(message_id == 12);
 
@@ -16,20 +15,21 @@ Ais12::Ais12(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<MAX_BITS> bs;  // Spec says 1008
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;  // Spec says 1008
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
 
-  seq_num = ubits(bs, 38, 2);
-  dest_mmsi = ubits(bs, 40, 30);
+  bs.SeekTo(38);
+  seq_num = bs.ToUnsignedInt(38, 2);
+  dest_mmsi = bs.ToUnsignedInt(40, 30);
   retransmitted = bs[70];
   spare = bs[71];
   const int num_txt = (num_bits - 72) / 6;
   const int num_txt_bits = num_txt * 6;
-  text = ais_str(bs, 72, num_txt_bits);
+  text = bs.ToString(72, num_txt_bits);
   // TODO(schwehr): watch for trailing spares
 
   status = AIS_OK;

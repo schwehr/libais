@@ -3,10 +3,8 @@
 #include "ais.h"
 
 Ais25::Ais25(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad) {
-  if (status != AIS_UNINITIALIZED)
-    return;
-
+    : AisMsg(nmea_payload, pad), use_app_id(false),  dest_mmsi_valid(false),
+      dest_mmsi(false), dac(0), fi(0) {
   assert(message_id == 25);
 
   if (num_bits < 40 || num_bits > 168) {
@@ -14,28 +12,29 @@ Ais25::Ais25(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<168> bs;
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
 
+  bs.SeekTo(38);
   const bool addressed = bs[38];
   use_app_id = bs[39];
   if (addressed) {
     dest_mmsi_valid = true;
-    dest_mmsi = ubits(bs, 40, 30);
+    dest_mmsi = bs.ToUnsignedInt(40, 30);
     if (use_app_id) {
-      dac = ubits(bs, 70, 10);
-      fi = ubits(bs, 80, 6);
+      dac = bs.ToUnsignedInt(70, 10);
+      fi = bs.ToUnsignedInt(80, 6);
     }
     // TODO(schwehr): Handle the payloads.
   } else {
     // broadcast
     if (use_app_id) {
-      dac = ubits(bs, 40, 10);
-      fi = ubits(bs, 50, 6);
+      dac = bs.ToUnsignedInt(40, 10);
+      fi = bs.ToUnsignedInt(50, 6);
     }
     // TODO(schwehr): Handle the payloads.
   }

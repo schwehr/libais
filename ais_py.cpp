@@ -2696,8 +2696,7 @@ PyObject *module = Py_InitModule("_ais", ais_methods);
     INITERROR;
   }
 
-  // Initialize the lookuptable and exception
-  BuildNmeaLookup();
+  // Initialize exception
   ais_py_exception = PyErr_NewException(const_cast<char *>("ais.decode.error"),
                                         NULL, NULL);
 

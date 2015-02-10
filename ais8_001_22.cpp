@@ -149,107 +149,112 @@ static int scale_multipliers[4] = {1, 10, 100, 1000};
 // Sub-Areas for the Area Notice class
 //////////////////////////////////////////////////////////////////////
 
-static void decode_xy(const bitset<AIS8_MAX_BITS> &bs, const size_t offset,
+// TODO(olafsinram): Deprecate in favor of AisPoint.
+static void decode_xy(const AisBitset &bs, const size_t offset,
                       float &x, float &y) {
     // Offset is the start of the sub area.  Same as the caller's offset
     // This is the same for all but the text subarea
-    // OLD Nav 55: sbits(bs, offset + 5, 28) / 600000.;
-  x = sbits(bs, offset + 5, 25) / 60000.;
-  y = sbits(bs, offset + 30, 24) / 60000.;
+    // OLD Nav 55: bs.ToInt(offset + 5, 28) / 600000.;
+  x = bs.ToInt(offset, 25) / 60000.;
+  y = bs.ToInt(offset + 25, 24) / 60000.;
 }
 
-Ais8_001_22_Circle::Ais8_001_22_Circle(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_001_22_Circle::Ais8_001_22_Circle(const AisBitset &bs,
                                        const size_t offset) {
-  const int scale_factor = ubits(bs, offset + 3, 2);
-  decode_xy(bs, offset, x, y);
-  precision = ubits(bs, offset + 54, 3);  // useless
-  radius_m  = ubits(bs, offset + 57, 12) * scale_multipliers[scale_factor];
-  spare     = ubits(bs, offset + 69, 18);
+  const int scale_factor = bs.ToUnsignedInt(offset, 2);
+  decode_xy(bs, offset + 2, x, y);
+  precision = bs.ToUnsignedInt(offset + 51, 3);  // useless
+  radius_m  = bs.ToUnsignedInt(offset + 54, 12) * scale_multipliers[scale_factor];
+  spare     = bs.ToUnsignedInt(offset + 66, 18);
 }
 
-Ais8_001_22_Rect::Ais8_001_22_Rect(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_001_22_Rect::Ais8_001_22_Rect(const AisBitset &bs,
                                    const size_t offset) {
-  const int scale_factor = ubits(bs, offset + 3, 2);
-  decode_xy(bs, offset, x, y);
+  const int scale_factor = bs.ToUnsignedInt(offset, 2);
+  decode_xy(bs, offset + 2, x, y);
 
-  precision  = ubits(bs, offset + 54, 3);  // useless
-  e_dim_m    = ubits(bs, offset + 57, 8) * scale_multipliers[scale_factor];
-  n_dim_m    = ubits(bs, offset + 65, 8) * scale_multipliers[scale_factor];
-  orient_deg = ubits(bs, offset + 73, 9);
-  spare      = ubits(bs, offset + 82, 5);
+  precision  = bs.ToUnsignedInt(offset + 51, 3);  // useless
+  e_dim_m    = bs.ToUnsignedInt(offset + 54, 8) * scale_multipliers[scale_factor];
+  n_dim_m    = bs.ToUnsignedInt(offset + 62, 8) * scale_multipliers[scale_factor];
+  orient_deg = bs.ToUnsignedInt(offset + 70, 9);
+  spare      = bs.ToUnsignedInt(offset + 79, 5);
 }
 
-Ais8_001_22_Sector::Ais8_001_22_Sector(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_001_22_Sector::Ais8_001_22_Sector(const AisBitset &bs,
                                        const size_t offset) {
-  const int scale = ubits(bs, offset + 3, 2);
-  decode_xy(bs, offset, x, y);
+  const int scale = bs.ToUnsignedInt(offset, 2);
+  decode_xy(bs, offset + 2, x, y);
 
-  precision       = ubits(bs, offset + 54, 3);
-  radius_m        = ubits(bs, offset + 57, 12) * scale_multipliers[scale];
-  left_bound_deg  = ubits(bs, offset + 69, 9);
-  right_bound_deg = ubits(bs, offset + 78, 9);
+  precision       = bs.ToUnsignedInt(offset + 51, 3);
+  radius_m        = bs.ToUnsignedInt(offset + 54, 12) * scale_multipliers[scale];
+  left_bound_deg  = bs.ToUnsignedInt(offset + 66, 9);
+  right_bound_deg = bs.ToUnsignedInt(offset + 75, 9);
 }
 
 // Size of one point angle and distance
 static const size_t PT_AD_SIZE = 10 + 10;
 
-Ais8_001_22_Polyline::Ais8_001_22_Polyline(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_001_22_Polyline::Ais8_001_22_Polyline(const AisBitset &bs,
                                            const size_t offset) {
-  const int scale_factor = ubits(bs, offset + 3, 2);
+  const int scale_factor = bs.ToUnsignedInt(offset, 2);
   const int multiplier = scale_multipliers[scale_factor];
   for (size_t i = 0; i < 4; i++) {
-    const int angle = ubits(bs, offset + 5 + (i*PT_AD_SIZE), 10);
-    const int dist  = ubits(bs, offset + 15 + (i*PT_AD_SIZE), 10) * multiplier;
+    const int angle = bs.ToUnsignedInt(offset + 2 + (i*PT_AD_SIZE), 10);
+    const int dist  = bs.ToUnsignedInt(offset + 12 + (i*PT_AD_SIZE), 10) * multiplier;
     if (0 == dist)
       break;
     angles.push_back(angle);
     dists_m.push_back(dist);
   }
-  spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
+  const int spare_start = offset + AIS8_001_22_SUBAREA_SIZE - 5;
+  bs.SeekTo(spare_start);
+  spare = bs.ToUnsignedInt(spare_start, 2);
 }
 
 // TODO(schwehr): fold into polyline
-Ais8_001_22_Polygon::Ais8_001_22_Polygon(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_001_22_Polygon::Ais8_001_22_Polygon(const AisBitset &bs,
                                          const size_t offset) {
-  const int scale_factor = ubits(bs, offset + 3, 2);
+  const int scale_factor = bs.ToUnsignedInt(offset, 2);
   const int multiplier = scale_multipliers[scale_factor];
   for (size_t i = 0; i < 4; i++) {
-    const int angle = ubits(bs, offset + 5 + (i*PT_AD_SIZE), 10);
-    const int dist  = ubits(bs, offset + 15 + (i*PT_AD_SIZE), 10) * multiplier;
+    const int angle = bs.ToUnsignedInt(offset + 2 + (i*PT_AD_SIZE), 10);
+    const int dist  = bs.ToUnsignedInt(offset + 12 + (i*PT_AD_SIZE), 10) * multiplier;
     if (0 == dist)
       break;
     angles.push_back(angle);
     dists_m.push_back(dist);
   }
-  spare = ubits(bs, offset + AIS8_001_22_SUBAREA_SIZE - 2, 2);
+  const int spare_start = offset + AIS8_001_22_SUBAREA_SIZE - 5;
+  bs.SeekTo(spare_start);
+  spare = bs.ToUnsignedInt(spare_start, 2);
 }
 
-Ais8_001_22_Text::Ais8_001_22_Text(const bitset<AIS8_MAX_BITS> &bs,
+Ais8_001_22_Text::Ais8_001_22_Text(const AisBitset &bs,
                                    const size_t offset) {
-  text = string(ais_str(bs, offset + 3, 84));
+  text = string(bs.ToString(offset, 84));
   // TODO(schwehr): spare?
 }
 
 // Call the appropriate constructor
 Ais8_001_22_SubArea*
-ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
+ais8_001_22_subarea_factory(const AisBitset &bs,
                             const size_t offset) {
   const Ais8_001_22_AreaShapeEnum area_shape =
-      (Ais8_001_22_AreaShapeEnum)ubits(bs, offset, 3);
+      (Ais8_001_22_AreaShapeEnum)bs.ToUnsignedInt(offset, 3);
 
   switch (area_shape) {
   case AIS8_001_22_SHAPE_CIRCLE:
-    return new Ais8_001_22_Circle(bs, offset);
+    return new Ais8_001_22_Circle(bs, offset + 3);
   case AIS8_001_22_SHAPE_RECT:
-    return new Ais8_001_22_Rect(bs, offset);
+    return new Ais8_001_22_Rect(bs, offset + 3);
   case AIS8_001_22_SHAPE_SECTOR:
-    return new Ais8_001_22_Sector(bs, offset);
+    return new Ais8_001_22_Sector(bs, offset + 3);
   case AIS8_001_22_SHAPE_POLYLINE:
-    return new Ais8_001_22_Polyline(bs, offset);
+    return new Ais8_001_22_Polyline(bs, offset + 3);
   case AIS8_001_22_SHAPE_POLYGON:
-    return new Ais8_001_22_Polygon(bs, offset);
+    return new Ais8_001_22_Polygon(bs, offset + 3);
   case AIS8_001_22_SHAPE_TEXT:
-    return new Ais8_001_22_Text(bs, offset);
+    return new Ais8_001_22_Text(bs, offset + 3);
   case AIS8_001_22_SHAPE_RESERVED_6:  // FALLTHROUGH
   case AIS8_001_22_SHAPE_RESERVED_7:  // FALLTHROUGH
     // Keep area==0 to indicate error.
@@ -269,11 +274,6 @@ ais8_001_22_subarea_factory(const bitset<AIS8_MAX_BITS> &bs,
 
 Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad)
     : Ais8(nmea_payload, pad) {
-  assert(nmea_ord_initialized);  // Make sure we have the lookup table built
-
-  if (status != AIS_UNINITIALIZED)
-    return;
-
   assert(dac == 1);
   assert(fi == 22);
 
@@ -284,21 +284,22 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  bitset<MAX_BITS> bs;
-  const AIS_STATUS r = aivdm_to_bits(bs, nmea_payload);
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
 
-  link_id = ubits(bs, 56, 10);
-  notice_type = ubits(bs, 66, 7);
-  month = ubits(bs, 73, 4);
-  day = ubits(bs, 77, 5);
-  hour = ubits(bs, 82, 5);
-  minute = ubits(bs, 87, 6);
+  bs.SeekTo(56);
+  link_id = bs.ToUnsignedInt(56, 10);
+  notice_type = bs.ToUnsignedInt(66, 7);
+  month = bs.ToUnsignedInt(73, 4);
+  day = bs.ToUnsignedInt(77, 5);
+  hour = bs.ToUnsignedInt(82, 5);
+  minute = bs.ToUnsignedInt(87, 6);
 
-  duration_minutes = ubits(bs, 93, 18);
+  duration_minutes = bs.ToUnsignedInt(93, 18);
 
   // Use floor to be able to ignore any spare bits
   const int num_sub_areas = static_cast<int>(floor((num_bits - 111)/87.));
@@ -320,6 +321,7 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad)
     status = AIS_OK;
 }
 
+// TODO(schwehr): Use unique_ptr to manage memory.
 Ais8_001_22::~Ais8_001_22() {
   for (size_t i = 0; i < sub_areas.size(); i++) {
     delete sub_areas[i];
