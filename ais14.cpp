@@ -2,6 +2,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais14::Ais14(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), expected_num_spare_bits(0) {
 
@@ -29,3 +31,5 @@ Ais14::Ais14(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

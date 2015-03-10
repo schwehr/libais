@@ -1,15 +1,19 @@
 #include "ais.h"
 
+namespace libais {
+
 Ais9::Ais9(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), alt(0), sog(0.0), position_accuracy(0),
       cog(0.0), timestamp(0), alt_sensor(0), spare(0), dte(0), spare2(0),
       assigned_mode(0), raim(false), commstate_flag(0), sync_state(0),
-      slot_timeout(0), slot_timeout_valid(false), received_stations(0),
-      received_stations_valid(false), slot_number(0),
-      slot_number_valid(false), utc_valid(false), utc_hour(0), utc_min(0),
-      utc_spare(0), slot_offset(0), slot_offset_valid(false),
-      slot_increment(0), slot_increment_valid(false), slots_to_allocate(0),
-      slots_to_allocate_valid(false), keep_flag(false), keep_flag_valid(false) {
+      slot_timeout_valid(false), slot_timeout(0),
+      received_stations_valid(false), received_stations(0),
+      slot_number_valid(false), slot_number(0),
+      utc_valid(false), utc_hour(0), utc_min(0), utc_spare(0),
+      slot_offset_valid(false), slot_offset(0),
+      slot_increment_valid(false), slot_increment(0),
+      slots_to_allocate_valid(false), slots_to_allocate(0),
+      keep_flag_valid(false), keep_flag(false) {
   assert(message_id == 9);
 
   if (pad != 0 || num_chars != 28) {
@@ -89,3 +93,5 @@ Ais9::Ais9(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

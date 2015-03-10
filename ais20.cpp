@@ -2,12 +2,15 @@
 
 #include "ais.h"
 
+namespace libais{
+
 Ais20::Ais20(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), offset_1(0), num_slots_1(0),
-      timeout_1(0), incr_1(0), offset_2(0), num_slots_2(0), timeout_2(0),
-      incr_2(0), group_valid_2(false), offset_3(0), num_slots_3(0),
-      timeout_3(0), incr_3(0), group_valid_3(false), offset_4(0),
-      num_slots_4(0), timeout_4(0), incr_4(0), group_valid_4(false), spare2(0) {
+      timeout_1(0), incr_1(0), group_valid_2(false), offset_2(0),
+      num_slots_2(0), timeout_2(0), incr_2(0), group_valid_3(false),
+      offset_3(0), num_slots_3(0), timeout_3(0), incr_3(0),
+      group_valid_4(false), offset_4(0), num_slots_4(0), timeout_4(0),
+      incr_4(0), spare2(0) {
   assert(message_id == 20);
 
   if (num_bits < 72 || num_bits > 160) {
@@ -74,3 +77,5 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

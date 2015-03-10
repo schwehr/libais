@@ -14,6 +14,10 @@
 #ifndef THIRD_PARTY_LIBAIS_AIS8_001_22_H_
 #define THIRD_PARTY_LIBAIS_AIS8_001_22_H_
 
+#include "ais.h"
+
+namespace libais {
+
 const size_t AIS8_001_22_NUM_NAMES = 128;
 const size_t AIS8_001_22_SUBAREA_SIZE = 87;
 extern const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES];
@@ -164,3 +168,5 @@ class Ais8_001_22 : public Ais8 {
 ostream& operator<< (ostream& o, Ais8_001_22 const& msg);
 
 #endif  // THIRD_PARTY_LIBAIS_AIS8_001_22_H_
+
+}  // namespace libais

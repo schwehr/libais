@@ -2,6 +2,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 vector<string> Split(const string &str, const string &delim_str) {
   assert(!delim_str.empty());
   vector<string> r;
@@ -244,3 +246,5 @@ AisMsg::AisMsg(const char *nmea_payload, const size_t pad)
   repeat_indicator = bs.ToUnsignedInt(6, 2);
   mmsi = bs.ToUnsignedInt(8, 30);
 }
+
+}  // namespace libais

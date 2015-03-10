@@ -2,14 +2,15 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), year(0), month(0), day(0), hour(0), minute(0),
       second(0), position_accuracy(0), fix_type(0),
       transmission_ctl(0), spare(0), raim(false), sync_state(0),
-      slot_timeout(0), received_stations(0), received_stations_valid(false),
-      slot_number(0), slot_number_valid(false), utc_valid(false), utc_hour(0),
-      utc_min(0), utc_spare(0), slot_offset(0), slot_offset_valid(false) {
-
+      slot_timeout(0), received_stations_valid(false), received_stations(0),
+      slot_number_valid(false), slot_number(0), utc_valid(false), utc_hour(0),
+      utc_min(0), utc_spare(0), slot_offset_valid(false), slot_offset(0) {
   if (pad != 0 || num_chars != 28) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
@@ -21,6 +22,7 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad)
     status = r;
     return;
   }
+
   assert(message_id == 4 || message_id == 11);
 
   bs.SeekTo(38);
@@ -40,16 +42,7 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad)
   spare = bs.ToUnsignedInt(139, 9);
   raim = bs[148];
 
-  //
   // SOTDMA commstate
-  //
-
-  // Set all to invalid - this way we don't have to track it in multiple places
-  received_stations = -1;  received_stations_valid = false;
-  slot_number = -1; slot_number_valid = false;
-  utc_hour = utc_min = -1; utc_valid = false;
-  slot_offset = -1; slot_offset_valid = false;
-
   sync_state = bs.ToUnsignedInt(149, 2);
   slot_timeout = bs.ToUnsignedInt(151, 3);
 
@@ -86,3 +79,5 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad)
 ostream& operator<< (ostream &o, const Ais4_11 &msg) {
   return o << msg.message_id << ": " << msg.mmsi;
 }
+
+}  // namespace libais

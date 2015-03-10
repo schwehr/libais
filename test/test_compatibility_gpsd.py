@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-
-"""Test the ais compatibility layer
-
-"""
+"""Test the ais compatibility layer."""
 
 import ais.stream
 import ais.compatibility.gpsd
@@ -63,7 +60,7 @@ class GPSDCompatibility(unittest.TestCase):
 
     def tearDown(self):
         os.unlink(self.json)
-        
+
     def testAll(self):
         def gpsd():
             with open(self.json) as f:

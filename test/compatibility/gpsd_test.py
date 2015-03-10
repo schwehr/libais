@@ -1,10 +1,11 @@
-"""Tests for google3.third_party.py.ais.test.compatibility.gpsd."""
+#!/usr/bin/env python
 
+"""Tests for ais.compatibility.gpsd."""
+
+import unittest
 
 import ais
 from ais.compatibility import gpsd
-
-import unittest
 
 
 class GpsdTest(unittest.TestCase):

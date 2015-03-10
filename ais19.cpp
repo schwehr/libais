@@ -2,6 +2,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais19::Ais19(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), sog(0.0), position_accuracy(0),
       cog(0.0), true_heading(0), timestamp(0), spare2(0), type_and_cargo(0),
@@ -50,3 +52,5 @@ Ais19::Ais19(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

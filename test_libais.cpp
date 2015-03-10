@@ -8,6 +8,8 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
+namespace libais {
+
 #define CHECKPOINT cerr <<  __FILE__ << ": line " << __LINE__ << ": checkpoint" << endl
 
 #define UNUSED __attribute((__unused__))
@@ -31,6 +33,10 @@ void ASSERT_EQ(const bool a, const bool b, const int line) {
     assert(a == b);
   }
 }
+
+}  // namespace libais
+
+using namespace libais;
 
 int main(UNUSED int argc, UNUSED char* argv[]) {
   if (true) {

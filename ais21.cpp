@@ -2,6 +2,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais21::Ais21(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), aton_type(0), position_accuracy(0), dim_a(0),
       dim_b(0), dim_c(0), dim_d(0), fix_type(0), timestamp(0), off_pos(false),
@@ -56,3 +58,5 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

@@ -4,6 +4,8 @@
 #include "ais.h"
 #include "ais8_001_22.h"
 
+namespace libais {
+
 // TODO(schwehr): field on class
 const char *ais8_001_22_shape_names[8] = {"Circle/Pt", "Rect", "Sector",
                                           "Polyline", "Polygon", "Text",
@@ -328,3 +330,5 @@ Ais8_001_22::~Ais8_001_22() {
     sub_areas[i] = NULL;
   }
 }
+
+}  // namespace libais

@@ -2,6 +2,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais5::Ais5(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), ais_version(0), imo_num(0),
       type_and_cargo(0), dim_a(0), dim_b(0), dim_c(0), dim_d(0),
@@ -52,3 +54,5 @@ ostream& operator<< (ostream& o, const Ais5 &msg) {
            << msg.type_and_cargo << " " << msg.dim_a + msg.dim_b
            << "x" << msg.dim_c + msg.dim_d << "x" << msg.draught << "m";
 }
+
+}  // namespace libais

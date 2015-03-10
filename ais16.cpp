@@ -3,6 +3,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais16::Ais16(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), dest_mmsi_a(0), offset_a(0), inc_a(0),
       dest_mmsi_b(0), offset_b(0), inc_b(0), spare2(0) {
@@ -46,3 +48,5 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

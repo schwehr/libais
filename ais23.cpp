@@ -2,6 +2,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais23::Ais23(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), station_type(0), type_and_cargo(0),
       spare2(3), txrx_mode(0), interval_raw(0), quiet(0), spare3(0) {
@@ -39,3 +41,5 @@ Ais23::Ais23(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

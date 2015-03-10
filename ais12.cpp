@@ -2,6 +2,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais12::Ais12(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), seq_num(0), dest_mmsi(0), retransmitted(false),
       spare(0) {
@@ -34,3 +36,5 @@ Ais12::Ais12(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

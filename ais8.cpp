@@ -1,9 +1,10 @@
-// Since 2010-05-19
 // Binary Broadcast Message (BBM) - 8
 
 #include <iomanip>
 
 #include "ais.h"
+
+namespace libais {
 
 Ais8::Ais8(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), dac(0), fi(0) {
@@ -840,3 +841,5 @@ Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

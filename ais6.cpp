@@ -1,9 +1,11 @@
 // Address Binary Message (ABM) 6
 
-#include <iomanip>
 #include <cmath>
+#include <iomanip>
 
 #include "ais.h"
+
+namespace libais {
 
 Ais6::Ais6(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), seq(0), mmsi_dest(0), retransmit(false),
@@ -501,3 +503,5 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais

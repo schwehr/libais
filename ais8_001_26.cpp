@@ -6,6 +6,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais8_1_26_Location::Ais8_1_26_Location(const AisBitset &bs,
                                        const size_t offset) {
   x = bs.ToInt(offset, 28) / 600000.;
@@ -258,3 +260,5 @@ Ais8_1_26::~Ais8_1_26() {
     reports[i] = NULL;
   }
 }
+
+}  // namespace libais

@@ -6,6 +6,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 const char *shape_names[8] = {"Circle/Pt", "Rect", "Sector", "Polyline",
                               "Polygon", "Text", "Reserved_6", "Reserved_7"};
 
@@ -292,3 +294,5 @@ ais8_366_22_subarea_factory(const AisBitset &bs,
   }
   return NULL;
 }
+
+}  // namespace libais

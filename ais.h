@@ -21,8 +21,10 @@ using std::ostream;
 using std::string;
 using std::vector;
 
+namespace libais {
+
 #define LIBAIS_VERSION_MAJOR 0
-#define LIBAIS_VERSION_MINOR 14
+#define LIBAIS_VERSION_MINOR 15
 
 // Returns vector of the text between the delimiters.  Uses an empty string
 // for empty fields.  Empty string returns a vector of length 1 containing an
@@ -412,33 +414,33 @@ class Ais1_2_3 : public AisMsg {
 
   // COMM state SOTDMA msgs 1 and 2
   int sync_state;  // SOTDMA and ITDMA
-  int slot_timeout;
   bool slot_timeout_valid;
+  int slot_timeout;
 
   // Based on slot_timeout which ones are valid
-  int received_stations;
   bool received_stations_valid;
+  int received_stations;
 
-  int slot_number;
   bool slot_number_valid;
+  int slot_number;
 
   bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
 
-  int slot_offset;
   bool slot_offset_valid;
+  int slot_offset;
 
   // ITDMA - msg type 3
-  int slot_increment;
   bool slot_increment_valid;
+  int slot_increment;
 
-  int slots_to_allocate;
   bool slots_to_allocate_valid;
+  int slots_to_allocate;
 
-  bool keep_flag;  // 3.3.7.3.2 Annex 2 ITDMA.  Table 20
   bool keep_flag_valid;
+  bool keep_flag;  // 3.3.7.3.2 Annex 2 ITDMA.  Table 20
 
   Ais1_2_3(const char *nmea_payload, const size_t pad);
 };
@@ -465,19 +467,19 @@ class Ais4_11 : public AisMsg {
   int slot_timeout;
 
   // Based on slot_timeout which ones are valid
-  int received_stations;
   bool received_stations_valid;
+  int received_stations;
 
-  int slot_number;
   bool slot_number_valid;
+  int slot_number;
 
   bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
 
-  int slot_offset;
   bool slot_offset_valid;
+  int slot_offset;
 
   // **NO** ITDMA
   Ais4_11(const char *nmea_payload, const size_t pad);
@@ -1557,33 +1559,33 @@ class Ais9 : public AisMsg {
   int sync_state;  // In both SOTDMA and ITDMA
 
   // SOTDMA
-  int slot_timeout;
   bool slot_timeout_valid;
+  int slot_timeout;
 
   // Based on slot_timeout which ones are valid
-  int received_stations;
   bool received_stations_valid;
+  int received_stations;
 
-  int slot_number;
   bool slot_number_valid;
+  int slot_number;
 
   bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
 
-  int slot_offset;
   bool slot_offset_valid;
+  int slot_offset;
 
   // ITDMA
-  int slot_increment;
   bool slot_increment_valid;
+  int slot_increment;
 
-  int slots_to_allocate;
   bool slots_to_allocate_valid;
+  int slots_to_allocate;
 
-  bool keep_flag;
   bool keep_flag_valid;
+  bool keep_flag;
 
   Ais9(const char *nmea_payload, const size_t pad);
 };
@@ -1602,7 +1604,7 @@ ostream& operator<< (ostream &o, const Ais10 &msg);
 
 // 11 ';' - See 4_11
 
-// '<' - Addressd safety related
+// '<' - Addressed safety related text.
 class Ais12 : public AisMsg {
  public:
   int seq_num;
@@ -1617,7 +1619,7 @@ ostream& operator<< (ostream &o, const Ais12 &msg);
 
 // 13 '=' - See 7
 
-// '>' - Safety broadcast
+// '>' - Safety broadcast text.
 class Ais14 : public AisMsg {
  public:
   int spare;
@@ -1697,7 +1699,7 @@ class Ais18 : public AisMsg {
   int true_heading;
   int timestamp;
   int spare2;
-  int unit_flag;
+  int unit_flag;  // 0 is SOTDMA, 1 is Carrier Sense (CS).
   int display_flag;
   int dsc_flag;
   int band_flag;
@@ -1708,32 +1710,39 @@ class Ais18 : public AisMsg {
 
   // SOTDMA
   int sync_state;
+  bool slot_timeout_valid;
   int slot_timeout;
 
   // Based on slot_timeout which ones are valid
-  int received_stations;
   bool received_stations_valid;
+  int received_stations;
 
-  int slot_number;
   bool slot_number_valid;
+  int slot_number;
 
   bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
 
-  int slot_offset;
   bool slot_offset_valid;
+  int slot_offset;
 
   // ITDMA
-  int slot_increment;
   bool slot_increment_valid;
+  int slot_increment;
 
-  int slots_to_allocate;
   bool slots_to_allocate_valid;
+  int slots_to_allocate;
 
-  bool keep_flag;
   bool keep_flag_valid;
+  bool keep_flag;
+
+  // If commstate set to 1 for Carrier Sense (CS) devices, there is no
+  // state and the commstate region is supposed to be filled with this value:
+  //   1100000000000000110
+  bool commstate_cs_fill_valid;
+  int commstate_cs_fill;
 
   Ais18(const char *nmea_payload, const size_t pad);
 };
@@ -1776,23 +1785,24 @@ class Ais20 : public AisMsg {
   int timeout_1;
   int incr_1;
 
+  bool group_valid_2;
   int offset_2;
   int num_slots_2;
   int timeout_2;
   int incr_2;
-  bool group_valid_2;
 
+  bool group_valid_3;
   int offset_3;
   int num_slots_3;
   int timeout_3;
   int incr_3;
-  bool group_valid_3;
 
+  bool group_valid_4;
   int offset_4;
   int num_slots_4;
   int timeout_4;
   int incr_4;
-  bool group_valid_4;
+
   int spare2;
 
   Ais20(const char *nmea_payload, const size_t pad);
@@ -1932,33 +1942,33 @@ class Ais26 : public AisMsg {
 
   // SOTDMA
   int sync_state;
-  int slot_timeout;
   bool slot_timeout_valid;
+  int slot_timeout;
 
   // Based on slot_timeout which ones are valid
-  int received_stations;
   bool received_stations_valid;
+  int received_stations;
 
-  int slot_number;
   bool slot_number_valid;
+  int slot_number;
 
   bool utc_valid;
   int utc_hour;
   int utc_min;
   int utc_spare;
 
-  int slot_offset;
   bool slot_offset_valid;
+  int slot_offset;
 
   // ITDMA
-  int slot_increment;
   bool slot_increment_valid;
+  int slot_increment;
 
-  int slots_to_allocate;
   bool slots_to_allocate_valid;
+  int slots_to_allocate;
 
-  bool keep_flag;
   bool keep_flag_valid;
+  bool keep_flag;
 
   Ais26(const char *nmea_payload, const size_t pad);
 };
@@ -2033,5 +2043,6 @@ class AisBitset : protected bitset<MAX_BITS> {
   mutable int current_position;
 };
 
+}  // namespace libais
 
 #endif  // LIBAIS_AIS_H_

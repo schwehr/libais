@@ -2,6 +2,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais10::Ais10(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), dest_mmsi(0), spare2(0) {
 
@@ -32,3 +34,5 @@ ostream& operator<< (ostream &o, const Ais10 &msg) {
            << " dest=" << msg.dest_mmsi
            << " " << msg.spare << " " << msg.spare2;
 }
+
+}  // namespace libais

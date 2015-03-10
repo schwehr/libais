@@ -6,6 +6,8 @@
 #include "ais.h"
 #include "ais8_001_22.h"
 
+namespace libais {
+
 // Functional Identifiers (FI) are individual messages within a
 // specific DAC.  An FI in one DAC has nothing to do with an FI in
 // another DAC.
@@ -149,7 +151,6 @@ DictSafeSetItem(PyObject *dict, const string &key, PyObject *val_obj) {
   PyDict_SetItem(dict, key_obj, val_obj);
   Py_DECREF(key_obj);
 }
-
 
 extern "C" {
 
@@ -2108,40 +2109,34 @@ ais18_to_pydict(const char *nmea_payload, const size_t pad) {
   DictSafeSetItem(dict, "raim", msg.raim);
 
   DictSafeSetItem(dict, "commstate_flag", msg.commstate_flag);
-  if (0 == msg.unit_flag) {
-    if (0 == msg.commstate_flag) {
-      // SOTDMA
-      DictSafeSetItem(dict, "slot_timeout", msg.slot_timeout);
-      switch (msg.slot_timeout) {
-      case 0:
+  if (msg.slot_timeout_valid) {
+    DictSafeSetItem(dict, "slot_timeout", msg.slot_timeout);
+  }
+  if (msg.slot_offset_valid) {
         DictSafeSetItem(dict, "slot_offset", msg.slot_offset);
-        break;
-      case 1:
-        DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
-        DictSafeSetItem(dict, "utc_min", msg.utc_min);
-        DictSafeSetItem(dict, "utc_spare", msg.utc_spare);
-        break;
-      case 2:  // FALLTHROUGH
-      case 4:  // FALLTHROUGH
-      case 6:
-        DictSafeSetItem(dict, "slot_number", msg.slot_number);
-        break;
-      case 3:  // FALLTHROUGH
-      case 5:  // FALLTHROUGH
-      case 7:
-        DictSafeSetItem(dict, "received_stations", msg.received_stations);
-        break;
-      default:
-        assert(false);  // Should never get here.
-      }
+  }
+  if (msg.utc_valid) {
+    DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
+    DictSafeSetItem(dict, "utc_min", msg.utc_min);
+    DictSafeSetItem(dict, "utc_spare", msg.utc_spare);
+  }
+  if (msg.slot_number_valid) {
+    DictSafeSetItem(dict, "slot_number", msg.slot_number);
+  }
+  if (msg.received_stations_valid) {
+    DictSafeSetItem(dict, "received_stations", msg.received_stations);
+  }
 
-    } else {
-      // ITDMA
-      DictSafeSetItem(dict, "slot_increment", msg.slot_increment);
-      DictSafeSetItem(dict, "slots_to_allocate", msg.slots_to_allocate);
-      DictSafeSetItem(dict, "keep_flag", msg.keep_flag);
-    }
-  }  // do nothing if unit flag is 1... in CS mode and no commstate
+  // ITDMA
+  if (msg.slot_increment_valid) {
+    DictSafeSetItem(dict, "slot_increment", msg.slot_increment);
+    DictSafeSetItem(dict, "slots_to_allocate", msg.slots_to_allocate);
+    DictSafeSetItem(dict, "keep_flag", msg.keep_flag);
+  }
+
+  if (msg.commstate_cs_fill_valid) {
+    DictSafeSetItem(dict, "commstate_cs_fill", msg.commstate_cs_fill);
+  }
 
   return dict;
 }
@@ -2707,3 +2702,5 @@ PyObject *module = Py_InitModule("_ais", ais_methods);
 
 #endif
 }  // extern "C"
+
+}  // namespace libais

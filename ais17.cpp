@@ -8,6 +8,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais17::Ais17(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), spare2(0), gnss_type(0), z_cnt(0),
       station(0), seq(0) {
@@ -58,3 +60,5 @@ ostream& operator<< (ostream &o, const Ais17 &m) {
              << ", d s:" << m.station << ", seq:"
              << m.seq << ", h:" << m.health;
 }
+
+}  // namespace libais

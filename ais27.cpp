@@ -2,6 +2,8 @@
 
 #include "ais.h"
 
+namespace libais {
+
 Ais27::Ais27(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), position_accuracy(0), raim(false),
       nav_status(0), sog(0), cog(0), gnss(false), spare(0) {
@@ -33,3 +35,5 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad)
 
   status = AIS_OK;
 }
+
+}  // namespace libais
