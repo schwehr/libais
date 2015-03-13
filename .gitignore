@@ -11,3 +11,4 @@ test_libais
 *core*
 _ais.so
 dist
+.idea/
