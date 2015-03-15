@@ -174,14 +174,20 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad)
   for (int area_idx = 0; area_idx < num_sub_areas; area_idx++) {
     Ais8_366_22_SubArea *area =
         ais8_366_22_subarea_factory(bs, 111 + 90*area_idx);
-    if (area)
+    if (area) {
       sub_areas.push_back(area);
-    else
+    } else {
       status = AIS_ERR_BAD_SUB_SUB_MSG;
+      return;
+    }
   }
+
+  assert(bs.GetRemaining() == 0);
+  status = AIS_OK;
 }
 
 Ais8_366_22::~Ais8_366_22() {
+  // Switch to unique_ptr.
   for (size_t i = 0; i < sub_areas.size(); i++) {
     delete sub_areas[i];
 #ifndef NDEBUG
@@ -201,7 +207,8 @@ Ais8_366_22_Circle::Ais8_366_22_Circle(const AisBitset &bs,
   y = bs.ToInt(offset + 33, 27) / 600000.;
   // TODO(schwehr): precision? And bit counts for radius  and spare?
   // TODO(schwehr): collapse these numbers
-  radius_m = bs.ToUnsignedInt(offset + 60, 12) * scale_multipliers[scale_factor];
+  radius_m =
+      bs.ToUnsignedInt(offset + 60, 12) * scale_multipliers[scale_factor];
   spare = bs.ToUnsignedInt(offset + 72, 16);
 }
 
@@ -221,7 +228,8 @@ Ais8_366_22_Sector::Ais8_366_22_Sector(const AisBitset &bs,
   const int scale_factor = bs.ToUnsignedInt(offset + 3, 2);
   x = bs.ToInt(offset + 5, 28) / 600000.;
   y = bs.ToInt(offset + 33, 27) / 600000.;
-  radius_m = bs.ToUnsignedInt(offset + 60, 12) * scale_multipliers[scale_factor];
+  radius_m =
+      bs.ToUnsignedInt(offset + 60, 12) * scale_multipliers[scale_factor];
   left_bound_deg = bs.ToUnsignedInt(offset + 72, 9);
   right_bound_deg = bs.ToUnsignedInt(offset + 81, 9);
 }
@@ -231,26 +239,28 @@ Ais8_366_22_Polyline::Ais8_366_22_Polyline(const AisBitset &bs,
   const int scale_factor = bs.ToUnsignedInt(offset + 3, 2);
   for (size_t i = 0; i < 4; i++) {
     const int angle = bs.ToUnsignedInt(offset + 5 + (i*21), 10);
-    const int dist =
-        bs.ToUnsignedInt(offset + 15 + (i*21), 11) * scale_multipliers[scale_factor];
-    if (0 == dist)
+    const int dist = bs.ToUnsignedInt(offset + 15 + (i*21), 11) *
+                     scale_multipliers[scale_factor];
+    if (dist == 0) {
       break;
+    }
     angles.push_back(angle);
     dists_m.push_back(dist);
   }
   spare = bs[offset + 89];
 }
 
-// TODO(schwehr): merge with Polyline
+// TODO(schwehr): Merge with Polyline.
 Ais8_366_22_Polygon::Ais8_366_22_Polygon(const AisBitset &bs,
                                          const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset + 3, 2);
   for (size_t i = 0; i < 4; i++) {
     const int angle = bs.ToUnsignedInt(offset + 5 + (i*21), 10);
-    const int dist =
-        bs.ToUnsignedInt(offset + 15 + (i*21), 11) * scale_multipliers[scale_factor];
-    if (0 == dist)
+    const int dist = bs.ToUnsignedInt(offset + 15 + (i*21), 11) *
+                     scale_multipliers[scale_factor];
+    if (dist == 0) {
       break;
+    }
     angles.push_back(angle);
     dists_m.push_back(dist);
   }
@@ -292,7 +302,7 @@ ais8_366_22_subarea_factory(const AisBitset &bs,
   default:
     assert(false);
   }
-  return NULL;
+  return nullptr;
 }
 
 }  // namespace libais

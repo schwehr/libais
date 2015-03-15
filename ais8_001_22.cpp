@@ -266,7 +266,7 @@ ais8_001_22_subarea_factory(const AisBitset &bs,
   default:
     assert(false);
   }
-  return NULL;
+  return nullptr;
 }
 
 
@@ -327,7 +327,7 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad)
 Ais8_001_22::~Ais8_001_22() {
   for (size_t i = 0; i < sub_areas.size(); i++) {
     delete sub_areas[i];
-    sub_areas[i] = NULL;
+    sub_areas[i] = nullptr;
   }
 }
 

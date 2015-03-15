@@ -151,6 +151,7 @@ Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const AisBitset &bs,
   spare = bs.ToUnsignedInt(offset + 57, 28);
 }
 
+// TODO(schwehr): Refactor to be like the 8:367:22 factory.
 Ais8_1_26_SensorReport*
 ais8_1_26_sensor_report_factory(const AisBitset &bs,
                                 const size_t offset) {
@@ -161,7 +162,7 @@ ais8_1_26_sensor_report_factory(const AisBitset &bs,
   // Only get the report header if we can decode the type
   const size_t rpt_start = offset + 27;  // skip tp after site_id
   bs.SeekTo(rpt_start);
-  Ais8_1_26_SensorReport *rpt = NULL;
+  Ais8_1_26_SensorReport *rpt = nullptr;
   switch (rpt_type) {
   case AIS8_1_26_SENSOR_LOCATION:
     rpt = new Ais8_1_26_Location(bs, rpt_start);
@@ -244,20 +245,23 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad)
     bs.SeekTo(start);
     Ais8_1_26_SensorReport *sensor = ais8_1_26_sensor_report_factory(bs, start);
     if (sensor) {
-        reports.push_back(sensor);
+      reports.push_back(sensor);
     } else {
       status = AIS_ERR_BAD_SUB_SUB_MSG;
+      return;
     }
   }
-  if (AIS_UNINITIALIZED == status)
-    status = AIS_OK;
+
+  // TODO(schwehr): Enable this check.
+  // assert(bs.GetRemaining() == 0);
+  status = AIS_OK;
 }
 
 // TODO(schwehr): Use unique_ptr to manage memory.
 Ais8_1_26::~Ais8_1_26() {
   for (size_t i = 0; i < reports.size(); i++) {
     delete reports[i];
-    reports[i] = NULL;
+    reports[i] = nullptr;
   }
 }
 

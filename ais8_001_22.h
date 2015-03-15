@@ -11,8 +11,8 @@
   extend the message class to separately reassemble that polyline and polygon.
  */
 
-#ifndef THIRD_PARTY_LIBAIS_AIS8_001_22_H_
-#define THIRD_PARTY_LIBAIS_AIS8_001_22_H_
+#ifndef LIBAIS_AIS8_001_22_H_
+#define LIBAIS_AIS8_001_22_H_
 
 #include "ais.h"
 
@@ -167,6 +167,6 @@ class Ais8_001_22 : public Ais8 {
 };
 ostream& operator<< (ostream& o, Ais8_001_22 const& msg);
 
-#endif  // THIRD_PARTY_LIBAIS_AIS8_001_22_H_
+#endif  // LIBAIS_AIS8_001_22_H_
 
 }  // namespace libais
