@@ -1,0 +1,12 @@
+# -*- makefile -*-
+all:
+	(cd libais && make -f Makefile-custom all) 
+	(cd test && make -f Makefile-custom all) 
+
+clean:
+	(cd libais && make -f Makefile-custom clean) 
+	(cd test && make -f Makefile-custom clean) 
+
+test:
+	(cd libais && make -f Makefile-custom test) 
+	(cd test && make -f Makefile-custom test) 

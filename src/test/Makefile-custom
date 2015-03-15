@@ -1,0 +1,10 @@
+# -*- makefile -*-
+all:
+	@echo "TODO(schwehr): Implement src/test/$@"
+
+clean:
+	@echo "TODO(schwehr): Implement src/test/$@"
+
+test:
+	@echo "TODO(schwehr): Implement src/test/$@"
+
