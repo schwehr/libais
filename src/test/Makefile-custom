@@ -1,10 +1,142 @@
 # -*- makefile -*-
-all:
-	@echo "TODO(schwehr): Implement src/test/$@"
+
+TESTS :=
+TESTS += ais1_2_3_test
+TESTS += ais4_11_test
+TESTS += ais5_test
+TESTS += ais7_13_test
+TESTS += ais8_001_22_test
+TESTS += ais8_367_test
+# TESTS += ais9_test
+TESTS += ais10_test
+TESTS += ais12_test
+TESTS += ais14_test
+TESTS += ais15_test
+TESTS += ais16_test
+TESTS += ais17_test
+TESTS += ais18_test
+TESTS += ais19_test
+TESTS += ais20_test
+# TESTS += ais21_test
+# TESTS += ais22_test
+# TESTS += ais23_test
+# TESTS += ais24_test
+# TESTS += ais25_test
+# TESTS += ais26_test
+# TESTS += ais27_test
+
+# TESTS += ais_test
+
+all: test
+	@echo "Done"
 
 clean:
-	@echo "TODO(schwehr): Implement src/test/$@"
+	rm -f $(TESTS) *.a *.o
 
-test:
-	@echo "TODO(schwehr): Implement src/test/$@"
+test: $(TESTS)
+	@echo $(TESTS)
+	for test in $(TESTS); do ./$$test; done
+#	@echo "TODO(schwehr): Implement src/test/$@"
+
+
+GTEST_DIR = ../../third_party/gtest
+
+# Flags passed to the preprocessor.
+# Set Google Test's header directory as a system directory, such that
+# the compiler doesn't generate warnings in Google Test headers.
+CPPFLAGS += -isystem $(GTEST_DIR)/include
+CPPFLAGS +=  -I../libais
+
+# Flags passed to the C++ compiler.
+CXXFLAGS += -g -Wall -Wextra -pthread
+CXXFLAGS += -std=c++11
+
+GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
+                $(GTEST_DIR)/include/gtest/internal/*.h
+
+GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
+
+gtest_main.o : $(GTEST_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
+            $(GTEST_DIR)/src/gtest_main.cc
+
+gtest.a : gtest-all.o
+	$(AR) $(ARFLAGS) $@ $^
+
+gtest_main.a : gtest-all.o gtest_main.o
+	$(AR) $(ARFLAGS) $@ $^
+
+gtest-all.o : $(GTEST_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
+            $(GTEST_DIR)/src/gtest-all.cc
+
+ais1_2_3_test: ais1_2_3_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais4_11_test: ais4_11_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais5_test: ais5_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais7_13_test: ais7_13_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais8_001_22_test: ais8_001_22_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais8_367_test: ais8_367_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais9_test: ais9_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais10_test: ais10_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais12_test: ais12_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais14_test: ais14_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais15_test: ais15_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais16_test: ais16_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais17_test: ais17_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais18_test: ais18_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais19_test: ais19_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais20_test: ais20_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais21_test: ais21_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais22_test: ais23_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais23_test: ais23_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais24_test: ais24_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais25_test: ais25_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais26_test: ais26_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais27_test: ais27_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
 

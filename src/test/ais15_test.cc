@@ -20,7 +20,7 @@
 
 #include <memory>
 
-#include "gunit.h"
+#include "gtest/gtest.h"
 #include "ais.h"
 
 namespace libais {
@@ -65,7 +65,7 @@ void Validate(
   ASSERT_EQ(slot_offset_1_1, msg->slot_offset_1_1);
   ASSERT_EQ(spare2, msg->spare2);
   ASSERT_EQ(dest_msg_1_2, msg->dest_msg_1_2);
-  ASSERT_EQ(slot_offset_1_1, msg->slot_offset_1_2);
+  ASSERT_EQ(slot_offset_1_2, msg->slot_offset_1_2);
   ASSERT_EQ(spare3, msg->spare3);
   ASSERT_EQ(mmsi_2, msg->mmsi_2);
   ASSERT_EQ(msg_2, msg->msg_2);

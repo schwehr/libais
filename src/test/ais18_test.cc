@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include "gunit.h"
+#include "gtest/gtest.h"
 #include "ais.h"
 
 namespace libais {
