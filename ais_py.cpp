@@ -56,7 +56,7 @@ enum AIS_FI {
 };
 
 PyObject *ais_py_exception;
-const string exception_name("ais.decode.Error");
+const char exception_name[] = "ais.decode.Error";
 
 void
 DictSafeSetItem(PyObject *dict, const string &key, const long val) {
@@ -175,7 +175,7 @@ ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais1_2_3: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -234,7 +234,7 @@ ais4_11_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais4_11: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -283,7 +283,7 @@ ais5_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais5: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -648,7 +648,7 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error() && msg.get_error() != AIS_UNINITIALIZED) {
     PyErr_Format(ais_py_exception, "Ais6: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -719,7 +719,7 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
   if (status != AIS_OK) {
     PyErr_Format(ais_py_exception, "Ais6: %s",
                  AIS_STATUS_STRINGS[status]);
-    return NULL;
+    return nullptr;
   }
 
   return dict;
@@ -733,7 +733,7 @@ ais7_13_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais7_13: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -1321,7 +1321,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
         DictSafeSetItem(rpt_dict, "wind_gust_dir", rpt->wind_gust_dir);
         DictSafeSetItem(rpt_dict, "sensor_type", rpt->sensor_type);
         DictSafeSetItem(rpt_dict, "wind_forecast", rpt->wind_forecast);
-        DictSafeSetItem(rpt_dict, "wind_gust_forecast", rpt->wind_gust_forecast);
+        DictSafeSetItem(
+            rpt_dict, "wind_gust_forecast", rpt->wind_gust_forecast);
         DictSafeSetItem(rpt_dict, "wind_dir_forecast", rpt->wind_dir_forecast);
         DictSafeSetItem(rpt_dict, "utc_day_forecast", rpt->utc_day_forecast);
         DictSafeSetItem(rpt_dict, "utc_hour_forecast", rpt->utc_hour_forecast);
@@ -1465,7 +1466,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
         DictSafeSetItem(rpt_dict, "gap", rpt->gap);
         DictSafeSetItem(rpt_dict, "forecast_gap", rpt->forecast_gap);
         DictSafeSetItem(rpt_dict, "int trend", rpt->trend);
-        DictSafeSetItem(rpt_dict, "int utc_day_forecast", rpt->utc_day_forecast);
+        DictSafeSetItem(
+            rpt_dict, "int utc_day_forecast", rpt->utc_day_forecast);
         DictSafeSetItem(rpt_dict, "utc_hour_forecast", rpt->utc_hour_forecast);
         DictSafeSetItem(rpt_dict, "utc_min_forecast", rpt->utc_min_forecast);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
@@ -1743,7 +1745,137 @@ ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict,
   return AIS_OK;
 }
 
+void
+ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
+  Ais8_367_22 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
 
+  DictSafeSetItem(dict, "version", msg.version);
+  DictSafeSetItem(dict, "link_id", msg.link_id);
+  DictSafeSetItem(dict, "notice_type", msg.notice_type);
+  // TODO(schwehr): are 8:1:22 and 8:367:22 tables the same?
+  DictSafeSetItem(dict, "notice_type_str",
+                  ais8_001_22_notice_names[msg.notice_type]);
+
+  DictSafeSetItem(dict, "month", msg.month);  // This is UTC, not local time.
+  DictSafeSetItem(dict, "day", msg.day);
+  DictSafeSetItem(dict, "hour", msg.hour);
+  DictSafeSetItem(dict, "minute", msg.minute);
+
+  DictSafeSetItem(dict, "durations_minutes", msg.duration_minutes);
+
+  PyObject *sub_area_list = PyList_New(msg.sub_areas.size());
+
+  // Loop over sub_areas
+  for (size_t i = 0; i < msg.sub_areas.size(); i++) {
+    switch (msg.sub_areas[i]->getType()) {
+    case AIS8_366_22_SHAPE_CIRCLE:  // or point
+      {
+        PyObject *sub_area = PyDict_New();
+        Ais8_367_22_Circle *c =
+            reinterpret_cast<Ais8_367_22_Circle*>(msg.sub_areas[i]);
+
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_CIRCLE);
+        if (c->radius_m == 0)
+          DictSafeSetItem(sub_area, "sub_area_type_str", "point");
+        else
+          DictSafeSetItem(sub_area, "sub_area_type_str", "circle");
+
+        DictSafeSetItem(sub_area, "x", c->x);
+        DictSafeSetItem(sub_area, "y", c->y);
+        DictSafeSetItem(sub_area, "precision", c->precision);
+        DictSafeSetItem(sub_area, "radius", c->radius_m);
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+    case AIS8_366_22_SHAPE_RECT:
+      {
+        PyObject *sub_area = PyDict_New();
+        Ais8_367_22_Rect *c =
+            reinterpret_cast<Ais8_367_22_Rect*>(msg.sub_areas[i]);
+
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_RECT);
+        DictSafeSetItem(sub_area, "sub_area_type_str", "rect");
+
+        DictSafeSetItem(sub_area, "x", c->x);
+        DictSafeSetItem(sub_area, "y", c->y);
+        DictSafeSetItem(sub_area, "precision", c->precision);
+        DictSafeSetItem(sub_area, "e_dim_m", c->e_dim_m);
+        DictSafeSetItem(sub_area, "n_dim_m", c->n_dim_m);
+        DictSafeSetItem(sub_area, "orient_deg", c->orient_deg);
+
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+    case AIS8_366_22_SHAPE_SECTOR:
+      {
+        PyObject *sub_area = PyDict_New();
+        Ais8_367_22_Sector *c =
+            reinterpret_cast<Ais8_367_22_Sector*>(msg.sub_areas[i]);
+
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_SECTOR);
+        DictSafeSetItem(sub_area, "sub_area_type_str", "sector");
+
+        DictSafeSetItem(sub_area, "x", c->x);
+        DictSafeSetItem(sub_area, "y", c->y);
+        DictSafeSetItem(sub_area, "precision", c->precision);
+        DictSafeSetItem(sub_area, "radius", c->radius_m);
+        DictSafeSetItem(sub_area, "left_bound_deg", c->left_bound_deg);
+        DictSafeSetItem(sub_area, "right_bound_deg", c->right_bound_deg);
+
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+    case AIS8_366_22_SHAPE_POLYLINE:  // FALLTHROUGH
+    case AIS8_366_22_SHAPE_POLYGON:
+      {
+        PyObject *sub_area = PyDict_New();
+        Ais8_367_22_Poly *poly =
+            reinterpret_cast<Ais8_367_22_Poly*>(msg.sub_areas[i]);
+
+        DictSafeSetItem(sub_area, "sub_area_type", msg.sub_areas[i]->getType());
+        if (msg.sub_areas[i]->getType() == AIS8_366_22_SHAPE_POLYLINE)
+          DictSafeSetItem(sub_area, "sub_area_type_str", "polyline");
+        else
+          DictSafeSetItem(sub_area, "sub_area_type_str", "polygon");
+        assert(poly->angles.size() == poly->dists_m.size());
+        PyObject *angle_list = PyList_New(poly->angles.size());
+        PyObject *dist_list = PyList_New(poly->angles.size());
+
+        for (size_t pt_num = 0; pt_num < poly->angles.size(); pt_num++) {
+          PyList_SetItem(angle_list, pt_num,
+                         PyFloat_FromDouble(poly->angles[pt_num]));
+          PyList_SetItem(dist_list, pt_num,
+                         PyFloat_FromDouble(poly->dists_m[pt_num]));
+        }
+
+        DictSafeSetItem(sub_area, "angles", angle_list);
+        DictSafeSetItem(sub_area, "dists_m", dist_list);
+
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+    case AIS8_366_22_SHAPE_TEXT:
+      {
+        PyObject *sub_area = PyDict_New();
+
+        Ais8_367_22_Text *text =
+            reinterpret_cast<Ais8_367_22_Text*>(msg.sub_areas[i]);
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_TEXT);
+        DictSafeSetItem(sub_area, "sub_area_type_str", "text");
+
+        DictSafeSetItem(sub_area, "text", text->text);
+
+        PyList_SetItem(sub_area_list, i, sub_area);
+      }
+      break;
+
+    default:
+      {}  // TODO(schwehr): Mark an unknown subarea or raise an exception.
+    }
+  }
+  DictSafeSetItem(dict, "sub_areas", sub_area_list);
+}
 
 // AIS Binary broadcast messages.  There will be a huge number of subtypes
 // If we don't know how to decode it, just return the dac, fi
@@ -1756,7 +1888,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error() && msg.get_error() != AIS_UNINITIALIZED) {
     PyErr_Format(ais_py_exception, "Ais8: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -1854,7 +1986,16 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     }
     break;
     // TODO(schwehr): AIS_FI_8_366_22_AREA_NOTICE.
-    // TODO(schwehr): AIS_FI_8_367_22_AREA_NOTICE.
+  case 367:  // United states.
+    switch (msg.fi) {
+    case 22:  // USCG Area Notice 2012 (v5?).
+      ais8_367_22_append_pydict(nmea_payload, dict, pad);
+      break;
+    default:
+      DictSafeSetItem(dict, "parsed", false);
+      break;
+    }
+    break;
   default:
     DictSafeSetItem(dict, "parsed", false);
     // TODO(schwehr): raise exception or return standin?
@@ -1863,7 +2004,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
   if (status != AIS_OK) {
     PyErr_Format(ais_py_exception, "Ais8: %s",
                  AIS_STATUS_STRINGS[status]);
-    return NULL;
+    return nullptr;
   }
 
   return dict;
@@ -1876,7 +2017,7 @@ ais9_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais9: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -1931,7 +2072,7 @@ ais10_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais10: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -1953,7 +2094,7 @@ ais12_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais12: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -1981,7 +2122,7 @@ ais14_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais14: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2001,7 +2142,7 @@ ais15_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais15: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2033,7 +2174,7 @@ ais16_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais16: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2062,7 +2203,7 @@ ais17_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais17: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2083,7 +2224,7 @@ ais18_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais18: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2149,7 +2290,7 @@ ais19_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais19: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2190,7 +2331,7 @@ ais20_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais20: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2253,7 +2394,7 @@ ais21_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais21: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2287,7 +2428,7 @@ ais22_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais22: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2325,7 +2466,7 @@ ais23_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais23: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2356,7 +2497,7 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais24: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2382,7 +2523,7 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
   default:
     // status = AIS_ERR_BAD_MSG_CONTENT;
     // TODO(schwehr): setup python exception
-    return NULL;
+    return nullptr;
   }
 
   return dict;
@@ -2396,7 +2537,7 @@ ais25_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais25: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2420,7 +2561,7 @@ ais26_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais26: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2464,7 +2605,7 @@ ais27_to_pydict(const char *nmea_payload, const size_t pad) {
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais27: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
-    return NULL;
+    return nullptr;
   }
 
   PyObject *dict = ais_msg_to_pydict(&msg);
@@ -2491,7 +2632,7 @@ decode(PyObject *self, PyObject *args) {
     _pad = 0;
     if (!PyArg_ParseTuple(args, "s", &nmea_payload)) {
       PyErr_Format(ais_py_exception, "ais.decode: expected (str, int)");
-      return NULL;
+      return nullptr;
     }
   }
   const size_t pad = _pad;
@@ -2591,116 +2732,87 @@ decode(PyObject *self, PyObject *args) {
 
 static PyMethodDef ais_methods[] = {
   {"decode", decode, METH_VARARGS, "Return a dictionary for a NMEA string"},
-  {NULL, NULL, 0, NULL},
+  {nullptr, nullptr, 0, nullptr},
 };
 
-#if 0
-  PyMODINIT_FUNC
-  init_ais(void) {
-    PyObject *mod;
-    mod = Py_InitModule("_ais", ais_methods);
-    if (mod == NULL) {
-      cerr << "UNABLE TO LOAD MODULE";
-      return;
-    }
-    BuildNmeaLookup();
-  }
-#else
-  //////////////////////////////////////////////////////////////////////
-  // Python 3 initialization
-  //////////////////////////////////////////////////////////////////////
+// Python module initialization
 
 struct module_state {
   PyObject *error;
 };
 
 #if PY_MAJOR_VERSION >= 3
+
 #define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
-#else
-#define GETSTATE(m) (&_state)
-static struct module_state _state;
-#endif
-
-#if 0
-static PyObject *
-error_out(PyObject *m) {
-  struct module_state *st = GETSTATE(m);
-  PyErr_SetString(st->error, "something bad happened");
-  return NULL;
-}
-
-static PyMethodDef ais_methods[] = {
-  {"error_out", (PyCFunction)error_out, METH_NOARGS, NULL},
-  {NULL, NULL}
-};
-#endif
-
-#if PY_MAJOR_VERSION >= 3
 
 static int ais_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(GETSTATE(m)->error);
-  return NULL;
+  return nullptr;
 }
 
 static int ais_clear(PyObject *m) {
   Py_CLEAR(GETSTATE(m)->error);
-  return NULL;
+  return nullptr;
 }
 
 static struct PyModuleDef moduledef = {
   PyModuleDef_HEAD_INIT,
   "_ais",
-  NULL,
+  nullptr,
   sizeof(struct module_state),
   ais_methods,
-  NULL,
+  nullptr,
   ais_traverse,
   ais_clear,
-  NULL
+  nullptr
 };
 
-#define INITERROR return NULL
+PyObject *PyInit_ais(void) {
+  PyObject *module = PyModule_Create(&moduledef);
 
-PyObject *
-PyInit_ais(void)
-
-#warning "Should be okay"
-
-#else
-
-#define INITERROR return
-
-void
-init_ais(void)
-#endif
-  {
-#if PY_MAJOR_VERSION >= 3
-PyObject *module = PyModule_Create(&moduledef);
-#else
-PyObject *module = Py_InitModule("_ais", ais_methods);
-#endif
-
-  if (module == NULL)
-    INITERROR;
+  if (module == nullptr) {
+    return nullptr;
+  }
   struct module_state *st = GETSTATE(module);
 
-  st->error = PyErr_NewException(const_cast<char *>(exception_name.c_str()),
-                                 NULL, NULL);
-  if (st->error == NULL) {
+  st->error = PyErr_NewException(const_cast<char *>(exception_name),
+                                 nullptr, nullptr);
+  if (st->error == nullptr) {
     Py_DECREF(module);
-    INITERROR;
+    return nullptr;
   }
 
-  // Initialize exception
   ais_py_exception = PyErr_NewException(const_cast<char *>("ais.decode.error"),
-                                        NULL, NULL);
+                                        nullptr, nullptr);
 
-#if PY_MAJOR_VERSION >= 3
   return module;
-#endif
 }
 
-#endif
+#else  // Python 2.7
+
+static struct module_state _state;
+
+void init_ais(void) {
+  PyObject *module = Py_InitModule("_ais", ais_methods);
+
+  if (module == nullptr) {
+    return;
+  }
+  struct module_state *st = &_state;
+
+  st->error = PyErr_NewException(const_cast<char *>(exception_name),
+                                 nullptr, nullptr);
+  if (st->error == nullptr) {
+    Py_DECREF(module);
+    return;
+  }
+
+  ais_py_exception = PyErr_NewException(const_cast<char *>("ais.decode.error"),
+                                        nullptr, nullptr);
+}
+
+#endif  // PY_MAJOR_VERSION
+
 }  // extern "C"
 
 }  // namespace libais
