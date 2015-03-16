@@ -13,3 +13,4 @@ test_libais
 _ais.so
 dist
 .idea/
+venv/
