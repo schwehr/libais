@@ -1,92 +1,6 @@
 # -*- makefile -*-
 VERSION:=${shell cat VERSION}
 
-#CXX:=g++-fsf-4.4 -m32
-
-CXXFLAGS :=
-CXXFLAGS += -std=c++11
-
-# CXXFLAGS += -O3 -funroll-loops -fexpensive-optimizations -DNDEBUG
-# CXXFLAGS += -ffast-math 
-
-# CXXFLAGS += -g3 -O0 -m32
-
-WARN := -Wall
-WARN += -Wextra
-WARN += -Wno-sign-compare
-# WARN += -Werror
-
-# Disabled warnings
-# WARN += -pedantic  # long long
-# WARN += -W
-# WARN += -Weffc++
-# WARN += -Wendif-labels
-# WARN += -Wimplicit 
-# WARN += -Wmissing-prototypes
-# WARN += -Wnewline-eof
-# WARN += -Wredundant-decls
-# WARN += -Wshadow
-# WARN += -Wuninitialized  # Requires -O to work.
-# WARN += -Wunknown-pragmas
-# WARN += -Wunreachable-code
-# WARN += -Wunused
-
-DEBUG := -g3 -DDEBUG=1
-DEBUG += -O0
-# DEBUG+= -O
-# DEBUG+= -D_GLIBCXX_DEBUG # Bad things on the mac?  May be a gtest bug.
-# DEBUG+= -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCPP_CONCEPT_CHECKS
-
-OPT:= -O3 -funroll-loops -fexpensive-optimizations -ffast-math
-OPT+= -DNDEBUG
-
-ifdef OPTIMIZE
-  CXXFLAGS += ${OPT}
-else
-  CXXFLAGS += ${DEBUG}
-endif
-
-
-CXXFLAGS += ${WARN}
-
-#CFLAGS := ${CXXFLAGS}
-
-SRCS := ais.cpp 
-SRCS += ais1_2_3.cpp
-SRCS += ais4_11.cpp
-SRCS += ais5.cpp 
-SRCS += ais6.cpp
-SRCS += ais7_13.cpp
-SRCS += ais8.cpp
-
-# IMO Messages - Circ 289
-SRCS += ais8_001_22.cpp # Area notice
-SRCS += ais8_001_26.cpp # Env Sensors
-# US Specific Messages
-SRCS += ais8_366_22.cpp
-
-SRCS += ais9.cpp
-SRCS += ais10.cpp
-# See 4 for 11
-SRCS += ais12.cpp
-# See 7 for 13
-SRCS += ais14.cpp
-SRCS += ais15.cpp
-SRCS += ais16.cpp
-SRCS += ais17.cpp
-SRCS += ais18.cpp
-SRCS += ais19.cpp
-SRCS += ais20.cpp
-SRCS += ais21.cpp
-SRCS += ais22.cpp
-SRCS += ais23.cpp
-SRCS += ais24.cpp
-SRCS += ais25.cpp
-SRCS += ais26.cpp
-SRCS += ais27.cpp
-#SRCS += ais28.cpp
-OBJS := ${SRCS:.cpp=.o}
-
 default:
 	@echo
 	@echo
@@ -99,28 +13,17 @@ default:
 	@echo "  tar      - create a release source tar using VERSION"
 	@echo
 	@echo "  python   - build the python module"
-	@echo "  libais.a - build a static archive library"
-	@echo "  test_libais - Simple C++ library test"
-	@echo "  python2 - build the python2.6 module"
-	@echo "  python3 - build the python3.1 module"
-	@echo "  nais2pg - Run the python 2.6 nais2pg.py program"
+	@echo "  test     - Simple C++ library test"
+	@echo "  python2  - build the python2.6 module"
+	@echo "  python3  - build the python3.1 module"
 	@echo
 	@echo "  pull     - update from github"
 	@echo "  push     - update github with local changes"
 	@echo 
 	@echo "Read the README for more information"
 
-all: python2 python3 libais.a test_libais
-	./test_libais
-
-#ais.h: ais.h.in
-#	rm -f ais.h
-#	cmake -G "Unix Makefiles"
-
-nais2pg:
-	make clean
-	make python2
-	PYTHONPATH=build/lib.macosx-10.6-i386-2.6 ./nais2pg.py -v -I datalogger1.ccom.nh
+all: python2 python3
+	(cd src; make -f Makefile-custom all) 
 
 DIST:=libais-${shell cat VERSION}
 TAR:=${DIST}.tar
@@ -128,90 +31,58 @@ tar:
 	rm -f ${TAR}.bz2 ${TAR}
 	rm -rf ${DIST}
 	mkdir ${DIST}
-	cp -p *.cpp *.h [A-Z]* *.py ${DIST}/
+	cp -rp src test [A-Z]* *.py ${DIST}/
 	tar cf ${TAR} ${DIST}
 	bzip2 -9 ${TAR}
 	rm -rf ${DIST}
 
 
-# Remove the NDEBUG that python tries to use
 python2:
 	CFLAGS="-O3 -funroll-loops -fexpensive-optimizations -ffast-math" python2 setup.py build
-#	CFLAGS="-m32 -O0 -g -UNDEBUG" /sw/bin/python2.6 setup.py build
 
-# -D_GLIBCXX_DEBUG  This option does not seem to work for g++ versions 4.[0-2]
 python3:
-	CFLAGS="-m32 -O0 -g -UNDEBUG" /sw/bin/python3 setup.py build
-
-libais.a: ${OBJS}
-	ls ${OBJS}
-	ar rv $@ $?
-	ranlib $@
+	CFLAGS="-std=c++11 -O0 -g -UNDEBUG" python3 setup.py build
 
 clean:
-	-rm -rf *.o build *.a *.pyc test_libais
-	-rm -rf *.d *_unittest *.dSYM
+	(cd src && make -f Makefile-custom clean) 
+	(cd ais && make -f Makefile-custom clean) 
+	-rm -rf build
 
-#.cpp.o:
-#	${CXX} -c $< ${CXXFLAGS}
-
-test: test_libais
-	./test_libais
-
-test_libais: ${OBJS} test_libais.cpp ais.h
-	@echo SRCS: ${SRCS}
-	@echo OBJS: ${OBJS}
-	${CXX} -o $@ ${OBJS} test_libais.cpp ${CXXFLAGS}
-
-ais_decode_normed: ${OBJS} ais_decode_normed.o ais.h
-	@echo SRCS: ${SRCS}
-	@echo OBJS: ${OBJS}
-	${CXX} -o $@ ${OBJS} ais_decode_normed.o ${CXXFLAGS}
+test:
+	(cd src; make -f Makefile-custom test) 
 
 # Hard coded depends
-ais.o: ais.h
-ais123.o: ais.h
-ais4_11.o: ais.h
-ais5.o: ais.h
-ais6.o: ais.h
-ais7_13.o: ais.h
-ais8_001_22.o: ais.h 
-ais9.o: ais.h
-ais10.o: ais.h
-ais12.o: ais.h
-ais14.o: ais.h
-ais15.o: ais.h
-ais16.o: ais.h
-ais17.o: ais.h
-ais18.o: ais.h
-ais19.o: ais.h
-ais20.o: ais.h
-ais21.o: ais.h
-ais22.o: ais.h
-ais23.o: ais.h
-ais24.o: ais.h
-ais25.o: ais.h
-ais26.o: ais.h
-ais27.o: ais.h
-ais_py.o: ais.h
-test_libais.o: ais.h
-
-test2: ais1_2_3_unittest ais8_001_22_unittest
-#ais8_001_22_unittest
-
-FINK:=/sw32
-#LDFLAGS:=-L${FINK}/lib
-#GTESTFLAGS := ${shell gtest-config --cppflags --cxxflags --ldflags --libs}
-ais8_001_22_unittest: ais8_001_22_unittest.cpp ais8_001_22.cpp ais.cpp ais8.cpp
-	${CXX} -m32 -g ${WARN} $^ -o $@ ${GTESTFLAGS} -lgtest_main -lpthread
-	./$@
-
-ais1_2_3_unittest: ais1_2_3_unittest.cpp ais.cpp ais1_2_3.cpp
-	${CXX} -m32 -g ${WARN} $^ -o $@ ${GTESTFLAGS} -lgtest_main -lpthread
-	./$@
+src/libais/ais.o: src/libais/ais.h
+src/libais/ais123.o: src/libais/ais.h
+src/libais/ais4_11.o: src/libais/ais.h
+src/libais/ais5.o: src/libais/ais.h
+src/libais/ais6.o: src/libais/ais.h
+src/libais/ais7_13.o: src/libais/ais.h
+src/libais/ais8_001_22.o: src/libais/ais.h 
+src/libais/ais9.o: src/libais/ais.h
+src/libais/ais10.o: src/libais/ais.h
+src/libais/ais12.o: src/libais/ais.h
+src/libais/ais14.o: src/libais/ais.h
+src/libais/ais15.o: src/libais/ais.h
+src/libais/ais16.o: src/libais/ais.h
+src/libais/ais17.o: src/libais/ais.h
+src/libais/ais18.o: src/libais/ais.h
+src/libais/ais19.o: src/libais/ais.h
+src/libais/ais20.o: src/libais/ais.h
+src/libais/ais21.o: src/libais/ais.h
+src/libais/ais22.o: src/libais/ais.h
+src/libais/ais23.o: src/libais/ais.h
+src/libais/ais24.o: src/libais/ais.h
+src/libais/ais25.o: src/libais/ais.h
+src/libais/ais26.o: src/libais/ais.h
+src/libais/ais27.o: src/libais/ais.h
+src/libais/ais_py.o: src/libais/ais.h
+test_libsrc/libais/ais.o: src/libais/ais.h
 
 GIT_URL:=git@github.com:schwehr/libais.git
+
 pull:
 	git pull ${GIT_URL}
+
 push:
 	git push ${GIT_URL}

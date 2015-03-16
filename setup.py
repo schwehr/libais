@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import sys
 
 from setuptools import setup, find_packages, Extension
@@ -13,7 +14,7 @@ if sys.platform in ('linux2', 'darwin'):
 AIS_MODULE = Extension(
     '_ais',
     extra_compile_args=EXTRA_COMPILE_ARGS,
-    sources=[
+    sources=[os.path.join('src/libais', filename) for filename in (
         'ais_py.cpp',
         'ais.cpp',
         'ais1_2_3.cpp', # Class A position
@@ -24,6 +25,7 @@ AIS_MODULE = Extension(
         'ais8.cpp', # Broadcast binary message (BBM)
         'ais8_001_22.cpp', # Area notice
         'ais8_001_26.cpp', # Environmental Sensor Report
+        'ais8_367.cpp',
         'ais9.cpp',
         'ais10.cpp', # :
         # 11 See 4 - ;
@@ -44,6 +46,8 @@ AIS_MODULE = Extension(
         'ais26.cpp', # J - Multi-slot binary message with comm-state
         'ais27.cpp', # K - Long-range position
         # 'ais28.cpp', # L - Not yet defined
+        )
+
         ])
 
 setup(name='libais',
