@@ -54,8 +54,8 @@ TEST(Ais17Test, DecodeAnything) {
       "!AIVDM,1,1,,A,A6WWW6gP00a3PDlEKLrarOwUr8Mg,0*03");
 
   Validate(
-      msg.get(), 0, 444196634, 3,
-      -54.6133, 35.0333, 1, 19, 3513, 277, 6, 1);
+      msg.get(),
+      0, 444196634, 3, -54.6133, 35.0333, 1, 19, 3513, 277, 6, 1);
 
   // TODO(schwehr): Handle GNSS payload.
 }

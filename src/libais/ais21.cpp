@@ -1,4 +1,4 @@
-// Msg 21 - ATON status
+// Msg 21 - ATON status - 'E'
 
 #include "ais.h"
 

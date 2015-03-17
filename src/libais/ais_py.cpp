@@ -8,10 +8,6 @@
 
 namespace libais {
 
-#if PY_MAJOR_VERSION >= 3
-  #define PyInt_FromLong PyLong_FromLong
-#endif
-
 // Functional Identifiers (FI) are individual messages within a
 // specific DAC.  An FI in one DAC has nothing to do with an FI in
 // another DAC.
@@ -2039,6 +2035,7 @@ ais9_to_pydict(const char *nmea_payload, const size_t pad) {
   DictSafeSetItem(dict, "spare", msg.spare);
   DictSafeSetItem(dict, "dte", msg.dte);
   DictSafeSetItem(dict, "spare2", msg.spare2);
+  DictSafeSetItem(dict, "assigned_mode", msg.assigned_mode);
   DictSafeSetItem(dict, "raim", msg.raim);
 
   if (0 == msg.commstate_flag) {
@@ -2751,12 +2748,12 @@ struct module_state {
 
 static int ais_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(GETSTATE(m)->error);
-  return 0;
+  return nullptr;
 }
 
 static int ais_clear(PyObject *m) {
   Py_CLEAR(GETSTATE(m)->error);
-  return 0;
+  return nullptr;
 }
 
 static struct PyModuleDef moduledef = {

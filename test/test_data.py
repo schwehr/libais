@@ -204,6 +204,7 @@ top_level = [
     'nmea': [ '!AIVDM,1,1,,B,9oVAuAI5;rRRv2OqTi?1uoP?=a@1,0*74,raishub,1342572824' ],
     'result': {'alt': 2324,
                'alt_sensor': 0,
+               'assigned_mode': 1,
                'cog': 50.29999923706055,
                'dte': 1,
                'id': 9,
@@ -531,31 +532,38 @@ top_level = [
              'repeat_indicator': 0}
   },
 
+  # TODO(schwehr): Confirm if these expected values are correct.
   {
     'nmea': [ '!AIVDM,1,1,,B,J3`gb9@P8w8CC8TMeGBU<TH>0L@u,0*24,raishub,1342588508' ],
     'result': {'id': 26,
                'mmsi': 244050469,
-               'received_stations': 1085,
                'repeat_indicator': 0,
+               'received_stations': 1085,
                'sync_state': 0}
+               # 'slot_number': 2170,
+               # 'sync_state': 1}
   },
 
+  # TODO(schwehr): Confirm if these expected values are correct.
   {
     'nmea': [
       '!AIVDM,2,1,2,B,JfgwlGvNwts9?wUfQswQ<gv9Ow7wCl?nwv0wOi=mwd?,0*03,raishub,1342585126',
       '!AIVDM,2,2,2,B,oW8uwNg3wNS3tV,5*71,raishub,1342585126',
     ],
-    'result': {
-        'id': 26,
-        'mmsi': 989852767,
-        'repeat_indicator': 2,
-        'dac': 319,
-        'fi': 62,
-        'dest_mmsi': 666891186,
-        'utc_hour': 16,
-        'utc_min': 126,
-        'utc_spare': 1,
-        'sync_state': 2}
+    'result': {'dac': 319,
+               'dest_mmsi': 666891186,
+               'fi': 62,
+               'id': 26,
+               'mmsi': 989852767,
+               'repeat_indicator': 2,
+               'sync_state': 2,
+               'utc_hour': 16,
+               'utc_min': 126,
+               'utc_spare': 1}
+               # 'keep_flag': False,
+               # 'slot_increment': 3135,
+               # 'slots_to_allocate': 1,
+               # 'sync_state': 0}
   },
 
   {
