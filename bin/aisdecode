@@ -33,19 +33,37 @@ Available opptions:
     --gpsd Use gpsd compatible output
     --encoding=msgpack msgpack Use msgpack encoding
     --encoding=json Use json encoding (default)
+
+    --verbose
+    --allowUnknown
+    --treatABequal
+    --pass_invalid_checksums
+    --allow_missing_timestamps
+
+    --uscg=False
+    --validateChecksum=False
 """
     sys.exit(0)
 
-if args['encoding'] == 'json':
+encoding = args.pop('encoding', 'json')
+if encoding == 'json':
     def write(msg):
         json.dump(msg, sys.stdout)
         sys.stdout.write("\n")
 
-if args['encoding'] == 'msgpack':
+if encoding == 'msgpack':
     def write(msg):
         msgpack.pack(msg, sys.stdout)
 
-for msg in ais.stream.decode(sys.stdin):
-    if args.get("gpsd", False):
+use_gpsd = args.pop("gpsd", False)
+
+for key in ("uscg", "validateChecksum", "verbose", "allowUnknown", "treatABequal", "pass_invalid_checksums", "allow_missing_timestamps"):
+    if key in args and isinstance(args[key], str):
+        args[key] = args[key] == True
+if 'window' in args:
+    args['window'] = int('window')
+
+for msg in ais.stream.decode(sys.stdin, **args):
+    if use_gpsd:
         msg = ais.compatibility.gpsd.mangle(msg)
     write(msg)
