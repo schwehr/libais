@@ -3,7 +3,7 @@
 import sys
 import traceback
 
-from ais import _ais
+import ais
 from ais.stream import checksum
 
 
@@ -202,7 +202,7 @@ def decode(nmea=sys.stdin,
     body = ''.join(line.split(',')[5])
     pad = int(line.split('*')[0][-1])
     try:
-      res = _ais.decode(body, pad)
+      res = ais.decode(body, pad)
       if keep_nmea:
         res['nmea'] = line
       yield res
