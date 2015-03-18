@@ -44,9 +44,11 @@ python3:
 	CFLAGS="-std=c++11 -O0 -g -UNDEBUG" python3 setup.py build
 
 clean:
-	(cd src && make -f Makefile-custom clean) 
 	(cd ais && make -f Makefile-custom clean) 
+	(cd src && make -f Makefile-custom clean) 
+	(cd test && make -f Makefile-custom clean) 
 	-rm -rf build
+	rm -f _ais.so
 
 test:
 	(cd src; make -f Makefile-custom test) 

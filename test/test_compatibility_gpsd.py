@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 """Test the ais compatibility layer."""
 
+import itertools
+import json
+import re
+import os
+import subprocess
+import unittest
+
 import ais.stream
 import ais.compatibility.gpsd
-import unittest
-import os.path
-import json
-import itertools
-import re
-import subprocess
 
 
 known_bad = set(('radio','data', 'addressed', 'reserved', 'regional', 'structured', 'app_id'))

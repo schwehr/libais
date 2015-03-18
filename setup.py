@@ -69,4 +69,6 @@ setup(name='libais',
            'Interface Engine/Protocol Translator',
            'Topic :: Scientific/Engineering :: GIS',
            ],
-      scripts=["bin/aisdecode"])
+      scripts=["bin/aisdecode"],
+      test_suite = "test"
+      )
