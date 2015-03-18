@@ -1,5 +1,6 @@
 """Convert libais message dictionaries to GPSD JSON."""
 
+import datetime
 
 class Mangler(object):
   """Convert libais dictionaries to gpsd dictionaries."""
@@ -377,6 +378,10 @@ class Mangler(object):
 
   def mangle__interval_raw(self, res, msg):
     res['interval'] = msg['interval_raw']
+
+  # Tagblock data
+  def mangle__tagblock_timestamp(self, res, msg):
+    res['tagblock_timestamp'] = datetime.datetime.utcfromtimestamp(msg['tagblock_timestamp']).strftime("%Y-%m-%dT%H:%H:%S.%fZ")
 
   # Mappings
 
