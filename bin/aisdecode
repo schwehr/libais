@@ -31,6 +31,8 @@ if "help" in args:
     print """Usage: aisdecode [OPTIONS] < INFILE.nmea > OUTFILE.json
 Available opptions:
     --gpsd Use gpsd compatible output
+        --copy-tagblock-timestamp Copy tagblock_timestamp into timestamp if it's unset
+
     --encoding=msgpack msgpack Use msgpack encoding
     --encoding=json Use json encoding (default)
 
@@ -56,6 +58,8 @@ if encoding == 'msgpack':
         msgpack.pack(msg, sys.stdout)
 
 use_gpsd = args.pop("gpsd", False)
+copy_tagblock_timestamp = args.pop("copy-tagblock-timestamp", False)
+
 
 for key in ("uscg", "validateChecksum", "verbose", "allowUnknown", "treatABequal", "pass_invalid_checksums", "allow_missing_timestamps"):
     if key in args and isinstance(args[key], str):
@@ -66,4 +70,6 @@ if 'window' in args:
 for msg in ais.stream.decode(sys.stdin, **args):
     if use_gpsd:
         msg = ais.compatibility.gpsd.mangle(msg)
+        if copy_tagblock_timestamp and 'timestamp' not in msg and 'tagblock_timestamp' in msg:
+            msg['timestamp'] = msg['tagblock_timestamp']
     write(msg)
