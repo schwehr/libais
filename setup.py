@@ -58,6 +58,7 @@ setup(name='libais',
       url='https://github.com/schwehr/libais',
       license='Apache 2.0',
       ext_modules=[AIS_MODULE],
+      packages=find_packages(),
       classifiers=[
            'License :: OSI Approved :: Apache Software License',
            'Topic :: System :: Networking',
