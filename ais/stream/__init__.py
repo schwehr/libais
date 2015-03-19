@@ -106,7 +106,7 @@ def normalize(nmea=sys.stdin,
     window: number of seconds to allow the later parts of a multiline message to span
   """
   if not uscg:
-    print 'Need to make a faster version that does not worry about the extra args and stations dict'
+    errorcb('Need to make a faster version that does not worry about the extra args and stations dict')
     assert False
 
   buffers = {} # Put partial messages in a queue by station so that they can be reassembled
@@ -175,8 +175,7 @@ def normalize(nmea=sys.stdin,
         # Finished a message
         if bufferSlot not in buffers:
           if verbose:
-            print 'Do not have the preceeding packets for line'
-            print '  ', line
+            errorcb('Do not have the preceeding packets for line\n  ' + line)
           continue
         buffers[bufferSlot].append(newPacket)
         parts = buffers[bufferSlot]  # Now have all the pieces.
