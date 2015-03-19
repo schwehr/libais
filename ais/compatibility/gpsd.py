@@ -136,7 +136,7 @@ class Mangler(object):
     res['to_starboard'] = msg['dim_d']
 
   def mangle__eta_day(self, res, msg):
-    if msg['eta_month'] == 0 or msg['eta_day'] == 0 or msg['eta_hour'] == 24 or msg['eta_minute'] == 60:
+    if msg['eta_month'] < 1 or msg['eta_day'] == 0 or msg['eta_hour'] == 24 or msg['eta_minute'] == 60:
       return
 
     year = 0
@@ -145,11 +145,16 @@ class Mangler(object):
     elif 'tagblock_timestamp' in msg:
       year = datetime.datetime.utcfromtimestamp(msg['tagblock_timestamp']).year
 
-    res['eta'] = '%04d-%02d-%02dT%02d:%02d:00Z' % (year,
-                                                   msg['eta_month'],
-                                                   msg['eta_day'],
-                                                   msg['eta_hour'],
-                                                   msg['eta_minute'])
+    try:
+      eta = datetime.datetime(year,
+                              msg['eta_month'],
+                              msg['eta_day'],
+                              msg['eta_hour'],
+                              msg['eta_minute'])
+    except:
+      pass
+    else:
+      res['eta'] = eta.strftime("%Y-%m-%dT%H:%H:%S.%fZ")
 
   def mangle__eta_hour(self, res, msg):
     pass
