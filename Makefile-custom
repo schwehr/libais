@@ -53,6 +53,10 @@ clean:
 .PHONY: test
 test:
 	(cd src; make -f Makefile-custom test) 
+	python setup.py test
+
+# TODO(schwehr): Enable python3 testing.
+#	(type -p python3 && python3 setup.py test) || echo "python3 not available"
 
 # Hard coded depends
 src/libais/ais.o: src/libais/ais.h
