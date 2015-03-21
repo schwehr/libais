@@ -50,6 +50,7 @@ clean:
 	-rm -rf build
 	rm -f _ais.so
 
+.PHONY: test
 test:
 	(cd src; make -f Makefile-custom test) 
 

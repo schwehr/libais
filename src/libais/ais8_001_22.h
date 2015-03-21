@@ -53,7 +53,7 @@ ais8_001_22_subarea_factory(const AisBitset &bs,
 // or Point if radius is 0
 class Ais8_001_22_Circle : public Ais8_001_22_SubArea {
  public:
-  float x, y;  // Longitude and latitude.
+  AisPoint position;  // Longitude and latitude.
   // Going to assume that the precision is not useful.
   int precision;  // How many decimal places for x and y.
   int radius_m;
@@ -66,7 +66,7 @@ class Ais8_001_22_Circle : public Ais8_001_22_SubArea {
 
 class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
  public:
-  float x, y;  // Longitude and latitude.
+  AisPoint position;  // Longitude and latitude.
   int precision;  // How many decimal places for x and y.  Useless.
   int e_dim_m;  // East dimension in meters.
   int n_dim_m;
@@ -80,7 +80,7 @@ class Ais8_001_22_Rect : public Ais8_001_22_SubArea {
 
 class Ais8_001_22_Sector : public Ais8_001_22_SubArea {
  public:
-  float x, y;  // Longitude and latitude.
+  AisPoint position;  // Longitude and latitude.
   // TODO(schwehr): precision in IMO, but not RTCM.  Double check.
   int precision;  // How many decimal places for x and y?
   int radius_m;

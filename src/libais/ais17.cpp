@@ -30,8 +30,7 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
   bs.SeekTo(38);
   spare = bs.ToUnsignedInt(38, 2);
 
-  x = bs.ToInt(40, 18) / 600.;
-  y = bs.ToInt(58, 17) / 600.;
+  position = bs.ToAisPoint(40, 35);
   spare2 = bs.ToUnsignedInt(75, 5);
 
   // Spec states that there might be no data.
@@ -55,7 +54,7 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
 
 ostream& operator<< (ostream &o, const Ais17 &m) {
     return o << "[" << m.message_id << "]: " << m.mmsi
-             << " (" << m.x << ", " << m.y << ") t:"
+             << " " << m.position << " t:"
              << m.gnss_type << ", z:" << m.z_cnt
              << ", d s:" << m.station << ", seq:"
              << m.seq << ", h:" << m.health;

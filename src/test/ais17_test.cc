@@ -38,8 +38,8 @@ void Validate(
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);
   EXPECT_EQ(spare, msg->spare);
-  EXPECT_NEAR(x, msg->x, 0.0001);
-  EXPECT_NEAR(y, msg->y, 0.0001);
+  EXPECT_NEAR(x, msg->position.lng_deg, 0.0001);
+  EXPECT_NEAR(y, msg->position.lat_deg, 0.0001);
   EXPECT_EQ(spare2, msg->spare2);
   EXPECT_EQ(gnss_type, msg->gnss_type);
   EXPECT_EQ(z_cnt, msg->z_cnt);

@@ -18,8 +18,7 @@ static int scale_multipliers[4] = {1, 10, 100, 1000};
 Ais8_367_22_Circle::Ais8_367_22_Circle(const AisBitset &bs,
                                        const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
-  x = bs.ToInt(offset + 2, 28) / 600000.;
-  y = bs.ToInt(offset + 30, 27) / 600000.;
+  position = bs.ToAisPoint(offset + 2, 55);
   precision = bs.ToUnsignedInt(offset + 57, 3);
   radius_m =
       bs.ToUnsignedInt(offset + 60, 12) * scale_multipliers[scale_factor];
@@ -29,8 +28,7 @@ Ais8_367_22_Circle::Ais8_367_22_Circle(const AisBitset &bs,
 Ais8_367_22_Rect::Ais8_367_22_Rect(const AisBitset &bs,
                                    const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
-  x = bs.ToInt(offset + 2, 28) / 600000.;
-  y = bs.ToInt(offset + 30, 27) / 600000.;
+  position = bs.ToAisPoint(offset + 2, 55);
   precision = bs.ToUnsignedInt(offset + 57, 3);
   e_dim_m =
       bs.ToUnsignedInt(offset + 60, 8) * scale_multipliers[scale_factor];
@@ -43,8 +41,7 @@ Ais8_367_22_Rect::Ais8_367_22_Rect(const AisBitset &bs,
 Ais8_367_22_Sector::Ais8_367_22_Sector(const AisBitset &bs,
                                        const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
-  x = bs.ToInt(offset + 2, 28) / 600000.;
-  y = bs.ToInt(offset + 30, 27) / 600000.;
+  position = bs.ToAisPoint(offset + 2, 55);
   precision = bs.ToUnsignedInt(offset + 57, 3);
   radius_m =
       bs.ToUnsignedInt(offset + 60, 12) * scale_multipliers[scale_factor];

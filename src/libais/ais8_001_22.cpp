@@ -151,20 +151,11 @@ static int scale_multipliers[4] = {1, 10, 100, 1000};
 // Sub-Areas for the Area Notice class
 //////////////////////////////////////////////////////////////////////
 
-// TODO(olafsinram): Deprecate in favor of AisPoint.
-static void decode_xy(const AisBitset &bs, const size_t offset,
-                      float &x, float &y) {
-    // Offset is the start of the sub area.  Same as the caller's offset
-    // This is the same for all but the text subarea
-    // OLD Nav 55: bs.ToInt(offset + 5, 28) / 600000.;
-  x = bs.ToInt(offset, 25) / 60000.;
-  y = bs.ToInt(offset + 25, 24) / 60000.;
-}
-
 Ais8_001_22_Circle::Ais8_001_22_Circle(const AisBitset &bs,
                                        const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
-  decode_xy(bs, offset + 2, x, y);
+  position = bs.ToAisPoint(offset + 2, 49);
+
   precision = bs.ToUnsignedInt(offset + 51, 3);  // useless
   radius_m  = bs.ToUnsignedInt(offset + 54, 12) * scale_multipliers[scale_factor];
   spare     = bs.ToUnsignedInt(offset + 66, 18);
@@ -173,7 +164,7 @@ Ais8_001_22_Circle::Ais8_001_22_Circle(const AisBitset &bs,
 Ais8_001_22_Rect::Ais8_001_22_Rect(const AisBitset &bs,
                                    const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
-  decode_xy(bs, offset + 2, x, y);
+  position = bs.ToAisPoint(offset + 2, 49);
 
   precision  = bs.ToUnsignedInt(offset + 51, 3);  // useless
   e_dim_m    = bs.ToUnsignedInt(offset + 54, 8) * scale_multipliers[scale_factor];
@@ -185,7 +176,7 @@ Ais8_001_22_Rect::Ais8_001_22_Rect(const AisBitset &bs,
 Ais8_001_22_Sector::Ais8_001_22_Sector(const AisBitset &bs,
                                        const size_t offset) {
   const int scale = bs.ToUnsignedInt(offset, 2);
-  decode_xy(bs, offset + 2, x, y);
+  position = bs.ToAisPoint(offset + 2, 49);
 
   precision       = bs.ToUnsignedInt(offset + 51, 3);
   radius_m        = bs.ToUnsignedInt(offset + 54, 12) * scale_multipliers[scale];

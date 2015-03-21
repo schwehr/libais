@@ -25,8 +25,7 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad)
   position_accuracy = bs[38];
   raim = bs[39];
   nav_status = bs.ToUnsignedInt(40, 4);
-  x = bs.ToInt(44, 18) / 600.;
-  y = bs.ToInt(62, 17) / 600.;
+  position = bs.ToAisPoint(44, 35);
   sog = bs.ToUnsignedInt(79, 6);  // Knots.
   cog = bs.ToUnsignedInt(85, 9);  // Degrees.
   // 0 is a current GNSS position.  1 is NOT the current GNSS position

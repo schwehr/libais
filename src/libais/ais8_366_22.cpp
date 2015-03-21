@@ -203,8 +203,7 @@ static int scale_multipliers[4] = {1, 10, 100, 1000};
 Ais8_366_22_Circle::Ais8_366_22_Circle(const AisBitset &bs,
                                        const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset + 3, 2);
-  x = bs.ToInt(offset + 5, 28) / 600000.;
-  y = bs.ToInt(offset + 33, 27) / 600000.;
+  position = bs.ToAisPoint(offset + 5, 55);
   // TODO(schwehr): precision? And bit counts for radius  and spare?
   // TODO(schwehr): collapse these numbers
   radius_m =
@@ -215,8 +214,7 @@ Ais8_366_22_Circle::Ais8_366_22_Circle(const AisBitset &bs,
 Ais8_366_22_Rect::Ais8_366_22_Rect(const AisBitset &bs,
                                    const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset + 3, 2);
-  x = bs.ToInt(offset + 5, 28) / 600000.;
-  y = bs.ToInt(offset + 33, 27) / 600000.;
+  position = bs.ToAisPoint(offset + 5, 55);
   e_dim_m = bs.ToUnsignedInt(offset + 60, 8) * scale_multipliers[scale_factor];
   n_dim_m = bs.ToUnsignedInt(offset + 68, 8) * scale_multipliers[scale_factor];
   orient_deg = bs.ToUnsignedInt(offset + 76, 9);
@@ -226,8 +224,7 @@ Ais8_366_22_Rect::Ais8_366_22_Rect(const AisBitset &bs,
 Ais8_366_22_Sector::Ais8_366_22_Sector(const AisBitset &bs,
                                        const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset + 3, 2);
-  x = bs.ToInt(offset + 5, 28) / 600000.;
-  y = bs.ToInt(offset + 33, 27) / 600000.;
+  position = bs.ToAisPoint(offset + 5, 55);
   radius_m =
       bs.ToUnsignedInt(offset + 60, 12) * scale_multipliers[scale_factor];
   left_bound_deg = bs.ToUnsignedInt(offset + 72, 9);

@@ -97,7 +97,7 @@ clean:
 	-rm -rf *.o *.a *.pyc test_libais
 	-rm -rf *.d *_unittest *.dSYM
 
-test: test_libais
+test: libais.a test_libais
 	./test_libais
 
 test_libais: ${OBJS} test_libais.cpp ais.h

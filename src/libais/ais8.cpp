@@ -92,8 +92,12 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad)
   }
 
   bs.SeekTo(56);
-  y = bs.ToInt(56, 24) / 60000.;
-  x = bs.ToInt(80, 25) / 60000.;
+  // Reverse order lat/lng!
+  // TODO(schwehr): Reverse order, or just reverse bit count? Compare 6.1.14!
+  float y = bs.ToInt(56, 24) / 60000.;
+  float x = bs.ToInt(80, 25) / 60000.;
+  position = AisPoint(x, y);
+
   day = bs.ToUnsignedInt(105, 5);
   hour = bs.ToUnsignedInt(110, 5);
   minute = bs.ToUnsignedInt(115, 6);
@@ -268,8 +272,11 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad)
     target.type = bs.ToUnsignedInt(start, 2);
     target.id = bs.ToString(start + 2, 42);
     target.spare = bs.ToUnsignedInt(start + 44, 4);
-    target.y = bs.ToInt(start + 48, 24) / 60000.;  // booo - lat, lon
-    target.x = bs.ToInt(start + 72, 25) / 60000.;
+    // booo - lat, lon inverse order
+    float y = bs.ToInt(start + 48, 24) / 60000.;
+    float x = bs.ToInt(start + 72, 25) / 60000.;
+    target.position = AisPoint(x, y);
+
     target.cog = bs.ToUnsignedInt(start + 97, 9);
     target.timestamp = bs.ToUnsignedInt(start + 106, 6);
     target.sog = bs.ToUnsignedInt(start + 112, 8);
@@ -302,8 +309,7 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad)
   bs.SeekTo(56);
   link_id = bs.ToUnsignedInt(56, 10);
   name = bs.ToString(66, 120);
-  x = bs.ToInt(186, 25) / 60000.;
-  y = bs.ToInt(211, 24) / 60000.;
+  position = bs.ToAisPoint(186, 49);
   status = bs.ToUnsignedInt(235, 2);
   signal = bs.ToUnsignedInt(237, 5);
   utc_hour_next = bs.ToUnsignedInt(242, 5);
@@ -357,8 +363,7 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad)
   if (!type_wx_report) {
     // WX obs from ship
     location = bs.ToString(57, 120);
-    x = bs.ToInt(177, 25) / 60000.;
-    y = bs.ToInt(202, 24) / 60000.;
+    position = bs.ToAisPoint(177, 49);
     utc_day = bs.ToUnsignedInt(226, 5);
     utc_hour = bs.ToUnsignedInt(231, 5);
     utc_min = bs.ToUnsignedInt(236, 6);
@@ -381,8 +386,9 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad)
     spare2 = bs.ToUnsignedInt(357, 3);
   } else {
     // Type 1: WMO OBS from ship.
-    x = (bs.ToUnsignedInt(57, 16) / 100.) - 180;
-    y = (bs.ToUnsignedInt(73, 15) / 100.) - 180;
+    float x = (bs.ToUnsignedInt(57, 16) / 100.) - 180;
+    float y = (bs.ToUnsignedInt(73, 15) / 100.) - 180;
+    position = AisPoint(x, y);
 
     utc_month = bs.ToUnsignedInt(88, 4);
     utc_day = bs.ToUnsignedInt(92, 6);
@@ -526,11 +532,8 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad)
   // TODO(schwehr): manage the case where num_waypoints does not match
   // const size_t num_waypoints_stated = bs.ToUnsignedInt(112, 5);
   for (size_t waypoint_num = 0; waypoint_num < num_waypoints; waypoint_num++) {
-    AisPoint pt;
     const size_t start = 117 + 55*waypoint_num;
-    pt.x =  bs.ToInt(start, 28) / 600000.;
-    pt.y =  bs.ToInt(start + 28, 27) / 600000.;
-    waypoints.push_back(pt);
+    waypoints.push_back(bs.ToAisPoint(start, 55));
   }
 
   status = AIS_OK;
@@ -603,8 +606,7 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad)
   }
 
   bs.SeekTo(56);
-  x = bs.ToInt(56, 25) / 60000.;
-  y = bs.ToInt(81, 24) / 60000.;
+  position = bs.ToAisPoint(56, 49);
   position_accuracy = bs[105];
   utc_day = bs.ToUnsignedInt(106, 5);
   utc_hour = bs.ToUnsignedInt(111, 5);
@@ -724,10 +726,8 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad)
   utc_hour_end = bs.ToUnsignedInt(101, 5);
   utc_min_end = bs.ToUnsignedInt(106, 6);
 
-  x1 = bs.ToInt(112, 28) / 600000.;
-  y1 = bs.ToInt(140, 27) / 600000.;
-  x2 = bs.ToInt(167, 28) / 600000.;
-  y2 = bs.ToInt(195, 27) / 600000.;
+  position1 = bs.ToAisPoint(112, 55);
+  position2 = bs.ToAisPoint(167, 55);
 
   type = bs.ToUnsignedInt(222, 4);
   min = bs.ToUnsignedInt(226, 9);
@@ -790,8 +790,7 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad)
   }
 
   bs.SeekTo(56);
-  x = bs.ToInt(56, 28) / 600000.;
-  y = bs.ToInt(84, 27) / 600000.;
+  position = bs.ToAisPoint(56, 55);
   form = bs.ToUnsignedInt(111, 4);
   dir = bs.ToUnsignedInt(115, 9);  // degrees
   stream_dir = bs.ToUnsignedInt(124, 3);

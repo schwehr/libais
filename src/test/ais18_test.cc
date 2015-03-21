@@ -49,8 +49,8 @@ void Validate(const Ais18 *msg, const int repeat_indicator, const int mmsi,
   ASSERT_EQ(spare, msg->spare);
   ASSERT_EQ(sog, msg->sog);
   ASSERT_EQ(position_accuracy, msg->position_accuracy);
-  ASSERT_EQ(x, msg->x);
-  ASSERT_EQ(y, msg->y);
+  ASSERT_EQ(x, msg->position.lng_deg);
+  ASSERT_EQ(y, msg->position.lat_deg);
   ASSERT_EQ(cog, msg->cog);
   ASSERT_EQ(true_heading, msg->true_heading);
   ASSERT_EQ(timestamp, msg->timestamp);

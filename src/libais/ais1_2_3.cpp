@@ -45,8 +45,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad)
 
   sog = bs.ToUnsignedInt(50, 10) / 10.0;  // Knots.
   position_accuracy = bs[60];
-  x = bs.ToInt(61, 28) / 600000.;
-  y = bs.ToInt(89, 27) / 600000.;
+  position = bs.ToAisPoint(61, 55);
   cog = bs.ToUnsignedInt(116, 12) / 10.0;  // Degrees.
   true_heading = bs.ToUnsignedInt(128, 9);
   timestamp = bs.ToUnsignedInt(137, 6);

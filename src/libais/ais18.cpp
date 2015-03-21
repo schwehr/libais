@@ -60,8 +60,7 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad)
   sog = bs.ToUnsignedInt(46, 10) / 10.;
 
   position_accuracy = bs[56];
-  x = bs.ToInt(57, 28) / 600000.;
-  y = bs.ToInt(85, 27) / 600000.;
+  position = bs.ToAisPoint(57, 55);
 
   cog = bs.ToUnsignedInt(112, 12) / 10.;
   true_heading = bs.ToUnsignedInt(124, 9);

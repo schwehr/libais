@@ -190,6 +190,38 @@ string AisBitset::ToString(const size_t start, const size_t len) const {
   return result;
 }
 
+const AisPoint AisBitset::ToAisPoint(const size_t start,
+                                     const size_t point_size) const {
+  int lng_bits;
+  int lat_bits;
+  float divisor;
+  switch (point_size) {
+    case 35:
+      lng_bits = 18;
+      lat_bits = 17;
+      divisor = 600.;
+      break;
+    case 49:
+      lng_bits = 25;
+      lat_bits = 24;
+      divisor = 60000.;  // 1/1000th minute
+      break;
+    case 55:
+      lng_bits = 28;
+      lat_bits = 27;
+      divisor = 600000.;
+      break;
+    default:
+      std::cerr << "Unsupported point AIS size: " << point_size << std::endl;
+      assert(false);
+      return AisPoint(-1, -1);
+  }
+  float lng_deg = ToInt(start, lng_bits);
+  float lat_deg = ToInt(start + lng_bits, lat_bits);
+  return AisPoint(lng_deg / divisor, lat_deg / divisor);
+}
+
+
 // static private
 
 void AisBitset::InitNmeaOrd() {
@@ -245,6 +277,17 @@ AisMsg::AisMsg(const char *nmea_payload, const size_t pad)
   message_id = bs.ToUnsignedInt(0, 6);
   repeat_indicator = bs.ToUnsignedInt(6, 2);
   mmsi = bs.ToUnsignedInt(8, 30);
+}
+
+AisPoint::AisPoint() : lng_deg(0), lat_deg(0) {
+}
+
+AisPoint::AisPoint(float lng_deg_, float lat_deg_)
+    : lng_deg(lng_deg_), lat_deg(lat_deg_) {
+}
+
+ostream& operator<< (ostream &o, const AisPoint &position) {
+  return o << " (" << position.lng_deg << ", " << position.lat_deg << ")";
 }
 
 }  // namespace libais

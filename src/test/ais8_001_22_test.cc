@@ -67,8 +67,8 @@ TEST(Ais8_1_22Test, CircleAndTextForMarineMammals) {
   Ais8_001_22_Circle *circle =
       dynamic_cast<Ais8_001_22_Circle *>(msg->sub_areas[0]);
 
-  ASSERT_FLOAT_EQ(-70.22429656982422, circle->x);
-  ASSERT_FLOAT_EQ(42.105865478515625, circle->y);
+  ASSERT_FLOAT_EQ(-70.22429656982422, circle->position.lng_deg);
+  ASSERT_FLOAT_EQ(42.105865478515625, circle->position.lat_deg);
   ASSERT_EQ(4, circle->precision);
   ASSERT_EQ(14810, circle->radius_m);
   ASSERT_EQ(0, circle->spare);

@@ -34,8 +34,7 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad)
   second = bs.ToUnsignedInt(72, 6);
 
   position_accuracy = bs[78];
-  x = bs.ToInt(79, 28) / 600000.;
-  y = bs.ToInt(107, 27) / 600000.;
+  position = bs.ToAisPoint(79, 55);
 
   fix_type = bs.ToUnsignedInt(134, 4);
   transmission_ctl = bs[138];

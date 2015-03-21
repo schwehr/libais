@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "gtest/gtest.h"
-
 #include "ais.h"
 
 namespace libais {
@@ -49,8 +48,8 @@ void Validate(
   ASSERT_EQ(rot_over_range, msg->rot_over_range);
   ASSERT_FLOAT_EQ(sog, msg->sog);
   ASSERT_EQ(position_accuracy, msg->position_accuracy);
-  ASSERT_FLOAT_EQ(x, msg->x);
-  ASSERT_FLOAT_EQ(y, msg->y);
+  ASSERT_FLOAT_EQ(x, msg->position.lng_deg);
+  ASSERT_FLOAT_EQ(y, msg->position.lat_deg);
   ASSERT_EQ(true_heading, msg->true_heading);
   ASSERT_EQ(timestamp, msg->timestamp);
   ASSERT_EQ(special_manoeuvre, msg->special_manoeuvre);

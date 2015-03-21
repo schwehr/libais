@@ -3,17 +3,14 @@ include ChangeLog.html
 include CMakeLists.txt
 include LICENSE
 include Makefile-custom
-include */Makefile-custom
-include */*/Makefile-custom
 include README.org
 include TODO.org
 include VERSION
-include ais_decode_normed.cpp
 include ais_lut.py
 include create.sql
 include maritime_id_codes.py
 include nais2pg.py
 
 recursive-include docs *.txt *.org Makefile *.csv
-recursive-include src
-recursive-include test
+recursive-include src *.cpp *.cc *.h Makefile-custom
+recursive-include test *.py Makefile-custom

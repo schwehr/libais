@@ -40,8 +40,8 @@ void Validate(
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
   EXPECT_EQ(raim, msg->raim);
   EXPECT_EQ(nav_status, msg->nav_status);
-  EXPECT_EQ(x, msg->x);
-  EXPECT_EQ(y, msg->y);
+  EXPECT_EQ(x, msg->position.lng_deg);
+  EXPECT_EQ(y, msg->position.lat_deg);
   EXPECT_EQ(sog, msg->sog);
   EXPECT_EQ(cog, msg->cog);
   EXPECT_EQ(gnss, msg->gnss);
