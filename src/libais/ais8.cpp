@@ -1,5 +1,7 @@
 // Binary Broadcast Message (BBM) - 8
 
+// See also: http://www.e-navigation.nl/asm
+
 #include <iomanip>
 
 #include "ais.h"
@@ -187,7 +189,7 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-// No 8_1_16
+// No 8_1_14
 
 // IMO Circ 289 - Extended Shipdata - Air gap
 // See also Circ 236
