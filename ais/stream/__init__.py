@@ -52,6 +52,42 @@ class DifferingTimestampsError(StreamError):
   def __str__(self):
     return '%(description)s for %(timestamp)s: %(line_num)s: %(line)s, parts: %(parts)s' % self.kw
 
+def parseTagBlock(line):
+  if not line.startswith("\\"):
+    return {}, line
+  tagblock, line = line[1:].split("\\", 1)
+  tagblock, checksum = tagblock.rsplit("*", 1)
+
+  tags = {}
+  for field in tagblock.split(","):
+    key, value = field.split(":")
+
+    if key == 'c':
+      key = 'timestamp'
+      value = int(value)
+      # This can be either seconds or milliseconds...
+      if value > 40000000000:
+        value = value / 1000.0
+    elif key == 'n':
+      key = 'line_count'
+      value = int(value)
+    elif key == 'r':
+      key = 'relative_time'
+      value = int(value)
+    elif key == 'd':
+      key = 'destination'
+    elif key == 's':
+      key = 'station'
+    elif key == 't':
+      key = 'text'
+    elif key == 'g':
+      key = 'group'
+      value = dict(zip(["sentence", "groupsize", "id"],
+                       [int(part) for part in value.split("-")]))
+
+    tags["tagblock_" + key] = value
+  return tags, line
+
 
 def normalize(nmea=sys.stdin,
               uscg=True,
@@ -70,7 +106,7 @@ def normalize(nmea=sys.stdin,
     window: number of seconds to allow the later parts of a multiline message to span
   """
   if not uscg:
-    print 'Need to make a faster version that does not worry about the extra args and stations dict'
+    errorcb('Need to make a faster version that does not worry about the extra args and stations dict')
     assert False
 
   buffers = {} # Put partial messages in a queue by station so that they can be reassembled
@@ -79,10 +115,12 @@ def normalize(nmea=sys.stdin,
 
   for idx, line in enumerate(nmea):
     try:
+      tagblock, line = parseTagBlock(line)
+
       line = line.strip() + '\n'  # Get rid of DOS issues.
       line_num += 1
       if len(line) < 7 or line[3:6] not in ('VDM', 'VDO'):
-        yield line
+        yield tagblock, line
         continue
 
       if validateChecksum and not checksum.isChecksumValid(line):
@@ -103,7 +141,7 @@ def normalize(nmea=sys.stdin,
       totNumSentences = int(fields[1])
       if 1 == totNumSentences:
         # A single line needs no work, so pass it along.
-        yield line
+        yield tagblock, line
         continue
 
       sentenceNum = int(fields[2])  # Message sequence number 1..9 (packetNum)
@@ -116,7 +154,7 @@ def normalize(nmea=sys.stdin,
           station = fields[i]
           break  # Found it so ditch the for loop.
 
-      if station is None and options.allowUnknown:
+      if station is None and allowUnknown:
         station = 'UNKNOWN'
 
       if station is None:
@@ -128,7 +166,7 @@ def normalize(nmea=sys.stdin,
       else:
         bufferSlot = station + fields[3] + fields[4]  # seqId and Channel make a unique stream
 
-      newPacket = payload, station, timestamp
+      newPacket = payload, station, timestamp, tagblock
       if sentenceNum == 1:
         buffers[bufferSlot] = [newPacket]  # Overwrite any partials
         continue
@@ -137,8 +175,7 @@ def normalize(nmea=sys.stdin,
         # Finished a message
         if bufferSlot not in buffers:
           if verbose:
-            print 'Do not have the preceeding packets for line'
-            print '  ', line
+            errorcb('Do not have the preceeding packets for line\n  ' + line)
           continue
         buffers[bufferSlot].append(newPacket)
         parts = buffers[bufferSlot]  # Now have all the pieces.
@@ -168,6 +205,9 @@ def normalize(nmea=sys.stdin,
           continue
 
         payload = ''.join([p[0] for p in parts])
+        tagblock = {}
+        for p in reversed(parts):
+          tagblock.update(p[3])
 
         # Try to mirror the packet as much as possible... same seqId and channel.
         checksumed_str = ','.join((fields[0], '1,1', fields[3], fields[4],
@@ -183,7 +223,7 @@ def normalize(nmea=sys.stdin,
 
         if not checksum.isChecksumValid(out_str):
           errorcb(InvalidChecksumInConstructedError(line_num=line_num, line=line.strip()))
-        yield out_str.strip()+'\n'  # FIX: Why do I have to do this last strip?
+        yield tagblock, out_str.strip()+'\n'  # FIX: Why do I have to do this last strip?
 
         continue
 
@@ -191,18 +231,18 @@ def normalize(nmea=sys.stdin,
     except Exception, inst:
       errorcb(inst)
 
-
 def decode(nmea=sys.stdin,
            errorcb=ErrorPrinter,
            keep_nmea=False,
            **kw):
   """Decodes a stream of AIS messages. Takes the same arguments as normalize."""
 
-  for line in normalize(nmea=nmea, errorcb=errorcb, **kw):
+  for tagblock, line in normalize(nmea=nmea, errorcb=errorcb, **kw):
     body = ''.join(line.split(',')[5])
     pad = int(line.split('*')[0][-1])
     try:
       res = ais.decode(body, pad)
+      res.update(tagblock)
       if keep_nmea:
         res['nmea'] = line
       yield res
