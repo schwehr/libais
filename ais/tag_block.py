@@ -22,15 +22,15 @@ TAG_BLOCK_RE = re.compile(r"""
 (\\
 (?P<metadata>(
   (
-    c:(?P<time>\d{10,15}(\.\d*)?) | # Receiver Unix time in seconds or millisec
-    d:(?P<dest>[^*,\\]{1,15}) | # Destination
+    c:(?P<time>\d{10,15}(\.\d*)?) |  # Receiver Unix time in seconds or millisec
+    d:(?P<dest>[^*,\\]{1,15}) |  # Destination
     g:(?P<group>(?P<sentence_num>\d)-(?P<sentence_tot>\d)-(?P<group_id>\d+)) |
-    n:(?P<line_num>\d+) | # Line count
-    q:(?P<quality>\w) | # Orbcomm specific character code
+    n:(?P<line_num>\d+) |  # Line count
+    q:(?P<quality>\w) |  # Orbcomm specific character code
     r:(?P<rel_time>\d+) | # Relative time
-    s:(?P<rcvr>[^$*,!\\]{1,15}) | # Source / station
-    t:(?P<text>[^$*,!\\]+) | # Text string
-    T:(?P<text_date>[^$*,!\\]+) # Orbcomm human readable date
+    s:(?P<rcvr>[^$*,!\\]{1,15}) |  # Source / station
+    t:(?P<text>[^$*,!\\]+) |  # Text string
+    T:(?P<text_date>[^$*,!\\]+)  # Orbcomm human readable date
   )[,]?
 )+([*](?P<tag_checksum>[0-9A-Fa-f]{2}))?)
 \\)(?P<payload>.*)
