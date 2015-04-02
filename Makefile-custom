@@ -5,7 +5,7 @@ VERSION:=${shell cat VERSION}
 default:
 	@echo
 	@echo
-	@echo "	Welcome to libais ${VERSION}"
+	@echo "        Welcome to libais ${VERSION}"
 	@echo
 	@echo "Build options:"
 	@echo
