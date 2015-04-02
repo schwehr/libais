@@ -4,7 +4,6 @@
 #include <Python.h>
 
 #include "ais.h"
-#include "ais8_001_22.h"
 
 namespace libais {
 
@@ -1047,7 +1046,7 @@ ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict,
 AIS_STATUS
 ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
                         const size_t pad) {
-  Ais8_001_22 msg(nmea_payload, pad);
+  Ais8_1_22 msg(nmea_payload, pad);
   if (msg.had_error()) {
     return msg.get_error();
   }
@@ -1055,7 +1054,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
   DictSafeSetItem(dict, "link_id", msg.link_id);
   DictSafeSetItem(dict, "notice_type", msg.notice_type);
   DictSafeSetItem(dict, "notice_type_str",
-                  ais8_001_22_notice_names[msg.notice_type]);
+                  ais8_1_22_notice_names[msg.notice_type]);
 
   DictSafeSetItem(dict, "month", msg.month);
   DictSafeSetItem(dict, "day", msg.day);
@@ -1068,13 +1067,13 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
   // Loop over sub_areas
   for (size_t i = 0; i < msg.sub_areas.size(); i++) {
     switch (msg.sub_areas[i]->getType()) {
-    case AIS8_001_22_SHAPE_CIRCLE:  // or point
+    case AIS8_1_22_SHAPE_CIRCLE:  // or point
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Circle *c =
-            reinterpret_cast<Ais8_001_22_Circle*>(msg.sub_areas[i]);
+        Ais8_1_22_Circle *c =
+            reinterpret_cast<Ais8_1_22_Circle*>(msg.sub_areas[i]);
 
-        DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_CIRCLE);
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_CIRCLE);
         if (c->radius_m == 0)
           DictSafeSetItem(sub_area, "sub_area_type_str", "point");
         else
@@ -1087,13 +1086,13 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
         PyList_SetItem(sub_area_list, i, sub_area);
       }
       break;
-    case AIS8_001_22_SHAPE_RECT:
+    case AIS8_1_22_SHAPE_RECT:
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Rect *c =
-            reinterpret_cast<Ais8_001_22_Rect*>(msg.sub_areas[i]);
+        Ais8_1_22_Rect *c =
+            reinterpret_cast<Ais8_1_22_Rect*>(msg.sub_areas[i]);
 
-        DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_RECT);
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_RECT);
         DictSafeSetItem(sub_area, "sub_area_type_str", "rect");
 
         DictSafeSetItem(sub_area, "x", "y", c->position);
@@ -1105,13 +1104,13 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
         PyList_SetItem(sub_area_list, i, sub_area);
       }
       break;
-    case AIS8_001_22_SHAPE_SECTOR:
+    case AIS8_1_22_SHAPE_SECTOR:
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Sector *c =
-            reinterpret_cast<Ais8_001_22_Sector*>(msg.sub_areas[i]);
+        Ais8_1_22_Sector *c =
+            reinterpret_cast<Ais8_1_22_Sector*>(msg.sub_areas[i]);
 
-        DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_SECTOR);
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_SECTOR);
         DictSafeSetItem(sub_area, "sub_area_type_str", "sector");
 
         DictSafeSetItem(sub_area, "x", "y", c->position);
@@ -1123,13 +1122,13 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
         PyList_SetItem(sub_area_list, i, sub_area);
       }
       break;
-    case AIS8_001_22_SHAPE_POLYLINE:
+    case AIS8_1_22_SHAPE_POLYLINE:
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Polyline *polyline =
-            reinterpret_cast<Ais8_001_22_Polyline*>(msg.sub_areas[i]);
+        Ais8_1_22_Polyline *polyline =
+            reinterpret_cast<Ais8_1_22_Polyline*>(msg.sub_areas[i]);
 
-        DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_POLYLINE);
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_POLYLINE);
         DictSafeSetItem(sub_area, "sub_area_type_str", "polyline");
         assert(polyline->angles.size() == polyline->dists_m.size());
         PyObject *angle_list = PyList_New(polyline->angles.size());
@@ -1149,13 +1148,13 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
         PyList_SetItem(sub_area_list, i, sub_area);
       }
       break;
-    case AIS8_001_22_SHAPE_POLYGON:
+    case AIS8_1_22_SHAPE_POLYGON:
       {
         PyObject *sub_area = PyDict_New();
-        Ais8_001_22_Polygon *polygon =
-            reinterpret_cast<Ais8_001_22_Polygon*>(msg.sub_areas[i]);
+        Ais8_1_22_Polygon *polygon =
+            reinterpret_cast<Ais8_1_22_Polygon*>(msg.sub_areas[i]);
 
-        DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_POLYGON);
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_POLYGON);
         DictSafeSetItem(sub_area, "sub_area_type_str", "polygon");
         assert(polygon->angles.size() == polygon->dists_m.size());
         PyObject *angle_list = PyList_New(polygon->angles.size());
@@ -1175,13 +1174,13 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
         PyList_SetItem(sub_area_list, i, sub_area);
       }
       break;
-    case AIS8_001_22_SHAPE_TEXT:
+    case AIS8_1_22_SHAPE_TEXT:
       {
         PyObject *sub_area = PyDict_New();
 
-        Ais8_001_22_Text *text =
-            reinterpret_cast<Ais8_001_22_Text*>(msg.sub_areas[i]);
-        DictSafeSetItem(sub_area, "sub_area_type", AIS8_001_22_SHAPE_TEXT);
+        Ais8_1_22_Text *text =
+            reinterpret_cast<Ais8_1_22_Text*>(msg.sub_areas[i]);
+        DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_TEXT);
         DictSafeSetItem(sub_area, "sub_area_type_str", "text");
 
         DictSafeSetItem(sub_area, "text", text->text);
@@ -1746,7 +1745,7 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
   DictSafeSetItem(dict, "notice_type", msg.notice_type);
   // TODO(schwehr): are 8:1:22 and 8:367:22 tables the same?
   DictSafeSetItem(dict, "notice_type_str",
-                  ais8_001_22_notice_names[msg.notice_type]);
+                  ais8_1_22_notice_names[msg.notice_type]);
 
   DictSafeSetItem(dict, "month", msg.month);  // This is UTC, not local time.
   DictSafeSetItem(dict, "day", msg.day);

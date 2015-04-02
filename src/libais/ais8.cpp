@@ -445,6 +445,8 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
+// See ais8_1_22.cpp
+// No 8_1_23
 
 // IMO Circ 289 - Extended ship static and voyage-related
 // See also Circ 236
@@ -496,8 +498,8 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad)
 }
 
 
-// There is no 8_1_25
-// See ais8_001_26.cpp
+// No 8_1_25
+// See ais8_1_26.cpp
 
 // IMO Circ 289 - Route information
 // See also Circ 236

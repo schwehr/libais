@@ -4,17 +4,16 @@
 
 #include "gtest/gtest.h"
 #include "ais.h"
-#include "ais8_001_22.h"
 
 namespace libais {
 namespace {
 
-std::unique_ptr<Ais8_001_22> Init(const string &nmea_string) {
+std::unique_ptr<Ais8_1_22> Init(const string &nmea_string) {
   const string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.
-  std::unique_ptr<Ais8_001_22> msg(new Ais8_001_22(body.c_str(), pad));
+  std::unique_ptr<Ais8_1_22> msg(new Ais8_1_22(body.c_str(), pad));
   if (!msg || msg->had_error()) {
     return nullptr;
   }
@@ -22,7 +21,7 @@ std::unique_ptr<Ais8_001_22> Init(const string &nmea_string) {
 }
 
 void Validate(
-    const Ais8_001_22 *msg,
+    const Ais8_1_22 *msg,
     const int message_id,
     const int repeat_indicator,
     const int mmsi,
@@ -53,7 +52,7 @@ void Validate(
 
 // Tests decoding a Boston right whale alert message.
 TEST(Ais8_1_22Test, CircleAndTextForMarineMammals) {
-  std::unique_ptr<Ais8_001_22> msg = Init(
+  std::unique_ptr<Ais8_1_22> msg = Init(
       "!AIVDM,1,1,0,B,803Ovrh0EPM0WB0h2l0MwJUi=6B4G9000aip8<2Bt2H"
       "q2Qhp,0*01,d-084,S1582,t091042.00,T42.19038981,r003669945,"
       "1332321042");
@@ -61,11 +60,11 @@ TEST(Ais8_1_22Test, CircleAndTextForMarineMammals) {
 
   ASSERT_EQ(2, msg->sub_areas.size());
 
-  ASSERT_EQ(AIS8_001_22_SHAPE_CIRCLE, msg->sub_areas[0]->getType());
-  ASSERT_EQ(AIS8_001_22_SHAPE_TEXT, msg->sub_areas[1]->getType());
+  ASSERT_EQ(AIS8_1_22_SHAPE_CIRCLE, msg->sub_areas[0]->getType());
+  ASSERT_EQ(AIS8_1_22_SHAPE_TEXT, msg->sub_areas[1]->getType());
 
-  Ais8_001_22_Circle *circle =
-      dynamic_cast<Ais8_001_22_Circle *>(msg->sub_areas[0]);
+  Ais8_1_22_Circle *circle =
+      dynamic_cast<Ais8_1_22_Circle *>(msg->sub_areas[0]);
 
   ASSERT_FLOAT_EQ(-70.22429656982422, circle->position.lng_deg);
   ASSERT_FLOAT_EQ(42.105865478515625, circle->position.lat_deg);
@@ -73,14 +72,14 @@ TEST(Ais8_1_22Test, CircleAndTextForMarineMammals) {
   ASSERT_EQ(14810, circle->radius_m);
   ASSERT_EQ(0, circle->spare);
 
-  Ais8_001_22_Text *text = dynamic_cast<Ais8_001_22_Text *>(msg->sub_areas[1]);
+  Ais8_1_22_Text *text = dynamic_cast<Ais8_1_22_Text *>(msg->sub_areas[1]);
 
   ASSERT_STREQ("NOAA RW SGHTNG", text->text.c_str());
 }
 
 // Tests missing subareas.
 TEST(Ais8_1_22Test, BadAreaNotice) {
-  std::unique_ptr<Ais8_001_22> msg = Init(
+  std::unique_ptr<Ais8_1_22> msg = Init(
       "!AIVDM,1,1,,A,803Ovrh0EPG0WB5p2l0L40,4*1E,d-085,S1593"
       ",t091042.00,T42.48370895,r003669945,1332321042");
   ASSERT_EQ(nullptr, msg);
@@ -88,7 +87,7 @@ TEST(Ais8_1_22Test, BadAreaNotice) {
 
 // Tests missing subareas and incorrect pad.
 TEST(Ais8_1_22Test, BadAreaNoticeAndWrongPad) {
-  std::unique_ptr<Ais8_001_22> msg = Init(
+  std::unique_ptr<Ais8_1_22> msg = Init(
       "!AIVDM,1,1,,A,803Ovrh0EPG0WB5p2l0L40,4*1E,d-085,S1593"
       ",t091042.00,T42.48370895,r003669945,1332321042");
   ASSERT_EQ(nullptr, msg);
