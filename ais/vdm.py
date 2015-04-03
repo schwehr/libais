@@ -140,7 +140,14 @@ class BareQueue(Queue.Queue):
     if sentence_total == 1:
       body = match['body']
       fill_bits = int(match['fill_bits'])
-      decoded = ais.decode(body, fill_bits)
+      try:
+        decoded = ais.decode(body, fill_bits)
+      # TODO(schwehr): Make the C++ python exception available in python.
+      # pylint: disable=broad-except
+      except Exception as error:
+        logging.error(
+            'Unable to decode message: %s\n  %d %s', error, line_num, line)
+        return
       decoded['md5'] = hashlib.md5(body).hexdigest()
       Queue.Queue.put(self, {
           'line_nums': [line_num],
@@ -185,7 +192,14 @@ class BareQueue(Queue.Queue):
 
     body = ''.join([match['body'] for match in entry['matches']])
     fill_bits = int(entry['matches'][-1]['fill_bits'])
-    # TODO(schwehr): Wrap decode() with a try/except for trouble.
+    try:
+      decoded = ais.decode(body, fill_bits)
+    # TODO(schwehr): Make the C++ python exception available in python.
+    # pylint: disable=broad-except
+    except Exception as error:
+      logging.error(
+          'Unable to decode message: %s\n%s', error, entry)
+      return
     decoded = ais.decode(body, fill_bits)
     decoded['md5'] = hashlib.md5(body).hexdigest()
     entry['decoded'] = decoded

@@ -458,6 +458,12 @@ class BareQueueTest(unittest.TestCase):
     self.assertEqual(msgs[3]['decoded']['callsign'], 'KHJL   ')
     self.assertEqual(msgs[3]['matches'][0]['seq_id'], '7')
 
+  def testUnhandledSingleLineVdmMessageType(self):
+    # AIS 6:669:11 not handled.
+    line = '!AIVDM,1,1,,B,6B?n;be:cbapalgc;i6?Ow4,2*4A'
+    self.queue.put(line)
+    self.assertEqual(self.queue.qsize(), 0)
+
 
 if __name__ == '__main__':
   unittest.main()

@@ -717,7 +717,10 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
   }
 
   if (status != AIS_OK) {
-    PyErr_Format(ais_py_exception, "Ais6: %s",
+    PyErr_Format(ais_py_exception,
+                 "Ais6: DAC:FI not known.  6:%d:%d %s",
+                 msg.dac,
+                 msg.fi,
                  AIS_STATUS_STRINGS[status]);
     return nullptr;
   }
