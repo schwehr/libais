@@ -1,8 +1,12 @@
 """Convert libais message dictionaries to GPSD JSON."""
 
+import datetime
 
 class Mangler(object):
   """Convert libais dictionaries to gpsd dictionaries."""
+
+  def __init__(self, copy_tagblock_timestamp=True):
+    self.copy_tagblock_timestamp = copy_tagblock_timestamp
 
   def __call__(self, msg):
     res = {}
@@ -107,6 +111,9 @@ class Mangler(object):
 
   # Type 5: Static and Voyage Related Data  #####
 
+  def mangle__mmsi(self, res, msg):
+    res['mmsi'] = str(msg['mmsi'])
+
   def mangle__name(self, res, msg):
     res['shipname'] = msg['name'].strip('@').strip()
 
@@ -129,10 +136,25 @@ class Mangler(object):
     res['to_starboard'] = msg['dim_d']
 
   def mangle__eta_day(self, res, msg):
-    res['eta'] = '%02d-%02dT%02d:%02dZ' % (msg['eta_month'],
-                                           msg['eta_day'],
-                                           msg['eta_hour'],
-                                           msg['eta_minute'])
+    if msg['eta_month'] < 1 or msg['eta_day'] == 0 or msg['eta_hour'] == 24 or msg['eta_minute'] == 60:
+      return
+
+    year = 0
+    if 'year' in msg:
+      year = msg['year']
+    elif 'tagblock_timestamp' in msg:
+      year = datetime.datetime.utcfromtimestamp(msg['tagblock_timestamp']).year
+
+    try:
+      eta = datetime.datetime(year,
+                              msg['eta_month'],
+                              msg['eta_day'],
+                              msg['eta_hour'],
+                              msg['eta_minute'])
+    except:
+      pass
+    else:
+      res['eta'] = eta.strftime("%Y-%m-%dT%H:%H:%S.%fZ")
 
   def mangle__eta_hour(self, res, msg):
     pass
@@ -144,7 +166,7 @@ class Mangler(object):
     pass
 
   def mangle__imo_num(self, res, msg):
-    res['imo'] = msg['imo_num']
+    res['imo'] = str(msg['imo_num'])
 
   def mangle__type_and_cargo(self, res, msg):
     res['shiptype'] = msg['type_and_cargo']
@@ -377,6 +399,14 @@ class Mangler(object):
 
   def mangle__interval_raw(self, res, msg):
     res['interval'] = msg['interval_raw']
+
+  # Tagblock data
+  def mangle__tagblock_timestamp(self, res, msg):
+    res['tagblock_timestamp'] = datetime.datetime.utcfromtimestamp(msg['tagblock_timestamp']).strftime("%Y-%m-%dT%H:%H:%S.%fZ")
+
+    if self.copy_tagblock_timestamp and 'year' not in msg:
+      res['timestamp'] = res['tagblock_timestamp']
+
 
   # Mappings
 
