@@ -246,5 +246,5 @@ def decode(nmea=sys.stdin,
       if keep_nmea:
         res['nmea'] = line
       yield res
-    except Exception, e:
+    except ais.DecodeError as e:
       errorcb(e)

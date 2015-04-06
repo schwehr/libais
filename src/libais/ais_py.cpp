@@ -2771,25 +2771,17 @@ PyObject *PyInit_ais(void) {
 
 #else  // Python 2.7
 
-static struct module_state _state;
-
 void init_ais(void) {
   PyObject *module = Py_InitModule("_ais", ais_methods);
 
   if (module == nullptr) {
     return;
   }
-  struct module_state *st = &_state;
 
-  st->error = PyErr_NewException(const_cast<char *>(exception_name),
-                                 nullptr, nullptr);
-  if (st->error == nullptr) {
-    Py_DECREF(module);
-    return;
-  }
-
-  ais_py_exception = PyErr_NewException(const_cast<char *>("ais.decode.error"),
-                                        nullptr, nullptr);
+  ais_py_exception = PyErr_NewException(
+      const_cast<char *>(exception_name), NULL, NULL);
+  Py_INCREF(ais_py_exception);
+  PyModule_AddObject(module, "DecodeError", ais_py_exception);
 }
 
 #endif  // PY_MAJOR_VERSION

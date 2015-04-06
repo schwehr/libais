@@ -142,9 +142,7 @@ class BareQueue(Queue.Queue):
       fill_bits = int(match['fill_bits'])
       try:
         decoded = ais.decode(body, fill_bits)
-      # TODO(schwehr): Make the C++ python exception available in python.
-      # pylint: disable=broad-except
-      except Exception as error:
+      except ais.DecodeError as error:
         logging.error(
             'Unable to decode message: %s\n  %d %s', error, line_num, line)
         return
@@ -194,13 +192,10 @@ class BareQueue(Queue.Queue):
     fill_bits = int(entry['matches'][-1]['fill_bits'])
     try:
       decoded = ais.decode(body, fill_bits)
-    # TODO(schwehr): Make the C++ python exception available in python.
-    # pylint: disable=broad-except
-    except Exception as error:
+    except ais.DecodeError as error:
       logging.error(
           'Unable to decode message: %s\n%s', error, entry)
       return
-    decoded = ais.decode(body, fill_bits)
     decoded['md5'] = hashlib.md5(body).hexdigest()
     entry['decoded'] = decoded
 

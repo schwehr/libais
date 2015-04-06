@@ -31,13 +31,8 @@ class Ais6Decoders(unittest.TestCase):
   def testDecodeUnknownMessage6(self):
     # !AIVDM,1,1,,B,6B?n;be:cbapalgc;i6?Ow4,2*4A'
     # TODO(schwehr): Expose the C++ Python exception to Python.
-    exception_happened = False
-    try:
-      ais.decode('6B?n;be:cbapalgc;i6?Ow4', 2)
-    except Exception as error:
-      exception_happened = True
-      self.assertIn('6:669:11', str(error))
-    self.assertTrue(exception_happened)
+    self.assertRaisesRegexp(ais.DecodeError, '6:669:11',
+                            ais.decode, '6B?n;be:cbapalgc;i6?Ow4', 2)
 
 if __name__=='__main__':
   unittest.main()
