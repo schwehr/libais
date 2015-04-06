@@ -2,6 +2,7 @@
 
 import datetime
 
+
 class Mangler(object):
   """Convert libais dictionaries to gpsd dictionaries."""
 
@@ -136,7 +137,9 @@ class Mangler(object):
     res['to_starboard'] = msg['dim_d']
 
   def mangle__eta_day(self, res, msg):
-    if msg['eta_month'] < 1 or msg['eta_day'] == 0 or msg['eta_hour'] == 24 or msg['eta_minute'] == 60:
+    if msg['eta_month'] < 1 or msg['eta_day'] == 0 or msg['eta_hour'] == 24:
+      return
+    if msg['eta_minute'] == 60:
       return
 
     year = 0
@@ -155,7 +158,7 @@ class Mangler(object):
       # TODO(redhog): What exception is being triggered and why?
       pass
     else:
-      res['eta'] = eta.strftime("%Y-%m-%dT%H:%H:%S.%fZ")
+      res['eta'] = eta.strftime('%Y-%m-%dT%H:%H:%S.%fZ')
 
   def mangle__eta_hour(self, res, msg):
     pass
@@ -403,11 +406,11 @@ class Mangler(object):
 
   # Tagblock data
   def mangle__tagblock_timestamp(self, res, msg):
-    res['tagblock_timestamp'] = datetime.datetime.utcfromtimestamp(msg['tagblock_timestamp']).strftime("%Y-%m-%dT%H:%H:%S.%fZ")
+    res['tagblock_timestamp'] = datetime.datetime.utcfromtimestamp(
+        msg['tagblock_timestamp']).strftime('%Y-%m-%dT%H:%H:%S.%fZ')
 
     if self.copy_tagblock_timestamp and 'year' not in msg:
       res['timestamp'] = res['tagblock_timestamp']
-
 
   # Mappings
 
