@@ -228,7 +228,7 @@ def normalize(nmea=sys.stdin,
         continue
 
       buffers[bufferSlot].append(newPacket)
-    except Exception, inst:
+    except Exception as inst:
       errorcb(inst)
 
 def decode(nmea=sys.stdin,
