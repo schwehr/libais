@@ -50,12 +50,12 @@ clean:
 	(cd test && make -f Makefile-custom clean)
 	-rm -rf build
 	rm -f _ais.so
+	rm -rf */__pycache__
+	rm -rf *.egg-info
 
 real-clean: clean
 	rm -f MANIFEST
 	rm -rf build dist
-	rm -rf */__pycache__
-	rm -rf *.egg-info
 	find . -name .DS_Store | xargs rm -f
 
 .PHONY: test
