@@ -38,7 +38,7 @@ known_problems = {
 def HaveGpsdecode():
   """Return true if the gpsdecode binary is on the path or false if not."""
   try:
-    subprocess.check_call('gpsdecode', '-V')
+    subprocess.check_call(['gpsdecode', '-V'])
     return True
   except:
     return False
