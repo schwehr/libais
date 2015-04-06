@@ -152,6 +152,7 @@ class Mangler(object):
                               msg['eta_hour'],
                               msg['eta_minute'])
     except:
+      # TODO(redhog): What exception is being triggered and why?
       pass
     else:
       res['eta'] = eta.strftime("%Y-%m-%dT%H:%H:%S.%fZ")
