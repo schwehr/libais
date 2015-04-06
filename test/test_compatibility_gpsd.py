@@ -12,17 +12,36 @@ import ais.stream
 import ais.compatibility.gpsd
 
 
-known_bad = set(('radio','data', 'addressed', 'reserved', 'regional', 'structured', 'app_id'))
-precission = 5.0
+known_bad = set((
+    'addressed',
+    'app_id',
+    'data',
+    'radio',
+    'regional',
+    'reserved',
+    'structured',
+    ))
+precision = 5.0
 
 known_problems = {
-    27: set(('status',)),
-    17: set(('lat', 'lon')),
-    15: set(('mmsi2',)),
-    20: set(('offset4', 'increment4', 'increment3', 'offset3', 'timeout3', 'timeout4', 'number4', 'number3')),
     2:  set(('turn', 'status_text')),
-    9:  set(('speed',))
+    9:  set(('speed', )),
+    15: set(('mmsi2',)),
+    17: set(('lat', 'lon')),
+    20: set((
+        'increment3', 'number3', 'offset3', 'timeout3',
+        'increment4', 'number4', 'offset4', 'timeout4', )),
+    27: set(('status', )),
     }
+
+
+def HaveGpsdecode():
+  """Return true if the gpsdecode binary is on the path or false if not."""
+  try:
+    subprocess.check_call('gpsdecode', '-V')
+    return True
+  except:
+    return False
 
 
 def strNum(s):
@@ -40,7 +59,8 @@ def dictDiff(a, b):
         if isinstance(x, (str, unicode)) and isinstance(y, (str, unicode)):
             if re.sub(r"[^a-z]", r"", unicode(x).lower()) == re.sub(r"[^a-z]", r"", unicode(y).lower()): return True
         if isinstance(x, (int, float, long)) and isinstance(y, (int, float, long)):
-            if abs(float(x) - float(y)) < precission: return True
+            if abs(float(x) - float(y)) < precision:
+              return True
         return False
 
     return {
@@ -62,6 +82,7 @@ class GPSDCompatibility(unittest.TestCase):
     def tearDown(self):
         os.unlink(self.json)
 
+    @unittest.skipIf(not HaveGpsdecode(), 'gpsdecode not on the path')
     def testAll(self):
         def gpsd():
             with open(self.json) as f:
@@ -93,6 +114,7 @@ class GPSDCompatibility(unittest.TestCase):
                 self.assertTrue(not diff['removed'])
         except StopIteration:
             pass
+
 
 if __name__=='__main__':
     unittest.main()
