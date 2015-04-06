@@ -10,12 +10,11 @@ TODO(schwehr): Add a queue method to drop old groups caches.
 TODO(schwehr): Catch a wider variety of incomplete groups.
 TODO(schwehr): Compute running stats in the queue.
 """
-import Queue
 import re
 
-from . import nmea
-from . import util
-
+from ais import nmea
+from ais import util
+import six.moves.queue as Queue
 
 # Added a decimal value to time beyond the normal TAG BLOCK spec.
 TAG_BLOCK_RE = re.compile(r"""

@@ -58,13 +58,13 @@ See Also:
 """
 
 import hashlib
-import Queue
+import logging
 import re
 
 import ais
 from ais import nmea
+import six.moves.queue as Queue
 
-import logging
 
 
 # Orbcomm sometimes leaves out the channel.
@@ -146,7 +146,7 @@ class BareQueue(Queue.Queue):
         logging.error(
             'Unable to decode message: %s\n  %d %s', error, line_num, line)
         return
-      decoded['md5'] = hashlib.md5(body).hexdigest()
+      decoded['md5'] = hashlib.md5(body.encode('utf-8')).hexdigest()
       Queue.Queue.put(self, {
           'line_nums': [line_num],
           'lines': [line],
@@ -196,7 +196,7 @@ class BareQueue(Queue.Queue):
       logging.error(
           'Unable to decode message: %s\n%s', error, entry)
       return
-    decoded['md5'] = hashlib.md5(body).hexdigest()
+    decoded['md5'] = hashlib.md5(body.encode('utf-8')).hexdigest()
     entry['decoded'] = decoded
 
     # Found the final message in a group.

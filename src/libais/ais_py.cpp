@@ -7,6 +7,11 @@
 
 namespace libais {
 
+PyObject *ais_py_exception;
+const char exception_name[] = "_ais.DecodeError";
+
+// TODO(schwehr): Write a full module doc string.
+
 // Functional Identifiers (FI) are individual messages within a
 // specific DAC.  An FI in one DAC has nothing to do with an FI in
 // another DAC.
@@ -53,9 +58,6 @@ enum AIS_FI {
   AIS_FI_8_366_22_AREA_NOTICE = 22,  // USCG.
   AIS_FI_8_367_22_AREA_NOTICE = 22,  // USCG.
 };
-
-PyObject *ais_py_exception;
-const char exception_name[] = "ais.decode.Error";
 
 void
 DictSafeSetItem(PyObject *dict, const string &key, const long val) {
@@ -158,7 +160,6 @@ DictSafeSetItem(PyObject *dict, const string &key, PyObject *val_obj) {
   Py_DECREF(key_obj);
 }
 
-extern "C" {
 
 PyObject *
 ais_msg_to_pydict(const AisMsg* msg) {
@@ -403,10 +404,10 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict,
   PyObject *res_list = PyList_New(26);
   for (size_t cap_num = 0; cap_num < 128/2; cap_num++) {
     // TODO(schwehr): memory leak?
-    PyObject *cap = PyInt_FromLong(long(msg.capabilities[cap_num]));
+    PyObject *cap = PyLong_FromLong(long(msg.capabilities[cap_num]));
     PyList_SetItem(cap_list, cap_num, cap);
 
-    PyObject *res = PyInt_FromLong(long(msg.cap_reserved[cap_num]));
+    PyObject *res = PyLong_FromLong(long(msg.cap_reserved[cap_num]));
     PyList_SetItem(res_list, cap_num, res);
   }
   DictSafeSetItem(dict, "capabilities", cap_list);
@@ -550,7 +551,7 @@ ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict,
   if (msg.services_known) {
     PyObject *serv_list = PyList_New(26);
     for (size_t serv_num = 0; serv_num < 26; serv_num++) {
-      PyObject *serv = PyInt_FromLong(long(msg.services[serv_num]));
+      PyObject *serv = PyLong_FromLong(long(msg.services[serv_num]));
       PyList_SetItem(serv_list, serv_num, serv);
     }
     DictSafeSetItem(dict, "services", serv_list);
@@ -1082,7 +1083,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
         else
           DictSafeSetItem(sub_area, "sub_area_type_str", "circle");
 
-        DictSafeSetItem(sub_area, "x", "y",c->position);
+        DictSafeSetItem(sub_area, "x", "y", c->position);
         DictSafeSetItem(sub_area, "precision", c->precision);
         DictSafeSetItem(sub_area, "radius", c->radius_m);
         // TODO(schwehr): spare?
@@ -1227,7 +1228,7 @@ ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict,
 
   PyObject *solas_list = PyList_New(26);
   for (size_t solas_num = 0; solas_num < 26; solas_num++) {
-    PyObject *solas = PyInt_FromLong(msg.solas_status[solas_num]);
+    PyObject *solas = PyLong_FromLong(msg.solas_status[solas_num]);
     PyList_SetItem(solas_list, solas_num, solas);
   }
   DictSafeSetItem(dict, "solas", solas_list);
@@ -1678,7 +1679,7 @@ ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict,
 
   PyObject *id_list = PyList_New(4);
   for (size_t i = 0; i < 4; i++)
-    PyList_SetItem(id_list, 0, PyInt_FromLong(msg.gauge_ids[i]));
+    PyList_SetItem(id_list, 0, PyLong_FromLong(msg.gauge_ids[i]));
   DictSafeSetItem(dict, "gauge_ids", id_list);
 
   PyObject *level_list = PyList_New(4);
@@ -1732,7 +1733,7 @@ ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict,
 
   PyObject *spare2_list = PyList_New(3);
   for (size_t i = 0; i < 3; i++)
-    PyList_SetItem(spare2_list, 0,  PyInt_FromLong(msg.spare2[i]));
+    PyList_SetItem(spare2_list, 0,  PyLong_FromLong(msg.spare2[i]));
   DictSafeSetItem(dict, "spare2", spare2_list);
 
   return AIS_OK;
@@ -2604,6 +2605,8 @@ ais27_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 
+extern "C" {
+
 static PyObject *
 decode(PyObject *self, PyObject *args) {
   int _pad;
@@ -2620,14 +2623,13 @@ decode(PyObject *self, PyObject *args) {
 
   // The grand dispatcher
   switch (nmea_payload[0]) {
-    // Class A Position
-  case '1':  // FALLTHROUGH
+  case '1':  // FALLTHROUGH - Class A Position
   case '2':  // FALLTHROUGH
   case '3':
     return ais1_2_3_to_pydict(nmea_payload, pad);
 
   case '4':  // FALLTHROUGH - 4 - Basestation report
-  case ';':  //  11 - UTC date response
+  case ';':  // 11 - UTC date response
     return ais4_11_to_pydict(nmea_payload, pad);
 
   case '5':  // 5 - Ship and Cargo
@@ -2713,59 +2715,30 @@ decode(PyObject *self, PyObject *args) {
 
 static PyMethodDef ais_methods[] = {
   {"decode", decode, METH_VARARGS, "Return a dictionary for a NMEA string"},
-  {nullptr, nullptr, 0, nullptr},
+  {nullptr, nullptr, 0, nullptr},  // Sentinel
 };
 
 // Python module initialization
 
-struct module_state {
-  PyObject *error;
-};
-
 #if PY_MAJOR_VERSION >= 3
 
-#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
-
-static int ais_traverse(PyObject *m, visitproc visit, void *arg) {
-  Py_VISIT(GETSTATE(m)->error);
-  return nullptr;
-}
-
-static int ais_clear(PyObject *m) {
-  Py_CLEAR(GETSTATE(m)->error);
-  return nullptr;
-}
-
-static struct PyModuleDef moduledef = {
+static struct PyModuleDef aismodule = {
   PyModuleDef_HEAD_INIT,
-  "_ais",
-  nullptr,
-  sizeof(struct module_state),
-  ais_methods,
-  nullptr,
-  ais_traverse,
-  ais_clear,
-  nullptr
+  "_ais",  // Module name.
+  nullptr,  // Module documentation.
+  -1,  // Says the module keeps state in global variables.
+  ais_methods
 };
 
-PyObject *PyInit_ais(void) {
-  PyObject *module = PyModule_Create(&moduledef);
+PyMODINIT_FUNC PyInit__ais(void) {
+  PyObject *module = PyModule_Create(&aismodule);
 
-  if (module == nullptr) {
+  if (module == nullptr)
     return nullptr;
-  }
-  struct module_state *st = GETSTATE(module);
 
-  st->error = PyErr_NewException(const_cast<char *>(exception_name),
-                                 nullptr, nullptr);
-  if (st->error == nullptr) {
-    Py_DECREF(module);
-    return nullptr;
-  }
-
-  ais_py_exception = PyErr_NewException(const_cast<char *>("ais.decode.error"),
-                                        nullptr, nullptr);
-
+  ais_py_exception = PyErr_NewException("_ais.DecodeError", nullptr, nullptr);
+  Py_INCREF(ais_py_exception);
+  PyModule_AddObject(module, "DecodeError", ais_py_exception);
   return module;
 }
 
@@ -2779,7 +2752,7 @@ void init_ais(void) {
   }
 
   ais_py_exception = PyErr_NewException(
-      const_cast<char *>(exception_name), NULL, NULL);
+      const_cast<char *>(exception_name), nullptr, nullptr);
   Py_INCREF(ais_py_exception);
   PyModule_AddObject(module, "DecodeError", ais_py_exception);
 }

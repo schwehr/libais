@@ -14,7 +14,7 @@ class TestCase(unittest.TestCase):
     # This method has the correct order.
     self.assertIsInstance(expected, dict)
     self.assertIsInstance(actual, dict)
-    for key, value in expected.iteritems():
+    for key, value in expected.items():
       self.assertEqual(actual[key], value, 'kv: %s, %s' % (key, value))
 
 
