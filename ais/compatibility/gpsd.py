@@ -112,9 +112,6 @@ class Mangler(object):
 
   # Type 5: Static and Voyage Related Data  #####
 
-  def mangle__mmsi(self, res, msg):
-    res['mmsi'] = msg['mmsi']
-
   def mangle__name(self, res, msg):
     res['shipname'] = msg['name'].strip('@').strip()
 
