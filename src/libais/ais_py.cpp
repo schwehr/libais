@@ -205,12 +205,16 @@ ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
 
   // SOTDMA
   if (msg.message_id == 1 || msg.message_id == 2) {
-    DictSafeSetItem(dict, "slot_timeout", msg.slot_timeout);
+    if (msg.slot_timeout_valid) {
+      DictSafeSetItem(dict, "slot_timeout", msg.slot_timeout);
+    }
 
-    if (msg.received_stations_valid)
+    if (msg.received_stations_valid) {
       DictSafeSetItem(dict, "received_stations", msg.received_stations);
-    if (msg.slot_number_valid)
+    }
+    if (msg.slot_number_valid) {
       DictSafeSetItem(dict, "slot_number", msg.slot_number);
+    }
     if (msg.utc_valid) {
       DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
       DictSafeSetItem(dict, "utc_min", msg.utc_min);
