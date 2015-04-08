@@ -2056,6 +2056,8 @@ ais9_to_pydict(const char *nmea_payload, const size_t pad) {
   DictSafeSetItem(dict, "assigned_mode", msg.assigned_mode);
   DictSafeSetItem(dict, "raim", msg.raim);
 
+  DictSafeSetItem(dict, "sync_state", msg.sync_state);
+
   if (0 == msg.commstate_flag) {
     // SOTMDA
     DictSafeSetItem(dict, "slot_timeout", msg.slot_timeout);
