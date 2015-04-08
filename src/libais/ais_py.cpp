@@ -976,7 +976,6 @@ ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict,
   }
 
   DictSafeSetItem(dict, "x", "y", msg.position);
-  DictSafeSetItem(dict, "utc_month", msg.utc_month);
   DictSafeSetItem(dict, "utc_day", msg.utc_day);
   DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
   DictSafeSetItem(dict, "utc_min", msg.utc_min);
@@ -1002,7 +1001,8 @@ ais8_1_21_append_pydict(const char *nmea_payload, PyObject *dict,
     DictSafeSetItem(dict, "spare2", msg.spare2);
   } else {
     // type == 1
-    // PAIN IN THE ASS WMO OBS from ship
+    // WMO OBS from ship
+    DictSafeSetItem(dict, "utc_month", msg.utc_month);
     DictSafeSetItem(dict, "cog", msg.cog);
     DictSafeSetItem(dict, "sog", msg.sog);
     DictSafeSetItem(dict, "heading", msg.heading);
