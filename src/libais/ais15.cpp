@@ -33,6 +33,7 @@ Ais15::Ais15(const char *nmea_payload, const size_t pad)
 
   // TODO(schwehr): set remaining fields to -1
   if (num_chars <= 15) {
+    assert(bs.GetRemaining() == 0);
     status = AIS_OK;
     return;
   }
@@ -50,6 +51,7 @@ Ais15::Ais15(const char *nmea_payload, const size_t pad)
 
   // TODO(schwehr): set remaining fields to -1
   if (num_chars <= 18) {
+    // TODO(schwehr): Crashes: assert(bs.GetRemaining() == 0);
     status = AIS_OK;
     return;
   }
@@ -59,6 +61,8 @@ Ais15::Ais15(const char *nmea_payload, const size_t pad)
   msg_2 = bs.ToUnsignedInt(140, 6);
   slot_offset_2 = bs.ToUnsignedInt(146, 12);
   spare4 = bs.ToUnsignedInt(158, 2);
+
+  assert(bs.GetRemaining() == 0);
 
   status = AIS_OK;
 }

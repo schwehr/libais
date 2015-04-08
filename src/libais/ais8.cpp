@@ -65,6 +65,8 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad)
     spare2 = 0;
   else
     spare2 = bs.ToUnsignedInt(68, spare2_size);
+
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -144,6 +146,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad)
   bs.SeekRelative(-6);
   extended_water_level = bs.ToUnsignedInt(346, 6);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -186,6 +189,8 @@ Ais8_1_13::Ais8_1_13(const char *nmea_payload, const size_t pad)
   hour_to = bs.ToUnsignedInt(457, 5);
   minute_to = bs.ToUnsignedInt(462, 6);
   spare2 = bs.ToUnsignedInt(468, 4);
+
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -213,6 +218,8 @@ Ais8_1_15::Ais8_1_15(const char *nmea_payload, const size_t pad)
   bs.SeekTo(56);
   air_draught = bs.ToUnsignedInt(56, 11) / 10.;
   spare2 = bs.ToUnsignedInt(67, 5);
+
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -239,6 +246,8 @@ Ais8_1_16::Ais8_1_16(const char *nmea_payload, const size_t pad)
   bs.SeekTo(56);
   persons = bs.ToUnsignedInt(56, 13);
   spare2 = bs.ToUnsignedInt(69, 3);
+
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -283,6 +292,8 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad)
     target.timestamp = bs.ToUnsignedInt(start + 106, 6);
     target.sog = bs.ToUnsignedInt(start + 112, 8);
   }
+
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -323,6 +334,8 @@ Ais8_1_19::Ais8_1_19(const char *nmea_payload, const size_t pad)
     spare2[2] = bs.ToUnsignedInt(322, 32);
     spare2[3] = bs.ToUnsignedInt(354, 6);
   }
+
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -442,6 +455,8 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad)
     ice_devel = bs.ToUnsignedInt(351, 5);
     bearing_ice_edge = bs.ToUnsignedInt(356, 4) * 45;
   }
+
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -494,6 +509,8 @@ Ais8_1_24::Ais8_1_24(const char *nmea_payload, const size_t pad)
   bunker_oil = bs.ToUnsignedInt(323, 14);  // tonnes
   persons = bs.ToUnsignedInt(337, 13);
   spare2 = bs.ToUnsignedInt(350, 10);
+
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -540,6 +557,7 @@ Ais8_1_27::Ais8_1_27(const char *nmea_payload, const size_t pad)
     waypoints.push_back(bs.ToAisPoint(start, 55));
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -576,6 +594,7 @@ Ais8_1_29::Ais8_1_29(const char *nmea_payload, const size_t pad)
     spare2 = 0;
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -653,6 +672,7 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad)
   ice = bs.ToUnsignedInt(348, 2);  // yes/no/undef/unknown
   spare2 = bs.ToUnsignedInt(350, 10);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -691,6 +711,7 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad)
   heading_qual = bs[159];
   spare2 = bs.ToUnsignedInt(160, 8);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -740,6 +761,7 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad)
   wind_dir = bs.ToUnsignedInt(246, 4);
   spare2 = bs.ToUnsignedInt(250, 6);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -771,6 +793,8 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad)
     // ERROR: the spec has a bit listing mistake
     levels[i] = sign * bs.ToUnsignedInt(start + 12, 13);
   }
+
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -802,6 +826,7 @@ Ais8_200_40::Ais8_200_40(const char *nmea_payload, const size_t pad)
   // TODO(schwehr): status[ ] = bite me;
   spare2 = bs.ToUnsignedInt(157, 11);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -842,6 +867,7 @@ Ais8_200_55::Ais8_200_55(const char *nmea_payload, const size_t pad)
     spare2[1] = bs.ToUnsignedInt(117, 19);
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

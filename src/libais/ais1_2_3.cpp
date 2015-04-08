@@ -97,6 +97,8 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad)
     keep_flag_valid = true;
   }
 
+  assert(bs.GetRemaining() == 0);
+
   status = AIS_OK;
 }
 

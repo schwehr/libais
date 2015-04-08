@@ -222,8 +222,9 @@ ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
       DictSafeSetItem(dict, "utc_spare", msg.utc_spare);
     }
 
-    if (msg.slot_offset_valid)
+    if (msg.slot_offset_valid) {
       DictSafeSetItem(dict, "slot_offset", msg.slot_offset);
+    }
   }
 
   // ITDMA
@@ -2145,8 +2146,8 @@ ais14_to_pydict(const char *nmea_payload, const size_t pad) {
 
   PyObject *dict = ais_msg_to_pydict(&msg);
   DictSafeSetItem(dict, "spare", msg.spare);
-
   DictSafeSetItem(dict, "text", msg.text);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
 
   return dict;
 }

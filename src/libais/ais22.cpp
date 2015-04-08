@@ -62,6 +62,7 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad)
 
   spare2 = bs.ToUnsignedInt(145, 23);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

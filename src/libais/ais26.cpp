@@ -98,6 +98,8 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad)
     keep_flag = bs[comm_flag_offset + 19];
     keep_flag_valid = true;
   }
+
+  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

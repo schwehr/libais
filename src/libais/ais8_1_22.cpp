@@ -304,11 +304,12 @@ Ais8_1_22::Ais8_1_22(const char *nmea_payload, const size_t pad)
       status = AIS_ERR_BAD_SUB_SUB_MSG;
     }
   }
-  /* TODO(schwehr): inspect the subareas to make sure the are sane.
+  /* TODO(schwehr): inspect the subareas to make sure they are sane.
      - polyline/polygon have a point first
      - text has geometry to go through it all
   */
   // TODO(schwehr): watch out for mandatory spare bits to byte align payload
+  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
   if (status == AIS_UNINITIALIZED)
     status = AIS_OK;
 }

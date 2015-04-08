@@ -287,7 +287,8 @@ top_level = [
              'mmsi': 970210000,
              'repeat_indicator': 0,
              'spare': 0,
-             'text': 'SART TEST@@@@@@@'}
+             'text': 'SART TEST@@@@@@@',
+             'spare2': 0}
   },
 
   {

@@ -49,6 +49,7 @@ Ais19::Ais19(const char *nmea_payload, const size_t pad)
   assigned_mode = bs[307];
   spare3 = bs.ToUnsignedInt(308, 4);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

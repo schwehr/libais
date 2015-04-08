@@ -40,6 +40,8 @@ Ais25::Ais25(const char *nmea_payload, const size_t pad)
     }
     // TODO(schwehr): Handle the payloads.
   }
+
+  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

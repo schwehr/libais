@@ -34,6 +34,7 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad)
 
   if (num_bits == 72) {
     spare2 = bs.ToUnsignedInt(70, 2);
+    assert(bs.GetRemaining() == 0);
     status = AIS_OK;
     return;
   }
@@ -75,6 +76,7 @@ Ais20::Ais20(const char *nmea_payload, const size_t pad)
 
   spare2 = 0;
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

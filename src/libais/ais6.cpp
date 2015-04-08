@@ -67,6 +67,7 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad)
   else
     spare2 = bs.ToUnsignedInt(100 + text_size, spare2_size);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -92,6 +93,7 @@ Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad)
   msg_seq = bs.ToUnsignedInt(98, 11);
   spare2 = bs.ToUnsignedInt(109, 3);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -116,6 +118,7 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad)
   req_dac = bs.ToUnsignedInt(88, 10);
   req_fi = bs.ToUnsignedInt(98, 6);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -141,6 +144,7 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad)
   req_dac = bs.ToUnsignedInt(88, 10);
   spare2 = bs.ToUnsignedInt(94, 6);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -175,6 +179,7 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
   // spare2 = bs.ToUnsignedInt(226, 6);  // OR NOT
   // TODO(schwehr): add in the offset of the dest mmsi
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -255,6 +260,7 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad)
   // 360
 #endif
 
+  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -301,6 +307,7 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad)
     windows.push_back(w);
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -334,6 +341,7 @@ Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad)
   spare2[0] = bs.ToUnsignedInt(317, 32);
   spare2[1] = bs.ToUnsignedInt(349, 11);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -375,6 +383,7 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad)
   name = bs.ToString(191, 120);
   position = bs.ToAisPoint(311, 49);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -460,6 +469,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad)
     cargos.push_back(cargo);
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -506,6 +516,7 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad)
     windows.push_back(w);
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -531,6 +542,7 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad)
   persons = bs.ToUnsignedInt(88, 13);
   spare2 = bs.ToUnsignedInt(101, 3);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

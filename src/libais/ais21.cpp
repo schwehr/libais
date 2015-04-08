@@ -55,6 +55,7 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad)
     spare2 = 0;
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

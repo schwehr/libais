@@ -32,6 +32,7 @@ Ais27::Ais27(const char *nmea_payload, const size_t pad)
   gnss = !bs[94];
   spare = bs[95];
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

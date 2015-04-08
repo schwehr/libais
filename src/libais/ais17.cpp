@@ -48,6 +48,8 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
 
   // TODO(schwehr): Implement parsing the payload.
 
+  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
+
   status = AIS_OK;  // TODO(schwehr): not really okay yet.
 }
 

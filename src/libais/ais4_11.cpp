@@ -72,6 +72,7 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad)
     assert(false);
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

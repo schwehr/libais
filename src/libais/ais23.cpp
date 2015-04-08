@@ -37,6 +37,7 @@ Ais23::Ais23(const char *nmea_payload, const size_t pad)
   quiet = bs.ToUnsignedInt(150, 4);
   spare3 = bs.ToUnsignedInt(154, 6);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

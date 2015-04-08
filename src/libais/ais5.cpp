@@ -46,6 +46,7 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad)
   dte = bs[422];
   spare = bs[423];
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

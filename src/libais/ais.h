@@ -1865,6 +1865,7 @@ class Ais12 : public AisMsg {
   bool retransmitted;
   int spare;
   string text;
+  int spare2;
 
   Ais12(const char *nmea_payload, const size_t pad);
 };
@@ -1877,7 +1878,7 @@ class Ais14 : public AisMsg {
  public:
   int spare;
   string text;
-  int expected_num_spare_bits;  // The bits in the nmea_payload not used
+  int spare2;
 
   Ais14(const char *nmea_payload, const size_t pad);
 };

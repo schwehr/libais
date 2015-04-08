@@ -29,6 +29,7 @@ Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad)
     seq_num.push_back(bs.ToUnsignedInt(40 + i*32 + 30, 2));
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
