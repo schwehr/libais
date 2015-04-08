@@ -178,6 +178,38 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
+// IMO 1371-5 Ack
+Ais6_1_5::Ais6_1_5(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad), ack_dac(0), ack_fi(0), seq_num(0),
+      ai_available(false), ai_response(0), spare(0) {
+  assert(dac == 1);
+  assert(fi == 5);
+
+  if (num_bits != 168) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
+  if (r != AIS_OK) {
+    status = r;
+    return;
+  }
+
+  bs.SeekTo(88);
+  ack_dac = bs.ToUnsignedInt(88, 10);
+  ack_fi = bs.ToUnsignedInt(98, 6);
+  seq_num = bs.ToUnsignedInt(104, 11);
+  ai_available = static_cast<bool>(bs[115]);
+  ai_response = bs.ToUnsignedInt(116, 3);
+  spare = bs.ToUnsignedInt(119, 49);
+
+  assert(bs.GetRemaining() == 0);
+
+  status = AIS_OK;
+}
+
 // IMO Circ 289 - Dangerous cargo
 // See also Circ 236
 Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad)

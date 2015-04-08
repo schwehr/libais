@@ -591,6 +591,20 @@ class Ais6_1_4 : public Ais6 {
 };
 ostream& operator<< (ostream &o, const Ais6_1_4 &msg);
 
+// International function message 5: Application ack to addr binary message.
+class Ais6_1_5 : public Ais6 {
+ public:
+  // TODO(schwehr): How to handle the sequence number and retransmit flag?
+  int ack_dac;
+  int ack_fi;
+  int seq_num;
+  bool ai_available;  // TODO(schwehr): AI?  Is this the dac/fi being acked?
+  int ai_response;
+  int spare;
+
+  Ais6_1_5(const char *nmea_payload, const size_t pad);
+};
+
 // IMO Circ 236 Dangerous cargo indication
 // Not to be transmitted after 2012-Jan-01
 class Ais6_1_12 : public Ais6 {

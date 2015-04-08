@@ -21,6 +21,7 @@ enum AIS_FI {
   AIS_FI_6_1_2_FI_INTERROGATE = 2,
   AIS_FI_6_1_3_CAPABILITY_INTERROGATE = 3,
   AIS_FI_6_1_4_CAPABILITY_REPLY = 4,
+  AIS_FI_6_1_5_ACK= 5,
   AIS_FI_6_1_12_DANGEROUS_CARGO = 12,
   AIS_FI_6_1_14_TIDAL_WINDOW = 14,
   AIS_FI_6_1_16_VTS_TARGET = 16,
@@ -422,21 +423,25 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict,
 }
 
 AIS_STATUS
-ais6_1_40_append_pydict(const char *nmea_payload, PyObject *dict,
-                        const size_t pad) {
+ais6_1_5_append_pydict(const char *nmea_payload, PyObject *dict,
+                       const size_t pad) {
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
-  Ais6_1_40 msg(nmea_payload, pad);
+  Ais6_1_5 msg(nmea_payload, pad);
   if (msg.had_error()) {
     return msg.get_error();
   }
-  DictSafeSetItem(dict, "persons", msg.persons);
-  DictSafeSetItem(dict, "spare2", msg.spare2);
+
+  DictSafeSetItem(dict, "ack_dac", msg.ack_dac);
+  DictSafeSetItem(dict, "ack_fi", msg.ack_dac);
+  DictSafeSetItem(dict, "seq_num", msg.ack_dac);
+  DictSafeSetItem(dict, "ai_available", msg.ack_dac);
+  DictSafeSetItem(dict, "ai_response", msg.ack_dac);
+  DictSafeSetItem(dict, "spare", msg.ack_dac);
 
   return AIS_OK;
 }
-
 
 AIS_STATUS
 ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict,
@@ -645,6 +650,21 @@ ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict,
   return AIS_OK;
 }
 
+AIS_STATUS
+ais6_1_40_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
+  assert(nmea_payload);
+  assert(dict);
+  assert(pad < 6);
+  Ais6_1_40 msg(nmea_payload, pad);
+  if (msg.had_error()) {
+    return msg.get_error();
+  }
+  DictSafeSetItem(dict, "persons", msg.persons);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
+
+  return AIS_OK;
+}
 
 PyObject*
 ais6_to_pydict(const char *nmea_payload, const size_t pad) {
@@ -686,6 +706,9 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
       break;
     case AIS_FI_6_1_4_CAPABILITY_REPLY:  // OLD ITU 1371-1.
       status = ais6_1_4_append_pydict(nmea_payload, dict, pad);
+      break;
+    case AIS_FI_6_1_5_ACK:  // ITU 1371-5.
+      status = ais6_1_5_append_pydict(nmea_payload, dict, pad);
       break;
     case AIS_FI_6_1_12_DANGEROUS_CARGO:  // Not to be used after 1 Jan 2013.
       status = ais6_1_12_append_pydict(nmea_payload, dict, pad);
