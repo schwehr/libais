@@ -186,19 +186,12 @@ def DecodeTagSingle(tag_block_message):
   return decoded
 
 
-def GetVdmLines(lines):
-  for line in lines:
-    line = line.rstrip()
-    if nmea.ID_BARE_VDM_RE.match(line):
-      yield line
-
-
 def DecodeTagMultiple(tag_block_message):
   """Decode a TAG block message that spans multiple lines."""
   payloads = [msg['payload'] for msg in tag_block_message['matches']]
 
   q = vdm.BareQueue()
-  for line in GetVdmLines(payloads):
+  for line in vdm.VdmLines(payloads):
     q.put(line)
   if q.qsize() != 1:
     logging.info('Error: Should get just one message decoded from this: %s',

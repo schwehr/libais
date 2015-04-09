@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 """Handle AIS VD[MO] messages without extra metadata.
 
 An example single line message:
@@ -66,7 +67,6 @@ from ais import nmea
 import six.moves.queue as Queue
 
 
-
 # Orbcomm sometimes leaves out the channel.
 # TAG BLOCKS use "sentence" as the regex group name.  Use sen here to
 # avoid collision.
@@ -80,6 +80,21 @@ VDM_RE_STR = r'''!(?P<talker>[A-Z][A-Z])(?P<vdm_type>VD[MO])
 '''
 
 VDM_RE = re.compile(VDM_RE_STR, re.VERBOSE)
+
+
+def VdmLines(lines):
+  """Yield only the lines that contain AIS messages.
+
+  Args:
+    lines: An iterable series of strings.
+
+  Yields:
+    Lines that look like they probably contain valid VDM/VDO messages.
+  """
+  for line in lines:
+    line = line.rstrip()
+    if nmea.ID_BARE_VDM_RE.match(line):
+      yield line
 
 
 def Parse(data):

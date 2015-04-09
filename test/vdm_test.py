@@ -5,6 +5,7 @@
 import unittest
 
 from ais import vdm
+import six
 
 
 class TestCase(unittest.TestCase):
@@ -18,7 +19,7 @@ class TestCase(unittest.TestCase):
       self.assertEqual(actual[key], value, 'kv: %s, %s' % (key, value))
 
 
-class VdmTest(unittest.TestCase):
+class VdmRegexTest(unittest.TestCase):
   """Test handling simple NMEA messages without TAG BLOCK info."""
 
   def testRegexSingleLineMessage(self):
@@ -63,6 +64,20 @@ class VdmTest(unittest.TestCase):
     matches = [vdm.VDM_RE.match(line).groupdict() for line in lines]
     self.assertEqual(matches[0], expected[0])
     self.assertEqual(matches[1], expected[1])
+
+
+class VdmLinesTest(unittest.TestCase):
+
+  def testVdmLinesGenerator(self):
+    lines = (
+        '',
+        '!AIVDM,2,2,2,B,00000000000,2*25 \n',
+        '$ARVSI,r003669945,5,201704.05687473,0152,-085,0*2E',
+        r'\g:3-3-42349,n:111460*1E\$',
+    )
+    generator = vdm.VdmLines(lines)
+    self.assertEqual(six.next(generator), '!AIVDM,2,2,2,B,00000000000,2*25')
+    self.assertRaises(StopIteration, six.next, generator)
 
 
 class ParseTest(TestCase):

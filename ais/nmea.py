@@ -30,7 +30,7 @@ ID_USCG_RE = re.compile(r'[!$][A-Z]{4}[^*!$]*\*[0-9A-Fa-f]{2},[^*!$]+$')
 ID_TAGB_RE = re.compile(r'\\([a-zA-Z]:[^*,\\]*[,]?)+\*[0-9A-Fa-f]{2}(\\.*)?$')
 
 # Specific match for an AIS line.
-ID_BARE_VDM_RE = re.compile(r'[!$][A-Z]{2}VD[MO][^*!$]*\*[0-9A-Fa-f]{2}$')
+ID_BARE_VDM_RE = re.compile(r'[!$][A-Z]{2}VD[MO][^*!$]*\*[0-9A-Fa-f]{2}')
 
 
 def _Checksum(sentence):
