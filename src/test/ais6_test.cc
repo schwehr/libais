@@ -1,5 +1,7 @@
 // Test parsing AIS 6 address binary messages.
 
+#include <memory>
+
 #include "gtest/gtest.h"
 #include "ais.h"
 
