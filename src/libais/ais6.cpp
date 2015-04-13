@@ -35,6 +35,47 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad)
   fi = bs.ToUnsignedInt(82, 6);
 }
 
+// http://www.e-navigation.nl/content/monitoring-aids-navigation
+Ais6_0_0::Ais6_0_0(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad),
+      sub_id(1),
+      voltage(0.0),
+      current(0.0),
+      dc_power_supply(true),
+      light_on(true),
+      battery_low(false),
+      off_position(false),
+      spare2(0) {
+  assert(dac == 0);
+  assert(fi == 0);
+
+  if (num_bits != 136) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
+  if (r != AIS_OK) {
+    status = r;
+    return;
+  }
+
+  bs.SeekTo(88);
+  sub_id = bs.ToUnsignedInt(88, 16);
+  voltage = bs.ToUnsignedInt(104, 12) / 10.0;
+  current = bs.ToUnsignedInt(116, 10) / 10.0;
+  dc_power_supply = bs[126];
+  light_on = bs[127];
+  battery_low = bs[128];
+  off_position = bs[129];
+
+  spare2 = bs.ToUnsignedInt(130, 6);
+
+  assert(bs.GetRemaining() == 0);
+  status = AIS_OK;
+}
+
 Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad)
     : Ais6(nmea_payload, pad), ack_required(false), msg_seq(0),
       spare2(0) {
