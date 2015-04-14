@@ -35,6 +35,8 @@ void Validate(
     const int dim_d,
     const int spare) {
   ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(24, msg->message_id);
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);

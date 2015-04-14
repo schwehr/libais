@@ -12,12 +12,14 @@ void ValidateAis8(const Ais8 *msg, const int repeat_indicator, const int mmsi,
                   const int spare,
                   const int dac, const int fi) {
   ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(8, msg->message_id);
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);
   EXPECT_EQ(spare, msg->spare);
 
-  ASSERT_EQ(dac, msg->dac);
+  EXPECT_EQ(dac, msg->dac);
   ASSERT_EQ(fi, msg->fi);
 }
 

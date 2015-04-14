@@ -43,25 +43,27 @@ void Validate(const Ais18 *msg, const int repeat_indicator, const int mmsi,
               const int band_flag, const int m22_flag, const int mode_flag,
               const bool raim) {
   ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(18, msg->message_id);
-  ASSERT_EQ(repeat_indicator, msg->repeat_indicator);
-  ASSERT_EQ(mmsi, msg->mmsi);
-  ASSERT_EQ(spare, msg->spare);
-  ASSERT_EQ(sog, msg->sog);
-  ASSERT_EQ(position_accuracy, msg->position_accuracy);
-  ASSERT_EQ(x, msg->position.lng_deg);
-  ASSERT_EQ(y, msg->position.lat_deg);
-  ASSERT_EQ(cog, msg->cog);
-  ASSERT_EQ(true_heading, msg->true_heading);
-  ASSERT_EQ(timestamp, msg->timestamp);
-  ASSERT_EQ(spare2, msg->spare2);
-  ASSERT_EQ(unit_flag, msg->unit_flag);
-  ASSERT_EQ(display_flag, msg->display_flag);
-  ASSERT_EQ(dsc_flag, msg->dsc_flag);
-  ASSERT_EQ(band_flag, msg->band_flag);
-  ASSERT_EQ(m22_flag, msg->m22_flag);
-  ASSERT_EQ(mode_flag, msg->mode_flag);
-  ASSERT_EQ(raim, msg->raim);
+  EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
+  EXPECT_EQ(mmsi, msg->mmsi);
+  EXPECT_EQ(spare, msg->spare);
+  EXPECT_EQ(sog, msg->sog);
+  EXPECT_EQ(position_accuracy, msg->position_accuracy);
+  EXPECT_EQ(x, msg->position.lng_deg);
+  EXPECT_EQ(y, msg->position.lat_deg);
+  EXPECT_EQ(cog, msg->cog);
+  EXPECT_EQ(true_heading, msg->true_heading);
+  EXPECT_EQ(timestamp, msg->timestamp);
+  EXPECT_EQ(spare2, msg->spare2);
+  EXPECT_EQ(unit_flag, msg->unit_flag);
+  EXPECT_EQ(display_flag, msg->display_flag);
+  EXPECT_EQ(dsc_flag, msg->dsc_flag);
+  EXPECT_EQ(band_flag, msg->band_flag);
+  EXPECT_EQ(m22_flag, msg->m22_flag);
+  EXPECT_EQ(mode_flag, msg->mode_flag);
+  EXPECT_EQ(raim, msg->raim);
 }
 
 void ValidateCommState(
@@ -75,53 +77,53 @@ void ValidateCommState(
     const int slots_to_allocate, const bool keep_flag_valid,
     const bool keep_flag, const bool commstate_cs_fill_valid,
     const int commstate_cs_fill) {
-  ASSERT_EQ(sync_state, msg->sync_state);
+  EXPECT_EQ(sync_state, msg->sync_state);
 
-  ASSERT_EQ(slot_timeout_valid, msg->slot_timeout_valid);
+  EXPECT_EQ(slot_timeout_valid, msg->slot_timeout_valid);
   if (slot_timeout_valid) {
-    ASSERT_EQ(slot_timeout, msg->slot_timeout);
+    EXPECT_EQ(slot_timeout, msg->slot_timeout);
   }
 
-  ASSERT_EQ(received_stations_valid, msg->received_stations_valid);
+  EXPECT_EQ(received_stations_valid, msg->received_stations_valid);
   if (received_stations_valid) {
-    ASSERT_EQ(received_stations, msg->received_stations);
+    EXPECT_EQ(received_stations, msg->received_stations);
   }
 
-  ASSERT_EQ(slot_number_valid, msg->slot_number_valid);
+  EXPECT_EQ(slot_number_valid, msg->slot_number_valid);
   if (slot_number_valid) {
-    ASSERT_EQ(slot_number, msg->slot_number);
+    EXPECT_EQ(slot_number, msg->slot_number);
   }
 
-  ASSERT_EQ(utc_valid, msg->utc_valid);
+  EXPECT_EQ(utc_valid, msg->utc_valid);
   if (utc_valid) {
-    ASSERT_EQ(utc_hour, msg->utc_hour);
-    ASSERT_EQ(utc_min, msg->utc_min);
-    ASSERT_EQ(utc_spare, msg->utc_spare);
+    EXPECT_EQ(utc_hour, msg->utc_hour);
+    EXPECT_EQ(utc_min, msg->utc_min);
+    EXPECT_EQ(utc_spare, msg->utc_spare);
   }
 
-  ASSERT_EQ(slot_offset_valid, msg->slot_offset_valid);
+  EXPECT_EQ(slot_offset_valid, msg->slot_offset_valid);
   if (slot_offset_valid) {
-    ASSERT_EQ(slot_offset, msg->slot_offset);
+    EXPECT_EQ(slot_offset, msg->slot_offset);
   }
 
-  ASSERT_EQ(slot_increment_valid, msg->slot_increment_valid);
+  EXPECT_EQ(slot_increment_valid, msg->slot_increment_valid);
   if (slot_increment_valid) {
-    ASSERT_EQ(slot_increment, msg->slot_increment);
+    EXPECT_EQ(slot_increment, msg->slot_increment);
   }
 
-  ASSERT_EQ(slots_to_allocate_valid, msg->slots_to_allocate_valid);
+  EXPECT_EQ(slots_to_allocate_valid, msg->slots_to_allocate_valid);
   if (slots_to_allocate_valid) {
-    ASSERT_EQ(slots_to_allocate, msg->slots_to_allocate);
+    EXPECT_EQ(slots_to_allocate, msg->slots_to_allocate);
   }
 
-  ASSERT_EQ(keep_flag_valid, msg->keep_flag_valid);
+  EXPECT_EQ(keep_flag_valid, msg->keep_flag_valid);
   if (keep_flag_valid) {
-    ASSERT_EQ(keep_flag, msg->keep_flag);
+    EXPECT_EQ(keep_flag, msg->keep_flag);
   }
 
-  ASSERT_EQ(commstate_cs_fill_valid, msg->commstate_cs_fill_valid);
+  EXPECT_EQ(commstate_cs_fill_valid, msg->commstate_cs_fill_valid);
   if (commstate_cs_fill_valid) {
-    ASSERT_EQ(commstate_cs_fill, msg->commstate_cs_fill);
+    EXPECT_EQ(commstate_cs_fill, msg->commstate_cs_fill);
   }
 }
 

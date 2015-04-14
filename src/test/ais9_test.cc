@@ -38,6 +38,8 @@ void Validate(
     const int assigned_mode,
     const bool raim) {
   ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(9, msg->message_id);
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);

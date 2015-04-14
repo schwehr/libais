@@ -28,12 +28,15 @@ void Validate(
     const int spare,
     const vector<int> dest_mmsi,
     const vector<int> seq_num) {
+  ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(message_id, msg->message_id);
-  ASSERT_EQ(repeat_indicator, msg->repeat_indicator);
-  ASSERT_EQ(mmsi, msg->mmsi);
-  ASSERT_EQ(spare, msg->spare);
-  ASSERT_EQ(dest_mmsi, msg->dest_mmsi);
-  ASSERT_EQ(seq_num, msg->seq_num);
+  EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
+  EXPECT_EQ(mmsi, msg->mmsi);
+  EXPECT_EQ(spare, msg->spare);
+  EXPECT_EQ(dest_mmsi, msg->dest_mmsi);
+  EXPECT_EQ(seq_num, msg->seq_num);
 }
 
 TEST(Ais713Test, Msg7Length1) {

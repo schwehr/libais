@@ -16,6 +16,8 @@ void Validate(const Ais5 *msg, const int repeat_indicator, const int mmsi,
               const int eta_hour, const int eta_minute, const float draught,
               const string destination, const int dte, const int spare) {
   ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(5, msg->message_id);
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);
@@ -40,8 +42,10 @@ void Validate(const Ais5 *msg, const int repeat_indicator, const int mmsi,
 }
 
 TEST(Ais5Test, DecodeAnything) {
-  // !SAVDM,2,1,6,A,55NOvQP1u>QIL@O??SL985`u>0EQ18E=>222221J1p`884i6N344Sll1@m80,0*0C,b003669956,1426118503
+  // clang-format off
+  // !SAVDM,2,1,6,A,55NOvQP1u>QIL@O??SL985`u>0EQ18E=>222221J1p`884i6N344Sll1@m80,0*0C,b003669956,1426118503 NOLINT
   // !SAVDM,2,2,6,A,TRA1iH88880,2*6F,b003669956,1426118503
+  // clang-format on
 
   std::unique_ptr<Ais5> msg(new Ais5(
       "55NOvQP1u>QIL@O??SL985`u>0EQ18E=>222221J1p`884i6N344Sll1@m80"

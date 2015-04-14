@@ -40,7 +40,6 @@ std::unique_ptr<Ais15> Init(const string &nmea_string) {
 
 void Validate(
     const Ais15 *msg,
-    const int message_id,
     const int repeat_indicator,
     const int mmsi,
     const int spare,
@@ -56,21 +55,23 @@ void Validate(
     const int slot_offset_2,
     const int spare4) {
   ASSERT_NE(nullptr, msg);
-  ASSERT_EQ(message_id, msg->message_id);
-  ASSERT_EQ(repeat_indicator, msg->repeat_indicator);
-  ASSERT_EQ(mmsi, msg->mmsi);
-  ASSERT_EQ(spare, msg->spare);
-  ASSERT_EQ(mmsi_1, msg->mmsi_1);
-  ASSERT_EQ(msg_1_1, msg->msg_1_1);
-  ASSERT_EQ(slot_offset_1_1, msg->slot_offset_1_1);
-  ASSERT_EQ(spare2, msg->spare2);
-  ASSERT_EQ(dest_msg_1_2, msg->dest_msg_1_2);
-  ASSERT_EQ(slot_offset_1_2, msg->slot_offset_1_2);
-  ASSERT_EQ(spare3, msg->spare3);
-  ASSERT_EQ(mmsi_2, msg->mmsi_2);
-  ASSERT_EQ(msg_2, msg->msg_2);
-  ASSERT_EQ(slot_offset_2, msg->slot_offset_2);
-  ASSERT_EQ(spare4, msg->spare4);
+  EXPECT_FALSE(msg->had_error());
+
+  ASSERT_EQ(15, msg->message_id);
+  EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
+  EXPECT_EQ(mmsi, msg->mmsi);
+  EXPECT_EQ(spare, msg->spare);
+  EXPECT_EQ(mmsi_1, msg->mmsi_1);
+  EXPECT_EQ(msg_1_1, msg->msg_1_1);
+  EXPECT_EQ(slot_offset_1_1, msg->slot_offset_1_1);
+  EXPECT_EQ(spare2, msg->spare2);
+  EXPECT_EQ(dest_msg_1_2, msg->dest_msg_1_2);
+  EXPECT_EQ(slot_offset_1_2, msg->slot_offset_1_2);
+  EXPECT_EQ(spare3, msg->spare3);
+  EXPECT_EQ(mmsi_2, msg->mmsi_2);
+  EXPECT_EQ(msg_2, msg->msg_2);
+  EXPECT_EQ(slot_offset_2, msg->slot_offset_2);
+  EXPECT_EQ(spare4, msg->spare4);
 }
 
 
@@ -79,7 +80,7 @@ TEST(Ais15Test, DecodeAnything) {
       "!SAVDM,1,1,,B,?03OwnB0ACVlD00,2*59");
 
   Validate(
-      msg.get(), 15, 0, 3669977, 0, 538005101, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      msg.get(), 0, 3669977, 0, 538005101, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
 }  // namespace

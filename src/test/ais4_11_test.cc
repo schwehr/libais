@@ -39,22 +39,24 @@ void Validate(
     const int spare,
     const bool raim) {
   ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(message_id, msg->message_id);
-  ASSERT_EQ(repeat_indicator, msg->repeat_indicator);
-  ASSERT_EQ(mmsi, msg->mmsi);
-  ASSERT_EQ(year, msg->year);
-  ASSERT_EQ(month, msg->month);
-  ASSERT_EQ(day, msg->day);
-  ASSERT_EQ(hour, msg->hour);
-  ASSERT_EQ(minute, msg->minute);
-  ASSERT_EQ(second, msg->second);
-  ASSERT_EQ(position_accuracy, msg->position_accuracy);
-  ASSERT_FLOAT_EQ(x, msg->position.lng_deg);
-  ASSERT_FLOAT_EQ(y, msg->position.lat_deg);
-  ASSERT_EQ(fix_type, msg->fix_type);
-  ASSERT_EQ(transmission_ctl, msg->transmission_ctl);
-  ASSERT_EQ(spare, msg->spare);
-  ASSERT_EQ(raim, msg->raim);
+  EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
+  EXPECT_EQ(mmsi, msg->mmsi);
+  EXPECT_EQ(year, msg->year);
+  EXPECT_EQ(month, msg->month);
+  EXPECT_EQ(day, msg->day);
+  EXPECT_EQ(hour, msg->hour);
+  EXPECT_EQ(minute, msg->minute);
+  EXPECT_EQ(second, msg->second);
+  EXPECT_EQ(position_accuracy, msg->position_accuracy);
+  EXPECT_FLOAT_EQ(x, msg->position.lng_deg);
+  EXPECT_FLOAT_EQ(y, msg->position.lat_deg);
+  EXPECT_EQ(fix_type, msg->fix_type);
+  EXPECT_EQ(transmission_ctl, msg->transmission_ctl);
+  EXPECT_EQ(spare, msg->spare);
+  EXPECT_EQ(raim, msg->raim);
 }
 
 void ValidateCommState(
@@ -71,29 +73,29 @@ void ValidateCommState(
     const int utc_spare,
     const bool slot_offset_valid,
     const int slot_offset) {
-  ASSERT_EQ(sync_state, msg->sync_state);
-  ASSERT_EQ(slot_timeout, msg->slot_timeout);
+  EXPECT_EQ(sync_state, msg->sync_state);
+  EXPECT_EQ(slot_timeout, msg->slot_timeout);
 
-  ASSERT_EQ(received_stations_valid, msg->received_stations_valid);
+  EXPECT_EQ(received_stations_valid, msg->received_stations_valid);
   if (received_stations_valid) {
-    ASSERT_EQ(received_stations, msg->received_stations);
+    EXPECT_EQ(received_stations, msg->received_stations);
   }
 
-  ASSERT_EQ(slot_number_valid, msg->slot_number_valid);
+  EXPECT_EQ(slot_number_valid, msg->slot_number_valid);
   if (slot_number_valid) {
-    ASSERT_EQ(slot_number, msg->slot_number);
+    EXPECT_EQ(slot_number, msg->slot_number);
   }
 
-  ASSERT_EQ(utc_valid, msg->utc_valid);
+  EXPECT_EQ(utc_valid, msg->utc_valid);
   if (utc_valid) {
-    ASSERT_EQ(utc_hour, msg->utc_hour);
-    ASSERT_EQ(utc_min, msg->utc_min);
-    ASSERT_EQ(utc_spare, msg->utc_spare);
+    EXPECT_EQ(utc_hour, msg->utc_hour);
+    EXPECT_EQ(utc_min, msg->utc_min);
+    EXPECT_EQ(utc_spare, msg->utc_spare);
   }
 
-  ASSERT_EQ(slot_offset_valid, msg->slot_offset_valid);
+  EXPECT_EQ(slot_offset_valid, msg->slot_offset_valid);
   if (slot_offset_valid) {
-    ASSERT_EQ(slot_offset, msg->slot_offset);
+    EXPECT_EQ(slot_offset, msg->slot_offset);
   }
 }
 

@@ -24,24 +24,25 @@ std::unique_ptr<Ais14> Init(const string &nmea_string) {
 
 void Validate(
     const Ais14 *msg,
-    const int message_id,
     const int repeat_indicator,
     const int mmsi,
     const int spare,
     const string &text) {
   ASSERT_NE(nullptr, msg);
-  ASSERT_EQ(message_id, msg->message_id);
-  ASSERT_EQ(repeat_indicator, msg->repeat_indicator);
-  ASSERT_EQ(mmsi, msg->mmsi);
-  ASSERT_EQ(spare, msg->spare);
-  ASSERT_EQ(text, msg->text);
+  EXPECT_FALSE(msg->had_error());
+
+  ASSERT_EQ(14, msg->message_id);
+  EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
+  EXPECT_EQ(mmsi, msg->mmsi);
+  EXPECT_EQ(spare, msg->spare);
+  EXPECT_EQ(text, msg->text);
 }
 
 TEST(Ais14Test, DecodeAnything) {
   std::unique_ptr<Ais14> msg = Init(
       "!AIVDM,1,1,,A,>>M@rl1<59B1@E=@0000000,2*0D");
   Validate(
-      msg.get(), 14, 0, 970210000, 0, "SART TEST@@@@@@@");
+      msg.get(), 0, 970210000, 0, "SART TEST@@@@@@@");
 }
 
 }  // namespace

@@ -44,12 +44,14 @@ void Validate(
     const int dest_mmsi,
     const int spare2) {
   ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(message_id, msg->message_id);
-  ASSERT_EQ(repeat_indicator, msg->repeat_indicator);
-  ASSERT_EQ(mmsi, msg->mmsi);
-  ASSERT_EQ(spare, msg->spare);
-  ASSERT_EQ(dest_mmsi, msg->dest_mmsi);
-  ASSERT_EQ(spare2, msg->spare2);
+  EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
+  EXPECT_EQ(mmsi, msg->mmsi);
+  EXPECT_EQ(spare, msg->spare);
+  EXPECT_EQ(dest_mmsi, msg->dest_mmsi);
+  EXPECT_EQ(spare2, msg->spare2);
 }
 
 TEST(Ais10Test, DecodeAnything) {

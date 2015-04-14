@@ -17,29 +17,31 @@ void Validate(const Ais19 *msg, const int repeat_indicator, const int mmsi,
               const int fix_type, const bool raim, const int dte,
               const int assigned_mode, const int spare3) {
   ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(19, msg->message_id);
-  ASSERT_EQ(repeat_indicator, msg->repeat_indicator);
-  ASSERT_EQ(mmsi, msg->mmsi);
-  ASSERT_EQ(spare, msg->spare);
-  ASSERT_EQ(sog, msg->sog);
-  ASSERT_EQ(position_accuracy, msg->position_accuracy);
-  ASSERT_EQ(x, msg->position.lng_deg);
-  ASSERT_EQ(y, msg->position.lat_deg);
-  ASSERT_EQ(cog, msg->cog);
-  ASSERT_EQ(true_heading, msg->true_heading);
-  ASSERT_EQ(timestamp, msg->timestamp);
-  ASSERT_EQ(spare2, msg->spare2);
-  ASSERT_EQ(name, msg->name);
-  ASSERT_EQ(type_and_cargo, msg->type_and_cargo);
-  ASSERT_EQ(dim_a, msg->dim_a);
-  ASSERT_EQ(dim_b, msg->dim_b);
-  ASSERT_EQ(dim_c, msg->dim_c);
-  ASSERT_EQ(dim_d, msg->dim_d);
-  ASSERT_EQ(fix_type, msg->fix_type);
-  ASSERT_EQ(raim, msg->raim);
-  ASSERT_EQ(dte, msg->dte);
-  ASSERT_EQ(assigned_mode, msg->assigned_mode);
-  ASSERT_EQ(spare3, msg->spare3);
+  EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
+  EXPECT_EQ(mmsi, msg->mmsi);
+  EXPECT_EQ(spare, msg->spare);
+  EXPECT_EQ(sog, msg->sog);
+  EXPECT_EQ(position_accuracy, msg->position_accuracy);
+  EXPECT_EQ(x, msg->position.lng_deg);
+  EXPECT_EQ(y, msg->position.lat_deg);
+  EXPECT_EQ(cog, msg->cog);
+  EXPECT_EQ(true_heading, msg->true_heading);
+  EXPECT_EQ(timestamp, msg->timestamp);
+  EXPECT_EQ(spare2, msg->spare2);
+  EXPECT_EQ(name, msg->name);
+  EXPECT_EQ(type_and_cargo, msg->type_and_cargo);
+  EXPECT_EQ(dim_a, msg->dim_a);
+  EXPECT_EQ(dim_b, msg->dim_b);
+  EXPECT_EQ(dim_c, msg->dim_c);
+  EXPECT_EQ(dim_d, msg->dim_d);
+  EXPECT_EQ(fix_type, msg->fix_type);
+  EXPECT_EQ(raim, msg->raim);
+  EXPECT_EQ(dte, msg->dte);
+  EXPECT_EQ(assigned_mode, msg->assigned_mode);
+  EXPECT_EQ(spare3, msg->spare3);
 }
 
 TEST(Ais19Test, DecodeAnything) {

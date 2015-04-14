@@ -39,10 +39,12 @@ void Validate(const Ais8_367_22 *msg, const int repeat_indicator,
               const int month, const int day, const int hour, const int minute,
               const int duration_minutes) {
   ASSERT_NE(nullptr, msg);
+  EXPECT_FALSE(msg->had_error());
+
   ASSERT_EQ(8, msg->message_id);
-  ASSERT_EQ(repeat_indicator, msg->repeat_indicator);
-  ASSERT_EQ(mmsi, msg->mmsi);
-  ASSERT_EQ(367, msg->dac);
+  EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
+  EXPECT_EQ(mmsi, msg->mmsi);
+  EXPECT_EQ(367, msg->dac);
   ASSERT_EQ(22, msg->fi);
 
   EXPECT_EQ(0, msg->spare);
@@ -71,8 +73,8 @@ TEST(Ais8_367_22Test, DecodeSingleTest) {
 
   Ais8_367_22_Text *text = dynamic_cast<Ais8_367_22_Text *>(msg->sub_areas[0]);
 
-  ASSERT_EQ("USCG-TEST@@@@@@", text->text);
-  ASSERT_EQ(0, text->spare);
+  EXPECT_EQ("USCG-TEST@@@@@@", text->text);
+  EXPECT_EQ(0, text->spare);
 }
 
 TEST(Ais8_367_22Test, DecodeUscgWhaleBouyTest) {

@@ -22,7 +22,6 @@ std::unique_ptr<Ais8_1_22> Init(const string &nmea_string) {
 
 void Validate(
     const Ais8_1_22 *msg,
-    const int message_id,
     const int repeat_indicator,
     const int mmsi,
     const int link_id,
@@ -33,21 +32,23 @@ void Validate(
     const int minute,
     const int duration_minutes) {
   ASSERT_NE(nullptr, msg);
-  ASSERT_EQ(message_id, msg->message_id);
-  ASSERT_EQ(repeat_indicator, msg->repeat_indicator);
-  ASSERT_EQ(mmsi, msg->mmsi);
-  ASSERT_EQ(1, msg->dac);
+  EXPECT_FALSE(msg->had_error());
+
+  ASSERT_EQ(8, msg->message_id);
+  EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
+  EXPECT_EQ(mmsi, msg->mmsi);
+  EXPECT_EQ(1, msg->dac);
   ASSERT_EQ(22, msg->fi);
 
-  ASSERT_EQ(0, msg->spare);
+  EXPECT_EQ(0, msg->spare);
 
-  ASSERT_EQ(link_id, msg->link_id);
-  ASSERT_EQ(notice_type, msg->notice_type);
-  ASSERT_EQ(month, msg->month);
-  ASSERT_EQ(day, msg->day);
-  ASSERT_EQ(hour, msg->hour);
-  ASSERT_EQ(minute, msg->minute);
-  ASSERT_EQ(duration_minutes, msg->duration_minutes);
+  EXPECT_EQ(link_id, msg->link_id);
+  EXPECT_EQ(notice_type, msg->notice_type);
+  EXPECT_EQ(month, msg->month);
+  EXPECT_EQ(day, msg->day);
+  EXPECT_EQ(hour, msg->hour);
+  EXPECT_EQ(minute, msg->minute);
+  EXPECT_EQ(duration_minutes, msg->duration_minutes);
 }
 
 // Tests decoding a Boston right whale alert message.
@@ -56,25 +57,25 @@ TEST(Ais8_1_22Test, CircleAndTextForMarineMammals) {
       "!AIVDM,1,1,0,B,803Ovrh0EPM0WB0h2l0MwJUi=6B4G9000aip8<2Bt2H"
       "q2Qhp,0*01,d-084,S1582,t091042.00,T42.19038981,r003669945,"
       "1332321042");
-  Validate(msg.get(), 8, 0, 3669739, 29, 1, 3, 20, 16, 6, 1440);
+  Validate(msg.get(), 0, 3669739, 29, 1, 3, 20, 16, 6, 1440);
 
-  ASSERT_EQ(2, msg->sub_areas.size());
+  EXPECT_EQ(2, msg->sub_areas.size());
 
-  ASSERT_EQ(AIS8_1_22_SHAPE_CIRCLE, msg->sub_areas[0]->getType());
-  ASSERT_EQ(AIS8_1_22_SHAPE_TEXT, msg->sub_areas[1]->getType());
+  EXPECT_EQ(AIS8_1_22_SHAPE_CIRCLE, msg->sub_areas[0]->getType());
+  EXPECT_EQ(AIS8_1_22_SHAPE_TEXT, msg->sub_areas[1]->getType());
 
   Ais8_1_22_Circle *circle =
       dynamic_cast<Ais8_1_22_Circle *>(msg->sub_areas[0]);
 
-  ASSERT_FLOAT_EQ(-70.22429656982422, circle->position.lng_deg);
-  ASSERT_FLOAT_EQ(42.105865478515625, circle->position.lat_deg);
-  ASSERT_EQ(4, circle->precision);
-  ASSERT_EQ(14810, circle->radius_m);
-  ASSERT_EQ(0, circle->spare);
+  EXPECT_FLOAT_EQ(-70.22429656982422, circle->position.lng_deg);
+  EXPECT_FLOAT_EQ(42.105865478515625, circle->position.lat_deg);
+  EXPECT_EQ(4, circle->precision);
+  EXPECT_EQ(14810, circle->radius_m);
+  EXPECT_EQ(0, circle->spare);
 
   Ais8_1_22_Text *text = dynamic_cast<Ais8_1_22_Text *>(msg->sub_areas[1]);
 
-  ASSERT_STREQ("NOAA RW SGHTNG", text->text.c_str());
+  EXPECT_STREQ("NOAA RW SGHTNG", text->text.c_str());
 }
 
 // Tests missing subareas.
