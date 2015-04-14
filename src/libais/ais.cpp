@@ -282,7 +282,7 @@ AisMsg::AisMsg(const char *nmea_payload, const size_t pad)
 AisPoint::AisPoint() : lng_deg(0), lat_deg(0) {
 }
 
-AisPoint::AisPoint(float lng_deg_, float lat_deg_)
+AisPoint::AisPoint(double lng_deg_, double lat_deg_)
     : lng_deg(lng_deg_), lat_deg(lat_deg_) {
 }
 

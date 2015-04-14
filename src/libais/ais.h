@@ -372,11 +372,11 @@ class AisBitset;
 
 class AisPoint {
  public:
-  float lng_deg;
-  float lat_deg;
+  double lng_deg;
+  double lat_deg;
 
   AisPoint();
-  AisPoint(float lng_deg_, float lat_deg_);
+  AisPoint(double lng_deg_, double lat_deg_);
 };
 ostream& operator<< (ostream &o, const AisPoint &position);
 

@@ -131,9 +131,21 @@ DictSafeSetItem(PyObject *dict, const string &key, const bool val) {
 }
 #endif
 
-// TODO(schwehr): float -> double?
 void
 DictSafeSetItem(PyObject *dict, const string &key, const float val) {
+  PyObject *key_obj = PyUnicode_FromString(key.c_str());
+  PyObject *val_obj = PyFloat_FromDouble(val);
+  assert(key_obj);
+  assert(val_obj);
+  PyDict_SetItem(dict, key_obj, val_obj);
+  Py_DECREF(key_obj);
+  Py_DECREF(val_obj);
+}
+
+
+// Python Floats are IEE-754 double precision.
+void
+DictSafeSetItem(PyObject *dict, const string &key, const double val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyFloat_FromDouble(val);
   assert(key_obj);
