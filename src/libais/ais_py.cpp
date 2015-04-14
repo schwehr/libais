@@ -2778,7 +2778,7 @@ PyMODINIT_FUNC PyInit__ais(void) {
   if (module == nullptr)
     return nullptr;
 
-  ais_py_exception = PyErr_NewException("_ais.DecodeError", nullptr, nullptr);
+  ais_py_exception = PyErr_NewException(exception_name, nullptr, nullptr);
   Py_INCREF(ais_py_exception);
   PyModule_AddObject(module, "DecodeError", ais_py_exception);
   return module;
