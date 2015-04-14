@@ -535,6 +535,23 @@ class Ais6 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais6 &msg);
 
+// http://www.e-navigation.nl/content/monitoring-aids-navigation
+// Zeni Lite Buoy Co., Ltd buoy status.
+class Ais6_0_0 : public Ais6 {
+ public:
+  int sub_id;
+  float voltage;
+  float current;
+  bool dc_power_supply;  // False is AC.
+  bool light_on;
+  bool battery_low;
+  bool off_position;
+  int spare2;
+
+  Ais6_0_0(const char *nmea_payload, const size_t pad);
+};
+ostream& operator<< (ostream &o, const Ais6_0_0 &msg);
+
 // Text message.  ITU 1371-1
 class Ais6_1_0 : public Ais6 {
  public:
