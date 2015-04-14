@@ -36,6 +36,8 @@ Available opptions:
     --encoding=msgpack Use msgpack encoding
     --encoding=json Use json encoding (default)
 
+    --keep_nmea Include the raw nmea as a field in the decoded output
+
     --verbose
     --allowUnknown
     --treatABequal
