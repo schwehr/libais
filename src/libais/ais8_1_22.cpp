@@ -2,16 +2,15 @@
 #include <iomanip>
 
 #include "ais.h"
-#include "ais8_001_22.h"
 
 namespace libais {
 
 // TODO(schwehr): field on class
-const char *ais8_001_22_shape_names[8] = {"Circle/Pt", "Rect", "Sector",
+const char *ais8_1_22_shape_names[8] = {"Circle/Pt", "Rect", "Sector",
                                           "Polyline", "Polygon", "Text",
                                           "Reserved_6", "Reserved_7"};
 
-const char *ais8_001_22_notice_names[AIS8_001_22_NUM_NAMES] = {
+const char *ais8_1_22_notice_names[AIS8_1_22_NUM_NAMES] = {
   // 0 has extra text compared to the spec
   "Caution Area: Marine mammals habitat (implies whales NOT observed)",  // 0
   "Caution Area: Marine mammals in area - reduce speed",  // 1
@@ -151,29 +150,20 @@ static int scale_multipliers[4] = {1, 10, 100, 1000};
 // Sub-Areas for the Area Notice class
 //////////////////////////////////////////////////////////////////////
 
-// TODO(olafsinram): Deprecate in favor of AisPoint.
-static void decode_xy(const AisBitset &bs, const size_t offset,
-                      float &x, float &y) {
-    // Offset is the start of the sub area.  Same as the caller's offset
-    // This is the same for all but the text subarea
-    // OLD Nav 55: bs.ToInt(offset + 5, 28) / 600000.;
-  x = bs.ToInt(offset, 25) / 60000.;
-  y = bs.ToInt(offset + 25, 24) / 60000.;
-}
-
-Ais8_001_22_Circle::Ais8_001_22_Circle(const AisBitset &bs,
+Ais8_1_22_Circle::Ais8_1_22_Circle(const AisBitset &bs,
                                        const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
-  decode_xy(bs, offset + 2, x, y);
+  position = bs.ToAisPoint(offset + 2, 49);
+
   precision = bs.ToUnsignedInt(offset + 51, 3);  // useless
   radius_m  = bs.ToUnsignedInt(offset + 54, 12) * scale_multipliers[scale_factor];
   spare     = bs.ToUnsignedInt(offset + 66, 18);
 }
 
-Ais8_001_22_Rect::Ais8_001_22_Rect(const AisBitset &bs,
+Ais8_1_22_Rect::Ais8_1_22_Rect(const AisBitset &bs,
                                    const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
-  decode_xy(bs, offset + 2, x, y);
+  position = bs.ToAisPoint(offset + 2, 49);
 
   precision  = bs.ToUnsignedInt(offset + 51, 3);  // useless
   e_dim_m    = bs.ToUnsignedInt(offset + 54, 8) * scale_multipliers[scale_factor];
@@ -182,10 +172,10 @@ Ais8_001_22_Rect::Ais8_001_22_Rect(const AisBitset &bs,
   spare      = bs.ToUnsignedInt(offset + 79, 5);
 }
 
-Ais8_001_22_Sector::Ais8_001_22_Sector(const AisBitset &bs,
+Ais8_1_22_Sector::Ais8_1_22_Sector(const AisBitset &bs,
                                        const size_t offset) {
   const int scale = bs.ToUnsignedInt(offset, 2);
-  decode_xy(bs, offset + 2, x, y);
+  position = bs.ToAisPoint(offset + 2, 49);
 
   precision       = bs.ToUnsignedInt(offset + 51, 3);
   radius_m        = bs.ToUnsignedInt(offset + 54, 12) * scale_multipliers[scale];
@@ -196,7 +186,7 @@ Ais8_001_22_Sector::Ais8_001_22_Sector(const AisBitset &bs,
 // Size of one point angle and distance
 static const size_t PT_AD_SIZE = 10 + 10;
 
-Ais8_001_22_Polyline::Ais8_001_22_Polyline(const AisBitset &bs,
+Ais8_1_22_Polyline::Ais8_1_22_Polyline(const AisBitset &bs,
                                            const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
   const int multiplier = scale_multipliers[scale_factor];
@@ -208,13 +198,13 @@ Ais8_001_22_Polyline::Ais8_001_22_Polyline(const AisBitset &bs,
     angles.push_back(angle);
     dists_m.push_back(dist);
   }
-  const int spare_start = offset + AIS8_001_22_SUBAREA_SIZE - 5;
+  const int spare_start = offset + AIS8_1_22_SUBAREA_SIZE - 5;
   bs.SeekTo(spare_start);
   spare = bs.ToUnsignedInt(spare_start, 2);
 }
 
 // TODO(schwehr): fold into polyline
-Ais8_001_22_Polygon::Ais8_001_22_Polygon(const AisBitset &bs,
+Ais8_1_22_Polygon::Ais8_1_22_Polygon(const AisBitset &bs,
                                          const size_t offset) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
   const int multiplier = scale_multipliers[scale_factor];
@@ -226,42 +216,42 @@ Ais8_001_22_Polygon::Ais8_001_22_Polygon(const AisBitset &bs,
     angles.push_back(angle);
     dists_m.push_back(dist);
   }
-  const int spare_start = offset + AIS8_001_22_SUBAREA_SIZE - 5;
+  const int spare_start = offset + AIS8_1_22_SUBAREA_SIZE - 5;
   bs.SeekTo(spare_start);
   spare = bs.ToUnsignedInt(spare_start, 2);
 }
 
-Ais8_001_22_Text::Ais8_001_22_Text(const AisBitset &bs,
+Ais8_1_22_Text::Ais8_1_22_Text(const AisBitset &bs,
                                    const size_t offset) {
   text = string(bs.ToString(offset, 84));
   // TODO(schwehr): spare?
 }
 
 // Call the appropriate constructor
-Ais8_001_22_SubArea*
-ais8_001_22_subarea_factory(const AisBitset &bs,
+Ais8_1_22_SubArea*
+ais8_1_22_subarea_factory(const AisBitset &bs,
                             const size_t offset) {
-  const Ais8_001_22_AreaShapeEnum area_shape =
-      (Ais8_001_22_AreaShapeEnum)bs.ToUnsignedInt(offset, 3);
+  const Ais8_1_22_AreaShapeEnum area_shape =
+      (Ais8_1_22_AreaShapeEnum)bs.ToUnsignedInt(offset, 3);
 
   switch (area_shape) {
-  case AIS8_001_22_SHAPE_CIRCLE:
-    return new Ais8_001_22_Circle(bs, offset + 3);
-  case AIS8_001_22_SHAPE_RECT:
-    return new Ais8_001_22_Rect(bs, offset + 3);
-  case AIS8_001_22_SHAPE_SECTOR:
-    return new Ais8_001_22_Sector(bs, offset + 3);
-  case AIS8_001_22_SHAPE_POLYLINE:
-    return new Ais8_001_22_Polyline(bs, offset + 3);
-  case AIS8_001_22_SHAPE_POLYGON:
-    return new Ais8_001_22_Polygon(bs, offset + 3);
-  case AIS8_001_22_SHAPE_TEXT:
-    return new Ais8_001_22_Text(bs, offset + 3);
-  case AIS8_001_22_SHAPE_RESERVED_6:  // FALLTHROUGH
-  case AIS8_001_22_SHAPE_RESERVED_7:  // FALLTHROUGH
+  case AIS8_1_22_SHAPE_CIRCLE:
+    return new Ais8_1_22_Circle(bs, offset + 3);
+  case AIS8_1_22_SHAPE_RECT:
+    return new Ais8_1_22_Rect(bs, offset + 3);
+  case AIS8_1_22_SHAPE_SECTOR:
+    return new Ais8_1_22_Sector(bs, offset + 3);
+  case AIS8_1_22_SHAPE_POLYLINE:
+    return new Ais8_1_22_Polyline(bs, offset + 3);
+  case AIS8_1_22_SHAPE_POLYGON:
+    return new Ais8_1_22_Polygon(bs, offset + 3);
+  case AIS8_1_22_SHAPE_TEXT:
+    return new Ais8_1_22_Text(bs, offset + 3);
+  case AIS8_1_22_SHAPE_RESERVED_6:  // FALLTHROUGH
+  case AIS8_1_22_SHAPE_RESERVED_7:  // FALLTHROUGH
     // Keep area==0 to indicate error.
     break;
-  case AIS8_001_22_SHAPE_ERROR:
+  case AIS8_1_22_SHAPE_ERROR:
     break;
   default:
     assert(false);
@@ -274,7 +264,7 @@ ais8_001_22_subarea_factory(const AisBitset &bs,
 // Area Notice class
 //////////////////////////////////////////////////////////////////////
 
-Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad)
+Ais8_1_22::Ais8_1_22(const char *nmea_payload, const size_t pad)
     : Ais8(nmea_payload, pad) {
   assert(dac == 1);
   assert(fi == 22);
@@ -306,25 +296,26 @@ Ais8_001_22::Ais8_001_22(const char *nmea_payload, const size_t pad)
   // Use floor to be able to ignore any spare bits
   const int num_sub_areas = static_cast<int>(floor((num_bits - 111)/87.));
   for (int sub_area_idx = 0; sub_area_idx < num_sub_areas; sub_area_idx++) {
-    const size_t start = 111 + AIS8_001_22_SUBAREA_SIZE*sub_area_idx;
-    Ais8_001_22_SubArea *sub_area = ais8_001_22_subarea_factory(bs, start);
+    const size_t start = 111 + AIS8_1_22_SUBAREA_SIZE*sub_area_idx;
+    Ais8_1_22_SubArea *sub_area = ais8_1_22_subarea_factory(bs, start);
     if (sub_area) {
       sub_areas.push_back(sub_area);
     } else {
       status = AIS_ERR_BAD_SUB_SUB_MSG;
     }
   }
-  /* TODO(schwehr): inspect the subareas to make sure the are sane.
+  /* TODO(schwehr): inspect the subareas to make sure they are sane.
      - polyline/polygon have a point first
      - text has geometry to go through it all
   */
   // TODO(schwehr): watch out for mandatory spare bits to byte align payload
+  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
   if (status == AIS_UNINITIALIZED)
     status = AIS_OK;
 }
 
 // TODO(schwehr): Use unique_ptr to manage memory.
-Ais8_001_22::~Ais8_001_22() {
+Ais8_1_22::~Ais8_1_22() {
   for (size_t i = 0; i < sub_areas.size(); i++) {
     delete sub_areas[i];
     sub_areas[i] = nullptr;

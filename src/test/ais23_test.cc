@@ -41,10 +41,10 @@ void Validate(
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);
   EXPECT_EQ(spare, msg->spare);
-  EXPECT_EQ(x1, msg->x1);
-  EXPECT_EQ(y1, msg->y1);
-  EXPECT_EQ(x2, msg->x2);
-  EXPECT_EQ(y2, msg->y2);
+  EXPECT_EQ(x1, msg->position1.lng_deg);
+  EXPECT_EQ(y1, msg->position1.lat_deg);
+  EXPECT_EQ(x2, msg->position2.lng_deg);
+  EXPECT_EQ(y2, msg->position2.lat_deg);
   EXPECT_EQ(station_type, msg->station_type);
   EXPECT_EQ(type_and_cargo, msg->type_and_cargo);
   EXPECT_EQ(spare2, msg->spare2);

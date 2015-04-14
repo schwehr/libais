@@ -55,6 +55,7 @@ Ais24::Ais24(const char *nmea_payload, const size_t pad)
     return;
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

@@ -808,7 +808,7 @@ class ProcessingThread(threading.Thread):
 
                 try:
                      msg = ais.decode(result['body'])
-                except Exception as e:
+                except ais.DecodeError as e:
                     if 'not yet handled' in str(e) or 'not known' in str(e): continue
                     print ('BAD Decode:',result['body'][0])
                     print ('\tE:',Exception)
@@ -988,8 +988,7 @@ def main():
 
                     try:
                          msg = ais.decode(result['body'])
-                    # TODO(schwehr): except ais.decode.error:
-                    except Exception as e:
+                    except ais.DecodeError as e:
                         if 'not yet handled' in str(e):
                             continue
                         if ' not known' in str(e): continue

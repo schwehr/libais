@@ -6,7 +6,6 @@
 #include <string>
 
 #include "ais.h"
-#include "ais8_001_22.h"
 
 using namespace std;
 
@@ -27,7 +26,7 @@ TEST(PointTest, Point) {
   // AreaNotice: type=0  start=2011-07-06 00:00:00  duration=60 m  link_id=10  sub-areas: 1
   const string msg_str = "!AIVDM,1,1,,A,81mg=5@0EP:0>H0007P>0<D1<qp400000,0*1D";
   const string body(nth_field(msg_str, 5));
-  Ais8_001_22 msg(body.c_str(), 0);
+  Ais8_1_22 msg(body.c_str(), 0);
   ASSERT_EQ(AIS_OK, msg.get_error());
   EXPECT_EQ(msg.message_id, 8);
   EXPECT_EQ(msg.repeat_indicator, 0);

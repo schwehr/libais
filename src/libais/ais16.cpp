@@ -37,6 +37,7 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad)
     inc_b = -1;
     spare2 = bs.ToUnsignedInt(92, 4);
 
+    assert(bs.GetRemaining() == 0);
     status = AIS_OK;
     return;
   }
@@ -45,6 +46,9 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad)
   offset_b = bs.ToUnsignedInt(122, 12);
   inc_b = bs.ToUnsignedInt(134, 10);
   spare2 = -1;
+
+  // Currently crashes with the check.
+  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
 
   status = AIS_OK;
 }

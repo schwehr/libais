@@ -37,8 +37,8 @@ void Validate(
   EXPECT_EQ(aton_type, msg->aton_type);
   EXPECT_EQ(name, msg->name);
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
-  EXPECT_EQ(x, msg->x);
-  EXPECT_EQ(y, msg->y);
+  EXPECT_EQ(x, msg->position.lng_deg);
+  EXPECT_EQ(y, msg->position.lat_deg);
   EXPECT_EQ(dim_a, msg->dim_a);
   EXPECT_EQ(dim_b, msg->dim_b);
   EXPECT_EQ(dim_c, msg->dim_c);

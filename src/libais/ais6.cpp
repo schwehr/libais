@@ -35,6 +35,47 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad)
   fi = bs.ToUnsignedInt(82, 6);
 }
 
+// http://www.e-navigation.nl/content/monitoring-aids-navigation
+Ais6_0_0::Ais6_0_0(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad),
+      sub_id(1),
+      voltage(0.0),
+      current(0.0),
+      dc_power_supply(true),
+      light_on(true),
+      battery_low(false),
+      off_position(false),
+      spare2(0) {
+  assert(dac == 0);
+  assert(fi == 0);
+
+  if (num_bits != 136) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
+  if (r != AIS_OK) {
+    status = r;
+    return;
+  }
+
+  bs.SeekTo(88);
+  sub_id = bs.ToUnsignedInt(88, 16);
+  voltage = bs.ToUnsignedInt(104, 12) / 10.0;
+  current = bs.ToUnsignedInt(116, 10) / 10.0;
+  dc_power_supply = bs[126];
+  light_on = bs[127];
+  battery_low = bs[128];
+  off_position = bs[129];
+
+  spare2 = bs.ToUnsignedInt(130, 6);
+
+  assert(bs.GetRemaining() == 0);
+  status = AIS_OK;
+}
+
 Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad)
     : Ais6(nmea_payload, pad), ack_required(false), msg_seq(0),
       spare2(0) {
@@ -67,6 +108,7 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad)
   else
     spare2 = bs.ToUnsignedInt(100 + text_size, spare2_size);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -92,6 +134,7 @@ Ais6_1_1::Ais6_1_1(const char *nmea_payload, const size_t pad)
   msg_seq = bs.ToUnsignedInt(98, 11);
   spare2 = bs.ToUnsignedInt(109, 3);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -116,6 +159,7 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad)
   req_dac = bs.ToUnsignedInt(88, 10);
   req_fi = bs.ToUnsignedInt(98, 6);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -141,6 +185,7 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad)
   req_dac = bs.ToUnsignedInt(88, 10);
   spare2 = bs.ToUnsignedInt(94, 6);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -174,6 +219,39 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
   }
   // spare2 = bs.ToUnsignedInt(226, 6);  // OR NOT
   // TODO(schwehr): add in the offset of the dest mmsi
+
+  assert(bs.GetRemaining() == 0);
+  status = AIS_OK;
+}
+
+// IMO 1371-5 Ack
+Ais6_1_5::Ais6_1_5(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad), ack_dac(0), ack_fi(0), seq_num(0),
+      ai_available(false), ai_response(0), spare(0) {
+  assert(dac == 1);
+  assert(fi == 5);
+
+  if (num_bits != 168) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  AisBitset bs;
+  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
+  if (r != AIS_OK) {
+    status = r;
+    return;
+  }
+
+  bs.SeekTo(88);
+  ack_dac = bs.ToUnsignedInt(88, 10);
+  ack_fi = bs.ToUnsignedInt(98, 6);
+  seq_num = bs.ToUnsignedInt(104, 11);
+  ai_available = static_cast<bool>(bs[115]);
+  ai_response = bs.ToUnsignedInt(116, 3);
+  spare = bs.ToUnsignedInt(119, 49);
+
+  assert(bs.GetRemaining() == 0);
 
   status = AIS_OK;
 }
@@ -223,6 +301,7 @@ Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad)
   // 360
 #endif
 
+  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -255,9 +334,10 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad)
   for (size_t window_num = 0; window_num < 3; window_num++) {
     Ais6_1_14_Window w;
     const size_t start = 97 + window_num * 93;
-    w.y = bs.ToInt(start, 27) / 600000.;
-    w.x = bs.ToInt(start + 27, 28) / 600000.;
-
+    // Reversed order for lng/lat.
+    float y = bs.ToInt(start, 27) / 600000.;
+    float x = bs.ToInt(start + 27, 28) / 600000.;
+    w.position = AisPoint(x, y);
     w.utc_hour_from = bs.ToUnsignedInt(start + 55, 5);
     w.utc_min_from = bs.ToUnsignedInt(start + 60, 6);
     w.utc_hour_to = bs.ToUnsignedInt(start + 66, 5);
@@ -268,6 +348,7 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad)
     windows.push_back(w);
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -297,18 +378,18 @@ Ais6_1_18::Ais6_1_18(const char *nmea_payload, const size_t pad)
   utc_min = bs.ToUnsignedInt(112, 6);
   port_berth = bs.ToString(118, 120);
   dest = bs.ToString(238, 30);
-  x = bs.ToInt(268, 25) / 60000.;
-  y = bs.ToInt(293, 24) / 60000.;
+  position = bs.ToAisPoint(268, 49);
   spare2[0] = bs.ToUnsignedInt(317, 32);
   spare2[1] = bs.ToUnsignedInt(349, 11);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
 // IMO Circ 289 - Berthing data
 Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad)
     : Ais6(nmea_payload, pad), link_id(0), length(0), depth(0.0),
-      position(0), utc_month(0), utc_day(0), utc_hour(0), utc_min(0),
+      mooring_position(0), utc_month(0), utc_day(0), utc_hour(0), utc_min(0),
       services_known(false), services() {
   assert(dac == 1);
   assert(fi == 20);
@@ -329,7 +410,7 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad)
   link_id = bs.ToUnsignedInt(88, 10);
   length = bs.ToUnsignedInt(98, 9);
   depth = bs.ToUnsignedInt(107, 8);
-  position = bs.ToUnsignedInt(115, 3);
+  mooring_position = bs.ToUnsignedInt(115, 3);
   utc_month = bs.ToUnsignedInt(118, 4);
   utc_day = bs.ToUnsignedInt(122, 5);
   utc_hour = bs.ToUnsignedInt(127, 5);
@@ -341,9 +422,9 @@ Ais6_1_20::Ais6_1_20(const char *nmea_payload, const size_t pad)
         = static_cast<int>(bs.ToUnsignedInt(139 + 2*serv_num, 2));
   }
   name = bs.ToString(191, 120);
-  x = bs.ToInt(311, 25);
-  y = bs.ToInt(336, 24);
+  position = bs.ToAisPoint(311, 49);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -429,6 +510,7 @@ Ais6_1_25::Ais6_1_25(const char *nmea_payload, const size_t pad)
     cargos.push_back(cargo);
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -465,8 +547,7 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad)
   for (size_t window_num = 0; window_num < 3; window_num++) {
     Ais6_1_32_Window w;
     const size_t start = 97 + 88*window_num;
-    w.x = bs.ToInt(start, 25) / 60000.;
-    w.y = bs.ToInt(start + 25, 24) / 60000.;
+    w.position = bs.ToAisPoint(start, 49);
     w.from_utc_hour = bs.ToUnsignedInt(start + 49, 5);
     w.from_utc_min = bs.ToUnsignedInt(start + 54, 6);
     w.to_utc_hour = bs.ToUnsignedInt(start + 60, 5);
@@ -476,6 +557,7 @@ Ais6_1_32::Ais6_1_32(const char *nmea_payload, const size_t pad)
     windows.push_back(w);
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
@@ -501,6 +583,7 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad)
   persons = bs.ToUnsignedInt(88, 13);
   spare2 = bs.ToUnsignedInt(101, 3);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

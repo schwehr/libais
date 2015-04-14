@@ -13,8 +13,6 @@ project (libais)
 
 set (HEADERS
     ais.h
-    ais8_001_22.h
-    ais8_366_22.h
 )
 
 set (SOURCES
@@ -23,7 +21,7 @@ set (SOURCES
     ais4_11
     ais5
     ais7_13
-    ais8 ais8_001_22 ais8_001_26 ais8_366_22
+    ais8 ais8_1_22 ais8_1_26 ais8_366_22
     ais9
     ais10 # :
     # ais11 ; - See 4
@@ -97,7 +95,7 @@ if(BUILD_TESTS)
 
     set (TEST_SOURCES
         ais1_2_3_unittest
-        ais8_001_22_unittest
+        ais8_1_22_unittest
         ais8_200_10_unittest
     )
 

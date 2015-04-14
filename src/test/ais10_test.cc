@@ -18,7 +18,6 @@
 #include <memory>
 
 #include "gtest/gtest.h"
-
 #include "ais.h"
 
 namespace libais {

@@ -1,4 +1,5 @@
 # -*- makefile -*-
+
 VERSION:=${shell cat VERSION}
 
 default:
@@ -19,11 +20,11 @@ default:
 	@echo
 	@echo "  pull     - update from github"
 	@echo "  push     - update github with local changes"
-	@echo 
+	@echo
 	@echo "Read the README for more information"
 
 all: python2 python3
-	(cd src; make -f Makefile-custom all) 
+	(cd src; make -f Makefile-custom all)
 
 DIST:=libais-${shell cat VERSION}
 TAR:=${DIST}.tar
@@ -44,12 +45,26 @@ python3:
 	CFLAGS="-std=c++11 -O0 -g -UNDEBUG" python3 setup.py build
 
 clean:
-	(cd src && make -f Makefile-custom clean) 
-	(cd ais && make -f Makefile-custom clean) 
+	(cd ais && make -f Makefile-custom clean)
+	(cd src && make -f Makefile-custom clean)
+	(cd test && make -f Makefile-custom clean)
 	-rm -rf build
+	rm -f _ais.so
+	rm -rf */__pycache__
+	rm -rf *.egg-info
 
+real-clean: clean
+	rm -f MANIFEST
+	rm -rf build dist
+	find . -name .DS_Store | xargs rm -f
+
+.PHONY: test
 test:
-	(cd src; make -f Makefile-custom test) 
+	(cd src; make -f Makefile-custom test)
+	python setup.py test
+
+# TODO(schwehr): Enable python3 testing.
+#	(type -p python3 && python3 setup.py test) || echo "python3 not available"
 
 # Hard coded depends
 src/libais/ais.o: src/libais/ais.h
@@ -58,7 +73,8 @@ src/libais/ais4_11.o: src/libais/ais.h
 src/libais/ais5.o: src/libais/ais.h
 src/libais/ais6.o: src/libais/ais.h
 src/libais/ais7_13.o: src/libais/ais.h
-src/libais/ais8_001_22.o: src/libais/ais.h 
+src/libais/ais8_1_22.o: src/libais/ais.h
+src/libais/ais8_1_26.o: src/libais/ais.h
 src/libais/ais9.o: src/libais/ais.h
 src/libais/ais10.o: src/libais/ais.h
 src/libais/ais12.o: src/libais/ais.h
@@ -77,12 +93,3 @@ src/libais/ais25.o: src/libais/ais.h
 src/libais/ais26.o: src/libais/ais.h
 src/libais/ais27.o: src/libais/ais.h
 src/libais/ais_py.o: src/libais/ais.h
-test_libsrc/libais/ais.o: src/libais/ais.h
-
-GIT_URL:=git@github.com:schwehr/libais.git
-
-pull:
-	git pull ${GIT_URL}
-
-push:
-	git push ${GIT_URL}

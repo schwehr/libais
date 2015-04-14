@@ -44,8 +44,8 @@ void Validate(
   EXPECT_EQ(alt, msg->alt);
   EXPECT_EQ(sog, msg->sog);
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
-  EXPECT_EQ(x, msg->x);
-  EXPECT_EQ(y, msg->y);
+  EXPECT_EQ(x, msg->position.lng_deg);
+  EXPECT_EQ(y, msg->position.lat_deg);
   EXPECT_EQ(cog, msg->cog);
   EXPECT_EQ(timestamp, msg->timestamp);
   EXPECT_EQ(alt_sensor, msg->alt_sensor);

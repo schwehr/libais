@@ -8,7 +8,7 @@ from setuptools import setup, find_packages, Extension
 VERSION = open('VERSION').readline().strip()
 
 EXTRA_COMPILE_ARGS = []
-if sys.platform in ('linux2', 'darwin'):
+if sys.platform in ('darwin', 'linux', 'linux2'):
     EXTRA_COMPILE_ARGS = ['-std=c++11']
 
 AIS_MODULE = Extension(
@@ -23,8 +23,8 @@ AIS_MODULE = Extension(
         'ais6.cpp', # Addressed binary message (ABM)
         'ais7_13.cpp',
         'ais8.cpp', # Broadcast binary message (BBM)
-        'ais8_001_22.cpp', # Area notice
-        'ais8_001_26.cpp', # Environmental Sensor Report
+        'ais8_1_22.cpp', # Area notice
+        'ais8_1_26.cpp', # Environmental Sensor Report
         'ais8_367.cpp',
         'ais9.cpp',
         'ais10.cpp', # :
@@ -70,4 +70,6 @@ setup(name='libais',
            'Interface Engine/Protocol Translator',
            'Topic :: Scientific/Engineering :: GIS',
            ],
-      scripts=["bin/aisdecode"])
+      scripts=["bin/aisdecode"],
+      test_suite = "test"
+      )

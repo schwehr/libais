@@ -3,6 +3,7 @@
 
 import unittest
 from ais import util
+import six
 
 
 class UtilTest(unittest.TestCase):
@@ -24,7 +25,7 @@ class UtilTest(unittest.TestCase):
     value = 9999999999999999999999999
     value_str = '9999999999999999999999999'
     self.assertEqual(util.MaybeToNumber(value_str), value)
-    self.assertIsInstance(util.MaybeToNumber(value_str), long)
+    self.assertIsInstance(util.MaybeToNumber(value_str), six.integer_types)
 
     self.assertEqual(
         util.MaybeToNumber('1e99999999999999999999999'), float('inf'))

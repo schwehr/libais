@@ -5,7 +5,7 @@
 namespace libais {
 
 Ais14::Ais14(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad), spare(0), expected_num_spare_bits(0) {
+    : AisMsg(nmea_payload, pad), spare(0), spare2(0) {
 
   assert(message_id == 14);
 
@@ -26,8 +26,9 @@ Ais14::Ais14(const char *nmea_payload, const size_t pad)
 
   const int num_char = (num_bits - 40) / 6;
   text = bs.ToString(40, num_char * 6);
-  expected_num_spare_bits = num_bits - 40 - num_char*60;
-  // TODO(schwehr): fix processing of spare bits if any
+  if (bs.GetRemaining() > 0) {
+    spare2 = bs.ToUnsignedInt(40 + num_char * 6, bs.GetRemaining());
+  }
 
   status = AIS_OK;
 }

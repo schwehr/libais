@@ -25,10 +25,8 @@ Ais23::Ais23(const char *nmea_payload, const size_t pad)
   bs.SeekTo(38);
   spare = bs.ToUnsignedInt(38, 2);
 
-  x1 = bs.ToInt(40, 18) / 600.;
-  y1 = bs.ToInt(58, 17) / 600.;
-  x2 = bs.ToInt(75, 18) / 600.;
-  y2 = bs.ToInt(93, 17) / 600.;
+  position1 = bs.ToAisPoint(40, 35);
+  position2 = bs.ToAisPoint(75, 35);
 
   station_type = bs.ToUnsignedInt(110, 4);
   type_and_cargo = bs.ToUnsignedInt(114, 8);
@@ -39,6 +37,7 @@ Ais23::Ais23(const char *nmea_payload, const size_t pad)
   quiet = bs.ToUnsignedInt(150, 4);
   spare3 = bs.ToUnsignedInt(154, 6);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

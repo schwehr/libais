@@ -42,10 +42,8 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad)
     //   after setting all of the data members.
     pos_valid = true;
     // TODO(schwehr): Confirm this is correct!
-    x1 = bs.ToInt(69, 18) / 600.;
-    y1 = bs.ToInt(87, 17) / 600.;
-    x2 = bs.ToInt(104, 18) / 600.;
-    y2 = bs.ToInt(122, 17) / 600.;
+    position1 = bs.ToAisPoint(69, 35);
+    position2 = bs.ToAisPoint(104, 35);
   } else {
     dest_valid = true;
     dest_mmsi_1 = bs.ToUnsignedInt(69, 30);
@@ -64,6 +62,7 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad)
 
   spare2 = bs.ToUnsignedInt(145, 23);
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

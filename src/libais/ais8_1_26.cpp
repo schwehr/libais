@@ -10,8 +10,7 @@ namespace libais {
 
 Ais8_1_26_Location::Ais8_1_26_Location(const AisBitset &bs,
                                        const size_t offset) {
-  x = bs.ToInt(offset, 28) / 600000.;
-  y = bs.ToInt(offset + 28, 27) / 600000.;
+  position = bs.ToAisPoint(offset, 55);
   z = bs.ToUnsignedInt(offset + 55, 11) / 10.;
   owner = bs.ToUnsignedInt(offset + 66, 4);
   timeout = bs.ToUnsignedInt(offset + 70, 3);
@@ -245,14 +244,14 @@ Ais8_1_26::Ais8_1_26(const char *nmea_payload, const size_t pad)
     bs.SeekTo(start);
     Ais8_1_26_SensorReport *sensor = ais8_1_26_sensor_report_factory(bs, start);
     if (sensor) {
-      reports.push_back(sensor);
+        reports.push_back(sensor);
     } else {
       status = AIS_ERR_BAD_SUB_SUB_MSG;
       return;
     }
   }
 
-  // TODO(schwehr): Enable this check.
+  // TODO(schwehr): Enable this assert after fixing the message.
   // assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }

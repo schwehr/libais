@@ -28,8 +28,7 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad)
   aton_type = bs.ToUnsignedInt(38, 5);
   name = bs.ToString(43, 120);
   position_accuracy = bs[163];
-  x = bs.ToInt(164, 28) / 600000.;
-  y = bs.ToInt(192, 27) / 600000.;
+  position = bs.ToAisPoint(164, 55);
   dim_a = bs.ToUnsignedInt(219, 9);
   dim_b = bs.ToUnsignedInt(228, 9);
   dim_c = bs.ToUnsignedInt(237, 6);
@@ -56,6 +55,7 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad)
     spare2 = 0;
   }
 
+  assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 

@@ -26,6 +26,8 @@ Ais10::Ais10(const char *nmea_payload, const size_t pad)
   dest_mmsi = bs.ToUnsignedInt(40, 30);
   spare2 = bs.ToUnsignedInt(70, 2);
 
+  assert(bs.GetRemaining() == 0);
+
   status = AIS_OK;
 }
 

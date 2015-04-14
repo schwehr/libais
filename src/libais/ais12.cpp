@@ -32,7 +32,9 @@ Ais12::Ais12(const char *nmea_payload, const size_t pad)
   const int num_txt = (num_bits - 72) / 6;
   const int num_txt_bits = num_txt * 6;
   text = bs.ToString(72, num_txt_bits);
-  // TODO(schwehr): watch for trailing spares
+  if (bs.GetRemaining() > 0) {
+    spare2 = bs.ToUnsignedInt(72 + num_txt_bits, bs.GetRemaining());
+  }
 
   status = AIS_OK;
 }

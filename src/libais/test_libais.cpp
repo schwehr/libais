@@ -2,8 +2,6 @@
 
 #include "ais.h"
 
-#include "ais8_001_22.h"
-
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -17,7 +15,7 @@ namespace libais {
 #define CHECK_ERROR(MSG) if (MSG.had_error()) cerr << "FAILED " << MSG.message_id << ": " << AIS_STATUS_STRINGS[MSG.get_error()] << "\n";
 
 // Temporary until completely switch to gtest.
-void ASSERT_EQ(const int a, const int b, const int line) { 
+void ASSERT_EQ(const int a, const int b, const int line) {
   if (a != b)
     cerr << __FILE__ << ": line " << line << ": assert FAILED.  "<< a << " != " << b << endl;
   assert(a == b);
@@ -485,7 +483,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
         original_geojson: {"mmsi": 123456789, "repeat": 0, "msgtype": 8, "bbm": {"start": "2011-07-06T00:00:00Z", "link_id": 10, "duration_min": 60, "freetext": null, "area_type_desc": "Caution Area: Marine mammal habitat", "stop": "2011-07-06T01:00:00Z", "areas": [{"geometry": {"type": "Point", "coordinates": [-69.8, 42.0]}, "area_shape_name": "point", "area_shape": 0}], "bbm_type": [1, 22], "bbm_name": "area_notice", "area_type": 0}}
       */
-      Ais8_001_22 msg("81mg=5@0EP:0>H0007P>0<D1<qp400000", 0);
+      Ais8_1_22 msg("81mg=5@0EP:0>H0007P>0<D1<qp400000", 0);
       if (msg.had_error())  cerr<<"FAILED 8 1 22 pt\n";
     }
 
@@ -498,7 +496,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
         !AIVDM,1,1,,A,81mg=5@0EP:0>H0007PN0<D1<wg46b000,0*28
       */
-      Ais8_001_22 msg("81mg=5@0EP:0>H0007PN0<D1<wg46b000", 0);
+      Ais8_1_22 msg("81mg=5@0EP:0>H0007PN0<D1<wg46b000", 0);
       if (msg.had_error())  cerr<<"FAILED 8 1 22 circle\n";
     }
 
@@ -522,7 +520,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
       !AIVDM,1,1,,A,81mg=5@0EP:1fHcp07Qf0<D1=;Lt:0`00,0*63
     */
     {
-      Ais8_001_22 msg("81mg=5@0EP:1fHcp07Qf0<D1=;Lt:0`00", 0);
+      Ais8_1_22 msg("81mg=5@0EP:1fHcp07Qf0<D1=;Lt:0`00", 0);
       if (msg.had_error())  cerr<<"FAILED 8 1 22 poly\n";
     }
 
@@ -533,7 +531,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
       !AIVDM,1,1,,A,81mg=5@0EP:2>IV807R>0<D1=ACtvP1@j,0*3D
     */
     {
-      Ais8_001_22 msg("81mg=5@0EP:2>IV807R>0<D1=ACtvP1@j", 0);
+      Ais8_1_22 msg("81mg=5@0EP:2>IV807R>0<D1=ACtvP1@j", 0);
       if (msg.had_error())  cerr<<"FAILED 8 1 22 sector\n";
     }
 
@@ -546,7 +544,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
       norm: !AIVDM,1,1,,A,81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`01J000,3*61,rUNKNOWN,1296942146
     */
     {
-      Ais8_001_22 msg("81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`01J000", 3);
+      Ais8_1_22 msg("81mg=5@0EP:2fIp807P>0<D1=G:t00000J2QpFP05`01J000", 3);
       if (msg.had_error())  cerr<<"FAILED 8 1 22 polyline\n";
     }
 
@@ -560,7 +558,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
       norm: !AIVDM,1,1,,A,81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000,3*70,rUNKNOWN,1296942146
     */
     {
-      Ais8_001_22 msg("81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000", 3);
+      Ais8_1_22 msg("81mg=5@0EP:3>JWH07P>0<D1=M1t00000R2Q65`HM`01J000", 3);
       if (msg.had_error())  cerr<<"FAILED 8 1 22\n";
     }
 
@@ -575,7 +573,7 @@ int main(UNUSED int argc, UNUSED char* argv[]) {
 
     */
     {
-      Ais8_001_22 msg("81mg=5@0EP:3fJwH07P>0<D1=Rpt00000`c21P9h:Q9qh000", 3);
+      Ais8_1_22 msg("81mg=5@0EP:3fJwH07P>0<D1=Rpt00000`c21P9h:Q9qh000", 3);
       if (msg.had_error())  cerr<<"FAILED 8 1 22\n";
     }
   }

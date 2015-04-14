@@ -370,9 +370,15 @@ enum Dac {
 
 class AisBitset;
 
-struct AisPoint {
-  float x, y;  // TODO(schwehr): change all x, y to lng_deg, lat_deg.
+class AisPoint {
+ public:
+  double lng_deg;
+  double lat_deg;
+
+  AisPoint();
+  AisPoint(double lng_deg_, double lat_deg_);
 };
+ostream& operator<< (ostream &o, const AisPoint &position);
 
 class AisMsg {
  public:
@@ -404,7 +410,7 @@ class Ais1_2_3 : public AisMsg {
   float rot;
   float sog;  // Knots.
   int position_accuracy;
-  float x, y;
+  AisPoint position;
   float cog;  // Degrees.
   int true_heading;
   int timestamp;
@@ -456,7 +462,7 @@ class Ais4_11 : public AisMsg {
   int minute;
   int second;
   int position_accuracy;
-  float x, y;
+  AisPoint position;
   int fix_type;
   int transmission_ctl;
   int spare;
@@ -529,6 +535,23 @@ class Ais6 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais6 &msg);
 
+// http://www.e-navigation.nl/content/monitoring-aids-navigation
+// Zeni Lite Buoy Co., Ltd buoy status.
+class Ais6_0_0 : public Ais6 {
+ public:
+  int sub_id;
+  float voltage;
+  float current;
+  bool dc_power_supply;  // False is AC.
+  bool light_on;
+  bool battery_low;
+  bool off_position;
+  int spare2;
+
+  Ais6_0_0(const char *nmea_payload, const size_t pad);
+};
+ostream& operator<< (ostream &o, const Ais6_0_0 &msg);
+
 // Text message.  ITU 1371-1
 class Ais6_1_0 : public Ais6 {
  public:
@@ -585,6 +608,20 @@ class Ais6_1_4 : public Ais6 {
 };
 ostream& operator<< (ostream &o, const Ais6_1_4 &msg);
 
+// International function message 5: Application ack to addr binary message.
+class Ais6_1_5 : public Ais6 {
+ public:
+  // TODO(schwehr): How to handle the sequence number and retransmit flag?
+  int ack_dac;
+  int ack_fi;
+  int seq_num;
+  bool ai_available;  // TODO(schwehr): AI?  Is this the dac/fi being acked?
+  int ai_response;
+  int spare;
+
+  Ais6_1_5(const char *nmea_payload, const size_t pad);
+};
+
 // IMO Circ 236 Dangerous cargo indication
 // Not to be transmitted after 2012-Jan-01
 class Ais6_1_12 : public Ais6 {
@@ -609,7 +646,7 @@ ostream& operator<< (ostream &o, const Ais6_1_12 &msg);
 
 class Ais6_1_14_Window {
  public:
-  float y, x;
+  AisPoint position;
   int utc_hour_from, utc_min_from;
   int utc_hour_to, utc_min_to;
   int cur_dir;
@@ -635,7 +672,7 @@ class Ais6_1_18 : public Ais6 {
   int link_id;
   int utc_month, utc_day, utc_hour, utc_min;
   string port_berth, dest;
-  float x, y;
+  AisPoint position;
   std::array<int, 2> spare2;  // 32 bits per spare
 
   Ais6_1_18(const char *nmea_payload, const size_t pad);
@@ -649,13 +686,13 @@ class Ais6_1_20 : public Ais6 {
   int link_id;
   int length;
   float depth;
-  int position;
+  int mooring_position;
   int utc_month, utc_day, utc_hour, utc_min;
   bool services_known;
   // TODO(schwehr): enum of service types
   std::array<int, 26> services;
   string name;
-  float x, y;
+  AisPoint position;
 
   Ais6_1_20(const char *nmea_payload, const size_t pad);
 };
@@ -704,7 +741,7 @@ ostream& operator<< (ostream &o, const Ais6_1_25 &msg);
 // TODO(schwehr): Reuse Ais6_1_14_Window
 class Ais6_1_32_Window {
  public:
-  float x, y;
+  AisPoint position;
   int from_utc_hour, from_utc_min;
   int to_utc_hour, to_utc_min;
   int cur_dir;
@@ -786,7 +823,7 @@ ostream& operator<< (ostream &o, const Ais8_1_0 &msg);
 // See also IMO Circ 236
 class Ais8_1_11 : public Ais8 {
  public:
-  float y, x;
+  AisPoint position;
   int day;
   int hour;
   int minute;
@@ -879,7 +916,7 @@ class Ais8_1_17_Target {
   int type;
   string id;
   int spare;
-  float y, x;
+  AisPoint position;
   int cog;
   int timestamp;
   int sog;
@@ -903,7 +940,7 @@ class Ais8_1_19 : public Ais8 {
  public:
   int link_id;
   string name;
-  float x, y;  // funny bit count
+  AisPoint position;  // funny bit count
   int status;
   int signal;
   int utc_hour_next;
@@ -924,7 +961,7 @@ class Ais8_1_21 : public Ais8 {
 
   // TYPE 0
   string location;
-  float x, y;  // 25, 24 bits
+  AisPoint position;  // 25, 24 bits
   int utc_day, utc_hour, utc_min;
   // wx - use wx[0]
   float horz_viz;  // nautical miles
@@ -992,7 +1029,143 @@ class Ais8_1_21 : public Ais8 {
 };
 ostream& operator<< (ostream &o, const Ais8_1_21 &msg);
 
-// SEE ais8_001_22.h for Area notice
+
+const size_t AIS8_1_22_NUM_NAMES = 128;
+const size_t AIS8_1_22_SUBAREA_SIZE = 87;
+extern const char *ais8_1_22_notice_names[AIS8_1_22_NUM_NAMES];
+
+enum Ais8_1_22_AreaShapeEnum {
+  AIS8_1_22_SHAPE_ERROR = -1,
+  AIS8_1_22_SHAPE_CIRCLE = 0,  // OR Point.
+  AIS8_1_22_SHAPE_RECT = 1,
+  AIS8_1_22_SHAPE_SECTOR = 2,
+  AIS8_1_22_SHAPE_POLYLINE = 3,
+  AIS8_1_22_SHAPE_POLYGON = 4,
+  AIS8_1_22_SHAPE_TEXT = 5,
+  AIS8_1_22_SHAPE_RESERVED_6 = 6,
+  AIS8_1_22_SHAPE_RESERVED_7 = 7
+};
+
+extern const char *ais8_1_22_shape_names[8];
+
+// Sub-Areas for the Area Notice class
+
+class Ais8_1_22_SubArea {
+ public:
+  virtual Ais8_1_22_AreaShapeEnum getType() const = 0;
+  virtual ~Ais8_1_22_SubArea() {}
+};
+
+Ais8_1_22_SubArea*
+ais8_1_22_subarea_factory(const AisBitset &bs,
+                            const size_t offset);
+
+// or Point if radius is 0
+class Ais8_1_22_Circle : public Ais8_1_22_SubArea {
+ public:
+  AisPoint position;  // Longitude and latitude.
+  // Going to assume that the precision is not useful.
+  int precision;  // How many decimal places for x and y.
+  int radius_m;
+  unsigned int spare;  // 18 bits.
+
+  Ais8_1_22_Circle(const AisBitset &bs, const size_t offset);
+  ~Ais8_1_22_Circle() {}
+  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_CIRCLE;}
+};
+
+class Ais8_1_22_Rect : public Ais8_1_22_SubArea {
+ public:
+  AisPoint position;  // Longitude and latitude.
+  int precision;  // How many decimal places for x and y.  Useless.
+  int e_dim_m;  // East dimension in meters.
+  int n_dim_m;
+  int orient_deg;  // Orientation in degrees from true north.
+  unsigned int spare;  // 5 bits.
+
+  Ais8_1_22_Rect(const AisBitset &bs, const size_t offset);
+  ~Ais8_1_22_Rect() {}
+  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_RECT;}
+};
+
+class Ais8_1_22_Sector : public Ais8_1_22_SubArea {
+ public:
+  AisPoint position;  // Longitude and latitude.
+  // TODO(schwehr): precision in IMO, but not RTCM.  Double check.
+  int precision;  // How many decimal places for x and y?
+  int radius_m;
+  int left_bound_deg;
+  int right_bound_deg;
+
+  Ais8_1_22_Sector(const AisBitset &bs, const size_t offset);
+  ~Ais8_1_22_Sector() {}
+  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_SECTOR;}
+};
+
+// Or Waypoint
+// Must have a point before on the VDL
+// TODO(schwehr): do I bring in the prior point x,y, precision?
+class Ais8_1_22_Polyline : public Ais8_1_22_SubArea {
+ public:
+  // TODO(schwehr): int precision; // How many decimal places for x and y.
+
+  // Up to 4 points
+  vector<float> angles;
+  vector<float> dists_m;
+  unsigned int spare;  // 2 bit.
+
+  Ais8_1_22_Polyline(const AisBitset &bs, const size_t offset);
+  ~Ais8_1_22_Polyline() {}
+  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_POLYLINE;}
+};
+
+// TODO(schwehr): bring in the prior point?  And do we fold the sub area data
+// into one polygon if there are more than one?
+class Ais8_1_22_Polygon : public Ais8_1_22_SubArea {
+ public:
+  // TODO(schwehr): int precision; // How many decimal places for x and y.
+
+  // Up to 4 points in a first message, but aggregated if multiple sub areas
+  vector<float> angles;
+  vector<float> dists_m;
+  unsigned int spare;  // 2 bit
+
+  Ais8_1_22_Polygon(const AisBitset &bs, const size_t offset);
+  ~Ais8_1_22_Polygon() {}
+  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_POLYGON;}
+};
+
+
+class Ais8_1_22_Text : public Ais8_1_22_SubArea {
+ public:
+  string text;
+  // TODO(schwehr): spare?
+
+  Ais8_1_22_Text(const AisBitset &bs, const size_t offset);
+  ~Ais8_1_22_Text() {}
+  Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_TEXT;}
+};
+
+// Area Notice class
+
+class Ais8_1_22 : public Ais8 {
+ public:
+  int link_id;  // 10 bit id to match up text blocks.
+  int notice_type;  // Area type / Notice Description.
+  int month;  // These are in UTC.
+  int day;
+  int hour;
+  int minute;
+  int duration_minutes;  // Time from the start until the notice expires.
+
+  // 1 or more sub messages
+  vector<Ais8_1_22_SubArea *> sub_areas;
+
+  Ais8_1_22(const char *nmea_payload, const size_t pad);
+  ~Ais8_1_22();
+
+};
+ostream& operator<< (ostream& o, Ais8_1_22 const& msg);
 
 // No message 8_1_23
 
@@ -1063,13 +1236,14 @@ ais8_1_26_sensor_report_factory(const AisBitset &bs,
 
 class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
  public:
-  float x, y, z;  // lon, lat, alt in m from MSL
+  AisPoint position;
+  float z;  // alt in m from MSL
   int owner, timeout;
   int spare;
 
   Ais8_1_26_Location(const AisBitset &bs, const size_t offset);
   Ais8_1_26_Location() {}
-  Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_LOCATION;}
+  Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_LOCATION; }
 };
 
 class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
@@ -1286,7 +1460,7 @@ ostream& operator<< (ostream &o, const Ais8_1_29 &msg);
 //       x,y swapped.
 class Ais8_1_31 : public Ais8 {
  public:
-  float x, y;  // Opposite the bit order of 8_1_11
+  AisPoint position;  // Opposite the bit order of 8_1_11
   int position_accuracy;  // New field
   int utc_day;
   int utc_hour;
@@ -1360,8 +1534,8 @@ class Ais8_200_23 : public Ais8 {
   int utc_year_end, utc_month_end, utc_day_end;
   int utc_hour_start, utc_min_start;
   int utc_hour_end, utc_min_end;
-  float x1, y1;
-  float x2, y2;
+  AisPoint position1;
+  AisPoint position2;
   int type;
   int min;
   int max;
@@ -1386,7 +1560,7 @@ class Ais8_200_24 : public Ais8 {
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
 class Ais8_200_40 : public Ais8 {
  public:
-  float x, y;
+  AisPoint position;
   int form;
   int dir;  // degrees
   int stream_dir;
@@ -1435,7 +1609,7 @@ ais8_366_22_subarea_factory(const AisBitset &bs,
 // or Point if radius is 0
 class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
  public:
-    float x, y;
+    AisPoint position;
     // TODO(schwehr): int precision
     int radius_m;
     unsigned int spare;
@@ -1447,7 +1621,7 @@ class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
 
 class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
  public:
-    float x, y;  // longitude and latitude
+    AisPoint position;  // longitude and latitude
     // TODO(schwehr): int precision
     int e_dim_m;  // East dimension in meters
     int n_dim_m;
@@ -1461,7 +1635,7 @@ class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
 
 class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
  public:
-    float x, y;
+    AisPoint position;
     // TODO(schwehr): int precision
     int radius_m;
     int left_bound_deg;
@@ -1477,7 +1651,7 @@ class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
 // Must have a point before on the VDL, but pulled together here.
 class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
  public:
-    float x, y;  // longitude and latitude
+    AisPoint position;  // longitude and latitude
     // TODO(schwehr): precision
 
     // Up to 4 points
@@ -1492,7 +1666,7 @@ class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
 
 class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
  public:
-    float x, y;  // longitude and latitude
+    AisPoint position;  // longitude and latitude
     // TODO(schwehr): precision?
 
     // Up to 4 points in a first message, but aggregated if multiple sub areas
@@ -1552,8 +1726,7 @@ ais8_367_22_subarea_factory(const AisBitset &bs,
 
 class Ais8_367_22_Circle : public Ais8_367_22_SubArea {
  public:
-  float x;
-  float y;
+  AisPoint position;
   int precision;
   int radius_m;
   unsigned int spare;
@@ -1565,8 +1738,7 @@ class Ais8_367_22_Circle : public Ais8_367_22_SubArea {
 
 class Ais8_367_22_Rect : public Ais8_367_22_SubArea {
  public:
-  float x;
-  float y;
+  AisPoint position;
   int precision;
   int e_dim_m;
   int n_dim_m;
@@ -1580,8 +1752,7 @@ class Ais8_367_22_Rect : public Ais8_367_22_SubArea {
 
 class Ais8_367_22_Sector : public Ais8_367_22_SubArea {
  public:
-  float x;
-  float y;
+  AisPoint position;
   int precision;
   int radius_m;
   int left_bound_deg;
@@ -1597,8 +1768,7 @@ class Ais8_367_22_Sector : public Ais8_367_22_SubArea {
 class Ais8_367_22_Poly : public Ais8_367_22_SubArea {
  public:
   Ais8_366_22_AreaShapeEnum shape;
-  float x;
-  float y;
+  AisPoint position;
   int precision;
 
   // Up to 4 points
@@ -1645,7 +1815,7 @@ class Ais9 : public AisMsg {
   int alt;  // m above sea level
   float sog;
   int position_accuracy;
-  float x, y;
+  AisPoint position;
   float cog;
   int timestamp;
   int alt_sensor;
@@ -1712,6 +1882,7 @@ class Ais12 : public AisMsg {
   bool retransmitted;
   int spare;
   string text;
+  int spare2;
 
   Ais12(const char *nmea_payload, const size_t pad);
 };
@@ -1724,7 +1895,7 @@ class Ais14 : public AisMsg {
  public:
   int spare;
   string text;
-  int expected_num_spare_bits;  // The bits in the nmea_payload not used
+  int spare2;
 
   Ais14(const char *nmea_payload, const size_t pad);
 };
@@ -1773,8 +1944,7 @@ ostream& operator<< (ostream &o, const Ais16 &msg);
 class Ais17 : public AisMsg {
  public:
   int spare;
-  float x;
-  float y;
+  AisPoint position;
   int spare2;
   int gnss_type;
   int z_cnt;
@@ -1795,7 +1965,7 @@ class Ais18 : public AisMsg {
   int spare;
   float sog;
   int position_accuracy;
-  float x, y;  // Long and lat
+  AisPoint position;  // Long and lat
   float cog;
   int true_heading;
   int timestamp;
@@ -1855,7 +2025,7 @@ class Ais19 : public AisMsg {
   int spare;
   float sog;
   int position_accuracy;
-  float x, y;  // Long and lat
+  AisPoint position;  // Long and lat
   float cog;
   int true_heading;
   int timestamp;
@@ -1916,7 +2086,7 @@ class Ais21 : public AisMsg {
   int aton_type;
   string name;
   int position_accuracy;
-  float x, y;
+  AisPoint position;
   int dim_a;
   int dim_b;
   int dim_c;
@@ -1947,8 +2117,8 @@ class Ais22 : public AisMsg {
 
   // if addressed false, then geographic position
   bool pos_valid;
-  float x1, y1;
-  float x2, y2;
+  AisPoint position1;
+  AisPoint position2;
 
   // if addressed is true
   bool dest_valid;
@@ -1969,8 +2139,8 @@ ostream& operator<< (ostream &o, const Ais22 &msg);
 class Ais23 : public AisMsg {
  public:
   int spare;
-  float x1, y1;
-  float x2, y2;
+  AisPoint position1;
+  AisPoint position2;
   int station_type;
   int type_and_cargo;
 
@@ -2081,7 +2251,7 @@ class Ais27 : public AisMsg {
   int position_accuracy;
   bool raim;
   int nav_status;
-  float x, y;
+  AisPoint position;
   int sog;  // Knots.
   int cog;  // Degrees.
   bool gnss;  // warning: bits in AIS are flipped sense
@@ -2115,6 +2285,8 @@ class AisBitset : protected bitset<MAX_BITS> {
   int ToInt(const size_t start, const size_t len) const;
   string ToString(const size_t start, const size_t len) const;
 
+  const AisPoint ToAisPoint(const size_t start, const size_t point_size) const;
+
   // Visible for testing.
   static bitset<6> Reverse(const bitset<6> &bits);
 
@@ -2143,6 +2315,7 @@ class AisBitset : protected bitset<MAX_BITS> {
   // last read position.
   mutable int current_position;
 };
+
 
 }  // namespace libais
 

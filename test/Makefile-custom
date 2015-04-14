@@ -1,0 +1,8 @@
+# -*- makefile -*-
+all:
+	echo "NOP"
+
+clean:
+	(cd compatibility && make -f Makefile-custom clean) 
+	rm -f *.pyc
+

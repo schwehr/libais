@@ -1,8 +1,8 @@
 // Test basic AIS infrastructure for AIVDM NMEA and AIS bit handling.
 
 #include "ais.h"
-#include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 using ::testing::ElementsAre;
 

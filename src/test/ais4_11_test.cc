@@ -49,8 +49,8 @@ void Validate(
   ASSERT_EQ(minute, msg->minute);
   ASSERT_EQ(second, msg->second);
   ASSERT_EQ(position_accuracy, msg->position_accuracy);
-  ASSERT_FLOAT_EQ(x, msg->x);
-  ASSERT_FLOAT_EQ(y, msg->y);
+  ASSERT_FLOAT_EQ(x, msg->position.lng_deg);
+  ASSERT_FLOAT_EQ(y, msg->position.lat_deg);
   ASSERT_EQ(fix_type, msg->fix_type);
   ASSERT_EQ(transmission_ctl, msg->transmission_ctl);
   ASSERT_EQ(spare, msg->spare);
