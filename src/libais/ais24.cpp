@@ -28,16 +28,18 @@ Ais24::Ais24(const char *nmea_payload, const size_t pad)
 
   switch (part_num) {
   case 0:  // Part A
-    if (num_bits != 160) {
-      status = AIS_ERR_BAD_BIT_COUNT;
-      return;
-    }
     name = bs.ToString(40, 120);
+    if (num_bits == 168) {
+      // Accept the invalid size.
+      spare = bs.ToUnsignedInt(160, 8);
+    }
     break;
   case 1:  // Part B
-    if (num_bits != 168) {
-      status = AIS_ERR_BAD_BIT_COUNT;
-      return;
+    if (num_bits == 160) {
+      // Some devices incorrectly use part 1 as 0.
+      name = bs.ToString(40, 120);
+      part_num = 0;
+      break;
     }
     type_and_cargo = bs.ToUnsignedInt(40, 8);
     vendor_id = bs.ToString(48, 42);
@@ -48,8 +50,8 @@ Ais24::Ais24(const char *nmea_payload, const size_t pad)
     dim_d = bs.ToUnsignedInt(156, 6);
     spare = bs.ToUnsignedInt(162, 6);
     break;
-  case 2:  // FALLTHROUGH - not yet defined by ITU
-  case 3:  // FALLTHROUGH - not yet defined by ITU
+  case 2:  // FALLTHROUGH - Not defined by ITU 1371-5
+  case 3:  // FALLTHROUGH - Not defined by ITU 1371-5
   default:
     status = AIS_ERR_BAD_MSG_CONTENT;
     return;

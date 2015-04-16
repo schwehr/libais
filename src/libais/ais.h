@@ -1163,7 +1163,6 @@ class Ais8_1_22 : public Ais8 {
 
   Ais8_1_22(const char *nmea_payload, const size_t pad);
   ~Ais8_1_22();
-
 };
 ostream& operator<< (ostream& o, Ais8_1_22 const& msg);
 
@@ -2173,6 +2172,9 @@ class Ais24 : public AisMsg {
   int dim_d;
   int spare;
 
+  // Part C - Not defined by ITU 1371-5
+  // Part D - Not defined by ITU 1371-5
+
   Ais24(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais24 &msg);
@@ -2293,8 +2295,8 @@ class AisBitset : protected bitset<MAX_BITS> {
  protected:
   // TODO(schwehr): do not use long
   typedef union {
-    long long_val;
-    unsigned long ulong_val;
+    long long_val;  // NOLINT
+    unsigned long ulong_val;  // NOLINT
   } long_union;
 
   int num_bits;
