@@ -79,5 +79,15 @@ TEST(Ais21Test, TwoLine) {
       0, false, false, false, 0, 0);
 }
 
+TEST(Ais21Test, Short268BitMessage) {
+  // !AIVDM,1,1,,,ENjV2Bw0`bPQbV::a2hJ00000000L7kPBmfv@1088;v0@,2*20
+  std::unique_ptr<Ais21> msg(new Ais21(
+      "ENjV2Bw0`bPQbV::a2hJ00000000L7kPBmfv@1088;v0@", 2));
+  Validate(
+      msg.get(), 1, 992576075, 30, "AQUACULTURE 4@@@@@@@", 0,
+      12.28666687, 65.84914398, 1, 1, 1, 1, 7, 60, false,
+      4, false, false, false, 0, 0);
+}
+
 }  // namespace
 }  // namespace libais

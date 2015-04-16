@@ -12,7 +12,7 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad)
   assert(message_id == 21);
 
   // TODO(schwehr): make this more careful than 272-360
-  if (num_bits < 272 || num_bits > 360) {
+  if (num_bits != 268 && (num_bits < 272 || num_bits > 360)) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -37,6 +37,12 @@ Ais21::Ais21(const char *nmea_payload, const size_t pad)
   timestamp = bs.ToUnsignedInt(253, 6);
   off_pos = bs[259];
   aton_status = bs.ToUnsignedInt(260, 8);
+  if (num_bits == 268) {
+    // Non-standard small message.
+    assert(bs.GetRemaining() == 0);
+    status = AIS_OK;
+    return;
+  }
   raim = bs[268];
   virtual_aton = bs[269];
   assigned_mode = bs[270];
