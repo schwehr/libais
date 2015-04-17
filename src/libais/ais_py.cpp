@@ -8,6 +8,7 @@
 namespace libais {
 
 PyObject *ais_py_exception;
+const char exception_short[] = "DecodeError";
 const char exception_name[] = "_ais.DecodeError";
 
 // TODO(schwehr): Write a full module doc string.
@@ -61,7 +62,7 @@ enum AIS_FI {
 };
 
 void
-DictSafeSetItem(PyObject *dict, const string &key, const long val) {
+DictSafeSetItem(PyObject *dict, const string &key, const long val) {  // NOLINT
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyLong_FromLong(val);
   assert(key_obj);
@@ -142,7 +143,6 @@ DictSafeSetItem(PyObject *dict, const string &key, const float val) {
   Py_DECREF(val_obj);
 }
 
-
 // Python Floats are IEE-754 double precision.
 void
 DictSafeSetItem(PyObject *dict, const string &key, const double val) {
@@ -186,7 +186,7 @@ ais_msg_to_pydict(const AisMsg* msg) {
   return dict;
 }
 
-
+// Class A position report
 PyObject *
 ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -249,7 +249,7 @@ ais1_2_3_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-
+// Basestation report and ';' time report
 PyObject *
 ais4_11_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -298,7 +298,7 @@ ais4_11_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-
+// Class A ship data
 PyObject *
 ais5_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -333,7 +333,7 @@ ais5_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-
+// Address binary message
 AIS_STATUS
 ais6_1_0_append_pydict(const char *nmea_payload, PyObject *dict,
                        const size_t pad) {
@@ -422,10 +422,10 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict,
   PyObject *res_list = PyList_New(26);
   for (size_t cap_num = 0; cap_num < 128/2; cap_num++) {
     // TODO(schwehr): memory leak?
-    PyObject *cap = PyLong_FromLong(long(msg.capabilities[cap_num]));
+    PyObject *cap = PyLong_FromLong(long(msg.capabilities[cap_num]));  // NOLINT
     PyList_SetItem(cap_list, cap_num, cap);
 
-    PyObject *res = PyLong_FromLong(long(msg.cap_reserved[cap_num]));
+    PyObject *res = PyLong_FromLong(long(msg.cap_reserved[cap_num]));  // NOLINT
     PyList_SetItem(res_list, cap_num, res);
   }
   DictSafeSetItem(dict, "capabilities", cap_list);
@@ -573,7 +573,7 @@ ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict,
   if (msg.services_known) {
     PyObject *serv_list = PyList_New(26);
     for (size_t serv_num = 0; serv_num < 26; serv_num++) {
-      PyObject *serv = PyLong_FromLong(long(msg.services[serv_num]));
+      PyObject *serv = PyLong_FromLong(long(msg.services[serv_num]));  // NOLINT
       PyList_SetItem(serv_list, serv_num, serv);
     }
     DictSafeSetItem(dict, "services", serv_list);
@@ -769,7 +769,7 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-
+// Acknowledgement
 PyObject*
 ais7_13_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -1242,7 +1242,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
 }
 
 
-// no 23 broadcast
+// No 23 broadcast
 
 // IMO Circ 289 - Extended ship static and voyage-related
 AIS_STATUS
@@ -1289,7 +1289,7 @@ ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict,
 }
 
 
-// no 25 broadcast
+// No 25 broadcast
 
 AIS_STATUS
 ais8_1_26_append_pydict_sensor_hdr(PyObject *dict,
@@ -2041,6 +2041,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
+// Aircraft position report
 PyObject*
 ais9_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2095,7 +2096,7 @@ ais9_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// :
+// 10 - ':' - UTC and date inquiry
 PyObject*
 ais10_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2117,9 +2118,9 @@ ais10_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// msg 11 ';' - See msg 4
+// msg 11 ';' - See msg 4_11
 
-// 12 - '<'
+// 12 - '<' - Addressed safety related text
 PyObject*
 ais12_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2142,11 +2143,9 @@ ais12_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-
 // msg 13 - See msg 7
 
-
-// 14 - '>'
+// 14 - '>' - Safety broadcast text
 PyObject*
 ais14_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2166,7 +2165,7 @@ ais14_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// '?'
+// 15 - '?' - Interrogation
 PyObject*
 ais15_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2198,7 +2197,7 @@ ais15_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// '@'
+// 16 - '@' - Assigned mode command
 PyObject*
 ais16_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2227,7 +2226,7 @@ ais16_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// 'A' - GNSS differential - TODO(schwehr): incomplete
+// 17 - 'A' - GNSS differential - TODO(schwehr): incomplete
 PyObject*
 ais17_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2248,7 +2247,7 @@ ais17_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// 'B'
+// 18 - 'B' - Class B position report.
 PyObject*
 ais18_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2313,7 +2312,7 @@ ais18_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// 'C'
+// 19 - 'C' - Class B combined position report and ship data
 PyObject*
 ais19_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2353,7 +2352,7 @@ ais19_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// TODO(schwehr): 'D' - data link management
+// 20 - 'D' - data link management
 PyObject*
 ais20_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2416,7 +2415,7 @@ ais20_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 
-// E - ATON Aid to Navigation
+// 21 - 'E' - ATON Aid to Navigation
 PyObject*
 ais21_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2449,7 +2448,7 @@ ais21_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// F - channel mangement
+// 22 - 'F' - Channel mangement
 PyObject*
 ais22_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2485,7 +2484,7 @@ ais22_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 
-// F - group assignment command
+// 23 - 'F' - Group assignment command
 PyObject*
 ais23_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2514,7 +2513,7 @@ ais23_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// H - Static data report
+// 24 - 'H' - Static data report
 PyObject*
 ais24_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2554,7 +2553,7 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// I - single slot binary message
+// 25 - 'I' - Single slot binary message
 PyObject*
 ais25_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -2579,7 +2578,7 @@ ais25_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// J - multi-slot binary message with commstate
+// 26 - 'J' - Multi-slot binary message with commstate
 PyObject*
 ais26_to_pydict(const char *nmea_payload, const size_t pad) {
   Ais26 msg(nmea_payload, pad);
@@ -2623,7 +2622,7 @@ ais26_to_pydict(const char *nmea_payload, const size_t pad) {
 }
 
 
-// J - multi-slot binary message with commstate
+// 27 - 'K' - Short position report for satellite reception
 PyObject*
 ais27_to_pydict(const char *nmea_payload, const size_t pad) {
   Ais27 msg(nmea_payload, pad);
@@ -2780,7 +2779,7 @@ PyMODINIT_FUNC PyInit__ais(void) {
 
   ais_py_exception = PyErr_NewException(exception_name, nullptr, nullptr);
   Py_INCREF(ais_py_exception);
-  PyModule_AddObject(module, "DecodeError", ais_py_exception);
+  PyModule_AddObject(module, exception_short, ais_py_exception);
   return module;
 }
 
@@ -2796,7 +2795,7 @@ void init_ais(void) {
   ais_py_exception = PyErr_NewException(
       const_cast<char *>(exception_name), nullptr, nullptr);
   Py_INCREF(ais_py_exception);
-  PyModule_AddObject(module, "DecodeError", ais_py_exception);
+  PyModule_AddObject(module, exception_short, ais_py_exception);
 }
 
 #endif  // PY_MAJOR_VERSION

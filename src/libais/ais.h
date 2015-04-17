@@ -1873,7 +1873,7 @@ ostream& operator<< (ostream &o, const Ais10 &msg);
 
 // 11 ';' - See 4_11
 
-// '<' - Addressed safety related text.
+// 12 - '<' - Addressed safety related text.
 class Ais12 : public AisMsg {
  public:
   int seq_num;
@@ -1889,7 +1889,7 @@ ostream& operator<< (ostream &o, const Ais12 &msg);
 
 // 13 '=' - See 7
 
-// '>' - Safety broadcast text.
+// 14 - '>' - Safety broadcast text.
 class Ais14 : public AisMsg {
  public:
   int spare;
@@ -1900,7 +1900,7 @@ class Ais14 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais14 &msg);
 
-// ? - Interrogation
+// 15 - '?' - Interrogation
 class Ais15 : public AisMsg {
  public:
   int spare;
@@ -1922,7 +1922,7 @@ class Ais15 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais15 &msg);
 
-// @ - Assigned mode command
+// 16 - '@' - Assigned mode command
 class Ais16 : public AisMsg {
  public:
   int spare;
@@ -1939,7 +1939,7 @@ class Ais16 : public AisMsg {
 ostream& operator<< (ostream &o, const Ais16 &msg);
 
 // ITU-R M.823  http://www.itu.int/rec/R-REC-M.823/en
-// A - GNSS broacast - TODO(schwehr): only partially coded
+// 17 - 'A' - GNSS broacast - TODO(schwehr): only partially coded
 class Ais17 : public AisMsg {
  public:
   int spare;
@@ -1958,7 +1958,7 @@ class Ais17 : public AisMsg {
 ostream& operator<< (ostream &o, const Ais17 &msg);
 
 
-// B - Class B position report
+// 18 - 'B' - Class B position report
 class Ais18 : public AisMsg {
  public:
   int spare;
@@ -2018,7 +2018,7 @@ class Ais18 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais18 &msg);
 
-// C - Class B extended ship and position
+// 19 - 'C' - Class B extended ship and position
 class Ais19 : public AisMsg {
  public:
   int spare;
@@ -2045,7 +2045,7 @@ class Ais19 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais19 &msg);
 
-// 'D' - Data link management
+// 20 - 'D' - Data link management
 // TODO(schwehr): consider a vector
 class Ais20 : public AisMsg {
  public:
@@ -2079,7 +2079,7 @@ class Ais20 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais20 &msg);
 
-// 'E' - Aids to navigation report
+// 21 - 'E' - Aids to navigation report
 class Ais21 : public AisMsg {
  public:
   int aton_type;
@@ -2105,7 +2105,7 @@ class Ais21 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais21 &msg);
 
-// 'F' - Channel Management
+// 22 - 'F' - Channel Management
 class Ais22 : public AisMsg {
  public:
   int spare;
@@ -2134,7 +2134,7 @@ class Ais22 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais22 &msg);
 
-// 'G' - Group Assignment Command
+// 23 - 'G' - Group Assignment Command
 class Ais23 : public AisMsg {
  public:
   int spare;
@@ -2154,7 +2154,7 @@ class Ais23 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais23 &msg);
 
-// 'H' - Class B Static Data report
+// 24 - 'H' - Class B Static Data report
 class Ais24 : public AisMsg {
  public:
   int part_num;
@@ -2179,7 +2179,7 @@ class Ais24 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais24 &msg);
 
-// 'I' - Single slot binary message - addressed or broadcast
+// 25 - 'I' - Single slot binary message - addressed or broadcast
 // TODO(schwehr): handle payload
 class Ais25 : public AisMsg {
  public:
@@ -2197,7 +2197,7 @@ class Ais25 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais25 &msg);
 
-// 'J' - Multi slot binary message with comm state
+// 26 - 'J' - Multi slot binary message with comm state
 // TODO(schwehr): handle payload
 class Ais26 : public AisMsg {
  public:
@@ -2247,7 +2247,7 @@ class Ais26 : public AisMsg {
 };
 ostream& operator<< (ostream &o, const Ais26 &msg);
 
-// K - Long-range position report - e.g. for satellite receivers
+// 27 - 'K' - Long-range position report - e.g. for satellite receivers
 class Ais27 : public AisMsg {
  public:
   int position_accuracy;
