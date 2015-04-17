@@ -1,17 +1,24 @@
 """Manage a stream of NMEA messages with optional metadata.
 
 TODO(schwehr): Add support for decoding non-AIS NMEA messages (e.g. ZDA).
-TODO(schwehr): Implement old USCG metadata format support.
 """
 
 from ais import nmea
 from ais import tag_block
+from ais import uscg
 from ais import vdm
 import six.moves.queue as Queue
 
 
 class Error(Exception):
   pass
+
+
+def GetOrNone(queue):
+  try:
+    return queue.get(block=False)
+  except Queue.Empty:
+    return
 
 
 class NmeaQueue(Queue.Queue):
@@ -100,6 +107,7 @@ class NmeaQueue(Queue.Queue):
   def __init__(self):
     self.bare_queue = vdm.BareQueue()
     self.tagb_queue = tag_block.TagQueue()
+    self.uscg_queue = uscg.UscgQueue()
     self.line_num = 0
     Queue.Queue.__init__(self)
 
@@ -119,32 +127,22 @@ class NmeaQueue(Queue.Queue):
     line = line.rstrip()
     line_type = nmea.LineType(line)
 
+    msg = None
+
     if line_type == nmea.TEXT:
-      msg = {
-          'line_nums': [self.line_num],
-          'lines': [line],
-          'line_type': nmea.TEXT,
-      }
+      msg = {'line_nums': [self.line_num], 'lines': [line]}
+    elif line_type == nmea.BARE:
+      self.bare_queue.put(line, self.line_num)
+      msg = GetOrNone(self.bare_queue)
+    elif line_type == nmea.TAGB:
+      self.tagb_queue.put(line, self.line_num)
+      msg = GetOrNone(self.tagb_queue)
+    elif line_type == nmea.USCG:
+      self.uscg_queue.put(line, self.line_num)
+      msg = GetOrNone(self.uscg_queue)
+    else:
+      assert False  # Should never reach here.
+
+    if msg:
+      msg['line_type'] = line_type
       Queue.Queue.put(self, msg)
-      return
-
-    if line_type == nmea.BARE:
-      self.bare_queue.put(line)
-      if self.bare_queue.qsize() > 0:
-        msg = self.bare_queue.get()
-        msg['line_type'] = nmea.BARE,
-        Queue.Queue.put(self, msg)
-      return
-
-    if line_type == nmea.USCG:
-      raise NotImplementedError('USCG LINE:%d: %s' % (line_num, line))
-
-    if line_type == nmea.TAGB:
-      self.tagb_queue.put(line)
-      if not self.tagb_queue.empty():
-        msg = self.tagb_queue.get()
-        msg['line_type'] = nmea.TAGB,
-        Queue.Queue.put(self, msg)
-      return
-
-    assert False  # Should never reach here.

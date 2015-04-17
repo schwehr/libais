@@ -34,7 +34,8 @@ class VdmRegexTest(unittest.TestCase):
         'seq_id': None,
         'vdm_type': 'VDM',
         'talker': 'AI',
-        'sen_tot': '1'}
+        'sen_tot': '1',
+        'vdm': '!AIVDM,1,1,,A,14VIk0002sMM04vE>V9jGimn08RP,0*0D'}
     self.assertEqual(match, expected)
 
   def testRegexTwoLineMessage(self):
@@ -51,7 +52,10 @@ class VdmRegexTest(unittest.TestCase):
          'seq_id': '2',
          'vdm_type': 'VDM',
          'talker': 'AI',
-         'sen_tot': '2'},
+         'sen_tot': '2',
+         # pylint: disable=line-too-long
+         'vdm': '!AIVDM,2,1,2,B,5KNp?6@00000=Phb220u1@Tlv0TV22222222220N0h:22400000000000000,0*2A'
+        },
         {'body': '00000000000',
          'chan': 'B',
          'checksum': '25',
@@ -60,7 +64,9 @@ class VdmRegexTest(unittest.TestCase):
          'seq_id': '2',
          'vdm_type': 'VDM',
          'talker': 'AI',
-         'sen_tot': '2'})
+         'sen_tot': '2',
+         'vdm': '!AIVDM,2,2,2,B,00000000000,2*25'
+        })
     matches = [vdm.VDM_RE.match(line).groupdict() for line in lines]
     self.assertEqual(matches[0], expected[0])
     self.assertEqual(matches[1], expected[1])
@@ -181,7 +187,8 @@ class BareQueueTest(unittest.TestCase):
             'talker': 'SA',
             'chan': 'B',
             'seq_id': None,
-            'checksum': '7B'}]
+            'checksum': '7B',
+            'vdm': '!SAVDM,1,1,,B,K8VSqb9LdU28WP8P,0*7B'}]
     }
     msg = self.queue.get()
     self.assertEqual(msg, expected)
@@ -295,7 +302,9 @@ class BareQueueTest(unittest.TestCase):
                 'sen_tot': '2',
                 'seq_id': '2',
                 'talker': 'AB',
-                'vdm_type': 'VDM'},
+                'vdm_type': 'VDM',
+                # pylint: disable=line-too-long
+                'vdm': '!ABVDM,2,1,2,A,55NJPwP00001L@K?77@DhhU>0@5HU>222222220O18@374B<08CCm2EPH0kk,0*6D'},
             {
                 'body': 'UQCU8888880',
                 'chan': 'A',
@@ -305,7 +314,8 @@ class BareQueueTest(unittest.TestCase):
                 'sen_tot': '2',
                 'seq_id': '2',
                 'talker': 'AB',
-                'vdm_type': 'VDM'}]}
+                'vdm_type': 'VDM',
+                'vdm': '!ABVDM,2,2,2,A,UQCU8888880,2*3F'}]}
     msg = self.queue.get()
     self.assertEqual(msg, expected)
     self.assertEqual(self.queue.qsize(), 0)
@@ -397,7 +407,9 @@ class BareQueueTest(unittest.TestCase):
                          '5PD5HDPD8'),
                 'checksum': '26',
                 'chan': 'A',
-                'fill_bits': '0'},
+                'fill_bits': '0',
+                # pylint: disable=line-too-long
+                'vdm': '!AIVDM,3,1,4,A,81mg=5@0EP:4R40807P>0<D1>MNt00000f>FNVfnw7>6>FNU=?B5PD5HDPD8,0*26'},
             {
                 'talker': 'AI',
                 'seq_id': '4',
@@ -408,7 +420,9 @@ class BareQueueTest(unittest.TestCase):
                          '?C54PD?'),
                 'checksum': '60',
                 'chan': 'A',
-                'fill_bits': '0'},
+                'fill_bits': '0',
+                # pylint: disable=line-too-long
+                'vdm': '!AIVDM,3,2,4,A,1Dd2J09jL08JArJH5P=E<D9@<5P<9>0`bMl42Q0d2Pc2T59CPCE@@?C54PD?,0*60',},
             {
                 'talker': 'AI',
                 'seq_id': '4',
@@ -418,7 +432,8 @@ class BareQueueTest(unittest.TestCase):
                 'body': 'd0@d0IqhH:Pah:U54PD?75D85Bf00',
                 'checksum': '03',
                 'chan': 'A',
-                'fill_bits': '0'}]
+                'fill_bits': '0',
+                'vdm': '!AIVDM,3,3,4,A,d0@d0IqhH:Pah:U54PD?75D85Bf00,0*03'}]
     }
     msg = self.queue.get()
 

@@ -70,14 +70,16 @@ import six.moves.queue as Queue
 # Orbcomm sometimes leaves out the channel.
 # TAG BLOCKS use "sentence" as the regex group name.  Use sen here to
 # avoid collision.
-VDM_RE_STR = r'''!(?P<talker>[A-Z][A-Z])(?P<vdm_type>VD[MO])
+VDM_RE_STR = r"""(?P<vdm>
+!(?P<talker>[A-Z][A-Z])(?P<vdm_type>VD[MO])
 ,(?P<sen_tot>\d)  # Total number of sentences.
 ,(?P<sen_num>\d)  # Current sentence number.  Starts from 1.
 ,(?P<seq_id>[0-9])?  # Receiver sequence number.
 ,(?P<chan>[AB])?  # VHF channel.
 ,(?P<body>[;:=@a-zA-Z0-9<>\?\'\`]*)
 ,(?P<fill_bits>\d)\*(?P<checksum>[0-9A-F][0-9A-F])
-'''
+)  # end vdm
+"""
 
 VDM_RE = re.compile(VDM_RE_STR, re.VERBOSE)
 
@@ -108,7 +110,7 @@ def Parse(data):
   except AttributeError:
     return
 
-  actual = nmea.Checksum(data)
+  actual = nmea.Checksum(result['vdm'])
   expected = result['checksum']
   if actual != expected:
     return

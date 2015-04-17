@@ -30,6 +30,22 @@ TAG_BLOCK = r"""
 \n:80677,s:b003669952,c:1428884269*2A\!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17
 """
 
+USCG = r"""
+# pylint: disable=line-too-long
+!SAVDM,1,1,,A,15N4OMPP01I<cGrA1v>Id?vF060l,0*22,b003669978,1429287189
+!SAVDM,2,1,4,B,54h@7?02BAF=`L4wN21<eTH4hj2222222222220U4HG6553U06T0C3H0Q@@j,0*5D,d-86,S389,t161310.00,T10.377780,D07MN-MI-LAKBS1,1429287190
+!SAVDM,2,2,4,B,88888888880,2*39,d-86,S389,t161310.00,T10.377780,D07MN-MI-LAKBS1,1429287190
+!AIVDM,1,1,,B,3592u`iP03GWEflBRosm0Ov@0000,0*70,d-107,S0297,t161407.00,T07.92201452,r11CSDO1,1429287248
+!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17,rMySat,1429287258
+"""
+
+MIXED = r"""
+!SAVDM,1,1,,A,15N4OMPP01I<cGrA1v>Id?vF060l,0*22,b003669978,1429287189
+!SAVDM,1,1,,A,403Owi1utn1W0qMtr2AKStg020S:,0*4B
+\n:80677,s:b003669952,c:1428884269*2A\!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17
+random text
+"""
+
 
 class NmeaQueueTest(unittest.TestCase):
 
@@ -69,7 +85,7 @@ class NmeaQueueTest(unittest.TestCase):
 
     self.assertEqual(msgs[0],
                      {'line_nums': [1],
-                      'line_type': ('BARE',),
+                      'line_type': 'BARE',
                       'lines': ['$GPZDA,203003.00,12,07,2009,00,00,*47']})
     self.assertEqual(
         msgs[1],
@@ -95,7 +111,7 @@ class NmeaQueueTest(unittest.TestCase):
             'x': -118.22777557373047,
             'y': 31.2431697845459},
          'line_nums': [2],
-         'line_type': ('BARE',),
+         'line_type': 'BARE',
          'lines': ['!AIVDM,1,1,,B,23?up2001gGRju>Ap:;R2APP08:c,0*0E'],
          'matches': [{
              'body': '23?up2001gGRju>Ap:;R2APP08:c',
@@ -106,7 +122,8 @@ class NmeaQueueTest(unittest.TestCase):
              'sen_tot': '1',
              'seq_id': None,
              'talker': 'AI',
-             'vdm_type': 'VDM'}]}
+             'vdm_type': 'VDM',
+             'vdm': '!AIVDM,1,1,,B,23?up2001gGRju>Ap:;R2APP08:c,0*0E'}]}
     )
 
   def testTagBlockLines(self):
@@ -142,7 +159,7 @@ class NmeaQueueTest(unittest.TestCase):
             'x': -90.2066650390625,
             'y': 29.145000457763672},
          'line_nums': [9],
-         'line_type': ('TAGB',),
+         'line_type': 'TAGB',
          'lines': [
              '\\n:80677,s:b003669952,c:1428884269*2A'
              '\\!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17'],
@@ -163,6 +180,89 @@ class NmeaQueueTest(unittest.TestCase):
              'text_date': None,
              'time': '1428884269'}],
          'times': [1428884269]})
+
+  def testUscgLines(self):
+    queue = nmea_queue.NmeaQueue()
+    lines = [line for line in USCG.split('\n') if ',' in line]
+    for line in lines:
+      queue.put(line)
+
+    self.assertEqual(queue.qsize(), 4)
+    msgs = []
+    while not queue.empty():
+      msgs.append(queue.get())
+
+    for msg in msgs:
+      self.assertIn('decoded', msg)
+    ids = [msg['decoded']['id'] for msg in msgs]
+    self.assertEqual(ids, [1, 5, 3, 27])
+
+    self.assertEqual(
+        msgs[3],
+        {
+            'decoded': {
+                'cog': 131,
+                'gnss': True,
+                'id': 27,
+                'md5': '50898a3435865cf76f1b502b2821672b',
+                'mmsi': 577305000,
+                'nav_status': 5,
+                'position_accuracy': 1,
+                'raim': False,
+                'repeat_indicator': 0,
+                'sog': 0,
+                'spare': 0,
+                'x': -90.2066650390625,
+                'y': 29.145000457763672},
+            'line_nums': [5],
+            'line_type': 'USCG',
+            'lines': ['!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17,rMySat,1429287258'],
+            'matches': [{
+                'body': 'K8VSqb9LdU28WP8<',
+                'chan': 'B',
+                'checksum': '17',
+                'counter': None,
+                'fill_bits': '0',
+                'hour': None,
+                'minute': None,
+                'payload': '!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17',
+                'receiver_time': None,
+                'rssi': None,
+                'second': None,
+                'sen_num': '1',
+                'sen_tot': '1',
+                'seq_id': None,
+                'signal_strength': None,
+                'slot': None,
+                'station': 'rMySat',
+                'station_type': 'r',
+                'talker': 'SA',
+                'time': '1429287258',
+                'time_of_arrival': None,
+                'uscg_metadata': ',rMySat,1429287258',
+                'vdm': '!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17',
+                'vdm_type': 'VDM'}]})
+
+  def testMixedLines(self):
+    queue = nmea_queue.NmeaQueue()
+    lines = [line for line in MIXED.split('\n') if line.strip()]
+    for line in lines:
+      queue.put(line)
+
+    self.assertEqual(queue.qsize(), 4)
+    msgs = []
+    while not queue.empty():
+      msgs.append(queue.get())
+
+    for msg in msgs[:-1]:
+      self.assertIn('decoded', msg)
+    ids = [msg['decoded']['id'] for msg in msgs[:-1]]
+    self.assertEqual(ids, [1, 4, 27])
+
+    line_types = [msg['line_type'] for msg in msgs]
+    self.assertEqual(
+        line_types,
+        [nmea.USCG, nmea.BARE, nmea.TAGB, nmea.TEXT])
 
 
 if __name__ == '__main__':
