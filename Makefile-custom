@@ -4,22 +4,17 @@ VERSION:=${shell cat VERSION}
 
 default:
 	@echo
-	@echo
 	@echo "        Welcome to libais ${VERSION}"
 	@echo
 	@echo "Build options:"
 	@echo
-	@echo "  clean    - remove all objects and executables"
 	@echo "  all      - build everything"
+	@echo "  clean    - remove all objects and executables"
 	@echo "  tar      - create a release source tar using VERSION"
 	@echo
-	@echo "  python   - build the python module"
-	@echo "  test     - Simple C++ library test"
-	@echo "  python2  - build the python2.6 module"
-	@echo "  python3  - build the python3.1 module"
-	@echo
-	@echo "  pull     - update from github"
-	@echo "  push     - update github with local changes"
+	@echo "  test     - C++, python2, and python3 unittests"
+	@echo "  python2  - build the python2 module"
+	@echo "  python3  - build the python3 module"
 	@echo
 	@echo "Read the README for more information"
 
@@ -63,9 +58,6 @@ test:
 	(cd src; make -f Makefile-custom test)
 	python2 setup.py test
 	python3 setup.py test
-
-# TODO(schwehr): Enable python3 testing.
-#	(type -p python3 && python3 setup.py test) || echo "python3 not available"
 
 # Hard coded depends
 src/libais/ais.o: src/libais/ais.h
