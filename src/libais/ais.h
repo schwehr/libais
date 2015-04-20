@@ -76,7 +76,7 @@ extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
 enum Dac {
   AIS_DAC_0_TEST = 0,
   AIS_DAC_1_INTERNATIONAL,
-  AIS_DAC_200_RIS = 201,
+  AIS_DAC_200_RIS = 200,
   AIS_DAC_201_ALBANIA = 201,
   AIS_DAC_202_ANDORRA = 202,
   AIS_DAC_203_AUSTRIA = 203,
@@ -1510,7 +1510,8 @@ ostream& operator<< (ostream &o, const Ais8_1_31 &msg);
 class Ais8_200_10 : public Ais8 {
  public:
   string eu_id;  // European Vessel ID - 8 characters
-  float length, beam;  // m
+  float length;  // m
+  float beam;  // m
   int ship_type;
   int haz_cargo;
   float draught;
