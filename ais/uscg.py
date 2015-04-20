@@ -99,7 +99,6 @@ class UscgQueue(Queue.Queue):
       self.line_num += 1
 
     line = line.rstrip()
-    logging.info('put(%s, %s)', line, line_num)
     metadata_match = Parse(line)
     match = vdm.Parse(line)
 
@@ -130,7 +129,6 @@ class UscgQueue(Queue.Queue):
     sentence_tot = int(match['sen_tot'])
 
     if sentence_tot == 1:
-      logging.info('Single line message')
       body = match['body']
       fill_bits = int(match['fill_bits'])
       try:
@@ -156,6 +154,11 @@ class UscgQueue(Queue.Queue):
 
     if group_id not in self.groups:
       self.groups[group_id] = []
+
+    if not self.groups[group_id]:
+      if sentence_num != 1:
+        # Drop a partial AIS message.
+        return
 
     if sentence_num == 1:
       self.groups[group_id] = {
