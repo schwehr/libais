@@ -2277,6 +2277,7 @@ class AisBitset : protected bitset<MAX_BITS> {
 
   int GetNumBits() const { return num_bits; }
   int GetNumChars() const { return num_chars; }
+  int GetPosition() const { return current_position; }
   int GetRemaining() const { return num_bits - current_position; }
 
   const AisBitset& SeekRelative(int d) const;
