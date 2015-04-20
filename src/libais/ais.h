@@ -1754,6 +1754,14 @@ extern const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES];
 // 366 34 - Kurt older whale message 2008-2010
 // TODO(schwehr): Ais8_366_34
 
+// USCG Blue Force encrypted message.
+class Ais8_366_56 : public Ais8 {
+ public:
+  vector<unsigned char> encrypted;
+
+  Ais8_366_56(const char *nmea_payload, const size_t pad);
+};
+
 class Ais8_367_22_SubArea {
  public:
   virtual Ais8_366_22_AreaShapeEnum getType() const = 0;

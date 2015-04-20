@@ -6,6 +6,7 @@ TESTS += ais4_11_test
 TESTS += ais5_test
 TESTS += ais7_13_test
 TESTS += ais8_1_22_test
+TESTS += ais8_366_test
 TESTS += ais8_367_test
 TESTS += ais9_test
 TESTS += ais10_test
@@ -106,6 +107,9 @@ ais7_13_test: ais7_13_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais8_1_22_test: ais8_1_22_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+ais8_366_test: ais8_366_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais8_367_test: ais8_367_test.o gtest_main.a
