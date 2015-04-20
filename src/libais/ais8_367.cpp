@@ -112,7 +112,7 @@ Ais8_367_22::Ais8_367_22(const char *nmea_payload, const size_t pad)
   assert(dac == 367);
   assert(fi == 22);
 
-  if (num_bits <= 216 && num_bits >= 1016) {
+  if (num_bits < 216 || num_bits > 1016) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
