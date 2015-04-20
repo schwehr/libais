@@ -625,10 +625,14 @@ class Ais6_1_12 : public Ais6 {
  public:
   string last_port;
   int utc_month_dep;  // actual time of departure
-  int utc_day_dep, utc_hour_dep, utc_min_dep;
+  int utc_day_dep;
+  int utc_hour_dep;
+  int utc_min_dep;
   string next_port;
   int utc_month_next;  // estimated arrival
-  int utc_day_next, utc_hour_next, utc_min_next;
+  int utc_day_next;
+  int utc_hour_next;
+  int utc_min_next;
   string main_danger;
   string imo_cat;
   int un;
@@ -644,8 +648,10 @@ ostream& operator<< (ostream &o, const Ais6_1_12 &msg);
 class Ais6_1_14_Window {
  public:
   AisPoint position;
-  int utc_hour_from, utc_min_from;
-  int utc_hour_to, utc_min_to;
+  int utc_hour_from;
+  int utc_min_from;
+  int utc_hour_to;
+  int utc_min_to;
   int cur_dir;
   float cur_speed;
 };
@@ -655,7 +661,8 @@ class Ais6_1_14_Window {
 // Not to be transmitted after 2012-Jan-01
 class Ais6_1_14 : public Ais6 {
  public:
-  int utc_month, utc_day;
+  int utc_month;
+  int utc_day;
   vector<Ais6_1_14_Window> windows;
 
   Ais6_1_14(const char *nmea_payload, const size_t pad);
@@ -667,8 +674,12 @@ ostream& operator<< (ostream &o, const Ais6_1_14 &msg);
 class Ais6_1_18 : public Ais6 {
  public:
   int link_id;
-  int utc_month, utc_day, utc_hour, utc_min;
-  string port_berth, dest;
+  int utc_month;
+  int utc_day;
+  int utc_hour;
+  int utc_min;
+  string port_berth;
+  string dest;
   AisPoint position;
   std::array<int, 2> spare2;  // 32 bits per spare
 
@@ -684,7 +695,10 @@ class Ais6_1_20 : public Ais6 {
   int length;
   float depth;
   int mooring_position;
-  int utc_month, utc_day, utc_hour, utc_min;
+  int utc_month;
+  int utc_day;
+  int utc_hour;
+  int utc_min;
   bool services_known;
   // TODO(schwehr): enum of service types
   std::array<int, 26> services;
@@ -739,8 +753,10 @@ ostream& operator<< (ostream &o, const Ais6_1_25 &msg);
 class Ais6_1_32_Window {
  public:
   AisPoint position;
-  int from_utc_hour, from_utc_min;
-  int to_utc_hour, to_utc_min;
+  int from_utc_hour;
+  int from_utc_min;
+  int to_utc_hour;
+  int to_utc_min;
   int cur_dir;
   float cur_speed;  // knots
 
@@ -959,7 +975,9 @@ class Ais8_1_21 : public Ais8 {
   // TYPE 0
   string location;
   AisPoint position;  // 25, 24 bits
-  int utc_day, utc_hour, utc_min;
+  int utc_day;
+  int utc_hour;
+  int utc_min;
   // wx - use wx[0]
   float horz_viz;  // nautical miles
   int humidity;  // %
@@ -978,7 +996,7 @@ class Ais8_1_21 : public Ais8 {
   int spare2;
 
   // TYPE 1 - !@#$!!!!!
-  // x,y
+  // x, y
   int utc_month;
   // utc_day, hour, min
   int cog;
@@ -1101,7 +1119,7 @@ class Ais8_1_22_Sector : public Ais8_1_22_SubArea {
 
 // Or Waypoint
 // Must have a point before on the VDL
-// TODO(schwehr): do I bring in the prior point x,y, precision?
+// TODO(schwehr): do I bring in the prior point x, y, precision?
 class Ais8_1_22_Polyline : public Ais8_1_22_SubArea {
  public:
   // TODO(schwehr): int precision; // How many decimal places for x and y.
@@ -1219,7 +1237,9 @@ enum Ais8_1_26_SensorEnum {
 class Ais8_1_26_SensorReport {
  public:
   int report_type;
-  int utc_day, utc_hr, utc_min;
+  int utc_day;
+  int utc_hr;
+  int utc_min;
   int site_id;  // aka link_id
 
   virtual Ais8_1_26_SensorEnum getType() const = 0;
@@ -1234,7 +1254,8 @@ class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
  public:
   AisPoint position;
   float z;  // alt in m from MSL
-  int owner, timeout;
+  int owner;
+  int timeout;
   int spare;
 
   Ais8_1_26_Location(const AisBitset &bs, const size_t offset);
@@ -1254,12 +1275,17 @@ class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
  public:
-  int wind_speed, wind_gust;  // knots
-  int wind_dir, wind_gust_dir;
+  int wind_speed;  // knots
+  int wind_gust;  // knots
+  int wind_dir;
+  int wind_gust_dir;
   int sensor_type;
-  int wind_forecast, wind_gust_forecast;  // knots
+  int wind_forecast;  // knots
+  int wind_gust_forecast;  // knots
   int wind_dir_forecast;
-  int utc_day_forecast, utc_hour_forecast, utc_min_forecast;
+  int utc_day_forecast;
+  int utc_hour_forecast;
+  int utc_min_forecast;
   int duration;
   int spare;
 
@@ -1308,7 +1334,9 @@ class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_Curr3D_Current {
  public:
-  float north, east, up;
+  float north;
+  float east;
+  float up;
   int depth;  // m
 };
 
@@ -1325,9 +1353,11 @@ class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_HorzFlow_Current {
  public:
-  int bearing, dist;  // deg, m
+  int bearing;  // deg
+  int dist;  // m
   float speed;  // knots
-  int dir, level;  // deg, m
+  int dir;  // deg
+  int level;  // m
 };
 
 class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
@@ -1343,13 +1373,16 @@ class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
 class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
  public:
   float swell_height;
-  int swell_period, swell_dir;  // s, deg
+  int swell_period;  // seconds
+  int swell_dir;  // deg
   int sea_state;
   int swell_sensor_type;
-  float water_temp, water_temp_depth;  // C, m
+  float water_temp;  // C
+  float water_temp_depth;  // m
   int water_sensor_type;
   float wave_height;
-  int wave_period, wave_dir;  // s, deg
+  int wave_period;  // seconds
+  int wave_dir;  // deg
   int wave_sensor_type;
   float salinity;
 
@@ -1394,9 +1427,13 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
  public:
-  float draught, gap, forecast_gap;
+  float draught;
+  float gap;
+  float forecast_gap;
   int trend;
-  int utc_day_forecast, utc_hour_forecast, utc_min_forecast;
+  int utc_day_forecast;
+  int utc_hour_forecast;
+  int utc_min_forecast;
   int spare;
 
   Ais8_1_26_AirDraught(const AisBitset &bs, const size_t offset);
@@ -1527,10 +1564,16 @@ class Ais8_200_10 : public Ais8 {
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
 class Ais8_200_23 : public Ais8 {
  public:
-  int utc_year_start, utc_month_start, utc_day_start;
-  int utc_year_end, utc_month_end, utc_day_end;
-  int utc_hour_start, utc_min_start;
-  int utc_hour_end, utc_min_end;
+  int utc_year_start;
+  int utc_month_start;
+  int utc_day_start;
+  int utc_year_end;
+  int utc_month_end;
+  int utc_day_end;
+  int utc_hour_start;
+  int utc_min_start;
+  int utc_hour_end;
+  int utc_min_end;
   AisPoint position1;
   AisPoint position2;
   int type;
