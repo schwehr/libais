@@ -1,4 +1,4 @@
-// Test parsing 8:367:22.
+// Test parsing US Coast Guard (USCG) 8:367:* messages.
 
 // TODO(schwehr): Try these message.  Some may crash libais.
 // clang-format off
