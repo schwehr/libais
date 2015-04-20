@@ -16,6 +16,7 @@
 
 #include <memory>
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "ais.h"
 
@@ -58,6 +59,30 @@ void Validate(const Ais8_367_22 *msg, const int repeat_indicator,
   EXPECT_EQ(duration_minutes, msg->duration_minutes);
 }
 
+void ValidateCircle(const Ais8_367_22_SubArea *sub_area,
+                    const AisPoint position, const int precision,
+                    const int radius_m, const unsigned int spare) {
+  ASSERT_EQ(AIS8_366_22_SHAPE_CIRCLE, sub_area->getType());
+  auto shape = dynamic_cast<const Ais8_367_22_Circle *>(sub_area);
+  EXPECT_NEAR(position.lng_deg, shape->position.lng_deg, 0.001);
+  EXPECT_NEAR(position.lat_deg, shape->position.lat_deg, 0.001);
+  EXPECT_EQ(precision, shape->precision);
+  EXPECT_EQ(radius_m, shape->radius_m);
+  EXPECT_EQ(spare, shape->spare);
+}
+
+void ValidatePoly(const Ais8_367_22_SubArea *sub_area,
+                  const Ais8_366_22_AreaShapeEnum area_type,
+                  const vector<float> &angles, const vector<float> &dists_m,
+                  const unsigned int spare) {
+  ASSERT_TRUE(AIS8_366_22_SHAPE_POLYLINE == sub_area->getType() ||
+              AIS8_366_22_SHAPE_POLYGON == sub_area->getType());
+  auto shape = dynamic_cast<const Ais8_367_22_Poly *>(sub_area);
+  ASSERT_EQ(angles.size(), dists_m.size());
+  EXPECT_THAT(shape->angles, testing::ElementsAreArray(angles));
+  EXPECT_THAT(shape->dists_m, testing::ElementsAreArray(dists_m));
+  EXPECT_EQ(spare, shape->spare);
+}
 
 TEST(Ais8_367_22Test, DecodeSingleTest) {
   // Invalid USCG test message with only a TEXT subpacket.
@@ -94,6 +119,30 @@ TEST(Ais8_367_22Test, DecodeUscgWhaleBouyTest) {
   EXPECT_EQ(2, circle->precision);
   EXPECT_EQ(9260, circle->radius_m);
   EXPECT_EQ(0, circle->spare);
+}
+
+TEST(Ais8_367_22Test, PolylinesTest) {
+  // clang-format off
+  // !ANVDM,2,1,0,B,8h3Ovq1KmP@N<95=`2l01=dN<b7pGeP00000LL8PSV8RQ8cTs5H0LTHh477P,0*36,r08ACERDC,1429315382 NOLINT
+  // !ANVDM,2,2,0,B,Rpus@000,0*46,r08ACERDC,1429315382
+  // clang-format on
+
+  std::unique_ptr<Ais8_367_22> msg(new Ais8_367_22(
+      "8h3Ovq1KmP@N<95=`2l01=dN<b7pGeP00000LL8PSV8RQ8cTs5H0LTHh477PRpus@000",
+      0));
+  Validate(msg.get(), 3, 3669732, 30, 24, 4, 17, 9, 45, 1440);
+
+  ASSERT_EQ(3, msg->sub_areas.size());
+
+  ASSERT_EQ(AIS8_366_22_SHAPE_CIRCLE, msg->sub_areas[0]->getType());
+  ASSERT_EQ(AIS8_366_22_SHAPE_POLYLINE, msg->sub_areas[1]->getType());
+  ASSERT_EQ(AIS8_366_22_SHAPE_POLYLINE, msg->sub_areas[2]->getType());
+
+  ValidateCircle(msg->sub_areas[0], {-175.829, 59.3672}, 4, 0, 0);
+  ValidatePoly(msg->sub_areas[1], AIS8_366_22_SHAPE_POLYLINE,
+               {225, 230, 265, 315}, {13000, 27300, 17400, 17200}, 0);
+  ValidatePoly(msg->sub_areas[2], AIS8_366_22_SHAPE_POLYLINE, {291, 263, 279},
+               {19200, 24000, 24700}, 0);
 }
 
 }  // namespace

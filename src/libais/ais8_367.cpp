@@ -15,8 +15,8 @@ const size_t SUB_AREA_BITS = 96;
 
 static int scale_multipliers[4] = {1, 10, 100, 1000};
 
-Ais8_367_22_Circle::Ais8_367_22_Circle(const AisBitset &bs,
-                                       const size_t offset) {
+Ais8_367_22_Circle::Ais8_367_22_Circle(const AisBitset &bs, const size_t offset)
+    : precision(0), radius_m(0), spare(0) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
   position = bs.ToAisPoint(offset + 2, 55);
   precision = bs.ToUnsignedInt(offset + 57, 3);
@@ -25,21 +25,23 @@ Ais8_367_22_Circle::Ais8_367_22_Circle(const AisBitset &bs,
   spare = bs.ToUnsignedInt(offset + 72, 21);
 }
 
-Ais8_367_22_Rect::Ais8_367_22_Rect(const AisBitset &bs,
-                                   const size_t offset) {
+Ais8_367_22_Rect::Ais8_367_22_Rect(const AisBitset &bs, const size_t offset)
+    : precision(0), e_dim_m(0), n_dim_m(0), orient_deg(0), spare(0) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
   position = bs.ToAisPoint(offset + 2, 55);
   precision = bs.ToUnsignedInt(offset + 57, 3);
-  e_dim_m =
-      bs.ToUnsignedInt(offset + 60, 8) * scale_multipliers[scale_factor];
-  n_dim_m =
-      bs.ToUnsignedInt(offset + 68, 8) * scale_multipliers[scale_factor];
+  e_dim_m = bs.ToUnsignedInt(offset + 60, 8) * scale_multipliers[scale_factor];
+  n_dim_m = bs.ToUnsignedInt(offset + 68, 8) * scale_multipliers[scale_factor];
   orient_deg = bs.ToUnsignedInt(offset + 76, 9);
   spare = bs.ToUnsignedInt(offset + 85, 8);
 }
 
-Ais8_367_22_Sector::Ais8_367_22_Sector(const AisBitset &bs,
-                                       const size_t offset) {
+Ais8_367_22_Sector::Ais8_367_22_Sector(const AisBitset &bs, const size_t offset)
+    : precision(0),
+      radius_m(0),
+      left_bound_deg(0),
+      right_bound_deg(0),
+      spare(0) {
   const int scale_factor = bs.ToUnsignedInt(offset, 2);
   position = bs.ToAisPoint(offset + 2, 55);
   precision = bs.ToUnsignedInt(offset + 57, 3);
@@ -51,32 +53,33 @@ Ais8_367_22_Sector::Ais8_367_22_Sector(const AisBitset &bs,
 }
 
 // Polyline or polygon.
-Ais8_367_22_Poly::Ais8_367_22_Poly(const AisBitset &bs,
-                                   const size_t offset) {
-  shape =
-      static_cast<Ais8_366_22_AreaShapeEnum>(bs.ToUnsignedInt(offset, 3));
-  const int scale_factor = bs.ToUnsignedInt(offset + 3, 2);
+Ais8_367_22_Poly::Ais8_367_22_Poly(const AisBitset &bs, const size_t offset,
+                                   Ais8_366_22_AreaShapeEnum area_shape)
+    : shape(area_shape), precision(0), spare(0) {
+  const int scale_factor = bs.ToUnsignedInt(offset, 2);
+  size_t poly_offset = offset + 2;
   for (size_t i = 0; i < 4; i++) {
-    const int angle = bs.ToUnsignedInt(offset + 5 + (i * 21), 10);
-    const int dist = bs.ToUnsignedInt(offset + 15 + (i * 21), 11) *
+    const int angle = bs.ToUnsignedInt(poly_offset, 10);
+    poly_offset += 10;
+    const int dist = bs.ToUnsignedInt(poly_offset, 11) *
                      scale_multipliers[scale_factor];
+    poly_offset += 11;
     if (dist == 0) {
       break;
     }
     angles.push_back(angle);
     dists_m.push_back(dist);
   }
-  spare = bs.ToUnsignedInt(offset + 89, 7);
+  spare = bs.ToUnsignedInt(offset + 86, 7);
 }
 
-Ais8_367_22_Text::Ais8_367_22_Text(const AisBitset &bs,
-                                   const size_t offset) {
+Ais8_367_22_Text::Ais8_367_22_Text(const AisBitset &bs, const size_t offset) {
   text = string(bs.ToString(offset, 90));
   spare = bs.ToUnsignedInt(offset + 90, 3);
 }
 
-Ais8_367_22_SubArea *ais8_367_22_subarea_factory(
-    const AisBitset &bs, const size_t offset) {
+Ais8_367_22_SubArea *ais8_367_22_subarea_factory(const AisBitset &bs,
+                                                 const size_t offset) {
   const Ais8_366_22_AreaShapeEnum area_shape =
       static_cast<Ais8_366_22_AreaShapeEnum>(bs.ToUnsignedInt(offset, 3));
 
@@ -89,7 +92,7 @@ Ais8_367_22_SubArea *ais8_367_22_subarea_factory(
       return new Ais8_367_22_Sector(bs, offset + 3);
     case AIS8_366_22_SHAPE_POLYLINE:  // FALLTHROUGH
     case AIS8_366_22_SHAPE_POLYGON:
-      return new Ais8_367_22_Poly(bs, offset + 3);
+      return new Ais8_367_22_Poly(bs, offset + 3, area_shape);
     case AIS8_366_22_SHAPE_TEXT:
       return new Ais8_367_22_Text(bs, offset + 3);
     case AIS8_366_22_SHAPE_RESERVED_6:  // FALLTHROUGH
@@ -146,7 +149,8 @@ Ais8_367_22::Ais8_367_22(const char *nmea_payload, const size_t pad)
     }
   }
 
-  assert(bs.GetRemaining() == 0);
+  // TODO(schwehr): Save the spare bits at the end of the message.
+  assert(bs.GetRemaining() < 6);
   status = AIS_OK;
 }
 
