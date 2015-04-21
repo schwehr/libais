@@ -25,6 +25,8 @@ AIS_MODULE = Extension(
         'ais8.cpp', # Broadcast binary message (BBM)
         'ais8_1_22.cpp', # Area notice
         'ais8_1_26.cpp', # Environmental Sensor Report
+        'ais8_200.cpp',
+        'ais8_366.cpp',
         'ais8_367.cpp',
         'ais9.cpp',
         'ais10.cpp', # :
