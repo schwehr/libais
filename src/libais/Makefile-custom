@@ -32,12 +32,12 @@ WARN += -Wno-sign-compare
 
 DEBUG := -g3 -DDEBUG=1
 DEBUG += -O0
-# DEBUG+= -O
-# DEBUG+= -D_GLIBCXX_DEBUG # Bad things on the mac?  May be a gtest bug.
-# DEBUG+= -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCPP_CONCEPT_CHECKS
+# DEBUG += -O
+# DEBUG += -D_GLIBCXX_DEBUG # Bad things on the mac?  May be a gtest bug.
+# DEBUG += -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCPP_CONCEPT_CHECKS
 
-OPT:= -O3 -funroll-loops -fexpensive-optimizations -ffast-math
-OPT+= -DNDEBUG
+OPT := -O3 -funroll-loops -fexpensive-optimizations -ffast-math
+OPT += -DNDEBUG
 
 ifdef OPTIMIZE
   CXXFLAGS += ${OPT}
