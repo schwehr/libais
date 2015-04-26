@@ -52,6 +52,16 @@ real-clean: clean
 	rm -f MANIFEST
 	rm -rf build dist
 	find . -name .DS_Store | xargs rm -f
+	rm -f test/typeexamples.gpsdecode.json
+	find . -name \*.o | xargs rm
+	find . -name \*.a | xargs rm
+	echo "cmake files:"
+	rm -rf CMakeCache.txt
+	rm -f Makefile
+	find src -name Makefile | xargs rm
+	find . -name cmake_install.cmake | xargs rm
+	find . -name CMakeFiles | xargs rm -rf
+
 
 .PHONY: test
 test:
