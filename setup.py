@@ -73,5 +73,10 @@ setup(name='libais',
            'Topic :: Scientific/Engineering :: GIS',
            ],
       scripts=["bin/aisdecode"],
+      entry_points={
+          'console_scripts': [
+              'libais_stats = ais.stats:main'
+          ]
+      },
       test_suite = "test"
       )

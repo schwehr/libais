@@ -146,3 +146,9 @@ class NmeaQueue(Queue.Queue):
     if msg:
       msg['line_type'] = line_type
       Queue.Queue.put(self, msg)
+
+  def GetOrNone(self):
+    try:
+      return self.get(block=False)
+    except Queue.Empty:
+      return
