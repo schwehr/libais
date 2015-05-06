@@ -410,6 +410,7 @@ class Ais1_2_3 : public AisMsg {
   AisPoint position;
   float cog;  // Degrees.
   int true_heading;
+  // TODO(schwehr): What about a leap second when timestamp 60 may be valid?
   int timestamp;
   int special_manoeuvre;
   int spare;
