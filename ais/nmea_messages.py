@@ -150,6 +150,7 @@ def Decode(line):
 
   if sentence not in HANDLERS:
     logging.info('skipping: %s', line)
+    return
 
   msg = HANDLERS[sentence](line)
   logging.info('decoded: %s', msg)

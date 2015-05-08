@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import datetime
 import collections
 import logging
 import pprint
@@ -17,6 +18,8 @@ class TrackRange(object):
 
   def AddValues(self, *values):
     print ('AddValues', values)
+    values = [v for v in values if v is not None]
+    print ('AV3 ', values, self.min, self.max)
     if not len(values):
       raise ValueError('Must specify at least 1 value.')
     if self.min is None:
@@ -42,6 +45,7 @@ class Stats(object):
       self.AddLine(line)
 
   def AddLine(self, line):
+    print(line.rstrip())
     self.counts['lines'] += 1
     self.queue.put(line)
     msg = self.queue.GetOrNone()
@@ -49,8 +53,8 @@ class Stats(object):
       return
 
     # logging.info('stats found msg: %s', msg)
-    print ()
-    pprint.pprint(msg)
+    # print ()
+    # pprint.pprint(msg)
     self.counts[msg['line_type']] += 1
     if 'decoded' in msg:
       decoded = msg['decoded']
@@ -60,22 +64,29 @@ class Stats(object):
         self.counts['msg_%s' % decoded['msg']] += 1
 
     if 'times' in msg:
-      if self.time_range.min is None:
-        self.time_range.AddValues(*msg['times'])
-        # self.time_delta_range.AddValues(msg['times'])
-      else:
-        print (self.time_range.min, self.time_range.max)
-        time_delta = max(msg['times']) - self.time_range.max
-        self.time_delta_range.AddValues(time_delta)
-        self.time_range.AddValues(*msg['times'])
+      times = [t for t in msg['times'] if t is not None]
+      if times:
+        if self.time_range.min is None:
+          self.time_range.AddValues(*times)
+          # self.time_delta_range.AddValues(msg['times'])
+        else:
+          # print (self.time_range.min, self.time_range.max)
+          time_delta = max(times) - self.time_range.max
+          self.time_delta_range.AddValues(time_delta)
+          self.time_range.AddValues(*times)
 
 
   def PrintSummary(self):
     pprint.pprint(self.counts)
-    logging.info('time_range: %s to %s',
+
+    logging.info('time_range: [%s to %s]',
                  self.time_range.min,
                  self.time_range.max)
-    logging.info('time_delta_range: %s to %s',
+
+    logging.info('%s', datetime.datetime.utcfromtimestamp(self.time_range.min))
+    logging.info('%s', datetime.datetime.utcfromtimestamp(self.time_range.max))
+
+    logging.info('time_delta_range: [%s to %s]',
                  self.time_delta_range.min,
                  self.time_delta_range.max)
 
