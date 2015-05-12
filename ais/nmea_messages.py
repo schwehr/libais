@@ -152,7 +152,11 @@ def Decode(line):
     logging.info('skipping: %s', line)
     return
 
-  msg = HANDLERS[sentence](line)
+  try:
+    msg = HANDLERS[sentence](line)
+  except AttributeError:
+    logging.info('Unable to decode line with handle: %s', line)
+    return
   logging.info('decoded: %s', msg)
   return msg
 
