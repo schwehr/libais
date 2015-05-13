@@ -148,23 +148,25 @@ def normalize(nmea=sys.stdin,
       payload = fields[5]  # AIS binary data encoded in whacky ways
       timestamp = fields[-1].strip()   # Seconds since Epoch UTC.  Always the last field
 
-      station = None  # USCG Receive Stations        #if None==station:
+      station = None  # USCG Receive Stations        # if None==station:
       for i in range(len(fields)-1, 5, -1):
         if len(fields[i]) and fields[i][0] in ('r', 'b'):
           station = fields[i]
           break  # Found it so ditch the for loop.
 
+      tagblock_station = tagblock.get('station', None)
+
       if station is None and allowUnknown:
         station = 'UNKNOWN'
 
-      if station is None:
+      if station is None and tagblock_station is None:
         errorcb(NoStationFoundError(line_num=line_num, line=line.strip()))
         continue
 
-      if treatABequal:
-        bufferSlot = station + fields[3]  # seqId and Channel make a unique stream
-      else:
-        bufferSlot = station + fields[3] + fields[4]  # seqId and Channel make a unique stream
+      bufferSlot = (tagblock_station, station, fields[3])  # seqId and Channel make a unique stream
+
+      if not treatABequal:
+        bufferSlot += (fields[4],)  # channel id
 
       newPacket = payload, station, timestamp, tagblock
       if sentenceNum == 1:
