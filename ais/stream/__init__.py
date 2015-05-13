@@ -113,14 +113,14 @@ def normalize(nmea=sys.stdin,
   line_num = 0
   invalid_checksums = 0
 
-  for idx, line in enumerate(nmea):
+  for idx, origline in enumerate(nmea):
     try:
-      tagblock, line = parseTagBlock(line)
+      tagblock, line = parseTagBlock(origline)
 
       line = line.strip() + '\n'  # Get rid of DOS issues.
       line_num += 1
       if len(line) < 7 or line[3:6] not in ('VDM', 'VDO'):
-        yield tagblock, line
+        yield tagblock, line, origline
         continue
 
       if validateChecksum and not checksum.isChecksumValid(line):
@@ -141,7 +141,7 @@ def normalize(nmea=sys.stdin,
       totNumSentences = int(fields[1])
       if 1 == totNumSentences:
         # A single line needs no work, so pass it along.
-        yield tagblock, line
+        yield tagblock, line, origline
         continue
 
       sentenceNum = int(fields[2])  # Message sequence number 1..9 (packetNum)
@@ -168,7 +168,7 @@ def normalize(nmea=sys.stdin,
       if not treatABequal:
         bufferSlot += (fields[4],)  # channel id
 
-      newPacket = payload, station, timestamp, tagblock
+      newPacket = payload, station, timestamp, tagblock, origline
       if sentenceNum == 1:
         buffers[bufferSlot] = [newPacket]  # Overwrite any partials
         continue
@@ -225,7 +225,11 @@ def normalize(nmea=sys.stdin,
 
         if not checksum.isChecksumValid(out_str):
           errorcb(InvalidChecksumInConstructedError(line_num=line_num, line=line.strip()))
-        yield tagblock, out_str.strip()+'\n'  # FIX: Why do I have to do this last strip?
+
+        out_str = out_str.strip()+'\n'  # FIX: Why do I have to do this last strip?
+        origstr = ''.join([p[4] for p in parts])
+
+        yield tagblock, out_str, origstr
 
         continue
 
@@ -239,14 +243,14 @@ def decode(nmea=sys.stdin,
            **kw):
   """Decodes a stream of AIS messages. Takes the same arguments as normalize."""
 
-  for tagblock, line in normalize(nmea=nmea, errorcb=errorcb, **kw):
+  for tagblock, line, origline in normalize(nmea=nmea, errorcb=errorcb, **kw):
     body = ''.join(line.split(',')[5])
     pad = int(line.split('*')[0][-1])
     try:
       res = ais.decode(body, pad)
       res.update(tagblock)
       if keep_nmea:
-        res['nmea'] = line
+        res['nmea'] = origline
       yield res
     except ais.DecodeError as e:
       errorcb(e)
