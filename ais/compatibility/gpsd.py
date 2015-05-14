@@ -404,7 +404,7 @@ class Mangler(object):
   # Tagblock data
   def mangle__tagblock_timestamp(self, res, msg):
     res['tagblock_timestamp'] = datetime.datetime.utcfromtimestamp(
-        msg['tagblock_timestamp']).strftime('%Y-%m-%dT%H:%H:%S.%fZ')
+        msg['tagblock_timestamp']).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
     if self.copy_tagblock_timestamp and 'year' not in msg:
       res['timestamp'] = res['tagblock_timestamp']
