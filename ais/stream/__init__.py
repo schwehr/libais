@@ -154,7 +154,7 @@ def normalize(nmea=sys.stdin,
           station = fields[i]
           break  # Found it so ditch the for loop.
 
-      tagblock_station = tagblock.get('station', None)
+      tagblock_station = tagblock.get('tagblock_station', None)
 
       if station is None and allowUnknown:
         station = 'UNKNOWN'
@@ -191,12 +191,16 @@ def normalize(nmea=sys.stdin,
             ts1 = float(part[2])
             ts2 = float(timestamp)
           except ValueError:
-            if allow_missing_timestamps:
-              ts1 = 0
-              ts2 = 0
-            else:
-              ok = False
-              break
+            try:
+              ts1 = float(part[3]['tagblock_timestamp'])
+              ts2 = float(tagblock['tagblock_timestamp'])
+            except:
+              if allow_missing_timestamps:
+                ts1 = 0
+                ts2 = 0
+              else:
+                ok = False
+                break
           if ts1 > ts2+window or ts1 < ts2-window:
             errorcb(DifferingTimestampsError(line_num=line_num,
                                              line=line.strip(),
@@ -236,6 +240,10 @@ def normalize(nmea=sys.stdin,
       buffers[bufferSlot].append(newPacket)
     except Exception as inst:
       errorcb(inst)
+
+  if buffers and verbose:
+    errorcb('Unfinished messages at end of file:\n %s\n' % buffers)
+
 
 def decode(nmea=sys.stdin,
            errorcb=ErrorPrinter,
