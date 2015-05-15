@@ -14,3 +14,4 @@ _ais.so
 dist
 .idea/
 venv/
+test/typeexamples.gpsdecode.json
