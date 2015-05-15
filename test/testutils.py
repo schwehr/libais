@@ -14,11 +14,11 @@ known_bad = set((
 
 precision = 5.0
 
-def TextToNumber(s):
+def TextToNumber(text):
   try:
-    return float(s)
+    return float(text)
   except (TypeError, ValueError):
-    return s
+    return text
 
 
 def IsNumber(value):
@@ -30,6 +30,20 @@ def IsNumber(value):
 
 
 def DictDiff(a, b):
+  """Compares two dictionaries. Intended to be used in a test to
+  compare the actual return value from some function with a
+  known-good value.
+
+  Returns a dictionary with the following keys:
+
+    removed: Dict of all key/value pairs in a but not in b.
+
+    added: Dict of all key/value pairs in b but not in a.
+
+    changed: Dict with all keys with different values in a and b.
+    Values are pairs of the values from a and b.
+  """
+
   def Compare(x, y):
     if x == y:
       return True
