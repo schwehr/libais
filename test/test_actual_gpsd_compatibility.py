@@ -39,8 +39,8 @@ class GPSDCompatibility(unittest.TestCase):
 
   def setUp(self):
     self.dir = os.path.split(__file__)[0]
-    self.nmea = os.path.join(self.dir, 'typeexamples.nmea')
-    self.json = os.path.join(self.dir, 'typeexamples.gpsdecode.json')
+    self.nmea = os.path.join(self.dir, 'data/typeexamples.nmea')
+    self.json = os.path.join(self.dir, 'data/typeexamples.gpsdecode.json')
 
     subprocess.check_call('gpsdecode < %s > %s' % (self.nmea, self.json),
                           shell=True)
@@ -56,7 +56,7 @@ class GPSDCompatibility(unittest.TestCase):
           yield json.loads(msg)
 
     def Libais():
-      with open(os.path.join(self.dir, 'typeexamples.nmea')) as f:
+      with open(os.path.join(self.dir, 'data/typeexamples.nmea')) as f:
         for msg in ais.stream.decode(f):
           yield ais.compatibility.gpsd.mangle(msg)
 

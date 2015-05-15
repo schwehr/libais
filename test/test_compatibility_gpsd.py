@@ -71,10 +71,10 @@ class GPSDCompatibility(unittest.TestCase):
       pass
 
   def testTypeExamples(self):
-      self.validate_file("typeexamples")
+      self.validate_file("data/typeexamples")
 
   def testTagblock(self):
-      self.validate_file("tagblock")
+      self.validate_file("data/tagblock")
 
 
 if __name__ == '__main__':
