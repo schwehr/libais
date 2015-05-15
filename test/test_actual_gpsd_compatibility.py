@@ -12,6 +12,7 @@ import ais.stream
 import six
 import testutils
 
+
 known_problems = {
     2: set(('turn', 'status_text')),
     9: set(['speed']),
@@ -24,26 +25,42 @@ known_problems = {
     27: set(['status']),
 }
 
+
+def HaveGpsdecode():
+  """Return true if the gpsdecode binary is on the path or false if not."""
+  try:
+    subprocess.check_call(['gpsdecode', '-V'])
+    return True
+  except OSError:
+    return False
+
+
 class GPSDCompatibility(unittest.TestCase):
 
   def setUp(self):
     self.dir = os.path.split(__file__)[0]
+    self.nmea = os.path.join(self.dir, 'typeexamples.nmea')
+    self.json = os.path.join(self.dir, 'typeexamples.gpsdecode.json')
 
-  def validate_file(self, base):
-    nmea_name = os.path.join(self.dir, base + '.nmea')
-    json_name = os.path.join(self.dir, base + '.json')
+    subprocess.check_call('gpsdecode < %s > %s' % (self.nmea, self.json),
+                          shell=True)
 
-    def Json():
-      with open(json_name) as f:
+  def tearDown(self):
+    os.unlink(self.json)
+
+  @unittest.skipIf(not HaveGpsdecode(), 'gpsdecode not in the path')
+  def testAll(self):
+    def Gpsd():
+      with open(self.json) as f:
         for msg in f:
           yield json.loads(msg)
 
     def Libais():
-      with open(nmea_name) as f:
+      with open(os.path.join(self.dir, 'typeexamples.nmea')) as f:
         for msg in ais.stream.decode(f):
           yield ais.compatibility.gpsd.mangle(msg)
 
-    g = iter(Json())
+    g = iter(Gpsd())
     a = iter(Libais())
 
     try:
@@ -69,12 +86,6 @@ class GPSDCompatibility(unittest.TestCase):
 
     except StopIteration:
       pass
-
-  def testTypeExamples(self):
-      self.validate_file("typeexamples")
-
-  def testTagblock(self):
-      self.validate_file("tagblock")
 
 
 if __name__ == '__main__':
