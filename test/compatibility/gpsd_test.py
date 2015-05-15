@@ -71,6 +71,26 @@ class SingleMessageTestsTest(unittest.TestCase):
         'type': 5}
     self.assertDictContainsSubset(expected, mangled)
 
+  def testTimestamps(self):
+    msg = {
+        'id': 1,
+        'tagblock_timestamp': 1431682043,
+        'year': 2015,
+        'month': 5,
+        'day': 15,
+        'hour': 9,
+        'minute': 27,
+        'second': 23,
+        }
+    mangled = self.mangle(msg)
+
+    expected = {
+        'type': 1,
+        'timestamp': '2015-05-15T09:27:23Z',
+        'tagblock_timestamp': '2015-05-15T09:27:23.000000Z'
+        }
+    self.assertDictContainsSubset(expected, mangled)
+
 
 class StreamingTest(unittest.TestCase):
   def setUp(self):
