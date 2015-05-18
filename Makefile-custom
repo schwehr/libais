@@ -56,6 +56,7 @@ real-clean: clean
 	find . -name \*.o | xargs rm -f
 	find . -name \*.a | xargs rm -f
 	find . -name \*.la | xargs rm -f
+	find . -name \*.so | xargs rm -f
 	echo "cmake files:"
 	rm -rf CMakeCache.txt
 	rm -f Makefile
