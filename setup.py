@@ -61,6 +61,12 @@ setup(name='libais',
       license='Apache 2.0',
       ext_modules=[AIS_MODULE],
       packages=find_packages(),
+      install_requires=[
+          'six'
+      ],
+      extras_require={
+          'test': ['gpsd_format']
+      },
       classifiers=[
            'License :: OSI Approved :: Apache Software License',
            'Topic :: System :: Networking',

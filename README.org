@@ -1,5 +1,7 @@
 * Introduction
 
+[[https://travis-ci.org/schwehr/libais][https://travis-ci.org/schwehr/libais.svg?branch=master]]
+
 Library for decoding maritime Automatic Identification System messages.
 
 * See Also
