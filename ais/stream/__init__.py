@@ -169,7 +169,6 @@ def normalize(nmea=sys.stdin,
         bufferSlot += (fields[4],)  # channel id
 
       newPacket = {"payload": payload,
-                   "station": station,
                    "timestamp": timestamp,
                    "tagblock": tagblock,
                    "origline": origline}
