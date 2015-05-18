@@ -6,6 +6,8 @@ python:
   - "3.4"
 
 install:
+  - sudo apt-get update -qq
+  - sudo apt-get install gcc
   - python setup.py install
 
 script:
