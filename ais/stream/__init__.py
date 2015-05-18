@@ -168,7 +168,11 @@ def normalize(nmea=sys.stdin,
       if not treat_ab_equal:
         bufferSlot += (fields[4],)  # channel id
 
-      newPacket = payload, station, timestamp, tagblock, origline
+      newPacket = {"payload": payload,
+                   "station": station,
+                   "timestamp": timestamp,
+                   "tagblock": tagblock,
+                   "origline": origline}
       if sentenceNum == 1:
         buffers[bufferSlot] = [newPacket]  # Overwrite any partials
         continue
@@ -188,11 +192,11 @@ def normalize(nmea=sys.stdin,
         ts1 = None
         for part in parts:
           try:
-            ts1 = float(part[2])
+            ts1 = float(part['timestamp'])
             ts2 = float(timestamp)
           except ValueError:
             try:
-              ts1 = float(part[3]['tagblock_timestamp'])
+              ts1 = float(part['tagblock']['tagblock_timestamp'])
               ts2 = float(tagblock['tagblock_timestamp'])
             except:
               if allow_missing_timestamps:
@@ -210,10 +214,10 @@ def normalize(nmea=sys.stdin,
         if not ok:
           continue
 
-        payload = ''.join([p[0] for p in parts])
+        payload = ''.join([p['payload'] for p in parts])
         tagblock = {}
         for p in reversed(parts):
-          tagblock.update(p[3])
+          tagblock.update(p['tagblock'])
 
         # Try to mirror the packet as much as possible... same seqId and channel.
         checksumed_str = ','.join((fields[0], '1,1', fields[3], fields[4],
@@ -231,7 +235,7 @@ def normalize(nmea=sys.stdin,
           errorcb(InvalidChecksumInConstructedError(line_num=line_num, line=line.strip()))
 
         out_str = out_str.strip()+'\n'  # FIX: Why do I have to do this last strip?
-        origstr = ''.join([p[4] for p in parts])
+        origstr = ''.join([p['origline'] for p in parts])
 
         yield tagblock, out_str, origstr
 
