@@ -91,11 +91,11 @@ def parseTagBlock(line):
 
 def normalize(nmea=sys.stdin,
               uscg=True,
-              validateChecksum=True,
+              validate_checksum=True,
               verbose=False,
-              allowUnknown=False,
+              allow_unknown=False,
               window=2,
-              treatABequal=False,
+              treat_ab_equal=False,
               pass_invalid_checksums=False,
               allow_missing_timestamps=False,
               errorcb=ErrorPrinter):
@@ -123,7 +123,7 @@ def normalize(nmea=sys.stdin,
         yield tagblock, line, origline
         continue
 
-      if validateChecksum and not checksum.isChecksumValid(line):
+      if validate_checksum and not checksum.isChecksumValid(line):
         invalid_checksums += 1
         errorcb(InvalidChecksumError(line_num=line_num, line=line.strip()))
         if not pass_invalid_checksums:
@@ -156,7 +156,7 @@ def normalize(nmea=sys.stdin,
 
       tagblock_station = tagblock.get('tagblock_station', None)
 
-      if station is None and allowUnknown:
+      if station is None and allow_unknown:
         station = 'UNKNOWN'
 
       if station is None and tagblock_station is None:
@@ -165,7 +165,7 @@ def normalize(nmea=sys.stdin,
 
       bufferSlot = (tagblock_station, station, fields[3])  # seqId and Channel make a unique stream
 
-      if not treatABequal:
+      if not treat_ab_equal:
         bufferSlot += (fields[4],)  # channel id
 
       newPacket = payload, station, timestamp, tagblock, origline

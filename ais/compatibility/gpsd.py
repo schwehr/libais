@@ -506,7 +506,7 @@ class Mangler(object):
       15: 'Not defined'}
 
   ship_types = {
-      0: 'Not available (default)',
+      0: 'Not available',
       1: 'Reserved for future use',
       2: 'Reserved for future use',
       3: 'Reserved for future use',
