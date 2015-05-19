@@ -2,6 +2,16 @@
 
 #include "ais.h"
 
+extern "C" {
+int LibAisVersionMajor() {
+  return LIBAIS_VERSION_MAJOR;
+}
+
+int LibAisVersionMinor() {
+  return LIBAIS_VERSION_MINOR;
+}
+}  // extern "C"
+
 namespace libais {
 
 vector<string> Split(const string &str, const string &delim_str) {
