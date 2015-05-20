@@ -255,13 +255,13 @@ def decode(nmea=sys.stdin,
   """Decodes a stream of AIS messages. Takes the same arguments as normalize."""
 
   for tagblock, line, origline in normalize(nmea=nmea, errorcb=errorcb, **kw):
-    body = ''.join(line.split(',')[5])
-    pad = int(line.split('*')[0][-1])
     try:
+      body = ''.join(line.split(',')[5])
+      pad = int(line.split('*')[0][-1])
       res = ais.decode(body, pad)
       res.update(tagblock)
       if keep_nmea:
         res['nmea'] = origline
       yield res
-    except ais.DecodeError as e:
+    except Exception as e:
       errorcb(e)
