@@ -11,7 +11,13 @@ before_install:
 
 install:
   - sudo apt-get install -qq gcc-4.8 g++-4.8
-  - python setup.py install
+  - gcc --version
+  - g++ --version
+  - gcc-4.8 --version
+  - g++-4.8 --version
+  - printenv | egrep -i 'CC|XX|[+][+]'
+  - printenv | grep P
+  - CC=g++-4.8 python setup.py install
 
 script:
   - python setup.py test
