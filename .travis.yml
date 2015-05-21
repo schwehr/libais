@@ -7,16 +7,9 @@ python:
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 
 install:
   - sudo apt-get install -qq gcc-4.8 g++-4.8
-  - gcc --version
-  - g++ --version
-  - gcc-4.8 --version
-  - g++-4.8 --version
-  - printenv | egrep -i 'CC|XX|[+][+]'
-  - printenv | grep P
   - CC=g++-4.8 python setup.py install
 
 script:
