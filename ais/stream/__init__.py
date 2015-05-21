@@ -91,11 +91,11 @@ def parseTagBlock(line):
 
 def normalize(nmea=sys.stdin,
               uscg=True,
-              validateChecksum=True,
+              validate_checksum=True,
               verbose=False,
-              allowUnknown=False,
+              allow_unknown=False,
               window=2,
-              treatABequal=False,
+              treat_ab_equal=False,
               pass_invalid_checksums=False,
               allow_missing_timestamps=False,
               errorcb=ErrorPrinter):
@@ -113,17 +113,17 @@ def normalize(nmea=sys.stdin,
   line_num = 0
   invalid_checksums = 0
 
-  for idx, line in enumerate(nmea):
+  for idx, origline in enumerate(nmea):
     try:
-      tagblock, line = parseTagBlock(line)
+      tagblock, line = parseTagBlock(origline)
 
       line = line.strip() + '\n'  # Get rid of DOS issues.
       line_num += 1
       if len(line) < 7 or line[3:6] not in ('VDM', 'VDO'):
-        yield tagblock, line
+        yield tagblock, line, origline
         continue
 
-      if validateChecksum and not checksum.isChecksumValid(line):
+      if validate_checksum and not checksum.isChecksumValid(line):
         invalid_checksums += 1
         errorcb(InvalidChecksumError(line_num=line_num, line=line.strip()))
         if not pass_invalid_checksums:
@@ -141,32 +141,37 @@ def normalize(nmea=sys.stdin,
       totNumSentences = int(fields[1])
       if 1 == totNumSentences:
         # A single line needs no work, so pass it along.
-        yield tagblock, line
+        yield tagblock, line, origline
         continue
 
       sentenceNum = int(fields[2])  # Message sequence number 1..9 (packetNum)
       payload = fields[5]  # AIS binary data encoded in whacky ways
       timestamp = fields[-1].strip()   # Seconds since Epoch UTC.  Always the last field
 
-      station = None  # USCG Receive Stations        #if None==station:
+      station = None  # USCG Receive Stations        # if None==station:
       for i in range(len(fields)-1, 5, -1):
         if len(fields[i]) and fields[i][0] in ('r', 'b'):
           station = fields[i]
           break  # Found it so ditch the for loop.
 
-      if station is None and allowUnknown:
+      tagblock_station = tagblock.get('tagblock_station', None)
+
+      if station is None and allow_unknown:
         station = 'UNKNOWN'
 
-      if station is None:
+      if station is None and tagblock_station is None:
         errorcb(NoStationFoundError(line_num=line_num, line=line.strip()))
         continue
 
-      if treatABequal:
-        bufferSlot = station + fields[3]  # seqId and Channel make a unique stream
-      else:
-        bufferSlot = station + fields[3] + fields[4]  # seqId and Channel make a unique stream
+      bufferSlot = (tagblock_station, station, fields[3])  # seqId and Channel make a unique stream
 
-      newPacket = payload, station, timestamp, tagblock
+      if not treat_ab_equal:
+        bufferSlot += (fields[4],)  # channel id
+
+      newPacket = {"payload": payload,
+                   "timestamp": timestamp,
+                   "tagblock": tagblock,
+                   "origline": origline}
       if sentenceNum == 1:
         buffers[bufferSlot] = [newPacket]  # Overwrite any partials
         continue
@@ -186,15 +191,19 @@ def normalize(nmea=sys.stdin,
         ts1 = None
         for part in parts:
           try:
-            ts1 = float(part[2])
+            ts1 = float(part['timestamp'])
             ts2 = float(timestamp)
           except ValueError:
-            if allow_missing_timestamps:
-              ts1 = 0
-              ts2 = 0
-            else:
-              ok = False
-              break
+            try:
+              ts1 = float(part['tagblock']['tagblock_timestamp'])
+              ts2 = float(tagblock['tagblock_timestamp'])
+            except:
+              if allow_missing_timestamps:
+                ts1 = 0
+                ts2 = 0
+              else:
+                ok = False
+                break
           if ts1 > ts2+window or ts1 < ts2-window:
             errorcb(DifferingTimestampsError(line_num=line_num,
                                              line=line.strip(),
@@ -204,10 +213,10 @@ def normalize(nmea=sys.stdin,
         if not ok:
           continue
 
-        payload = ''.join([p[0] for p in parts])
+        payload = ''.join([p['payload'] for p in parts])
         tagblock = {}
         for p in reversed(parts):
-          tagblock.update(p[3])
+          tagblock.update(p['tagblock'])
 
         # Try to mirror the packet as much as possible... same seqId and channel.
         checksumed_str = ','.join((fields[0], '1,1', fields[3], fields[4],
@@ -223,7 +232,11 @@ def normalize(nmea=sys.stdin,
 
         if not checksum.isChecksumValid(out_str):
           errorcb(InvalidChecksumInConstructedError(line_num=line_num, line=line.strip()))
-        yield tagblock, out_str.strip()+'\n'  # FIX: Why do I have to do this last strip?
+
+        out_str = out_str.strip()+'\n'  # FIX: Why do I have to do this last strip?
+        origstr = ''.join([p['origline'] for p in parts])
+
+        yield tagblock, out_str, origstr
 
         continue
 
@@ -231,20 +244,24 @@ def normalize(nmea=sys.stdin,
     except Exception as inst:
       errorcb(inst)
 
+  if buffers and verbose:
+    errorcb('Unfinished messages at end of file:\n %s\n' % buffers)
+
+
 def decode(nmea=sys.stdin,
            errorcb=ErrorPrinter,
            keep_nmea=False,
            **kw):
   """Decodes a stream of AIS messages. Takes the same arguments as normalize."""
 
-  for tagblock, line in normalize(nmea=nmea, errorcb=errorcb, **kw):
-    body = ''.join(line.split(',')[5])
-    pad = int(line.split('*')[0][-1])
+  for tagblock, line, origline in normalize(nmea=nmea, errorcb=errorcb, **kw):
     try:
+      body = ''.join(line.split(',')[5])
+      pad = int(line.split('*')[0][-1])
       res = ais.decode(body, pad)
       res.update(tagblock)
       if keep_nmea:
-        res['nmea'] = line
+        res['nmea'] = origline
       yield res
-    except ais.DecodeError as e:
+    except Exception as e:
       errorcb(e)

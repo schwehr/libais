@@ -12,3 +12,6 @@ test_libais
 *core*
 _ais.so
 dist
+.idea/
+venv/
+test/data/*.gpsdecode.json
