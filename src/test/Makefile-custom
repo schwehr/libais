@@ -37,7 +37,11 @@ clean:
 
 test: $(TESTS)
 	@echo $(TESTS)
-	for test in $(TESTS); do echo; ./$$test; done
+	result=0; \
+	for test in $(TESTS); do \
+	  echo; ./$$test || result=1; \
+        done; \
+        exit $$result
 
 
 GTEST_DIR = ../../third_party/gtest
