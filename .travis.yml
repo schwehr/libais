@@ -14,3 +14,4 @@ install:
 
 script:
   - python setup.py test
+  - (cd src && CC=gcc-4.8 CXX=g++-4.8 make -f Makefile-custom test)
