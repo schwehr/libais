@@ -1869,7 +1869,7 @@ ostream& operator<< (ostream& o, Ais8_367_22 const& msg);
 class Ais9 : public AisMsg {
  public:
   int alt;  // m above sea level
-  float sog;
+  int sog;
   int position_accuracy;
   AisPoint position;
   float cog;
