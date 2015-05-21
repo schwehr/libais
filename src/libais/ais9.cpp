@@ -30,7 +30,7 @@ Ais9::Ais9(const char *nmea_payload, const size_t pad)
 
   bs.SeekTo(38);
   alt = bs.ToUnsignedInt(38, 12);
-  sog = bs.ToUnsignedInt(50, 10) / 10.;
+  sog = bs.ToUnsignedInt(50, 10);  // Type 9: Speed over ground is given in knots.
 
   position_accuracy = bs[60];
   position = bs.ToAisPoint(61, 55);
