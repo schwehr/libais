@@ -14,4 +14,5 @@ install:
 
 script:
   - python setup.py test
-  - (cd src && CC=gcc-4.8 CXX=g++-4.8 make -f Makefile-custom test)
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then (cd src && CC=gcc-4.8 CXX=g++-4.8 make -f Makefile-custom test); fi
+
