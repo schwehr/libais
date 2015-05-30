@@ -16,20 +16,19 @@ namespace libais {
 
 vector<string> Split(const string &str, const string &delim_str) {
   assert(!delim_str.empty());
-  vector<string> r;
   if (str.empty()) {
-    r.push_back("");
-    return r;
+    return vector<string>({""});
   }
+  vector<string> parts;
   size_t prev = 0;
   for (size_t off = str.find(delim_str);
       off != string::npos;
       off = str.find(delim_str, off + 1)) {
-    r.push_back(str.substr(prev, off-prev));
+    parts.push_back(str.substr(prev, off-prev));
     prev = off + delim_str.size();
   }
-  r.push_back(str.substr(prev));
-  return r;
+  parts.push_back(str.substr(prev));
+  return parts;
 }
 
 string GetNthField(const string &str, const size_t n,
