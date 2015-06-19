@@ -1,6 +1,6 @@
 # -*- makefile -*-
 
-CXX:=g++-5
+# CXX := c++
 
 CXXFLAGS :=
 CXXFLAGS += -std=c++11
