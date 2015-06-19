@@ -18,8 +18,10 @@ default:
 	@echo
 	@echo "Read the README for more information"
 
-all: python2 python3
-	(cd src; make -f Makefile-custom all)
+all: python2 python3 lib
+
+lib:
+	(cd src/libais; make -f Makefile-custom all)
 
 DIST:=libais-${shell cat VERSION}
 TAR:=${DIST}.tar
