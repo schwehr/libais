@@ -12,7 +12,7 @@ namespace libais {
 
 Ais17::Ais17(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), spare2(0), gnss_type(0), z_cnt(0),
-      station(0), seq(0) {
+      station(0), seq(0), health(0) {
   assert(message_id == 17);
 
   if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) {
@@ -35,7 +35,10 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
 
   // Spec states that there might be no data.
   if (num_bits == 80) {
-    gnss_type = station = z_cnt = seq = -1;
+    gnss_type = -1;
+    station = -1;
+    z_cnt = -1;
+    seq = -1;
     return;
   }
 
@@ -50,7 +53,7 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
 
   // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
 
-  status = AIS_OK;  // TODO(schwehr): not really okay yet.
+  status = AIS_OK;  // TODO(schwehr): Not really okay yet.
 }
 
 

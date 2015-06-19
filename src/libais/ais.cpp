@@ -265,7 +265,8 @@ const char AisBitset::bits_to_char_tbl_[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
 AisMsg::AisMsg(const char *nmea_payload, const size_t pad)
-    : message_id(0), repeat_indicator(0), mmsi(0), status(AIS_UNINITIALIZED) {
+    : message_id(0), repeat_indicator(0), mmsi(0), status(AIS_UNINITIALIZED),
+      num_chars(0) {
   assert(nmea_payload);
   assert(pad < 6);
 

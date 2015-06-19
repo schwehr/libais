@@ -265,7 +265,8 @@ ais8_1_22_subarea_factory(const AisBitset &bs,
 //////////////////////////////////////////////////////////////////////
 
 Ais8_1_22::Ais8_1_22(const char *nmea_payload, const size_t pad)
-    : Ais8(nmea_payload, pad) {
+    : Ais8(nmea_payload, pad), link_id(0), notice_type(0), month(0), day(0),
+      hour(0), minute(0), duration_minutes(0) {
   assert(dac == 1);
   assert(fi == 22);
 

@@ -18,6 +18,7 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad)
       dsc_flag(0),
       band_flag(0),
       m22_flag(0),
+      mode_flag(0),
       raim(false),
       commstate_flag(0),
       sync_state(0),
