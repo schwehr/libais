@@ -180,7 +180,7 @@ def normalize(nmea=sys.stdin,
         # Finished a message
         if bufferSlot not in buffers:
           if verbose:
-            errorcb('Do not have the preceeding packets for line\n  ' + line)
+            errorcb('Do not have the preceeding packets for %s:\n  %s' % (bufferSlot, line))
           continue
         buffers[bufferSlot].append(newPacket)
         parts = buffers[bufferSlot]  # Now have all the pieces.
