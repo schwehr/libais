@@ -48,7 +48,9 @@ Available opptions:
     --keep_nmea Include the raw nmea as a field in the decoded output
 
     --verbose
+    --max_errors=NUM Terminate if error rate is > NUM%.
     --allow_unknown
+    --ignore_tagblock_station
     --treat_ab_equal
     --pass_invalid_checksums
     --allow_missing_timestamps
@@ -74,6 +76,9 @@ copy_tagblock_timestamp = args.pop("copy-tagblock-timestamp", True)
 
 if 'window' in args:
     args['window'] = int('window')
+
+if "max_errors" in args:
+    args["max_errors"] = float(args["max_errors"])
 
 gpsd_mangle = ais.compatibility.gpsd.Mangler(copy_tagblock_timestamp=copy_tagblock_timestamp)
 
