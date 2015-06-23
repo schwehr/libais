@@ -12,7 +12,7 @@ def ErrorPrinter(e,
                  verbose=False,
                  max_errors=None, # In % of total number of input lines
                  **kw):
-  if max_errors != None and float(stats["error_num"]) / float(stats["line_num"]) * 100.0 > max_errors:
+  if max_errors != None and float(stats["error_num_total"]) / float(stats["line_num"]) * 100.0 > max_errors:
     raise TooManyErrorsError(**stats)
   if verbose:
     sys.stderr.write('%s\n' % e)
@@ -82,7 +82,11 @@ class TooManyErrorsError(StreamError):
   description = 'Too many errors'
 
   def __str__(self):
-    return '%(description)s: %(error_num)s errors in %(line_num)s lines' % self.kw
+    res = dict(self.kw)
+    res['error_lines'] = ""
+    if 'error_num' in res:
+      res['error_lines'] = "\n" + "\n".join("  %s: %s" % (error, num) for error, num in res['error_num'].iteritems())
+    return '%(description)s: %(error_num_total)s errors in %(line_num)s lines:%(error_lines)s' % res
 
 
 def parseTagBlock(line):
@@ -122,6 +126,18 @@ def parseTagBlock(line):
   return tags, line
 
 
+def add_error_to_stats(e, stats):
+  if "error_num_total" not in stats:
+    stats["error_num_total"] = 0
+  stats["error_num_total"] += 1
+  if "error_num" not in stats:
+     stats["error_num"] = {}
+  name = getattr(e, "description", getattr(e, "message", str(type(e))))
+  if name not in stats["error_num"]:
+     stats["error_num"][name] = 0
+  stats["error_num"][name] += 1
+
+
 def normalize(nmea=sys.stdin,
               uscg=True,
               validate_checksum=True,
@@ -144,11 +160,11 @@ def normalize(nmea=sys.stdin,
   buffers = {} # Put partial messages in a queue by station so that they can be reassembled
   if stats is None: stats={}
   stats['line_num'] = stats.pop('line_num', 0)
-  stats['error_num'] = stats.pop('error_num', 0)
+  stats['error_num_total'] = stats.pop('error_num_total', 0)
   stats['invalid_checksums'] = stats.pop('invalid_checksums', 0)
 
   def report_error(e):
-    stats["error_num"] += 1
+    add_error_to_stats(e, stats)
     errorcb(e, stats, **kw)
 
   if not uscg:
@@ -288,6 +304,8 @@ def normalize(nmea=sys.stdin,
         continue
 
       buffers[bufferSlot].append(newPacket)
+    except TooManyErrorsError:
+      raise
     except Exception as inst:
       report_error(inst)
 
@@ -305,7 +323,7 @@ def decode(nmea=sys.stdin,
   if stats is None: stats={}
 
   def report_error(e):
-    stats["error_num"] += 1
+    add_error_to_stats(e, stats)
     errorcb(e, stats, **kw)
 
   for tagblock, line, origline in normalize(nmea=nmea, errorcb=errorcb, stats=stats, **kw):
@@ -317,5 +335,7 @@ def decode(nmea=sys.stdin,
       if keep_nmea:
         res['nmea'] = origline
       yield res
+    except TooManyErrorsError:
+      raise
     except Exception as e:
       report_error(e)
