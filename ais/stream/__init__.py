@@ -66,10 +66,10 @@ class DifferingTimestampsError(StreamError):
     return '%(description)s for %(timestamp)s: %(line_num)s: %(line)s, parts: %(parts)s' % self.kw
 
 class OnlyMessageEndError(StreamError):
-  description = 'Do not have the preceeding packets for line'
+  description = 'Do not have the preceeding packets for'
 
   def __str__(self):
-    return '%(description)s:\n%(line)s\n' % self.kw
+    return '%(description)s for %(bufferSlot)s:\n%(line)s\n' % self.kw
 
 class UnfinishedMessagesError(StreamError):
   description = 'Unfinished messages at end of file'
@@ -240,7 +240,7 @@ def normalize(nmea=sys.stdin,
       if totNumSentences == sentenceNum:
         # Finished a message
         if bufferSlot not in buffers:
-          report_error(OnlyMessageEndError(line=line))
+          report_error(OnlyMessageEndError(line=line, bufferSlot=bufferSlot))
           continue
         buffers[bufferSlot].append(newPacket)
         parts = buffers[bufferSlot]  # Now have all the pieces.
