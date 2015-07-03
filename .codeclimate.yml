@@ -5,4 +5,4 @@ languages:
   PHP: false
   Python: true
 exclude_paths:
-- "third_party"
+- "third_party/**"
