@@ -1,0 +1,7 @@
+* Notes for docs
+
+** mid.csv
+
+The prefix is used as DAC for binary messages or as the 1st three of the MMSI.
+
+http://www.itu.int/online/mms/glad/cga_mids.sh?lng=E
