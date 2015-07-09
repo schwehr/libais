@@ -3,6 +3,7 @@
 [[https://travis-ci.org/schwehr/libais][https://travis-ci.org/schwehr/libais.svg?branch=master]]
 [[https://scan.coverity.com/projects/5519][https://scan.coverity.com/projects/5519/badge.svg]]
 [[https://codeclimate.com/github/schwehr/libais][https://codeclimate.com/github/schwehr/libais/badges/gpa.svg]]
+[[https://badge.fury.io/py/libais.svg][http://badge.fury.io/py/libais]]
 
 Library for decoding maritime Automatic Identification System messages.
 
