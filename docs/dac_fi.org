@@ -1,14 +1,16 @@
 ** List of AIS binary messages
 
-Commentary by Kurt: Compitent authorities should reuse the same DAC/FI for a message as it is used elsewhere.  It is a bad thing (TM) to create multiple DAC/FI pairs that mean the same message.
+Commentary by Kurt: Competent authorities should reuse the same DAC/FI
+for a message as it is used elsewhere.  It is a bad thing (TM) to
+create multiple DAC/FI pairs that mean the same message.
 
 *** Addressed type 6
 
-| dac | fi | sub id | Src Doc | status   | description           |
-|-----+----+--------+---------+----------+-----------------------|
-|   1 | 23 |        | NAV55   | Proposed | area notice addressed |
-|   1 | 28 |        | NAV55    | Proposed                        | Route info addressed            |
-|   1 | 30 |        | NAV55    | Proposed                        | Text description addressed      |
+| dac | fi | sub id | Src Doc | status   | description                |
+|-----+----+--------+---------+----------+----------------------------|
+|   1 | 23 |        | NAV55   | Proposed | area notice addressed      |
+|   1 | 28 |        | NAV55   | Proposed | Route info addressed       |
+|   1 | 30 |        | NAV55   | Proposed | Text description addressed |
 
 *** Broadcast type 8
 

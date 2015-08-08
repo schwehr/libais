@@ -9,5 +9,5 @@ clean:
 
 .PHONY: test
 test:
-	(cd libais && make -f Makefile-custom test)
+	(cd libais && make -f Makefile-custom)
 	(cd test && make -f Makefile-custom test)

@@ -2,6 +2,8 @@
 // TODO(schwehr): handle payload
 // BAD: the comm-state is after the veriable payload.  This is a bad design.
 
+// See also: http://www.e-navigation.nl/asm
+
 #include "ais.h"
 
 namespace libais {

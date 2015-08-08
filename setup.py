@@ -61,17 +61,31 @@ setup(name='libais',
       license='Apache 2.0',
       ext_modules=[AIS_MODULE],
       packages=find_packages(),
+      install_requires=[
+          'six'
+      ],
+      extras_require={
+          'test': ['gpsd_format']
+      },
       classifiers=[
-           'License :: OSI Approved :: Apache Software License',
-           'Topic :: System :: Networking',
-           'Development Status :: 4 - Beta',
-           'Intended Audience :: Science/Research',
-           'Topic :: Communications',
-           'Topic :: Scientific/Engineering :: Information Analysis',
-           'Topic :: Scientific/Engineering :: '
-           'Interface Engine/Protocol Translator',
-           'Topic :: Scientific/Engineering :: GIS',
-           ],
+          'License :: OSI Approved :: Apache Software License',
+          'Development Status :: 4 - Beta',
+          'Intended Audience :: Science/Research',
+          'Interface Engine/Protocol Translator',
+          'Operating System :: Android',
+          'Operating System :: iOS',
+          'Operating System :: POSIX',
+          'Programming Language :: C++',
+          'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: Implementation :: CPython',
+          'Topic :: Communications',
+          'Topic :: Scientific/Engineering :: Information Analysis',
+          'Topic :: Scientific/Engineering :: '
+          'Topic :: System :: Networking',
+          'Topic :: Scientific/Engineering :: GIS',
+          ],
+      platforms=["POSIX"],
       scripts=["bin/aisdecode"],
       entry_points={
           'console_scripts': [

@@ -18,10 +18,16 @@ using std::ostream;
 using std::string;
 using std::vector;
 
-namespace libais {
-
 #define LIBAIS_VERSION_MAJOR 0
 #define LIBAIS_VERSION_MINOR 15
+
+extern "C" {
+// For configuration scripts to detect libais and the version numbers.
+int LibAisVersionMajor();
+int LibAisVersionMinor();
+}
+
+namespace libais {
 
 // Returns vector of the text between the delimiters.  Uses an empty string
 // for empty fields.  Empty string returns a vector of length 1 containing an
@@ -1863,7 +1869,7 @@ ostream& operator<< (ostream& o, Ais8_367_22 const& msg);
 class Ais9 : public AisMsg {
  public:
   int alt;  // m above sea level
-  float sog;
+  int sog;
   int position_accuracy;
   AisPoint position;
   float cog;

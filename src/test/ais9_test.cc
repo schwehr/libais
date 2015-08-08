@@ -25,7 +25,7 @@ void Validate(
     const int repeat_indicator,
     const int mmsi,
     const int alt,
-    const float sog,
+    const int sog,
     const int position_accuracy,
     const float x,
     const float y,
@@ -63,7 +63,7 @@ TEST(Ais9Test, DecodeAnything) {
       "!AIVDM,1,1,,B,9oVAuAI5;rRRv2OqTi?1uoP?=a@1,0*74");
 
   Validate(
-      msg.get(), 3, 509902149, 2324, 76.2, 1,
+      msg.get(), 3, 509902149, 2324, 762, 1,
       35.601200103759766, -11.229339599609375,
       50.3, 30, 0, 3, 1, 4, 1, true);
 

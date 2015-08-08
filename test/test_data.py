@@ -214,7 +214,7 @@ top_level = [
                'repeat_indicator': 3,
                'slot_number': 5121,
                'slot_timeout': 2,
-               'sog': 76.19999694824219,
+               'sog': 762,
                'spare': 3,
                'spare2': 4,
                'sync_state': 3,

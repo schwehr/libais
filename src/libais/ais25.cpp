@@ -1,5 +1,7 @@
 // Msg 25 - I - Single slot binary message
 
+// See also: http://www.e-navigation.nl/asm
+
 #include "ais.h"
 
 namespace libais {
