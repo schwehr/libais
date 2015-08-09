@@ -8,18 +8,6 @@
 namespace libais {
 namespace {
 
-std::unique_ptr<Ais26> Init(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
-  const int pad = GetPad(nmea_string);
-
-  // TODO(schwehr): Switch to c++14 make_unique.
-  std::unique_ptr<Ais26> msg(new Ais26(body.c_str(), pad));
-  if (!msg || msg->had_error()) {
-    return nullptr;
-  }
-  return msg;
-}
-
 void Validate(
     const Ais26 *msg,
     const int repeat_indicator,
