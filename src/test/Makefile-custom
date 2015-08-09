@@ -65,6 +65,9 @@ GMOCK_HEADERS = $(GMOCK_DIR)/include/gmock/*.h \
 		$(GMOCK_DIR)/include/gmock/internal/*.h \
 		$(GTEST_HEADERS)
 
+# Hide complaints from gtest and gmock.
+GTEST_FLAGS := -Wno-missing-field-initializers
+
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 GMOCK_SRCS_ = $(GMOCK_DIR)/src/*.cc $(GMOCK_HEADERS)
 
@@ -80,13 +83,11 @@ gtest_main.a : gtest-all.o gtest_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
 gtest-all.o : $(GTEST_SRCS_)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c \
-	    $(GTEST_DIR)/src/gtest-all.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(GTEST_FLAGS) -c $(GTEST_DIR)/src/gtest-all.cc
 
 
 gmock-all.o : $(GMOCK_SRCS_)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) \
-	    -c $(GMOCK_DIR)/src/gmock-all.cc
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(GTEST_FLAGS) -c $(GMOCK_DIR)/src/gmock-all.cc
 
 gmock_main.o : $(GMOCK_SRCS_)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) \
@@ -173,7 +174,6 @@ ais26_test: ais26_test.o gtest_main.a
 
 ais27_test: ais27_test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
-
 
 
 ais_test: ais_test.o gmock_main.a
