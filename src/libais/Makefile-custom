@@ -88,6 +88,10 @@ SRCS += ais25.cpp
 SRCS += ais26.cpp
 SRCS += ais27.cpp
 #SRCS += ais28.cpp
+
+SRCS += decode_body.cpp
+SRCS += vdm.cpp
+
 OBJS := ${SRCS:.cpp=.o}
 
 all: libais.a

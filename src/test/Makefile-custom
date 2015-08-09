@@ -29,6 +29,9 @@ TESTS += ais27_test
 
 TESTS += ais_test
 
+# TESTS += decode_body_test
+# TESTS += vdm_test
+
 all: test
 	@echo "Done"
 
@@ -54,7 +57,7 @@ CPPFLAGS += -isystem $(GMOCK_DIR)/include
 CPPFLAGS +=  -I../libais
 CPPFLAGS += -I$(GTEST_DIR) -I$(GMOCK_DIR)
 
-CXXFLAGS += -g -Wall -Wextra -pthread
+CXXFLAGS += -g -Wall -Wextra
 CXXFLAGS += -std=c++11
 
 
@@ -176,3 +179,10 @@ ais27_test: ais27_test.o gtest_main.a
 
 ais_test: ais_test.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+decode_body_test: decode_body_test.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
+vdm_test: vdm_test.o gmock_main.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
+
