@@ -64,6 +64,7 @@ import re
 
 import ais
 from ais import nmea
+from ais import nmea_messages
 import six.moves.queue as Queue
 
 
@@ -146,11 +147,16 @@ class BareQueue(Queue.Queue):
     match = Parse(line)
 
     if not match:
-      logging.info('No match for line: %d, %s', line_num, line)
-      Queue.Queue.put(self, {
+      logging.info('No VDM match for line: %d, %s', line_num, line)
+      msg = {
           'line_nums': [line_num],
-          'lines': [line],
-      })
+          'lines': [line]}
+      decoded = nmea_messages.Decode(line)
+      if decoded:
+        msg['decoded'] = decoded
+      else:
+        logging.info('No NMEA match for line: %d, %s', line_num, line)
+      Queue.Queue.put(self, msg)
       return
 
     sentence_total = int(match['sen_tot'])

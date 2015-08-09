@@ -394,5 +394,6 @@ class DecodeTagBlockTest(TagTestCase):
     self.assertEqual(msg['decoded']['id'], 5)
     self.assertEqual(msg['times'], [1428451206, None, None])
 
+
 if __name__ == '__main__':
   unittest.main()

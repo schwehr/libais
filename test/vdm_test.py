@@ -2,6 +2,7 @@
 
 """Tests for ais.vdm."""
 
+import datetime
 import unittest
 
 from ais import vdm
@@ -133,14 +134,16 @@ class BareQueueTest(unittest.TestCase):
 
   def testSingleLineNmeaSentencesIgnored(self):
     lines = (
-        '$GPZDA,050013,29,11,2012,-5,00*5D',
-        '$WIMWV,144.8,R,2.1,N,A*29',
         '$GPGGA,000000,4308.1252,N,07056.3763,W,2,9,0.9,35.2,M,,,,*0A',
         '$HCHDT,25.6,T*18',
         '$GPVTG,269.5,T,284.9,M,0.0,N,0.0,K,D*29',
         '$WIMDA,29.1166,I,0.9860,B,19.6,C,,,,,,,175.8,T,191.2,M,2.0,N,1.0,M*2B',
         '$GPVTG,268.6,T,284.0,M,0.1,N,0.1,K,D*2',
         '$GPGGA,000003,4308.1252,N,07056.3763,W,2,9,0.9,35.3,M,,,,*08')
+
+    decoded = [
+
+    ]
 
     for line_num, line in enumerate(lines):
       self.queue.put(line)

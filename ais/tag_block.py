@@ -16,6 +16,7 @@ import re
 
 import ais
 from ais import nmea
+from ais import nmea_messages
 from ais import util
 from ais import vdm
 import six.moves.queue as Queue
@@ -92,7 +93,6 @@ class TagQueue(Queue.Queue):
     match = Parse(line)
 
     if not match:
-      # Pass unknown lines through.
       Queue.Queue.put(self, {
           'line_nums': [self.line_num],
           'lines': [line],
@@ -113,6 +113,11 @@ class TagQueue(Queue.Queue):
         msg['decoded'] = decoded
       else:
         logging.info('Unable to decode. Passing without decoded block.')
+        decoded = nmea_messages.Decode(match['payload'])
+        if decoded:
+          msg['decoded'] = decoded
+        else:
+          logging.info('No NMEA match for line: %d, %s', line_num, line)
       Queue.Queue.put(self, msg)
       return
 
