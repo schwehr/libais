@@ -25,6 +25,7 @@
 #include <deque>
 #include <functional>
 #include <iomanip>
+#include <iostream>
 #include <locale>
 #include <memory>
 #include <numeric>
@@ -105,44 +106,61 @@ bool GetSentenceSequenceNumbers(const string & /* line */,
                                 int32_t *sentence_total,
                                 int32_t *sentence_number,
                                 int32_t *sequence_number, char *channel) {
+  // for (const auto &field : fields) {
+  //   std::cerr << "  field: " << field << "\n";
+  // }
   try {
     *sentence_total = std::stoi(fields[1]);
   } catch (...) {
+    // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNum\n";
     return false;
   }
   if (*sentence_total < 0 || *sentence_total >= kMaxSentences) {
     // LOG(INFO) << ReportErrorLine("Invalid total", line, line_number);
+    std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNumbers\n";
     return false;
   }
 
   if (fields[2].size() != 1) {
+    // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNumbers\n";
     return false;
   }
   try {
     *sentence_number = std::stoi(fields[2]);
   } catch (...) {
+    std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNumbers\n";
     return false;
   }
   if (*sentence_number < 1 || *sentence_number > *sentence_total) {
     // LOG(INFO) << ReportErrorLine("Invalid sentence num", line, line_number);
+    // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNum\n";
     return false;
   }
 
-  try {
-    *sequence_number = std::stoi(fields[3]);
-  } catch (...) {
-    return false;
-  }
-  if (*sequence_number < 0 || *sequence_number >= kNumSequenceChannels) {
-    if (fields[3] != "") {
-      // LOG(INFO) << ReportErrorLine("Invalid sequence ", line, line_number);
+  if (fields[3].empty()) {
+    *sequence_number = -1;
+  } else {
+    try {
+      *sequence_number = std::stoi(fields[3]);
+    } catch (...) {
+      // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNum"
+      //           << " '" << fields[3] << "'\n";
       return false;
     }
-    *sequence_number = -1;
+    if (*sequence_number < 0 || *sequence_number >= kNumSequenceChannels) {
+      if (fields[3] != "") {
+        // std::cerr << __FILE__ << ":" << __LINE__
+        //          << " GetSentenceSequenceNumbers\n";
+        // LOG(INFO) << ReportErrorLine("Invalid sequence ", line, line_number);
+        return false;
+      }
+      *sequence_number = -1;
+    }
   }
 
   if (fields[4].size() != 1 || (fields[4][0] != 'A' && fields[4][0] != 'B')) {
     // LOG(INFO) << ReportErrorLine("Invalid channel", line, line_number);
+    // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNum\n";
     return false;
   }
   *channel = fields[4][0];
@@ -166,16 +184,19 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
   vector<string> fields = Split(line, ",");
   if (fields.size() != 7) {
     // LOG(INFO) << ReportErrorLine("Expected 7 fields", line, line_number);
+    // std::cerr << ReportErrorLine("Expected 7 fields", line, line_number);
     return nullptr;
   }
 
   if (!ValidateChecksum(line)) {
     // LOG(INFO) << ReportErrorLine("Invalid checksum", line, line_number);
+    // std::cerr << ReportErrorLine("Invalid checksum", line, line_number);
     return nullptr;
   }
 
   if (fields[0].size() != 6) {
     // LOG(INFO) << ReportErrorLine("Invalid preamble", line, line_number);
+    std::cerr << ReportErrorLine("Invalid preamble", line, line_number);
     return nullptr;
   }
 
@@ -189,12 +210,14 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
   if (!GetSentenceSequenceNumbers(line, line_number, fields, &sentence_total,
                                   &sentence_number, &sequence_number,
                                   &channel)) {
+    // std::cerr << __FILE__ << ":" << __LINE__ << "\n";
     return nullptr;
   }
 
   const string body(fields[5]);
   if (body.size() < 1 || body.size() > 199) {
     // LOG(INFO) << ReportErrorLine("Invalid body", line, line_number);
+    std::cerr << __FILE__ << ":" << __LINE__ << "\n";
     return nullptr;
   }
 
@@ -202,10 +225,12 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
   try {
     fill_bits = std::stoi(fields[6].substr(0, 1));
   } catch (...) {
+    std::cerr << __FILE__ << ":" << __LINE__ << "\n";
     return nullptr;
   }
   if (fill_bits < 0 || fill_bits > 5) {
     // LOG(INFO) << ReportErrorLine("Invalid fill bits", line, line_number);
+    // std::cerr << __FILE__ << ":" << __LINE__ << "\n";
     return nullptr;
   }
 
@@ -266,7 +291,7 @@ string NmeaSentence::ToString() const {
   string sequence((sequence_number_ != -1) ? std::to_string(sequence_number_)
                                            : "");
 
-  string result = "!";
+  string result = "";
   result.append(talker_ + sentence_type_);
   result.append(",");
   result.append(std::to_string(sentence_total_));
@@ -283,7 +308,7 @@ string NmeaSentence::ToString() const {
   string checksum_str = ChecksumHexString(result);
   result.append("*");
   result.append(checksum_str);
-  return result;
+  return "!" + result;
 }
 
 string NmeaSentence::ToMd5Digest() const {

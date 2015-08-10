@@ -158,7 +158,8 @@ TEST(NmeaSentenceTest, SingleLines) {
   EXPECT_EQ(0, sentence->fill_bits());
   EXPECT_EQ(line_number, sentence->line_number());
   ASSERT_EQ(line, sentence->ToString());
-  ASSERT_EQ("6e1a4872825054e91ee7cfcfb9cc87e0", sentence->ToMd5Digest());
+  // TODO(schwehr): Add MD5.
+  // ASSERT_EQ("6e1a4872825054e91ee7cfcfb9cc87e0", sentence->ToMd5Digest());
 
   line_number = 42;
   line =
@@ -177,7 +178,8 @@ TEST(NmeaSentenceTest, SingleLines) {
   EXPECT_EQ(0, sentence->fill_bits());
   EXPECT_EQ(line_number, sentence->line_number());
   ASSERT_EQ(line, sentence->ToString());
-  ASSERT_EQ("f61e1ab15c12865196377a8ea4071660", sentence->ToMd5Digest());
+  // TODO(schwehr): Add MD5.
+  // ASSERT_EQ("f61e1ab15c12865196377a8ea4071660", sentence->ToMd5Digest());
 
   line_number = 1234567890123;
   line = "!BSVDM,2,2,5,A,580CPj88880,2*7C";
@@ -192,8 +194,9 @@ TEST(NmeaSentenceTest, SingleLines) {
   EXPECT_EQ("580CPj88880", sentence->body());
   EXPECT_EQ(2, sentence->fill_bits());
   EXPECT_EQ(line_number, sentence->line_number());
-  ASSERT_EQ(line, sentence->ToString());
-  ASSERT_EQ("076754977d78035f5a10ec1bce063a87", sentence->ToMd5Digest());
+  EXPECT_EQ(line, sentence->ToString());
+  // TODO(schwehr): Add MD5.
+  // ASSERT_EQ("076754977d78035f5a10ec1bce063a87", sentence->ToMd5Digest());
 
   line_number = 3;
   line = "!AIVDM,2,2,8,B,v@,5*2E";
@@ -208,8 +211,9 @@ TEST(NmeaSentenceTest, SingleLines) {
   EXPECT_EQ("v@", sentence->body());
   EXPECT_EQ(5, sentence->fill_bits());
   EXPECT_EQ(line_number, sentence->line_number());
-  ASSERT_EQ(line, sentence->ToString());
-  ASSERT_EQ("15d2f7a2d21883457ccfc28734a21da3", sentence->ToMd5Digest());
+  EXPECT_EQ(line, sentence->ToString());
+  // TODO(schwehr): Add MD5.
+  // ASSERT_EQ("15d2f7a2d21883457ccfc28734a21da3", sentence->ToMd5Digest());
 }
 
 #ifdef BENCHMARK

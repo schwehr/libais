@@ -136,3 +136,5 @@ ais25.o: ais.h
 ais26.o: ais.h
 ais27.o: ais.h
 ais_py.o: ais.h
+vdm.o: vdm.h ais.h
+
