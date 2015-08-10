@@ -29,8 +29,8 @@ TESTS += ais27_test
 
 TESTS += ais_test
 
-# TESTS += decode_body_test
-# TESTS += vdm_test
+TESTS += decode_body_test
+TESTS += vdm_test
 
 all: test
 	@echo "Done"
@@ -58,6 +58,7 @@ CPPFLAGS +=  -I../libais
 CPPFLAGS += -I$(GTEST_DIR) -I$(GMOCK_DIR)
 
 CXXFLAGS += -g -Wall -Wextra
+CXXFLAGS += -pthread
 CXXFLAGS += -std=c++11
 
 
