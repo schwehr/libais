@@ -8,9 +8,10 @@
 namespace libais {
 namespace {
 
+// TODO(schwehr): Test eu_id.
 void Validate8_200_10(const Ais8_200_10 *msg, const int repeat_indicator,
-                      const int mmsi, const string &eu_id, const float length,
-                      const float beam, const int ship_type,
+                      const int mmsi, const string & /* eu_id */,
+                      const float length, const float beam, const int ship_type,
                       const int haz_cargo, const float draught,
                       const int loaded, const int speed_qual,
                       const int course_qual, const int heading_qual,
@@ -43,8 +44,8 @@ TEST(Ais8_200_10Test, DecodeAnything) {
 
   std::unique_ptr<Ais8_200_10> msg(
       new Ais8_200_10("85NLn@0j2d<8000000BhI?`50000", 0));
-  Validate8_200_10(msg.get(), 0, 367474240, string("foo"), 15, 5, 8000, 5,
-                   0, 0, 0, 0, 0, 0);
+  Validate8_200_10(msg.get(), 0, 367474240, string("foo"), 15, 5, 8000, 5, 0, 0,
+                   0, 0, 0, 0);
 }
 
 }  // namespace
