@@ -21,8 +21,6 @@
 #include <memory>
 #include <string>
 
-// #include "base/logging.h"
-// #include "benchmark.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock-matchers.h"
 #include "gmock/gmock.h"

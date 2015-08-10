@@ -25,7 +25,6 @@
 #include <deque>
 #include <functional>
 #include <iomanip>
-#include <iostream>
 #include <locale>
 #include <memory>
 #include <numeric>
@@ -33,7 +32,6 @@
 #include <string>
 #include <tuple>
 
-// #include "base/logging.h"
 #include "decode_body.h"
 #include "ais.h"
 
@@ -83,8 +81,6 @@ bool ValidateChecksum(const string &line) {
 
     int32_t checksum_calculated = Checksum(line.substr(1, line.size() - 4));
     if (checksum_calculated != checksum) {
-      // LOG(INFO) << "Checksum miss-match: 0x" << ToHex2(checksum_calculated)
-      //           << " != 0x" << ToHex2(checksum) << "\n  " << line;
       return false;
     }
   } catch (...) {
@@ -106,34 +102,26 @@ bool GetSentenceSequenceNumbers(const string & /* line */,
                                 int32_t *sentence_total,
                                 int32_t *sentence_number,
                                 int32_t *sequence_number, char *channel) {
-  // for (const auto &field : fields) {
-  //   std::cerr << "  field: " << field << "\n";
-  // }
   try {
     *sentence_total = std::stoi(fields[1]);
   } catch (...) {
-    // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNum\n";
     return false;
   }
   if (*sentence_total < 0 || *sentence_total >= kMaxSentences) {
-    // LOG(INFO) << ReportErrorLine("Invalid total", line, line_number);
-    std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNumbers\n";
+    // TODO(schwehr): Test this code path.
     return false;
   }
 
   if (fields[2].size() != 1) {
-    // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNumbers\n";
     return false;
   }
   try {
     *sentence_number = std::stoi(fields[2]);
   } catch (...) {
-    std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNumbers\n";
+    // TODO(schwehr): Test this code path.
     return false;
   }
   if (*sentence_number < 1 || *sentence_number > *sentence_total) {
-    // LOG(INFO) << ReportErrorLine("Invalid sentence num", line, line_number);
-    // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNum\n";
     return false;
   }
 
@@ -143,15 +131,11 @@ bool GetSentenceSequenceNumbers(const string & /* line */,
     try {
       *sequence_number = std::stoi(fields[3]);
     } catch (...) {
-      // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNum"
-      //           << " '" << fields[3] << "'\n";
       return false;
     }
     if (*sequence_number < 0 || *sequence_number >= kNumSequenceChannels) {
+      // TODO(schwehr): Simplify this block to just return false.
       if (fields[3] != "") {
-        // std::cerr << __FILE__ << ":" << __LINE__
-        //          << " GetSentenceSequenceNumbers\n";
-        // LOG(INFO) << ReportErrorLine("Invalid sequence ", line, line_number);
         return false;
       }
       *sequence_number = -1;
@@ -159,8 +143,6 @@ bool GetSentenceSequenceNumbers(const string & /* line */,
   }
 
   if (fields[4].size() != 1 || (fields[4][0] != 'A' && fields[4][0] != 'B')) {
-    // LOG(INFO) << ReportErrorLine("Invalid channel", line, line_number);
-    // std::cerr << __FILE__ << ":" << __LINE__ << " GetSentenceSequenceNum\n";
     return false;
   }
   *channel = fields[4][0];
@@ -183,20 +165,15 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
 
   vector<string> fields = Split(line, ",");
   if (fields.size() != 7) {
-    // LOG(INFO) << ReportErrorLine("Expected 7 fields", line, line_number);
-    // std::cerr << ReportErrorLine("Expected 7 fields", line, line_number);
     return nullptr;
   }
 
   if (!ValidateChecksum(line)) {
-    // LOG(INFO) << ReportErrorLine("Invalid checksum", line, line_number);
-    // std::cerr << ReportErrorLine("Invalid checksum", line, line_number);
     return nullptr;
   }
 
   if (fields[0].size() != 6) {
-    // LOG(INFO) << ReportErrorLine("Invalid preamble", line, line_number);
-    std::cerr << ReportErrorLine("Invalid preamble", line, line_number);
+    // TODO(schwehr): Test this code path.
     return nullptr;
   }
 
@@ -210,14 +187,12 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
   if (!GetSentenceSequenceNumbers(line, line_number, fields, &sentence_total,
                                   &sentence_number, &sequence_number,
                                   &channel)) {
-    // std::cerr << __FILE__ << ":" << __LINE__ << "\n";
     return nullptr;
   }
 
   const string body(fields[5]);
   if (body.size() < 1 || body.size() > 199) {
-    // LOG(INFO) << ReportErrorLine("Invalid body", line, line_number);
-    std::cerr << __FILE__ << ":" << __LINE__ << "\n";
+    // TODO(schwehr): Test this code path.
     return nullptr;
   }
 
@@ -225,12 +200,10 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
   try {
     fill_bits = std::stoi(fields[6].substr(0, 1));
   } catch (...) {
-    std::cerr << __FILE__ << ":" << __LINE__ << "\n";
+    // TODO(schwehr): Test this code path.
     return nullptr;
   }
   if (fill_bits < 0 || fill_bits > 5) {
-    // LOG(INFO) << ReportErrorLine("Invalid fill bits", line, line_number);
-    // std::cerr << __FILE__ << ":" << __LINE__ << "\n";
     return nullptr;
   }
 
@@ -253,14 +226,12 @@ string Join(const vector<string> &parts, char delim) {
 unique_ptr<NmeaSentence> NmeaSentence::Merge(
     const vector<unique_ptr<NmeaSentence>> &prior_sentences) const {
   if (prior_sentences.size() != sentence_total_ - 1) {
-    // LOG(INFO) << "Prior sentences incomplete.";
     return nullptr;
   }
 
   // Make sure these sentences really go together.
   for (const auto &prior_sentence : prior_sentences) {
     if (!VerifyInSameMessage(*prior_sentence)) {
-      // LOG(INFO) << "Not in the same multi-line message.";
       return nullptr;
     }
   }
@@ -268,8 +239,6 @@ unique_ptr<NmeaSentence> NmeaSentence::Merge(
   // Check the order.
   for (int i = 0; i < prior_sentences.size(); ++i) {
     if (prior_sentences[i]->sentence_number() != i + 1) {
-      // LOG(INFO) << "sentence_number mismatch: "
-      //           << prior_sentences[i]->sentence_number() << " != " << i - 1;
       return nullptr;
     }
   }
@@ -318,33 +287,21 @@ string NmeaSentence::ToMd5Digest() const {
 
 bool NmeaSentence::VerifyInSameMessage(const NmeaSentence &sentence) const {
   if (sentence.talker() != talker_) {
-    // LOG(INFO) << "Talker mismatch: " << sentence.talker() << " != "
-    //           << talker_;
     return false;
   }
   if (sentence.sentence_type() != sentence_type_) {
-    // LOG(INFO) << "sentence_type mismatch: " << sentence.sentence_type()
-    //           << " != " << sentence_type_;
     return false;
   }
   if (sentence.sentence_number() == sentence_number_) {
-    // LOG(INFO) << "sentence_number must be different.  Both are: "
-    //           << sentence.sentence_number();
     return false;
   }
   if (sentence.sentence_total() != sentence_total_) {
-    // LOG(INFO) << " mismatch: " << sentence.sentence_total()
-    //           << " != " << sentence_total_;
     return false;
   }
   if (sentence.sequence_number() != sequence_number_) {
-    // LOG(INFO) << "sequence_number mismatch: " << sentence.sequence_number()
-    //           << " != " << sequence_number_;
     return false;
   }
   if (sentence.channel() != channel_) {
-    // LOG(INFO) << "Channel mismatch: " << sentence.channel()
-    //           << " != " << channel_;
     return false;
   }
   return true;
@@ -367,13 +324,8 @@ bool VdmStream::AddLine(const string &line) {
   if (tot != 1) {
     int cnt = sentence->sentence_number();
 
-    // LOG(INFO) << "msg: " << seq << " " << tot << " " << cnt;
-
     // Beginning of a message.
     if (cnt == 1) {
-      // LOG_IF(ERROR, !incoming_sentences_[seq].empty())
-      //   << "Sequence not empty, but got part 1 of a message. "
-      //   << "Dropping old partial.";
       incoming_sentences_[seq].clear();
       incoming_sentences_[seq].emplace_back(std::move(sentence));
 
@@ -383,9 +335,6 @@ bool VdmStream::AddLine(const string &line) {
     // Middle sentences of a message.
     if (cnt != tot) {
       if (incoming_sentences_[seq].size() + 1 != cnt) {
-        // LOG(ERROR) << "Out of order part of a sentence. "
-        //            << "Dropping incoming sentence. "
-        //            << incoming_sentences_[seq].size() + 1 << " != " << cnt;
         return false;
       }
       incoming_sentences_[seq].emplace_back(std::move(sentence));
@@ -394,9 +343,6 @@ bool VdmStream::AddLine(const string &line) {
 
     // Got final sentence in a multi-line message.
     if (incoming_sentences_[seq].size() != tot - 1) {
-      // LOG(ERROR) << "Missing parts of a multi-line message. "
-      //            << "Dropping all incoming sentence for this seq.  "
-      //            << incoming_sentences_[seq].size() << " != " << tot - 1;
       incoming_sentences_[seq].clear();
       return false;
     }
@@ -404,7 +350,6 @@ bool VdmStream::AddLine(const string &line) {
     sentence = sentence->Merge(incoming_sentences_[seq]);
     incoming_sentences_[seq].clear();
     if (sentence == nullptr) {
-      // LOG(ERROR) << "Failed to assemble message.";
       return false;
     }
 

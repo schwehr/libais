@@ -18,7 +18,6 @@
 
 #include <memory>
 
-// #include "base/logging.h"
 #include "ais.h"
 
 using libais::AisMsg;
@@ -66,7 +65,6 @@ unique_ptr<AisMsg> CreateAisMsg6(const string &body, const int fill_bits) {
           return MakeUnique<libais::Ais6_1_40>(body.c_str(), fill_bits);
       }
   }
-  // LOG(ERROR) << "Unhandled message 6:" << msg.dac << ":" << msg.fi;
   return nullptr;
 }
 
@@ -126,23 +124,16 @@ unique_ptr<AisMsg> CreateAisMsg8(const string &body, const int fill_bits) {
           return MakeUnique<libais::Ais8_367_22>(body.c_str(), fill_bits);
       }
   }
-  // LOG(ERROR) << "Unhandled message 8:" << msg.dac << ":" << msg.fi;
   return nullptr;
 }
 
 unique_ptr<AisMsg> CreateAisMsg(const string &body, const int fill_bits) {
   if (body.empty()) {
-    // LOG(ERROR) << "Empty body for message.";
     return nullptr;
   }
   if (fill_bits < 0 || fill_bits > 5) {
-    // LOG(ERROR) << "fill_bits out of [0..5]: " << fill_bits;
     return nullptr;
   }
-  // if ((body.size() - fill_bits) % 8 != 0) {
-  // LOG(WARNING) << "Message is not 8 bits aligned. May be invalid. " << body
-  //             << " " << fill_bits;
-  // }
 
   switch (body[0]) {
     case '1':  // FALLTHROUGH
@@ -223,7 +214,6 @@ unique_ptr<AisMsg> CreateAisMsg(const string &body, const int fill_bits) {
       return MakeUnique<libais::Ais27>(body.c_str(), fill_bits);
 
     default:
-      // LOG(ERROR) << "Unknown message type: '" << body[0] << "'";
       return nullptr;
   }
   return nullptr;
