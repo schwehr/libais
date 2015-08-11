@@ -2,8 +2,8 @@
 # TODO(schwehr): Make sure this works with proprietary messages.
 
 import datetime
-import math
 import logging
+import math
 import re
 
 from ais import util
@@ -17,6 +17,44 @@ NMEA_SENTENCE_RE = re.compile(NMEA_SENTENCE_RE_STR)
 NMEA_CHECKSUM_RE = re.compile(NMEA_CHECKSUM_RE_STR)
 
 HANDLERS = {}
+
+BBM_RE_STR = (
+    # '[$!](?P<talker>[A-Z][A-Z])(?P<sentence>[A-Z]{3,4}),'
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>BBM),'
+    r'(?P<sen_tot>\d),'
+    r'(?P<sen_num>\d),'
+    r'(?P<seq_num>\d),'
+    r'(?P<chan>\d),'
+    r'(?P<msg_id>\d),'
+    r'(?P<body>[^,*]*),'
+    r'\d\*(?P<checksum>[0-9A-F][0-9A-F])'
+)
+
+BBM_RE = re.compile(BBM_RE_STR)
+
+
+def Bbm(line):
+  """Decode binary broadcast message (BBM) sentence."""
+  try:
+    fields = BBM_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  result = {
+      'msg': 'BBM',
+      'talker': fields['talker'],
+      'body': fields['body'],
+  }
+
+  for field in ('sen_tot', 'sen_num', 'seq_num', 'chan', 'msg_id'):
+    result[field] = util.MaybeToNumber(fields[field])
+
+  return result
+
+
+HANDLERS['BBM'] = Bbm
+
 
 GGA_RE_STR = (
     NMEA_HEADER_RE_STR +
@@ -37,6 +75,7 @@ GGA_RE_STR = (
     r'(?P<differential_age_sec>\d+)?'
     + NMEA_CHECKSUM_RE_STR
 )
+
 
 GGA_RE = re.compile(GGA_RE_STR)  # ; GGA_RE.search(line).groupdict()
 
@@ -78,6 +117,9 @@ def Gga(line):
       result[field] = util.MaybeToNumber(fields[field])
 
   return result
+
+
+HANDLERS['GGA'] = Gga
 
 
 # Time in UTC.

@@ -1,10 +1,43 @@
 #!/usr/bin/env python
-"""Tests for ais.nmea."""
+"""Tests for ais.nmea_messages."""
 
 import datetime
 import unittest
 
 from ais import nmea_messages
+
+
+class BbmTest(unittest.TestCase):
+
+  def testBbmRegex(self):
+    line = '!UPBBM,1,1,8,0,8,Fv4:Rb11Jq;=0Gjl:4vT80,4*06'
+    msg = nmea_messages.BBM_RE.search(line).groupdict()
+    self.assertEqual(
+        msg,
+        {
+            'body': 'Fv4:Rb11Jq;=0Gjl:4vT80',
+            'chan': '0',
+            'checksum': '06',
+            'msg_id': '8',
+            'sen_num': '1',
+            'sen_tot': '1',
+            'sentence': 'BBM',
+            'seq_num': '8',
+            'talker': 'UP'})
+
+  def testBbmDecode(self):
+    line = '!UPBBM,1,1,2,0,8,Fv4:3s3QJr<R@GoB64vT80,4*22'
+    msg = nmea_messages.Decode(line)
+    self.assertEqual(
+        msg, {
+            'body': 'Fv4:3s3QJr<R@GoB64vT80',
+            'chan': 0,
+            'msg': 'BBM',
+            'msg_id': 8,
+            'sen_num': 1,
+            'sen_tot': 1,
+            'seq_num': 2,
+            'talker': 'UP'})
 
 
 class GgaTest(unittest.TestCase):
