@@ -98,11 +98,11 @@ def Gga(line):
 
   x = int(fields['lon_deg']) + float(fields['lon_min']) / 60.0
   if fields['longitude_hemisphere'] == 'W':
-      x = -x
+    x = -x
 
   y = int(fields['lat_deg']) + float(fields['lat_min']) / 60.0
   if fields['latitude_hemisphere'] == 'S':
-      y = -y
+    y = -y
 
   result = {
       'time': when,
@@ -164,8 +164,8 @@ def Zda(line):
 
   # TODO(schwehr): Convert this to Unix UTC seconds.
   result = {
-    'msg': 'ZDA',
-    'datetime': when,
+      'msg': 'ZDA',
+      'datetime': when,
   }
 
   try:
