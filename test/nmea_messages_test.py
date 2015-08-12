@@ -45,7 +45,7 @@ class GgaTest(unittest.TestCase):
   def testGgaRegex(self):
     line = (
         '$GPGGA,174246.00,7119.6369,N,15640.8432,W,1,06,2.39,00011,M,000,M,,'
-        '*7D') # ',rakbarrow85,1226943363.79')
+        '*7D')  # ',rakbarrow85,1226943363.79')
     msg = nmea_messages.GGA_RE.search(line).groupdict()
     self.assertEqual(
         msg,
@@ -101,20 +101,20 @@ class ZdaTest(unittest.TestCase):
     line = '$INZDA,082015.0007,30,04,2009,,*73'
     msg = nmea_messages.ZDA_RE.search(line).groupdict()
     self.assertEqual(
-      msg,
-      {
-          'checksum': '73',
-          'day': '30',
-          'hours': '08',
-          'minutes': '20',
-          'month': '04',
-          'seconds': '15.0007',
-          'sentence': 'ZDA',
-          'talker': 'IN',
-          'time_utc': '082015.0007',
-          'year': '2009',
-          'zone_hours': None,
-          'zone_minutes': None})
+        msg,
+        {
+            'checksum': '73',
+            'day': '30',
+            'hours': '08',
+            'minutes': '20',
+            'month': '04',
+            'seconds': '15.0007',
+            'sentence': 'ZDA',
+            'talker': 'IN',
+            'time_utc': '082015.0007',
+            'year': '2009',
+            'zone_hours': None,
+            'zone_minutes': None})
 
   def testZdaDecode(self):
     line = '$INZDA,082015.0007,30,04,2009,,*73'
@@ -123,7 +123,7 @@ class ZdaTest(unittest.TestCase):
         msg,
         {
             'msg': 'ZDA',
-        'datetime': datetime.datetime(2009, 4, 30, 8, 20, 15, 700)})
+            'datetime': datetime.datetime(2009, 4, 30, 8, 20, 15, 700)})
 
 
 if __name__ == '__main__':
