@@ -193,6 +193,49 @@ def Gga(line):
 HANDLERS['GGA'] = Gga
 
 
+TXT_RE_STR = (
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>TXT),'
+    r'(?P<sen_tot>\d+)?,'
+    r'(?P<sen_num>\d+)?,'
+    r'(?P<seq_num>\d+)?,'
+    r'(?P<text>[^*,][^\*]*)?'
+    + NMEA_CHECKSUM_RE_STR
+)
+
+TXT_RE = re.compile(TXT_RE_STR)
+
+
+def Txt(line):
+  """Decode Text Transmission (TXT).
+
+  TODO(schwehr): Handle encoded characters.  e.g. ^21 is a '!'.
+
+  Args:
+    line: A string containing a NMEA TXT message.
+
+  Return:
+    A dictionary with the decoded fields.
+  """
+  try:
+    fields = TXT_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  result = {
+      'msg': 'TXT',
+      'talker': fields['talker'],
+      'text': fields['text'],
+  }
+
+  for field in ('sen_tot', 'sen_num', 'seq_num'):
+    result[field] = util.MaybeToNumber(fields[field])
+
+  return result
+
+
+HANDLERS['TXT'] = Txt
+
 # Time in UTC.
 ZDA_RE_STR = (
     NMEA_HEADER_RE_STR +

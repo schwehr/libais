@@ -197,8 +197,40 @@ class GgaTest(unittest.TestCase):
 # TODO(schwehr): RMC.
 # $GPRMC,150959.51,V,4234.8141,N,07039.8693,W,0.00,0.0,120308,15.1,W,N*21
 
-# TODO(schwehr): TXT
-# $AITXT,01,01,91,FREQ,2087,2088*57,rccom159-sr162,1206656905.87
+
+class TxtTest(unittest.TestCase):
+
+  def testRegex(self):
+    # From an SR-162.
+    line = '$AITXT,01,01,91,FREQ,2087,2088*57'
+    msg = nmea_messages.TXT_RE.search(line).groupdict()
+    self.assertEqual(
+        msg,
+        {'checksum': '57',
+         'sen_num': '01',
+         'sen_tot': '01',
+         'sentence': 'TXT',
+         'seq_num': '91',
+         'talker': 'AI',
+         'text': 'FREQ,2087,2088'})
+
+  def testDecode(self):
+    line = '$AITXT,01,01,91,FREQ,2087,2088*57'
+    msg = nmea_messages.Decode(line)
+    self.assertEqual(
+        msg,
+        {'msg': 'TXT',
+         'sen_num': 1,
+         'sen_tot': 1,
+         'seq_num': 91,
+         'talker': 'AI',
+         'text': 'FREQ,2087,2088'})
+    # TODO(schwehr): Add more tests from these.
+    # $AITXT,01,01,01,WHALE NOTICES DATETIME 20110508T133349 UTC*58
+    # $AITXT,01,01,70,Entered a DSC Receivable Window Chan A*46
+    # $AITXT,01,01,70,Leaving a DSC Receivable Window^2C Chan A*7E
+    # $AITXT,01,01,64,AIS: RATDMA Overflow*00,B0003160048,1064982808
+    # $AITXT,1,1,007,AIS: UTC clock lost*08,1179172653.22
 
 
 class ZdaTest(unittest.TestCase):
