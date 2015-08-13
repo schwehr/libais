@@ -216,7 +216,6 @@ def FloatSplit(value):
 
 
 def Zda(line):
-  logging.info('zda line: %s', line)
   try:
     fields = ZDA_RE.match(line).groupdict()
   except TypeError:
@@ -270,6 +269,6 @@ def Decode(line):
   except AttributeError:
     logging.info('Unable to decode line with handle: %s', line)
     return
-  logging.info('decoded: %s', msg)
+
   return msg
 
