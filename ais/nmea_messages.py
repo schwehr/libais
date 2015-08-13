@@ -18,6 +18,42 @@ NMEA_CHECKSUM_RE = re.compile(NMEA_CHECKSUM_RE_STR)
 
 HANDLERS = {}
 
+ABK_RE_STR = (
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>ABK),'
+    r'(?P<mmsi>\d+)?,'
+    r'(?P<chan>[AB])?,'
+    r'(?P<msg_id>\d+)?,'
+    r'(?P<seq_num>\d+)?,'
+    r'(?P<ack_type>\d+)' +
+    NMEA_CHECKSUM_RE_STR
+)
+print 'ABK_RE_STR:', ABK_RE_STR
+
+ABK_RE = re.compile(ABK_RE_STR)
+
+
+def Abk(line):
+  """Decode AIS Addressed and Binary Broadcast Acknowledgement (ABK)."""
+  try:
+    fields = ABK_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  result = {
+      'msg': 'ABK',
+      'talker': fields['talker'],
+      'chan': fields['chan'],
+  }
+
+  for field in ('mmsi', 'msg_id', 'seq_num', 'ack_type'):
+    result[field] = util.MaybeToNumber(fields[field])
+
+  return result
+
+
+HANDLERS['ABK'] = Abk
+
 BBM_RE_STR = (
     NMEA_HEADER_RE_STR +
     r'(?P<sentence>BBM),'
@@ -35,7 +71,7 @@ BBM_RE = re.compile(BBM_RE_STR)
 
 
 def Bbm(line):
-  """Decode binary broadcast message (BBM) sentence."""
+  """Decode Binary Broadcast Message (BBM) sentence."""
   try:
     fields = BBM_RE.match(line).groupdict()
   except TypeError:
@@ -54,7 +90,6 @@ def Bbm(line):
 
 
 HANDLERS['BBM'] = Bbm
-
 
 GGA_RE_STR = (
     NMEA_HEADER_RE_STR +
@@ -75,7 +110,6 @@ GGA_RE_STR = (
     r'(?P<differential_age_sec>\d+)?'
     + NMEA_CHECKSUM_RE_STR
 )
-
 
 GGA_RE = re.compile(GGA_RE_STR)  # ; GGA_RE.search(line).groupdict()
 

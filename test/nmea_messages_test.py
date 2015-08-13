@@ -7,6 +7,36 @@ import unittest
 from ais import nmea_messages
 
 
+class AbkTest(unittest.TestCase):
+
+  def testAbkRegex(self):
+    line = '$ANABK,,B,8,5,3*17'
+    msg = nmea_messages.ABK_RE.search(line).groupdict()
+    self.assertEqual(
+        msg,
+        {'ack_type': '3',
+         'chan': 'B',
+         'checksum': '17',
+         'mmsi': None,
+         'msg_id': '8',
+         'sentence': 'ABK',
+         'seq_num': '5',
+         'talker': 'AN'})
+
+  def testAbkDecode(self):
+    line = '$ANABK,,A,8,4,3*15'
+    msg = nmea_messages.Decode(line)
+    self.assertEqual(
+        msg,
+        {'ack_type': 3,
+         'chan': 'A',
+         'mmsi': None,
+         'msg_id': 8,
+         'msg': 'ABK',
+         'seq_num': 4,
+         'talker': 'AN'})
+
+
 class BbmTest(unittest.TestCase):
 
   def testBbmRegex(self):
