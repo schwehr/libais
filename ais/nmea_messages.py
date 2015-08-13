@@ -28,7 +28,6 @@ ABK_RE_STR = (
     r'(?P<ack_type>\d+)' +
     NMEA_CHECKSUM_RE_STR
 )
-print 'ABK_RE_STR:', ABK_RE_STR
 
 ABK_RE = re.compile(ABK_RE_STR)
 
@@ -53,6 +52,44 @@ def Abk(line):
 
 
 HANDLERS['ABK'] = Abk
+
+ADS_RE_STR = (
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>ADS),'
+    r'(?P<id>[^,]+?),'
+    r'(?P<time>\d\d\d\d\d\d(\.\d\d)?)?,'
+    r'(?P<alarm>)[AV]?,'
+    r'(?P<time_sync_method>\d)?,'
+    r'(?P<pos_src>[EINS])?,'
+    r'(?P<time_src>[EIN])?' +
+    NMEA_CHECKSUM_RE_STR
+)
+
+ADS_RE = re.compile(ADS_RE_STR)
+
+
+def Ads(line):
+  """Decode Automatic Device Status (ADS)."""
+  try:
+    fields = ADS_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  result = {
+      'msg': 'ADS',
+      'talker': fields['talker'],
+      'id': fields['id'],
+      'time': fields['time'],
+      'alarm': fields['alarm'],
+      'time_sync_method': util.MaybeToNumber(fields['time_sync_method']),
+      'pos_src': fields['pos_src'],
+      'time_src': fields['time_src'],
+  }
+
+  return result
+
+
+HANDLERS['ADS'] = Ads
 
 BBM_RE_STR = (
     NMEA_HEADER_RE_STR +

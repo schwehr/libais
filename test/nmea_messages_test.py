@@ -37,6 +37,73 @@ class AbkTest(unittest.TestCase):
          'talker': 'AN'})
 
 
+class AdsTest(unittest.TestCase):
+
+  def testAdsRegex(self):
+    line = '$ANADS,L3 AIS ID,024358.79,V,0,I,I*3E'
+    msg = nmea_messages.ADS_RE.search(line).groupdict()
+    self.assertEqual(
+        msg,
+        {'alarm': '',
+         'checksum': '3E',
+         'id': 'L3 AIS ID',
+         'pos_src': 'I',
+         'sentence': 'ADS',
+         'talker': 'AN',
+         'time': '024358.79',
+         'time_src': 'I',
+         'time_sync_method': '0'})
+
+  def testAdsDecode(self):
+    line = '$ANADS,L3 AIS ID,024829.51,V,0,I,I*39'
+    msg = nmea_messages.Decode(line)
+    self.assertEqual(
+        msg,
+        {'alarm': '',
+         'id': 'L3 AIS ID',
+         'msg': 'ADS',
+         'pos_src': 'I',
+         'talker': 'AN',
+         'time': '024829.51',
+         'time_src': 'I',
+         'time_sync_method': 0})
+
+    line = '$BSADS,312670-BS,134839.00,A,3,N,N*22'
+    msg = nmea_messages.Decode(line)
+    self.assertEqual(
+        msg,
+        {'alarm': '',
+         'id': '312670-BS',
+         'msg': 'ADS',
+         'pos_src': 'N',
+         'talker': 'BS',
+         'time': '134839.00',
+         'time_src': 'N',
+         'time_sync_method': 3})
+
+# TODO(schwehr): Add ALR
+# $ANALR,000000.00,007,A,V,AIS: UTC Lost*75,rccom-office-l3-4,1288708698.21
+# $BSALR,000000.00,001,V,V,AIS: Tx malfunction*52,rbs1,1206655746.04
+# $BSALR,000000.00,002,V,V,AIS: Antenna VSWR exceeds limit*5C,rbs1,1206655746.05
+# $BSALR,000000.00,003,V,V,AIS: Rx channel 1 malfunction*04,rbs1,1206655746.07
+# $BSALR,000000.00,004,V,V,AIS: Rx channel 2 malfunction*00,rbs1,1206655746.08
+# $BSALR,000000.00,005,V,V,AIS: Rx channel 70 malfunction*34,rbs1,1206655746.1
+# $BSALR,000000.00,006,V,V,AIS: General Failure*0D,rbs1,1206655746.11
+# $BSALR,000000.00,008,V,V,AIS: MKD connection lost*65,rbs1,1206655746.12
+# $BSALR,000000.00,025,V,V,AIS: External EPFS lost*03,rbs1,1206655746.14
+# $BSALR,221048.00,026,A,V,AIS: No sensor position in use*69,rbs1,1206655746.15
+# $BSALR,000000.00,029,V,V,AIS: No valid SOG information*76,rbs1,1206655746.17
+# $BSALR,000000.00,030,V,V,AIS: No valid COG information*6E,rbs1,1206655746.19
+# $BSALR,000000.00,032,V,V,AIS: Heading lost/invalid*0E,rbs1,1206655746.2
+# $BSALR,000000.00,035,V,V,AIS: No valid ROT information*69,rbs1,1206655746.22
+# $BSALR,000000.00,051,V,V,AIS: IEC Comm Error*02,rbs1,1206655746.23
+# $BSALR,221048.00,007,A,V,AIS: UTC Lost*66,rbs1,1206655746.24
+# $BSALR,221048.00,026,A,V,AIS: No sensor position in use*69,rbs1,1206655774.46
+# $BSALR,134239.00,002,A,V,AIS: Antenna VSWR exceeds limit*45
+# $BSALR,134132.00,026,A,V,AIS: No sensor position in use*62
+# $BSALR,134132.00,007,A,V,AIS: UTC Lost*6D,rmahghlndlght,1205761825.34
+
+
 class BbmTest(unittest.TestCase):
 
   def testBbmRegex(self):
@@ -125,6 +192,13 @@ class GgaTest(unittest.TestCase):
             'longitude': -156.68072,
             'satellites': 6,
             'time': datetime.time(17, 42, 46)})
+
+
+# TODO(schwehr): RMC.
+# $GPRMC,150959.51,V,4234.8141,N,07039.8693,W,0.00,0.0,120308,15.1,W,N*21
+
+# TODO(schwehr): TXT
+# $AITXT,01,01,91,FREQ,2087,2088*57,rccom159-sr162,1206656905.87
 
 
 class ZdaTest(unittest.TestCase):
