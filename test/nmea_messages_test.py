@@ -18,6 +18,7 @@ class BbmTest(unittest.TestCase):
             'body': 'Fv4:Rb11Jq;=0Gjl:4vT80',
             'chan': '0',
             'checksum': '06',
+            'fill_bits': '4',
             'msg_id': '8',
             'sen_num': '1',
             'sen_tot': '1',
@@ -32,6 +33,7 @@ class BbmTest(unittest.TestCase):
         msg, {
             'body': 'Fv4:3s3QJr<R@GoB64vT80',
             'chan': 0,
+            'fill_bits': 4,
             'msg': 'BBM',
             'msg_id': 8,
             'sen_num': 1,

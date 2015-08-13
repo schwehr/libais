@@ -19,7 +19,6 @@ NMEA_CHECKSUM_RE = re.compile(NMEA_CHECKSUM_RE_STR)
 HANDLERS = {}
 
 BBM_RE_STR = (
-    # '[$!](?P<talker>[A-Z][A-Z])(?P<sentence>[A-Z]{3,4}),'
     NMEA_HEADER_RE_STR +
     r'(?P<sentence>BBM),'
     r'(?P<sen_tot>\d),'
@@ -28,7 +27,8 @@ BBM_RE_STR = (
     r'(?P<chan>\d),'
     r'(?P<msg_id>\d),'
     r'(?P<body>[^,*]*),'
-    r'\d\*(?P<checksum>[0-9A-F][0-9A-F])'
+    r'(?P<fill_bits>\d)' +
+    NMEA_CHECKSUM_RE_STR
 )
 
 BBM_RE = re.compile(BBM_RE_STR)
@@ -47,7 +47,7 @@ def Bbm(line):
       'body': fields['body'],
   }
 
-  for field in ('sen_tot', 'sen_num', 'seq_num', 'chan', 'msg_id'):
+  for field in ('sen_tot', 'sen_num', 'seq_num', 'chan', 'msg_id', 'fill_bits'):
     result[field] = util.MaybeToNumber(fields[field])
 
   return result
