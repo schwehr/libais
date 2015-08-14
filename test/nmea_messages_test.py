@@ -187,6 +187,7 @@ class GgaTest(unittest.TestCase):
          'hdop': 2.39,
          'latitude': 71.32728166666666,
          'longitude': -156.68072,
+         'msg': 'GGA',
          'satellites': 6,
          'time': datetime.time(17, 42, 46)})
 
@@ -257,7 +258,10 @@ class ZdaTest(unittest.TestCase):
     self.assertEqual(
         msg,
         {'msg': 'ZDA',
-         'datetime': datetime.datetime(2009, 4, 30, 8, 20, 15, 700)})
+         'datetime': datetime.datetime(2009, 4, 30, 8, 20, 15, 700),
+         'talker': 'IN',
+         'zone_hours': None,
+         'zone_minutes': None})
 
 
 if __name__ == '__main__':
