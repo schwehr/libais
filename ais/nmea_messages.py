@@ -176,6 +176,7 @@ def Gga(line):
     y = -y
 
   result = {
+      'msg': 'GGA',
       'time': when,
       'longitude': x,
       'latitude': y,
@@ -264,31 +265,29 @@ def Zda(line):
   except TypeError:
     return
 
+  for field in ('year', 'month', 'day', 'hours', 'minutes', 'zone_hours', 'zone_minutes'):
+    if fields[field] is not None and fields[field]:
+      fields[field] = util.MaybeToNumber(fields[field])
+
   seconds, fractional_seconds = FloatSplit(float(fields['seconds']))
   microseconds = int(math.floor(fractional_seconds * 1e6))
   when = datetime.datetime(
-      int(fields['year']),
-      int(fields['month']),
-      int(fields['day']),
-      int(fields['hours']),
-      int(fields['minutes']),
+      fields['year'],
+      fields['month'],
+      fields['day'],
+      fields['hours'],
+      fields['minutes'],
       seconds,
       microseconds)
 
   # TODO(schwehr): Convert this to Unix UTC seconds.
   result = {
       'msg': 'ZDA',
+      'talker': fields['talker'],
       'datetime': when,
+      'zone_hours': fields['zone_hours'],
+      'zone_minutes': fields['zone_minutes'],
   }
-
-  try:
-    result['zone_hours'] = int(fields['zone_hours'])
-  except TypeError:
-    pass
-  try:
-    result['zone_minutes'] = int(fields['zone_minutes'])
-  except TypeError:
-    pass
 
   return result
 
