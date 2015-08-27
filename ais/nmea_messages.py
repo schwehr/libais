@@ -2,8 +2,8 @@
 # TODO(schwehr): Make sure this works with proprietary messages.
 
 import datetime
-import math
 import logging
+import math
 import re
 
 from ais import util
@@ -17,6 +17,116 @@ NMEA_SENTENCE_RE = re.compile(NMEA_SENTENCE_RE_STR)
 NMEA_CHECKSUM_RE = re.compile(NMEA_CHECKSUM_RE_STR)
 
 HANDLERS = {}
+
+ABK_RE_STR = (
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>ABK),'
+    r'(?P<mmsi>\d+)?,'
+    r'(?P<chan>[AB])?,'
+    r'(?P<msg_id>\d+)?,'
+    r'(?P<seq_num>\d+)?,'
+    r'(?P<ack_type>\d+)' +
+    NMEA_CHECKSUM_RE_STR
+)
+
+ABK_RE = re.compile(ABK_RE_STR)
+
+
+def Abk(line):
+  """Decode AIS Addressed and Binary Broadcast Acknowledgement (ABK)."""
+  try:
+    fields = ABK_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  result = {
+      'msg': 'ABK',
+      'talker': fields['talker'],
+      'chan': fields['chan'],
+  }
+
+  for field in ('mmsi', 'msg_id', 'seq_num', 'ack_type'):
+    result[field] = util.MaybeToNumber(fields[field])
+
+  return result
+
+
+HANDLERS['ABK'] = Abk
+
+ADS_RE_STR = (
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>ADS),'
+    r'(?P<id>[^,]+?),'
+    r'(?P<time>\d\d\d\d\d\d(\.\d\d)?)?,'
+    r'(?P<alarm>)[AV]?,'
+    r'(?P<time_sync_method>\d)?,'
+    r'(?P<pos_src>[EINS])?,'
+    r'(?P<time_src>[EIN])?' +
+    NMEA_CHECKSUM_RE_STR
+)
+
+ADS_RE = re.compile(ADS_RE_STR)
+
+
+def Ads(line):
+  """Decode Automatic Device Status (ADS)."""
+  try:
+    fields = ADS_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  result = {
+      'msg': 'ADS',
+      'talker': fields['talker'],
+      'id': fields['id'],
+      'time': fields['time'],
+      'alarm': fields['alarm'],
+      'time_sync_method': util.MaybeToNumber(fields['time_sync_method']),
+      'pos_src': fields['pos_src'],
+      'time_src': fields['time_src'],
+  }
+
+  return result
+
+
+HANDLERS['ADS'] = Ads
+
+BBM_RE_STR = (
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>BBM),'
+    r'(?P<sen_tot>\d),'
+    r'(?P<sen_num>\d),'
+    r'(?P<seq_num>\d),'
+    r'(?P<chan>\d),'
+    r'(?P<msg_id>\d),'
+    r'(?P<body>[^,*]*),'
+    r'(?P<fill_bits>\d)' +
+    NMEA_CHECKSUM_RE_STR
+)
+
+BBM_RE = re.compile(BBM_RE_STR)
+
+
+def Bbm(line):
+  """Decode Binary Broadcast Message (BBM) sentence."""
+  try:
+    fields = BBM_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  result = {
+      'msg': 'BBM',
+      'talker': fields['talker'],
+      'body': fields['body'],
+  }
+
+  for field in ('sen_tot', 'sen_num', 'seq_num', 'chan', 'msg_id', 'fill_bits'):
+    result[field] = util.MaybeToNumber(fields[field])
+
+  return result
+
+
+HANDLERS['BBM'] = Bbm
 
 GGA_RE_STR = (
     NMEA_HEADER_RE_STR +
@@ -59,13 +169,14 @@ def Gga(line):
 
   x = int(fields['lon_deg']) + float(fields['lon_min']) / 60.0
   if fields['longitude_hemisphere'] == 'W':
-      x = -x
+    x = -x
 
   y = int(fields['lat_deg']) + float(fields['lat_min']) / 60.0
   if fields['latitude_hemisphere'] == 'S':
-      y = -y
+    y = -y
 
   result = {
+      'msg': 'GGA',
       'time': when,
       'longitude': x,
       'latitude': y,
@@ -79,6 +190,52 @@ def Gga(line):
 
   return result
 
+
+HANDLERS['GGA'] = Gga
+
+
+TXT_RE_STR = (
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>TXT),'
+    r'(?P<sen_tot>\d+)?,'
+    r'(?P<sen_num>\d+)?,'
+    r'(?P<seq_num>\d+)?,'
+    r'(?P<text>[^*,][^\*]*)?'
+    + NMEA_CHECKSUM_RE_STR
+)
+
+TXT_RE = re.compile(TXT_RE_STR)
+
+
+def Txt(line):
+  """Decode Text Transmission (TXT).
+
+  TODO(schwehr): Handle encoded characters.  e.g. ^21 is a '!'.
+
+  Args:
+    line: A string containing a NMEA TXT message.
+
+  Return:
+    A dictionary with the decoded fields.
+  """
+  try:
+    fields = TXT_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  result = {
+      'msg': 'TXT',
+      'talker': fields['talker'],
+      'text': fields['text'],
+  }
+
+  for field in ('sen_tot', 'sen_num', 'seq_num'):
+    result[field] = util.MaybeToNumber(fields[field])
+
+  return result
+
+
+HANDLERS['TXT'] = Txt
 
 # Time in UTC.
 ZDA_RE_STR = (
@@ -103,37 +260,34 @@ def FloatSplit(value):
 
 
 def Zda(line):
-  logging.info('zda line: %s', line)
   try:
     fields = ZDA_RE.match(line).groupdict()
   except TypeError:
     return
 
+  for field in ('year', 'month', 'day', 'hours', 'minutes', 'zone_hours', 'zone_minutes'):
+    if fields[field] is not None and fields[field]:
+      fields[field] = util.MaybeToNumber(fields[field])
+
   seconds, fractional_seconds = FloatSplit(float(fields['seconds']))
   microseconds = int(math.floor(fractional_seconds * 1e6))
   when = datetime.datetime(
-      int(fields['year']),
-      int(fields['month']),
-      int(fields['day']),
-      int(fields['hours']),
-      int(fields['minutes']),
+      fields['year'],
+      fields['month'],
+      fields['day'],
+      fields['hours'],
+      fields['minutes'],
       seconds,
       microseconds)
 
   # TODO(schwehr): Convert this to Unix UTC seconds.
   result = {
-    'msg': 'ZDA',
-    'datetime': when,
+      'msg': 'ZDA',
+      'talker': fields['talker'],
+      'datetime': when,
+      'zone_hours': fields['zone_hours'],
+      'zone_minutes': fields['zone_minutes'],
   }
-
-  try:
-    result['zone_hours'] = int(fields['zone_hours'])
-  except TypeError:
-    pass
-  try:
-    result['zone_minutes'] = int(fields['zone_minutes'])
-  except TypeError:
-    pass
 
   return result
 
@@ -157,6 +311,6 @@ def Decode(line):
   except AttributeError:
     logging.info('Unable to decode line with handle: %s', line)
     return
-  logging.info('decoded: %s', msg)
+
   return msg
 
