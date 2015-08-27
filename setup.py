@@ -89,8 +89,8 @@ setup(name='libais',
       scripts=["bin/aisdecode"],
       entry_points={
           'console_scripts': [
-              'libais_decode = ais.decode:main'
-              'libais_stats = ais.stats:main'
+              'libais_decode = ais.decode:main',
+              'libais_stats = ais.stats:main',
           ]
       },
       test_suite = "test"
