@@ -138,6 +138,80 @@ class BbmTest(unittest.TestCase):
          'talker': 'UP'})
 
 
+class FsrTest(unittest.TestCase):
+
+  def testRegex(self):
+    line = '$SAFSR,D07MN-CH-MTGBS1,000000,A,561,3,41,369,3,-122,696*0F'
+    msg = nmea_messages.FSR_RE.search(line).groupdict()
+    self.assertEqual(
+        msg,
+        {'chan': 'A',
+         'checksum': '0F',
+         'crc_fails': '41',
+         'hours': '00',
+         'id': 'D07MN-CH-MTGBS1',
+         'minutes': '00',
+         'noise_db': '-122',
+         'seconds': '00',
+         'sentence': 'FSR',
+         'slots_above_noise': '696',
+         'slots_recv': '561',
+         'slots_reserved': '369',
+         'slots_reserved_self': '3',
+         'slots_self': '3',
+         'talker': 'SA',
+         'time_utc': '000000'})
+
+  def testDecodeFull(self):
+    line = '$SAFSR,D09MN-SM-GULBS1,000000,B,115,3,5,86,3,-121,124*1F'
+    msg = nmea_messages.Decode(line)
+    self.assertEqual(
+        msg,
+        {'chan': 'B',
+         'crc_fails': 5,
+         'id': 'D09MN-SM-GULBS1',
+         'msg': 'FSR',
+         'noise_db': -121,
+         'slots_above_noise': 124,
+         'slots_recv': 115,
+         'slots_reserved': 86,
+         'slots_reserved_self': 3,
+         'slots_self': 3,
+         'time': datetime.time(0, 0)})
+
+  def testDecodeA(self):
+    line = '$ARFSR,r17MANP1,000001,A,0005,0,0035,,,-128,*66'
+    msg = nmea_messages.Decode(line)
+    self.assertEqual(
+        msg,
+        {'chan': 'A',
+         'crc_fails': 35,
+         'id': 'r17MANP1',
+         'msg': 'FSR',
+         'noise_db': -128,
+         'slots_recv': 5,
+         'slots_self': 0,
+         'time': datetime.time(0, 0, 1)})
+
+  def testDecodeX(self):
+    line = '$ARFSR,b003669708,000004,X,488,0,,,,,*5B'
+    msg = nmea_messages.Decode(line)
+    self.assertEqual(
+        msg,
+        {'chan': 'X',
+         'id': 'b003669708',
+         'msg': 'FSR',
+         'slots_recv': 488,
+         'slots_self': 0,
+         'time': datetime.time(0, 0, 4)})
+
+# $ARFSR,b003669980,001435,X,369,0,,,,,*5A'
+# $ARFSR,r09SSTB1,000003,B,0006,0,0025,,,-115,*60
+# $ARFSR,b003669708,000004,X,488,0,,,,,*5B
+# $ARFSR,rCUDJOE_01,000015,X,132,0,,,,,*36
+# $ARFSR,b003665001,000017,Y,54,0,,,,,*6F
+# $SAFSR,D08MN-NO-GRMBS1,000000,A,979,3,66,945,3,-119,1298*3B
+
 class GgaTest(unittest.TestCase):
 
   def testRegex(self):

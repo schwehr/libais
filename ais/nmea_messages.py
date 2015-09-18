@@ -128,6 +128,55 @@ def Bbm(line):
 
 HANDLERS['BBM'] = Bbm
 
+FSR_RE_STR = (
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>FSR),'
+    r'(?P<id>[^,]+)?,'
+    r'(?P<time_utc>(?P<hours>\d\d)(?P<minutes>\d\d)(?P<seconds>\d\d(\.\d*)?))?,'
+    r'(?P<chan>[A-Z])?,'
+    r'(?P<slots_recv>\d+)?,'
+    r'(?P<slots_self>\d+)?,'
+    r'(?P<crc_fails>\d+)?,'
+    r'(?P<slots_reserved>\d+)?,'
+    r'(?P<slots_reserved_self>\d+)?,'
+    r'(?P<noise_db>[-]?\d+)?,'
+    r'(?P<slots_above_noise>\d+(\.d*)?)?' +
+    NMEA_CHECKSUM_RE_STR
+)
+
+FSR_RE = re.compile(FSR_RE_STR)
+
+def Fsr(line):
+  try:
+    fields = FSR_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  seconds, fractional_seconds = FloatSplit(float(fields['seconds']))
+  microseconds = int(math.floor(fractional_seconds * 1e6))
+
+  when = datetime.time(
+      int(fields['hours']),
+      int(fields['minutes']),
+      seconds,
+      microseconds
+  )
+
+  result = {
+      'msg': 'FSR',
+      'id': fields['id'],
+      'chan': fields['chan'],
+      'time': when,
+  }
+  for field in ('slots_recv', 'slots_self', 'crc_fails', 'slots_reserved',
+                'slots_reserved_self', 'noise_db', 'slots_above_noise'):
+    if fields[field] is not None and fields[field]:
+      result[field] = util.MaybeToNumber(fields[field])
+
+  return result
+
+HANDLERS['FSR'] = Fsr
+
 GGA_RE_STR = (
     NMEA_HEADER_RE_STR +
     r'(?P<sentence>GGA),'
@@ -313,4 +362,3 @@ def Decode(line):
     return
 
   return msg
-
