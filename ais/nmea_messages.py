@@ -18,6 +18,25 @@ NMEA_CHECKSUM_RE = re.compile(NMEA_CHECKSUM_RE_STR)
 
 HANDLERS = {}
 
+
+def TimeUtc(fields):
+  seconds, fractional_seconds = FloatSplit(float(fields['seconds']))
+  microseconds = int(math.floor(fractional_seconds * 1e6))
+
+  fields['seconds'] = seconds
+  fields['microseconds'] = microseconds
+  fields['hours'] = util.MaybeToNumber(fields['hours'])
+  fields['minutes'] = util.MaybeToNumber(fields['minutes'])
+
+  when = datetime.time(
+      fields['hours'],
+      fields['minutes'],
+      seconds,
+      microseconds
+  )
+  fields['when'] = when
+
+
 ABK_RE_STR = (
     NMEA_HEADER_RE_STR +
     r'(?P<sentence>ABK),'
@@ -57,7 +76,7 @@ ADS_RE_STR = (
     NMEA_HEADER_RE_STR +
     r'(?P<sentence>ADS),'
     r'(?P<id>[^,]+?),'
-    r'(?P<time>\d\d\d\d\d\d(\.\d\d)?)?,'
+    r'(?P<time_utc>(?P<hours>\d\d)(?P<minutes>\d\d)(?P<seconds>\d\d\.\d*))?,'
     r'(?P<alarm>)[AV]?,'
     r'(?P<time_sync_method>\d)?,'
     r'(?P<pos_src>[EINS])?,'
@@ -75,21 +94,73 @@ def Ads(line):
   except TypeError:
     return
 
+  TimeUtc(fields)
+
   result = {
       'msg': 'ADS',
       'talker': fields['talker'],
       'id': fields['id'],
-      'time': fields['time'],
       'alarm': fields['alarm'],
       'time_sync_method': util.MaybeToNumber(fields['time_sync_method']),
       'pos_src': fields['pos_src'],
       'time_src': fields['time_src'],
+      'when': fields['when'],
   }
 
   return result
 
 
 HANDLERS['ADS'] = Ads
+
+ALR_RE_STR = (
+    NMEA_HEADER_RE_STR +
+    r'(?P<sentence>ALR),'
+    r'(?P<time_utc>(?P<hours>\d\d)(?P<minutes>\d\d)(?P<seconds>\d\d\.\d*))?,'
+    r'(?P<id>\d+)?,'
+    r'(?P<condition>[AV]),'
+    r'(?P<ack_state>[AV]),'
+    r'(?P<text>[^*]*)' +
+    NMEA_CHECKSUM_RE_STR
+)
+
+ALR_RE = re.compile(ALR_RE_STR)
+
+
+def Alr(line):
+  """Decode Set Alarm State (ALR)."""
+  try:
+    fields = ALR_RE.match(line).groupdict()
+  except TypeError:
+    return
+
+  seconds, fractional_seconds = FloatSplit(float(fields['seconds']))
+  microseconds = int(math.floor(fractional_seconds * 1e6))
+
+  when = datetime.time(
+      int(fields['hours']),
+      int(fields['minutes']),
+      seconds,
+      microseconds
+  )
+
+  result = {
+      'ack_state_raw': fields['ack_state'],
+      'condition_raw': fields['condition'],
+      'id': fields['id'],
+      'msg': 'ALR',
+      'talker': fields['talker'],
+      'text': fields['text'],
+      'time': when,
+  }
+  if fields['ack_state'] in 'AV':
+    result['ack_state'] = ('A' == fields['ack_state'])
+  if fields['condition'] in 'AV':
+    result['condition'] = ('A' == fields['condition'])
+
+  return result
+
+
+HANDLERS['ALR'] = Alr
 
 BBM_RE_STR = (
     NMEA_HEADER_RE_STR +
@@ -314,7 +385,8 @@ def Zda(line):
   except TypeError:
     return
 
-  for field in ('year', 'month', 'day', 'hours', 'minutes', 'zone_hours', 'zone_minutes'):
+  for field in ('year', 'month', 'day', 'hours', 'minutes', 'zone_hours',
+                'zone_minutes'):
     if fields[field] is not None and fields[field]:
       fields[field] = util.MaybeToNumber(fields[field])
 
