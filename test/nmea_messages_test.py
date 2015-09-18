@@ -263,12 +263,6 @@ class FsrTest(unittest.TestCase):
          'slots_self': 0,
          'time': datetime.time(0, 0, 4)})
 
-# $ARFSR,b003669980,001435,X,369,0,,,,,*5A'
-# $ARFSR,r09SSTB1,000003,B,0006,0,0025,,,-115,*60
-# $ARFSR,b003669708,000004,X,488,0,,,,,*5B
-# $ARFSR,rCUDJOE_01,000015,X,132,0,,,,,*36
-# $ARFSR,b003665001,000017,Y,54,0,,,,,*6F
-# $SAFSR,D08MN-NO-GRMBS1,000000,A,979,3,66,945,3,-119,1298*3B
 
 class GgaTest(unittest.TestCase):
 
