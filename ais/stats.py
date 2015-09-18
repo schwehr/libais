@@ -94,7 +94,6 @@ class Stats(object):
 
 def main():
   logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-  # logger = logging.getLogger('fiona.tool')
   logging.info('in main')
 
   parser = argparse.ArgumentParser()
@@ -107,4 +106,3 @@ def main():
       stats.AddFile(open(filename), filename)
 
   stats.PrintSummary()
-
