@@ -15,3 +15,8 @@ dist
 .idea/
 venv/
 test/data/*.gpsdecode.json
+.eggs
+venv
+venv2
+.cache
+.coverage

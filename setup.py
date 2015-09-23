@@ -5,7 +5,8 @@ import sys
 
 from setuptools import setup, find_packages, Extension
 
-VERSION = open('VERSION').readline().strip()
+with open('VERSION') as f:
+    VERSION = f.readline().strip()
 
 EXTRA_COMPILE_ARGS = []
 if sys.platform in ('darwin', 'linux', 'linux2'):
@@ -65,7 +66,7 @@ setup(name='libais',
           'six'
       ],
       extras_require={
-          'test': ['gpsd_format']
+          'test': ['pytest', 'pytest-cov']
       },
       classifiers=[
           'License :: OSI Approved :: Apache Software License',
@@ -93,5 +94,5 @@ setup(name='libais',
               'libais_stats = ais.stats:main',
           ]
       },
-      test_suite = "test"
+      test_suite="test"
       )
