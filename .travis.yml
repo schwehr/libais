@@ -1,18 +1,35 @@
+sudo: false
+
 language: python
 
+env:
+  global:
+    - PIP_WHEEL_DIR=$HOME/.cache/pip/wheels
+    - PIP_FIND_LINKS=file://$HOME/.cache/pip/wheels
+
+cache:
+  directories:
+    - ~/.cache/pip
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.8
+      - g++-4.8
+
 python:
-  - "2.7"
-  - "3.4"
+  - 2.7
+  - 3.4
+  - 3.5
 
 before_install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq
+  - pip install pip setuptools --upgrade
 
 install:
-  - sudo apt-get install -qq gcc-4.8 g++-4.8
   - CC=g++-4.8 python setup.py install
 
 script:
   - python setup.py test
   - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then (cd src && CC=gcc-4.8 CXX=g++-4.8 make -f Makefile-custom test); fi
-
