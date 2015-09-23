@@ -28,8 +28,8 @@ before_install:
   - pip install pip setuptools --upgrade
 
 install:
-  - CC=g++-4.8 python setup.py install
+  - CC=g++-4.8 pip install .\[test\] --upgrade
 
 script:
-  - python setup.py test
+  - py.test test ais --cov ais --cov-report term-missing
   - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then (cd src && CC=gcc-4.8 CXX=g++-4.8 make -f Makefile-custom test); fi
