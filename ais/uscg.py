@@ -149,7 +149,7 @@ class UscgQueue(Queue.Queue):
     station = match['station'] or 'rUnknown'
     sentence_num = int(match['sen_num'])
     sequence_id = match['seq_id'] or ''
-    group_id = station + sequence_id
+    group_id = station + str(sequence_id)
     time = util.MaybeToNumber(match['time'])
 
     if group_id not in self.groups:
