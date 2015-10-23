@@ -1,9 +1,12 @@
 """Helpers for libais."""
 
 
+from types import NoneType
+
+
 def MaybeToNumber(instance):
   """Convert to an int or float if possible."""
-  if isinstance(instance, float) or isinstance(instance, int):
+  if isinstance(instance, (float, int, NoneType)):
     return instance
 
   try:
