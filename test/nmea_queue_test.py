@@ -168,7 +168,7 @@ class NmeaQueueTest(unittest.TestCase):
              'dest': None,
              'group': None,
              'group_id': None,
-             'line_num': '80677',
+             'line_num': 80677,
              'metadata': 'n:80677,s:b003669952,c:1428884269*2A',
              'payload': '!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17',
              'quality': None,
@@ -179,7 +179,7 @@ class NmeaQueueTest(unittest.TestCase):
              'tag_checksum': '2A',
              'text': None,
              'text_date': None,
-             'time': '1428884269'}],
+             'time': 1428884269}],
          'times': [1428884269]})
 
   def testUscgLines(self):
