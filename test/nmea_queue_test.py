@@ -238,7 +238,7 @@ class NmeaQueueTest(unittest.TestCase):
                 'station': 'rMySat',
                 'station_type': 'r',
                 'talker': 'SA',
-                'time': '1429287258',
+                'time': 1429287258,
                 'time_of_arrival': None,
                 'uscg_metadata': ',rMySat,1429287258',
                 'vdm': '!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17',
