@@ -64,14 +64,17 @@ class TagBlockTest(TagTestCase):
     # TAG BLOCK only allows for integer times, but allow for greater precision.
     line = '\\c:1425327399.*70\\'
     match = tag_block.TAG_BLOCK_RE.match(line).groupdict()
-    expected = {'time': '1425327399.'}
+    match['time'] = float(match['time'])
+    match['time'] = int(match['time'])
+    expected = {'time': 1425327399.0}
     self.assertDictContainsSubset2(match, expected)
     self.assertDictContainsSubset2(tag_block.Parse(match), expected)
     self.assertDictContainsSubset2(tag_block.Parse(line), expected)
 
     line = '\\c:1425327399.0*40\\'
     match = tag_block.TAG_BLOCK_RE.match(line).groupdict()
-    expected = {'time': '1425327399.0'}
+    match['time'] = float(match['time'])
+    expected = {'time': 1425327399.0}
     self.assertDictContainsSubset2(match, expected)
     self.assertDictContainsSubset2(tag_block.Parse(match), expected)
     self.assertDictContainsSubset2(tag_block.Parse(line), expected)
@@ -80,13 +83,15 @@ class TagBlockTest(TagTestCase):
     line = (r'\n:121650,s:r17MHOP1,c:1425327399*1D\$'
             'ANZDA,201638.00,02,03,2015,00,00*77')
     match = tag_block.TAG_BLOCK_RE.match(line).groupdict()
+    match['line_num'] = int(match['line_num'])
+    match['time'] = int(match['time'])
     expected = {
-        'line_num': '121650',
+        'line_num': 121650,
         'metadata': 'n:121650,s:r17MHOP1,c:1425327399*1D',
         'payload': '$ANZDA,201638.00,02,03,2015,00,00*77',
         'rcvr': 'r17MHOP1',
         'tag_checksum': '1D',
-        'time': '1425327399'}
+        'time': 1425327399}
     self.assertDictContainsSubset2(match, expected)
     self.assertDictContainsSubset2(tag_block.Parse(match), expected)
     self.assertDictContainsSubset2(tag_block.Parse(line), expected)
@@ -95,21 +100,24 @@ class TagBlockTest(TagTestCase):
     line = (r'\s:Station,d:somewhere,n:2,q:u,r:123,t:A string.,'
             r'c:1425168552,T:2015-03-01 00.09.12*3A\content')
     match = tag_block.TAG_BLOCK_RE.match(line).groupdict()
+    match['line_num'] = int(match['line_num'])
+    match['rel_time'] = int(match['rel_time'])
+    match['time'] = int(match['time'])
     expected = {
         'dest': 'somewhere',
         'group': None,
         'group_id': None,
-        'line_num': '2',
+        'line_num': 2,
         'payload': 'content',
         'quality': 'u',
         'rcvr': 'Station',
-        'rel_time': '123',
+        'rel_time': 123,
         'sentence_num': None,
         'sentence_tot': None,
         'tag_checksum': '3A',
         'text': 'A string.',
         'text_date': '2015-03-01 00.09.12',
-        'time': '1425168552'}
+        'time': 1425168552}
     self.assertDictContainsSubset2(match, expected)
     self.assertDictContainsSubset2(tag_block.Parse(match), expected)
     self.assertDictContainsSubset2(tag_block.Parse(line), expected)
@@ -118,18 +126,23 @@ class TagBlockTest(TagTestCase):
     line = (r'\g:1-3-42349,n:111458,s:r003669945,c:1425327424*41\!'
             'AIVDM,2,1,5,A,ENk`sPa17ab7W@7@1T@6;Q@0h@@=MeR4<7rpH00003v,0*16')
     match = tag_block.TAG_BLOCK_RE.match(line).groupdict()
+    match['group_id'] = int(match['group_id'])
+    match['line_num'] = int(match['line_num'])
+    match['sentence_num'] = int(match['sentence_num'])
+    match['sentence_tot'] = int(match['sentence_tot'])
+    match['time'] = int(match['time'])
     expected = {
         'group': '1-3-42349',
-        'group_id': '42349',
-        'line_num': '111458',
+        'group_id': 42349,
+        'line_num': 111458,
         'metadata': 'g:1-3-42349,n:111458,s:r003669945,c:1425327424*41',
         'payload':
             '!AIVDM,2,1,5,A,ENk`sPa17ab7W@7@1T@6;Q@0h@@=MeR4<7rpH00003v,0*16',
         'rcvr': 'r003669945',
-        'sentence_num': '1',
-        'sentence_tot': '3',
+        'sentence_num': 1,
+        'sentence_tot': 3,
         'tag_checksum': '41',
-        'time': '1425327424'}
+        'time': 1425327424}
     self.assertDictContainsSubset2(match, expected)
     self.assertDictContainsSubset2(tag_block.Parse(match), expected)
     self.assertDictContainsSubset2(tag_block.Parse(line), expected)
@@ -137,14 +150,18 @@ class TagBlockTest(TagTestCase):
   def testMiddleOfGroup(self):
     line = (r'\g:2-3-42349,n:111459*15\!AIVDM,2,2,5,A,P000,2*71')
     match = tag_block.TAG_BLOCK_RE.match(line).groupdict()
+    match['group_id'] = int(match['group_id'])
+    match['line_num'] = int(match['line_num'])
+    match['sentence_num'] = int(match['sentence_num'])
+    match['sentence_tot'] = int(match['sentence_tot'])
     expected = {
         'group': '2-3-42349',
-        'group_id': '42349',
-        'line_num': '111459',
+        'group_id': 42349,
+        'line_num': 111459,
         'metadata': 'g:2-3-42349,n:111459*15',
         'payload': '!AIVDM,2,2,5,A,P000,2*71',
-        'sentence_num': '2',
-        'sentence_tot': '3',
+        'sentence_num': 2,
+        'sentence_tot': 3,
         'tag_checksum': '15'}
     self.assertDictContainsSubset2(match, expected)
     self.assertDictContainsSubset2(tag_block.Parse(match), expected)
@@ -154,14 +171,18 @@ class TagBlockTest(TagTestCase):
     line = (r'\g:3-3-42349,n:111460*1E\$'
             'ARVSI,r003669945,5,201704.05687473,0152,-085,0*2E')
     match = tag_block.TAG_BLOCK_RE.match(line).groupdict()
+    match['group_id'] = int(match['group_id'])
+    match['line_num'] = int(match['line_num'])
+    match['sentence_num'] = int(match['sentence_num'])
+    match['sentence_tot'] = int(match['sentence_tot'])
     expected = {
         'group': '3-3-42349',
-        'group_id': '42349',
-        'line_num': '111460',
+        'group_id': 42349,
+        'line_num': 111460,
         'metadata': 'g:3-3-42349,n:111460*1E',
         'payload': '$ARVSI,r003669945,5,201704.05687473,0152,-085,0*2E',
-        'sentence_num': '3',
-        'sentence_tot': '3',
+        'sentence_num': 3,
+        'sentence_tot': 3,
         'tag_checksum': '1E'}
     self.assertDictContainsSubset2(match, expected)
     self.assertDictContainsSubset2(tag_block.Parse(match), expected)
@@ -171,6 +192,7 @@ class TagBlockTest(TagTestCase):
     line = (r'\s:rORBCOMM999,q:u,c:1424995200,T:2015-02-27 00.00.00*51\!'
             'AIVDM,1,1,,A,14VIk0002sMM04vE>V9jGimn08RP,0*0D')
     match = tag_block.TAG_BLOCK_RE.match(line).groupdict()
+    match['time'] = int(match['time'])
     expected = {
         'metadata': 's:rORBCOMM999,q:u,c:1424995200,T:2015-02-27 00.00.00*51',
         'payload': '!AIVDM,1,1,,A,14VIk0002sMM04vE>V9jGimn08RP,0*0D',
@@ -178,7 +200,7 @@ class TagBlockTest(TagTestCase):
         'rcvr': 'rORBCOMM999',
         'tag_checksum': '51',
         'text_date': '2015-02-27 00.00.00',
-        'time': '1424995200'}
+        'time': 1424995200}
     self.assertDictContainsSubset2(match, expected)
     self.assertDictContainsSubset2(tag_block.Parse(match), expected)
     self.assertDictContainsSubset2(tag_block.Parse(line), expected)
@@ -228,7 +250,7 @@ class TagQueueTestSingleLines(TagTestCase):
         'payload': 'a',
         'rcvr': 'station1',
         'tag_checksum': '78',
-        'time': '1425344187'}
+        'time': 1425344187}
     self.assertDictContainsSubset2(item['matches'][0], expected_match)
 
     item = queue.get()
@@ -243,7 +265,7 @@ class TagQueueTestSingleLines(TagTestCase):
         'payload': 'b',
         'rcvr': 'spacecraft2',
         'tag_checksum': '0E',
-        'time': '1425344304'}
+        'time': 1425344304}
     self.assertDictContainsSubset2(item['matches'][0], expected_match)
 
     item = queue.get()
@@ -257,7 +279,7 @@ class TagQueueTestSingleLines(TagTestCase):
         'metadata': 'c:1425344187,s:station1*78',
         'rcvr': 'station1',
         'tag_checksum': '78',
-        'time': '1425344187'}
+        'time': 1425344187}
     self.assertDictContainsSubset2(item['matches'][0], expected_match)
 
 
@@ -306,7 +328,7 @@ class DecodeTagBlockTest(TagTestCase):
             'dest': None,
             'group': None,
             'group_id': None,
-            'line_num': '852057',
+            'line_num': 852057,
             'metadata': 'n:852057,s:b003669955,c:1428451729*1B',
             'payload': '!ABVDM,1,1,,A,K8VSqb9LdU28WP8p,0*49',
             'quality': None,
@@ -317,7 +339,7 @@ class DecodeTagBlockTest(TagTestCase):
             'tag_checksum': '1B',
             'text': None,
             'text_date': None,
-            'time': '1428451729'}],
+            'time': 1428451729}],
         'times': [1428451729]}
 
     line = (

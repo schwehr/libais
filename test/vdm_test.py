@@ -96,12 +96,12 @@ class ParseTest(TestCase):
         'body': 'B7OeqLP0mB4<LFKO7noASwcUoP06',
         'checksum': '51',
         'vdm_type': 'VDM',
-        'fill_bits': '0',
+        'fill_bits': 0,
         'talker': 'AI',
         'chan': 'A',
-        'sen_num': '1',
+        'sen_num': 1,
         'seq_id': None,
-        'sen_tot': '1'}
+        'sen_tot': 1}
     self.assertDictContainsSubset2(msg, expected)
 
 
@@ -183,9 +183,9 @@ class BareQueueTest(unittest.TestCase):
             'id': 27},
         'matches': [{
             'body': 'K8VSqb9LdU28WP8P',
-            'fill_bits': '0',
-            'sen_num': '1',
-            'sen_tot': '1',
+            'fill_bits': 0,
+            'sen_num': 1,
+            'sen_tot': 1,
             'vdm_type': 'VDM',
             'talker': 'SA',
             'chan': 'B',
@@ -243,11 +243,11 @@ class BareQueueTest(unittest.TestCase):
 
     self.assertEqual(msgs[3]['decoded']['id'], 9)
     self.assertEqual(msgs[3]['decoded']['alt'], 2324)
-    self.assertEqual(msgs[3]['matches'][0]['sen_num'], '1')
+    self.assertEqual(msgs[3]['matches'][0]['sen_num'], 1)
 
     self.assertEqual(msgs[4]['decoded']['id'], 10)
     self.assertEqual(msgs[4]['decoded']['dest_mmsi'], 235089435)
-    self.assertEqual(msgs[4]['matches'][0]['sen_tot'], '1')
+    self.assertEqual(msgs[4]['matches'][0]['sen_tot'], 1)
 
     self.assertEqual(msgs[5]['decoded']['id'], 11)
     self.assertEqual(msgs[5]['decoded']['year'], 2012)
@@ -300,10 +300,10 @@ class BareQueueTest(unittest.TestCase):
                          'Cm2EPH0kk'),
                 'chan': 'A',
                 'checksum': '6D',
-                'fill_bits': '0',
-                'sen_num': '1',
-                'sen_tot': '2',
-                'seq_id': '2',
+                'fill_bits': 0,
+                'sen_num': 1,
+                'sen_tot': 2,
+                'seq_id': 2,
                 'talker': 'AB',
                 'vdm_type': 'VDM',
                 # pylint: disable=line-too-long
@@ -312,10 +312,10 @@ class BareQueueTest(unittest.TestCase):
                 'body': 'UQCU8888880',
                 'chan': 'A',
                 'checksum': '3F',
-                'fill_bits': '2',
-                'sen_num': '2',
-                'sen_tot': '2',
-                'seq_id': '2',
+                'fill_bits': 2,
+                'sen_num': 2,
+                'sen_tot': 2,
+                'seq_id': 2,
                 'talker': 'AB',
                 'vdm_type': 'VDM',
                 'vdm': '!ABVDM,2,2,2,A,UQCU8888880,2*3F'}]}
@@ -402,40 +402,40 @@ class BareQueueTest(unittest.TestCase):
         'matches': [
             {
                 'talker': 'AI',
-                'seq_id': '4',
+                'seq_id': 4,
                 'vdm_type': 'VDM',
-                'sen_tot': '3',
-                'sen_num': '1',
+                'sen_tot': 3,
+                'sen_num': 1,
                 'body': ('81mg=5@0EP:4R40807P>0<D1>MNt00000f>FNVfnw7>6>FNU=?B'
                          '5PD5HDPD8'),
                 'checksum': '26',
                 'chan': 'A',
-                'fill_bits': '0',
+                'fill_bits': 0,
                 # pylint: disable=line-too-long
                 'vdm': '!AIVDM,3,1,4,A,81mg=5@0EP:4R40807P>0<D1>MNt00000f>FNVfnw7>6>FNU=?B5PD5HDPD8,0*26'},
             {
                 'talker': 'AI',
-                'seq_id': '4',
+                'seq_id': 4,
                 'vdm_type': 'VDM',
-                'sen_tot': '3',
-                'sen_num': '2',
+                'sen_tot': 3,
+                'sen_num': 2,
                 'body': ('1Dd2J09jL08JArJH5P=E<D9@<5P<9>0`bMl42Q0d2Pc2T59CPCE@@'
                          '?C54PD?'),
                 'checksum': '60',
                 'chan': 'A',
-                'fill_bits': '0',
+                'fill_bits': 0,
                 # pylint: disable=line-too-long
                 'vdm': '!AIVDM,3,2,4,A,1Dd2J09jL08JArJH5P=E<D9@<5P<9>0`bMl42Q0d2Pc2T59CPCE@@?C54PD?,0*60',},
             {
                 'talker': 'AI',
-                'seq_id': '4',
+                'seq_id': 4,
                 'vdm_type': 'VDM',
-                'sen_tot': '3',
-                'sen_num': '3',
+                'sen_tot': 3,
+                'sen_num': 3,
                 'body': 'd0@d0IqhH:Pah:U54PD?75D85Bf00',
                 'checksum': '03',
                 'chan': 'A',
-                'fill_bits': '0',
+                'fill_bits': 0,
                 'vdm': '!AIVDM,3,3,4,A,d0@d0IqhH:Pah:U54PD?75D85Bf00,0*03'}]
     }
     msg = self.queue.get()
@@ -476,20 +476,20 @@ class BareQueueTest(unittest.TestCase):
     # Spot check each message.
     self.assertEqual(msgs[0]['decoded']['id'], 18)
     self.assertAlmostEqual(msgs[0]['decoded']['x'], -122.76744079589844)
-    self.assertEqual(msgs[0]['matches'][0]['seq_id'], '1')
+    self.assertEqual(msgs[0]['matches'][0]['seq_id'], 1)
 
     self.assertEqual(msgs[1]['decoded']['id'], 5)
     self.assertEqual(msgs[1]['decoded']['name'], 'IRON EAGLE          ')
-    self.assertEqual(msgs[1]['matches'][0]['seq_id'], '6')
+    self.assertEqual(msgs[1]['matches'][0]['seq_id'], 6)
 
     self.assertEqual(msgs[2]['decoded']['id'], 8)
     self.assertEqual(
         msgs[2]['decoded']['sub_areas'][8]['text'], 'ED TOGETHER.@@')
-    self.assertEqual(msgs[2]['matches'][0]['seq_id'], '4')
+    self.assertEqual(msgs[2]['matches'][0]['seq_id'], 4)
 
     self.assertEqual(msgs[3]['decoded']['id'], 5)
     self.assertEqual(msgs[3]['decoded']['callsign'], 'KHJL   ')
-    self.assertEqual(msgs[3]['matches'][0]['seq_id'], '7')
+    self.assertEqual(msgs[3]['matches'][0]['seq_id'], 7)
 
   def testUnhandledSingleLineVdmMessageType(self):
     # AIS 6:669:11 not handled.

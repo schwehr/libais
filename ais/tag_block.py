@@ -10,16 +10,19 @@ TODO(schwehr): Add a queue method to drop old groups caches.
 TODO(schwehr): Catch a wider variety of incomplete groups.
 TODO(schwehr): Compute running stats in the queue.
 """
+
 import hashlib
 import logging
 import re
+
+import six
+import six.moves.queue as Queue
 
 import ais
 from ais import nmea
 from ais import nmea_messages
 from ais import util
 from ais import vdm
-import six.moves.queue as Queue
 
 # Added a decimal value to time beyond the normal TAG BLOCK spec.
 TAG_BLOCK_RE = re.compile(r"""
@@ -39,6 +42,17 @@ TAG_BLOCK_RE = re.compile(r"""
 )+([*](?P<tag_checksum>[0-9A-Fa-f]{2}))?)
 \\)(?P<payload>.*)
 """, re.VERBOSE)
+
+NUMERIC_FIELDS = (
+  'dest',
+  'group',
+  'group_id',
+  'line_num',
+  'rel_time',
+  'sentence_num',
+  'sentence_tot',
+  'time'
+)
 
 
 def Parse(data):
@@ -62,6 +76,9 @@ def Parse(data):
     result = data
   else:
     return
+
+  result.update({k: util.MaybeToNumber(v)
+                 for k, v in six.iteritems(result) if k in NUMERIC_FIELDS})
 
   actual = nmea.Checksum(result['metadata'])
   expected = result['tag_checksum'].upper()

@@ -41,11 +41,12 @@ import hashlib
 import logging
 import re
 
+import six
+import six.moves.queue as Queue
+
 import ais
 from ais import util
 from ais import vdm
-import six.moves.queue as Queue
-
 
 # TODO(schwehr): Sort the parts.
 USCG_RE = re.compile(r"""
@@ -65,6 +66,18 @@ USCG_RE = re.compile(r"""
 )
 """, re.VERBOSE)
 
+NUMERIC_FIELDS = (
+  'counter',
+  'hour',
+  'minute',
+  'receiver_time',
+  'second',
+  'signal_strength',
+  'slot',
+  'time',
+  'time_of_arrival'
+)
+
 
 def Parse(data):
   """Unpack a USCG old metadata format line or return None.
@@ -78,9 +91,14 @@ def Parse(data):
     A vdm dict or None and a metadata dict or None.
   """
   try:
-    return USCG_RE.search(data).groupdict()
+    result = USCG_RE.search(data).groupdict()
   except AttributeError:
     return None
+
+  result.update({k: util.MaybeToNumber(v)
+                 for k, v in six.iteritems(result) if k in NUMERIC_FIELDS})
+
+  return result
 
 
 class UscgQueue(Queue.Queue):
@@ -149,7 +167,7 @@ class UscgQueue(Queue.Queue):
     station = match['station'] or 'rUnknown'
     sentence_num = int(match['sen_num'])
     sequence_id = match['seq_id'] or ''
-    group_id = station + sequence_id
+    group_id = station + str(sequence_id)
     time = util.MaybeToNumber(match['time'])
 
     if group_id not in self.groups:

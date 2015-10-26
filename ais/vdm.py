@@ -62,11 +62,13 @@ import hashlib
 import logging
 import re
 
+import six
+import six.moves.queue as Queue
+
 import ais
 from ais import nmea
 from ais import nmea_messages
-import six.moves.queue as Queue
-
+from ais import util
 
 # Orbcomm sometimes leaves out the channel.
 # TAG BLOCKS use "sentence" as the regex group name.  Use sen here to
@@ -83,6 +85,7 @@ VDM_RE_STR = r"""(?P<vdm>
 """
 
 VDM_RE = re.compile(VDM_RE_STR, re.VERBOSE)
+NUMERIC_FIELDS = ('fill_bits', 'sen_num', 'sen_tot', 'seq_id')
 
 
 def VdmLines(lines):
@@ -110,6 +113,9 @@ def Parse(data):
     result = VDM_RE.search(data).groupdict()
   except AttributeError:
     return
+
+  result.update({k: util.MaybeToNumber(v)
+                 for k, v in six.iteritems(result) if k in NUMERIC_FIELDS})
 
   actual = nmea.Checksum(result['vdm'])
   expected = result['checksum']
