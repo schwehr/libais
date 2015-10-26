@@ -58,7 +58,6 @@ See Also:
   http://www.itu.int/rec/R-REC-M.1371/en
 """
 
-
 import hashlib
 import logging
 import re
@@ -70,7 +69,6 @@ import ais
 from ais import nmea
 from ais import nmea_messages
 from ais import util
-
 
 # Orbcomm sometimes leaves out the channel.
 # TAG BLOCKS use "sentence" as the regex group name.  Use sen here to

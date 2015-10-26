@@ -37,7 +37,6 @@ Example two line message:
 
 """
 
-
 import hashlib
 import logging
 import re
@@ -48,7 +47,6 @@ import six.moves.queue as Queue
 import ais
 from ais import util
 from ais import vdm
-
 
 # TODO(schwehr): Sort the parts.
 USCG_RE = re.compile(r"""
@@ -67,7 +65,6 @@ USCG_RE = re.compile(r"""
 ,(?P<time>\d+([.]\d*)?)?  # Logger timestamp.  Can be hours from receive time.
 )
 """, re.VERBOSE)
-
 
 NUMERIC_FIELDS = (
   'counter',

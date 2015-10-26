@@ -11,7 +11,6 @@ TODO(schwehr): Catch a wider variety of incomplete groups.
 TODO(schwehr): Compute running stats in the queue.
 """
 
-
 import hashlib
 import logging
 import re
@@ -24,7 +23,6 @@ from ais import nmea
 from ais import nmea_messages
 from ais import util
 from ais import vdm
-
 
 # Added a decimal value to time beyond the normal TAG BLOCK spec.
 TAG_BLOCK_RE = re.compile(r"""
@@ -45,7 +43,6 @@ TAG_BLOCK_RE = re.compile(r"""
 \\)(?P<payload>.*)
 """, re.VERBOSE)
 
-
 NUMERIC_FIELDS = (
   'dest',
   'group',
@@ -56,7 +53,6 @@ NUMERIC_FIELDS = (
   'sentence_tot',
   'time'
 )
-
 
 
 def Parse(data):
