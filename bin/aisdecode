@@ -1,4 +1,10 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
+
+"""
+DEPRECATED: Will be removed in v1.0
+"""
+
+import warnings
 
 import ais
 import sys
@@ -13,6 +19,13 @@ try:
     import msgpack
 except:
     msgpack = None
+
+
+warnings.warn(
+    "This utility is deprecated and will be removed in 1.0",
+    FutureWarning,
+    stacklevel=2)
+
 
 args = {"encoding": "json"}
 files = []
@@ -37,7 +50,7 @@ for key in ("uscg", "validate_checksum", "verbose", "allow_unknown", "treat_ab_e
         args[key] = args[key] == 'True'
 
 if "help" in args:
-    print """Usage: aisdecode [OPTIONS] < INFILE.nmea > OUTFILE.json
+    print("""Usage: aisdecode [OPTIONS] < INFILE.nmea > OUTFILE.json
 Available opptions:
     --gpsd Use gpsd compatible output
         --copy-tagblock-timestamp=False
@@ -57,7 +70,7 @@ Available opptions:
 
     --uscg=False
     --validate_checksum=False
-"""
+""")
     sys.exit(0)
 
 encoding = args.pop('encoding', 'json')
