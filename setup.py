@@ -5,8 +5,11 @@ import sys
 
 from setuptools import setup, find_packages, Extension
 
-with open('VERSION') as f:
-    VERSION = f.readline().strip()
+VERSION = None
+with open(os.path.join('ais', '__init__.py')) as f:
+    for line in f:
+        if line.strip().startswith('__version__'):
+            VERSION = line.split('=')[1].strip().replace('"', '').replace("'", '').strip()
 
 EXTRA_COMPILE_ARGS = []
 if sys.platform in ('darwin', 'linux', 'linux2'):
