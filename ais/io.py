@@ -17,13 +17,20 @@ import ais.nmea_queue
 
 
 def open(name, mode='r', **kwargs):
-
-  """
-  Open a file containing NMEA and instantiate an instance of `NMEAFile()`.
+  """Open a file containing NMEA and instantiate an instance of `NmeaFile()`.
+  Lke Python's `open()`, use 'r' for reading.  Writing and updating are not
+  supported.
 
   Args:
     name: A file path, file-like object, or '-' for stdin.
     mode: Open file in this mode for reading.
+
+  Raises:
+    TypeError: Invalid object for name parameter.
+    ValueError: Invalid value for mode parameter.
+
+  Returns:
+    An instance of NmeaFile that is ready for reading.
   """
 
   if 'r' not in mode:
@@ -40,17 +47,15 @@ def open(name, mode='r', **kwargs):
     raise TypeError("'name' must be a file path, file-like object, "
                     "or '-' for stdin.")
 
-  return NMEAFile(fobj)
+  return NmeaFile(fobj)
 
 
-class NMEAFile(object):
+class NmeaFile(object):
 
   """A file-like object for parsing and reading NMEA data."""
 
   def __init__(self, fobj):
-
-    """
-    Construct a parsing stream.
+    """Construct a parsing stream.
 
     Args:
       fobj: File-like object.
