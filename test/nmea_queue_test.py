@@ -1,9 +1,11 @@
 """Tests for ais.nmea_queue."""
 
-from io import StringIO
+import contextlib
 import unittest
 
 import pytest
+import six
+from six.moves import StringIO
 
 import ais
 from ais import nmea
@@ -271,10 +273,10 @@ class NmeaQueueTest(unittest.TestCase):
 
 
 @pytest.mark.parametrize("nmea", [
-    BARE_NMEA.strip(),
-    TAG_BLOCK.strip(),
-    USCG.strip(),
-    MIXED.strip()
+    six.text_type(BARE_NMEA.strip()),
+    six.text_type(TAG_BLOCK.strip()),
+    six.text_type(USCG.strip()),
+    six.text_type(MIXED.strip())
 ])
 def test_NmeaFile_against_queue(nmea):
 
@@ -288,7 +290,7 @@ def test_NmeaFile_against_queue(nmea):
         expected.append(msg)
         msg = queue.GetOrNone()
 
-    with StringIO(nmea) as f, ais.open(f) as src:
+    with contextlib.closing(StringIO(nmea)) as f, ais.open(f) as src:
         actual = list(src)
 
     for e, a in zip(expected, actual):

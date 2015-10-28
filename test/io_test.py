@@ -1,5 +1,6 @@
 """Unittests for ais.io"""
 
+import contextlib
 import sys
 
 import ais
@@ -23,12 +24,13 @@ def test_open_path(typeexamples_nmea_path):
     with ais.open(typeexamples_nmea_path) as src:
         for idx, line in enumerate(src):
             assert isinstance(line, dict)
-        assert idx >= 20, "20 messages was kind of chosen arbitrarily.  Adjust if necessary."
+        assert idx >= 20, "20 messages was kind of chosen arbitrarily.  " \
+                          "Adjust if necessary."
 
 
 def test_open_file_like_object(bare_nmea):
     """Make sure ais.open() can handle a file-like object."""
-    with StringIO(bare_nmea) as f, ais.open(f) as src:
+    with contextlib.closing(StringIO(bare_nmea)) as f, ais.open(f) as src:
         for idx, line in enumerate(src):
             assert isinstance(line, dict)
             print(line)
