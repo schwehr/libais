@@ -31,7 +31,8 @@ def test_open_file_like_object(bare_nmea):
     with StringIO(bare_nmea) as f, ais.open(f) as src:
         for idx, line in enumerate(src):
             assert isinstance(line, dict)
-        assert idx >= 7
+            print(line)
+        assert idx >= 6
 
 
 def test_open_exceptions():
