@@ -7,6 +7,11 @@ import sys
 
 from setuptools import setup, find_packages, Extension
 
+
+with open('README.rst') as f:
+    readme = f.read()
+
+
 with open(os.path.join('ais', '__init__.py')) as f:
   for line in f:
     if line.strip().startswith('__version__'):
@@ -65,6 +70,7 @@ setup(
   name='libais',
   version=VERSION,
   description='Automatic Identification System decoding - ship tracking',
+  long_description=readme,
   author='Kurt Schwehr',
   author_email='schwehr@gmail.com',
   url='https://github.com/schwehr/libais',
