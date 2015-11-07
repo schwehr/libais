@@ -1,6 +1,6 @@
 # -*- makefile -*-
 
-VERSION:=${shell grep __version__ ais/__init__.py | cut -d = -f 2- | sed 's/^ *//g' | sed 's/ *$//g' | sed 's/^.//' | sed 's/.$//'}
+VERSION:=${shell grep __version__ ais/__init__.py | cut -d\' -f 2}
 
 default:
 	@echo
