@@ -1,5 +1,4 @@
-"""
-A file-like interface to NMEA parsing.
+"""A file-like interface to NMEA parsing.
 
 >>> import ais
 >>> import json
