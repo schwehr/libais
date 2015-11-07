@@ -1,6 +1,6 @@
 # -*- makefile -*-
 
-VERSION:=${shell cat VERSION}
+VERSION:=${shell cat ais/__init__.py | grep __version__ | cut -d = -f 2 | xargs}
 
 default:
 	@echo
