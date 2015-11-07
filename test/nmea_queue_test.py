@@ -1,7 +1,13 @@
 """Tests for ais.nmea_queue."""
 
+import contextlib
 import unittest
 
+import pytest
+import six
+from six.moves import StringIO
+
+import ais
 from ais import nmea
 from ais import nmea_queue
 
@@ -264,6 +270,31 @@ class NmeaQueueTest(unittest.TestCase):
     self.assertEqual(
         line_types,
         [nmea.USCG, nmea.BARE, nmea.TAGB, nmea.TEXT])
+
+
+@pytest.mark.parametrize("nmea", [
+    six.text_type(BARE_NMEA.strip()),
+    six.text_type(TAG_BLOCK.strip()),
+    six.text_type(USCG.strip()),
+    six.text_type(MIXED.strip())
+])
+def test_NmeaFile_against_queue(nmea):
+
+    queue = nmea_queue.NmeaQueue()
+    for line in nmea.splitlines():
+        queue.put(line)
+
+    expected = []
+    msg = queue.GetOrNone()
+    while msg:
+        expected.append(msg)
+        msg = queue.GetOrNone()
+
+    with contextlib.closing(StringIO(nmea)) as f, ais.open(f) as src:
+        actual = list(src)
+
+    for e, a in zip(expected, actual):
+        assert e == a
 
 
 if __name__ == '__main__':
