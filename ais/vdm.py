@@ -106,7 +106,7 @@ def VdmLines(lines):
 def Parse(data):
   """Unpack a NMEA VDM AIS message line(s)."""
 
-  if not isinstance(data, str):
+  if not isinstance(data, six.string_types):
     raise NotImplementedError
 
   try:
