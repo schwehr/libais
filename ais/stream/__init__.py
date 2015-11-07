@@ -2,9 +2,16 @@
 
 import sys
 import traceback
+import warnings
 
 import ais
 from ais.stream import checksum
+
+warnings.warn(
+  "The stream module is deprecated and will be removed in 1.0",
+  FutureWarning,
+  stacklevel=2
+)
 
 
 def ErrorPrinter(e,

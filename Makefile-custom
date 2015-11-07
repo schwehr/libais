@@ -1,6 +1,6 @@
 # -*- makefile -*-
 
-VERSION:=${shell cat VERSION}
+VERSION:=${shell grep __version__ ais/__init__.py | cut -d\' -f 2}
 
 default:
 	@echo

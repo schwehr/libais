@@ -1,13 +1,15 @@
 include AUTHOR.txt
-include ChangeLog.html
+include Changelog.md
 include CMakeLists.txt
 include LICENSE
 include Makefile-custom
-include README.org
-include VERSION
-include ais_lut.py
-include maritime_id_codes.py
+include Makefile.am
+include MANIFEST.in
+include README.rst
+include setup.py
 
+recursive-include bin *
 recursive-include docs *.txt *.org Makefile *.csv
 recursive-include src *.cpp *.cc *.h Makefile-custom
 recursive-include test *.py Makefile-custom
+recursive-include utils *
