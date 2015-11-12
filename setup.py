@@ -65,6 +65,11 @@ AIS_MODULE = Extension(
   ]
 )
 
+tests_require = [
+    'pytest',
+    'pytest-cov',
+    'pytest-runner',
+]
 
 setup(
   name='libais',
@@ -75,14 +80,6 @@ setup(
   author_email='schwehr@gmail.com',
   url='https://github.com/schwehr/libais',
   license='Apache 2.0',
-  ext_modules=[AIS_MODULE],
-  packages=find_packages(exclude=['test']),
-  install_requires=[
-    'six'
-  ],
-  extras_require={
-    'test': ['pytest', 'pytest-cov']
-  },
   classifiers=[
     'License :: OSI Approved :: Apache Software License',
     'Development Status :: 4 - Beta',
@@ -101,6 +98,7 @@ setup(
     'Topic :: System :: Networking',
     'Topic :: Scientific/Engineering :: GIS'
   ],
+
   platforms=["POSIX"],
   scripts=[os.path.join('bin', 'aisdecode')],
   entry_points={
@@ -108,5 +106,13 @@ setup(
       'libais_stats=ais.stats:main',
     ]
   },
+
+  ext_modules=[AIS_MODULE],
+  packages=find_packages(exclude=['test']),
+  install_requires=['six'],
+  extras_require={
+      'tests': tests_require,
+  },
+  tests_require=tests_require,
   test_suite="test"
 )

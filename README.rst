@@ -34,13 +34,6 @@ Other open source AIS projects:
 Building
 ========
 
-Building with legacy Makefile
------------------------------
-
-.. code-block:: console
-
-    $ make -f Makefile-custom test
-
 Building with Python
 --------------------
 
@@ -49,6 +42,15 @@ Building with Python
     $ python setup.py build
     $ python setup.py install
 
+Testing with Python
+--------------------
+
+.. code-block:: console
+
+    $ virtualenv ve
+    $ source ve/bin/activate
+    $ python setup.py test
+
 Building with CMake
 -------------------
 
@@ -56,6 +58,13 @@ Building with CMake
 
     $ cmake .
     $ make
+
+Building with legacy Makefile
+-----------------------------
+
+.. code-block:: console
+
+    $ make -f Makefile-custom test
 
 Usage
 =====
@@ -119,5 +128,21 @@ http://google-styleguide.googlecode.com/svn/trunk/cpplint/
 
     $ git clone https://github.com/schwehr/libais
     $ cd libais
-    $ pip install -e .\[test\]
-    $ py.test test ais --cov ais --cov-report term-missing
+    $ virtualenv ve
+    $ source ve/bin/activate
+    $ pip install -e .[tests]
+    $ python setup.py test
+    $ py.test --cov=ais --cov-report term-missing
+
+or
+
+.. code-block:: console
+
+    $ git clone https://github.com/schwehr/libais
+    $ cd libais
+    $ virtualenv ve
+    $ source ve/bin/activate
+    $ pip install -e .[test]
+    $ python setup.py develop
+    $ python setup.py test
+    $ py.test --cov=ais --cov-report term-missing
