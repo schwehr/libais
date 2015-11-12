@@ -162,7 +162,7 @@ unique_ptr<AisMsg> CreateAisMsg(const string &body, const int fill_bits) {
       return MakeUnique<libais::Ais9>(body.c_str(), fill_bits);
 
     case ':':  //  10 - UTC Query
-      return MakeUnique<libais::Ais9>(body.c_str(), fill_bits);
+      return MakeUnique<libais::Ais10>(body.c_str(), fill_bits);
 
     // ';' 11 - See 4
 
@@ -216,6 +216,7 @@ unique_ptr<AisMsg> CreateAisMsg(const string &body, const int fill_bits) {
     default:
       return nullptr;
   }
+
   return nullptr;
 }
 
