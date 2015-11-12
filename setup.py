@@ -84,7 +84,6 @@ setup(
     'License :: OSI Approved :: Apache Software License',
     'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
-    'Interface Engine/Protocol Translator',
     'Operating System :: Android',
     'Operating System :: iOS',
     'Operating System :: POSIX',
@@ -94,9 +93,9 @@ setup(
     'Programming Language :: Python :: Implementation :: CPython',
     'Topic :: Communications',
     'Topic :: Scientific/Engineering :: Information Analysis',
-    'Topic :: Scientific/Engineering :: '
     'Topic :: System :: Networking',
-    'Topic :: Scientific/Engineering :: GIS'
+    'Topic :: Scientific/Engineering :: GIS',
+    'Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator',
   ],
 
   platforms=["POSIX"],
