@@ -1,6 +1,24 @@
 Changelog and release history for libais
 ========================================
 
+0.16 - 2015-11-12
+-----------------
+
+* Make setup.py more functional for development and testing
+* Version number is now in ais/__init__.py
+* Travis-CI container testing
+* Converted README.org to README.rst
+* Converted Changelog.html to Changelog.md
+* Add ais/io.py
+* Add ais/nmea_messages.py for non-AIS messages
+* Some improvements to ais/stream and aisdecode, but they are now deprecated
+* TAG Block and USCG parsing converts message parts to python types
+* Moved python code out of the top level directory
+* Remove legacy SQL, Nagios and NAIS tools
+* Fix initialization of ais12, ais16, ais17, ais18, ais8_1_22, ais8_366_22
+* Fix memory leak in python handling of ais20
+* Add C++ decode_body and vdm handler
+
 0.15 - 2015-06-16
 -----------------
 
