@@ -25,6 +25,7 @@ python:
 
 before_install:
   - pip install pip setuptools --upgrade
+  - pip install --upgrade pytest pytest-cov
 
 install:
   - CC=g++-5 pip install .\[test\] --upgrade
