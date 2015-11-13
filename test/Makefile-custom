@@ -3,6 +3,6 @@ all:
 	echo "NOP"
 
 clean:
-	(cd compatibility && make -f Makefile-custom clean) 
+	(cd compatibility && $(MAKE) -f Makefile-custom clean)
 	rm -f *.pyc
 

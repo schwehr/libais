@@ -1,13 +1,13 @@
 # -*- makefile -*-
 all:
-	(cd libais && make -f Makefile-custom all)
-	(cd test && make -f Makefile-custom all)
+	(cd libais && $(MAKE) -f Makefile-custom all)
+	(cd test && $(MAKE) -f Makefile-custom all)
 
 clean:
-	(cd libais && make -f Makefile-custom clean)
-	(cd test && make -f Makefile-custom clean)
+	(cd libais && $(MAKE) -f Makefile-custom clean)
+	(cd test && $(MAKE) -f Makefile-custom clean)
 
 .PHONY: test
 test:
-	(cd libais && make -f Makefile-custom)
-	(cd test && make -f Makefile-custom test)
+	(cd libais && $(MAKE) -f Makefile-custom)
+	(cd test && $(MAKE) -f Makefile-custom test)

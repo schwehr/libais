@@ -84,7 +84,7 @@ maintainer-clean: real-clean
 
 .PHONY: test
 test:
-	(cd src; make -f Makefile-custom test)
+	(cd src; $(MAKE) -f Makefile-custom test)
 
 # Hard coded depends
 src/libais/ais.o: src/libais/ais.h
