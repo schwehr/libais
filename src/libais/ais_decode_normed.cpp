@@ -1,3 +1,8 @@
+// This file is deprecated.  I plan to make a new C++ decoder based on vdm.cc
+// and to make C++ based TAG Block and USCG metadata handlers.
+//
+// Do not expect this file to build or really work.
+
 #include "ais.h"
 
 #include <fstream>
@@ -5,8 +10,6 @@
 #include <cstring>
 #include <sstream>
 #include <string>
-
-#define UNUSED __attribute((__unused__))
 
 using std::stringstream;
 
@@ -27,7 +30,6 @@ vector<string> split(const string &s, char delim) {
 
 
 int main(int argc,  char* argv[]) {
-  build_nmea_lookup();
   assert(2 <= argc);
   std::ifstream infile(argv[1]);
   if (!infile.is_open()) {
@@ -48,9 +50,10 @@ int main(int argc,  char* argv[]) {
       if (fields.size() < 7) continue;
       if (fields[5].size() < 5) continue;
       if (fields[5][0] != '5') continue;
-      Ais5 m5(fields[5].c_str());
+      Ais5 m5(fields[5].c_str(), 2);
       if (m5.had_error()) continue;
-      std::cout << m5.mmsi << "," << m5.name << "," << m5.callsign << "," << m5.type_and_cargo << std::endl;
+      std::cout << m5.mmsi << "," << m5.name << "," << m5.callsign << ","
+                << m5.type_and_cargo << std::endl;
     }
   }
   return 0;

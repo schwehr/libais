@@ -105,6 +105,7 @@ clean:
 	-rm -rf *.o *.a *.pyc
 	-rm -rf *.d *.dSYM
 
+# Deprecated.
 ais_decode_normed: ${OBJS} ais_decode_normed.o ais.h
 	@echo SRCS: ${SRCS}
 	@echo OBJS: ${OBJS}
