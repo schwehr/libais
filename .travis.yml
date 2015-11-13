@@ -18,6 +18,7 @@ addons:
     packages:
       - gcc-5
       - g++-5
+      - python-pytest
 
 python:
   - 2.7
