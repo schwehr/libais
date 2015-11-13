@@ -85,8 +85,6 @@ maintainer-clean: real-clean
 .PHONY: test
 test:
 	(cd src; make -f Makefile-custom test)
-	python2 setup.py test
-	python3 setup.py test
 
 # Hard coded depends
 src/libais/ais.o: src/libais/ais.h
