@@ -146,5 +146,29 @@ TEST(Ais8_367_22Test, PolylinesTest) {
                {19200, 24000, 24700}, 0);
 }
 
+#if 0
+// TODO: Get this to work.
+TEST(Ais8_367_22Test, DecodeUscgWhaleBouyTest2) {
+  // clang-format off
+  // !ANVDM,1,1,,A,8h3Ovq1KmPHu08aTp3oh1cG=91LUBh@00000T02upLGve2us@000,0*65,r08ACERDC,1428669597 NOLINT
+  // clang-format on
+  std::unique_ptr<Ais8_367_22> msg(new Ais8_367_22(
+      "8h3Ovq1KmPHu08aTp3oh1cG=91LUBh@00000T02upLGve2us@000", 0));
+  Validate(msg.get(), 3, 3669732, 104, 0, 4, 10, 17, 0, 60);
+
+  ASSERT_EQ(1, msg->sub_areas.size());
+
+  ASSERT_EQ(AIS8_366_22_SHAPE_CIRCLE, msg->sub_areas[0]->getType());
+
+  Ais8_367_22_Circle *circle =
+      dynamic_cast<Ais8_367_22_Circle *>(msg->sub_areas[0]);
+  EXPECT_NEAR(-70.1184, circle->position.lng_deg, 0.0001);
+  EXPECT_NEAR(42.3113, circle->position.lat_deg, 0.0001);
+  EXPECT_EQ(2, circle->precision);
+  EXPECT_EQ(9260, circle->radius_m);
+  EXPECT_EQ(0, circle->spare);
+}
+#endif
+
 }  // namespace
 }  // namespace libais
