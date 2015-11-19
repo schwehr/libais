@@ -48,6 +48,8 @@ import ais
 from ais import util
 from ais import vdm
 
+logger = logging.getLogger('libais')
+
 # TODO(schwehr): Sort the parts.
 USCG_RE = re.compile(r"""
 (?P<payload>[^*]*\*[A-F0-9][A-F0-9])
@@ -121,7 +123,7 @@ class UscgQueue(Queue.Queue):
     match = vdm.Parse(line)
 
     if not match:
-      logging.info('not match')
+      logger.info('not match')
       msg = {
           'line_nums': [self.line_num],
           'lines': [line],
@@ -132,7 +134,7 @@ class UscgQueue(Queue.Queue):
       return
 
     if not metadata_match:
-      logging.info('not metadata match')
+      logger.info('not metadata match')
       self.unknown_queue.put(line)
       if not self.unknown_queue.empty():
         msg = Queue.Queue.get()
@@ -152,7 +154,7 @@ class UscgQueue(Queue.Queue):
       try:
         decoded = ais.decode(body, fill_bits)
       except ais.DecodeError as error:
-        logging.error(
+        logger.error(
             'Unable to decode message: %s\n  %d %s', error, self.line_num, line)
         return
       decoded['md5'] = hashlib.md5(body.encode('utf-8')).hexdigest()
@@ -202,7 +204,7 @@ class UscgQueue(Queue.Queue):
     if decoded:
       entry['decoded'] = decoded
     else:
-      logging.info('Unable to process: %s', entry)
+      logger.info('Unable to process: %s', entry)
     Queue.Queue.put(self, entry)
     self.groups.pop(group_id)
 
@@ -215,7 +217,7 @@ def DecodeMultiple(message):
   for line in vdm.VdmLines(payloads):
     q.put(line)
   if q.qsize() != 1:
-    logging.info('Error: Should get just one message decoded from this: %s',
+    logger.info('Error: Should get just one message decoded from this: %s',
                  message)
     return
   msg = q.get()

@@ -8,6 +8,8 @@ import re
 
 from ais import util
 
+logger = logging.getLogger('libais')
+
 NMEA_HEADER_RE_STR = r'[$!](?P<talker>[A-Z][A-Z])'
 NMEA_SENTENCE_RE_STR = NMEA_HEADER_RE_STR + r'(?P<sentence>[A-Z]{3,4}),'
 NMEA_CHECKSUM_RE_STR = r'\*(?P<checksum>[0-9A-F][0-9A-F])'
@@ -424,13 +426,13 @@ def Decode(line):
     return
 
   if sentence not in HANDLERS:
-    logging.info('skipping: %s', line)
+    logger.info('skipping: %s', line)
     return
 
   try:
     msg = HANDLERS[sentence](line)
   except AttributeError:
-    logging.info('Unable to decode line with handle: %s', line)
+    logger.info('Unable to decode line with handle: %s', line)
     return
 
   return msg

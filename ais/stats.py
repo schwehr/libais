@@ -9,6 +9,8 @@ import sys
 
 from ais import nmea_queue
 
+logger = logging.getLogger('libais')
+
 
 class TrackRange(object):
 
@@ -79,27 +81,27 @@ class Stats(object):
   def PrintSummary(self):
     pprint.pprint(self.counts)
 
-    logging.info('time_range: [%s to %s]',
+    logger.info('time_range: [%s to %s]',
                  self.time_range.min,
                  self.time_range.max)
 
-    logging.info('%s', datetime.datetime.utcfromtimestamp(self.time_range.min))
-    logging.info('%s', datetime.datetime.utcfromtimestamp(self.time_range.max))
+    logger.info('%s', datetime.datetime.utcfromtimestamp(self.time_range.min))
+    logger.info('%s', datetime.datetime.utcfromtimestamp(self.time_range.max))
 
-    logging.info('time_delta_range: [%s to %s]',
+    logger.info('time_delta_range: [%s to %s]',
                  self.time_delta_range.min,
                  self.time_delta_range.max)
 
 
 
 def main():
-  logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-  logging.info('in main')
+  logger.setLevel(logging.INFO)
+  logger.info('in main')
 
   parser = argparse.ArgumentParser()
   parser.add_argument('filenames', type=str, nargs='+', help='NMEA files')
   args = parser.parse_args()
-  logging.info('args: %s', args)
+  logger.info('args: %s', args)
 
   stats = Stats()
   for filename in args.filenames:

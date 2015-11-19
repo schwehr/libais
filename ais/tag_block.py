@@ -24,6 +24,8 @@ from ais import nmea_messages
 from ais import util
 from ais import vdm
 
+logger = logging.getLogger('libais')
+
 # Added a decimal value to time beyond the normal TAG BLOCK spec.
 TAG_BLOCK_RE = re.compile(r"""
 (\\
@@ -129,12 +131,12 @@ class TagQueue(Queue.Queue):
       if decoded:
         msg['decoded'] = decoded
       else:
-        logging.info('Unable to decode. Passing without decoded block.')
+        logger.info('Unable to decode. Passing without decoded block.')
         decoded = nmea_messages.Decode(match['payload'])
         if decoded:
           msg['decoded'] = decoded
         else:
-          logging.info('No NMEA match for line: %d, %s', line_num, line)
+          logger.info('No NMEA match for line: %d, %s', line_num, line)
       Queue.Queue.put(self, msg)
       return
 
@@ -152,7 +154,7 @@ class TagQueue(Queue.Queue):
       return
 
     if group_id not in self.groups:
-      logging.error('group_id not in groups: %d', group_id)
+      logger.error('group_id not in groups: %d', group_id)
       return
 
     entry = self.groups[group_id]
@@ -170,7 +172,7 @@ class TagQueue(Queue.Queue):
     if decoded:
       entry['decoded'] = decoded
     else:
-      logging.info('Unable to process: %s', entry)
+      logger.info('Unable to process: %s', entry)
     Queue.Queue.put(self, entry)
     self.groups.pop(group_id)
 
@@ -187,13 +189,13 @@ def DecodeTagSingle(tag_block_message):
   line = tag_block_message['matches'][0]['payload']
   match = vdm.Parse(line)
   if not match:
-    logging.info('Single line NMEA TAG block decode failed for: %s',
+    logger.info('Single line NMEA TAG block decode failed for: %s',
                  tag_block_message)
     return
 
   sentence_total = int(match['sen_tot'])
   if sentence_total != 1:
-    logging.error('Multi-line message? %s', tag_block_message)
+    logger.error('Multi-line message? %s', tag_block_message)
     return
 
   body = match['body']
@@ -201,7 +203,7 @@ def DecodeTagSingle(tag_block_message):
   try:
     decoded = ais.decode(body, fill_bits)
   except ais.DecodeError as error:
-    logging.error('Unable to decode: %s', error)
+    logger.error('Unable to decode: %s', error)
     return
 
   decoded['md5'] = hashlib.md5(body.encode('utf-8')).hexdigest()
@@ -216,7 +218,7 @@ def DecodeTagMultiple(tag_block_message):
   for line in vdm.VdmLines(payloads):
     q.put(line)
   if q.qsize() != 1:
-    logging.info('Error: Should get just one message decoded from this: %s',
+    logger.info('Error: Should get just one message decoded from this: %s',
                  tag_block_message)
     return
   msg = q.get()
