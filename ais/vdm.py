@@ -70,6 +70,8 @@ from ais import nmea
 from ais import nmea_messages
 from ais import util
 
+logger = logging.getLogger('libais')
+
 # Orbcomm sometimes leaves out the channel.
 # TAG BLOCKS use "sentence" as the regex group name.  Use sen here to
 # avoid collision.
@@ -153,7 +155,7 @@ class BareQueue(Queue.Queue):
     match = Parse(line)
 
     if not match:
-      logging.info('No VDM match for line: %d, %s', line_num, line)
+      logger.info('No VDM match for line: %d, %s', line_num, line)
       msg = {
           'line_nums': [line_num],
           'lines': [line]}
@@ -161,7 +163,7 @@ class BareQueue(Queue.Queue):
       if decoded:
         msg['decoded'] = decoded
       else:
-        logging.info('No NMEA match for line: %d, %s', line_num, line)
+        logger.info('No NMEA match for line: %d, %s', line_num, line)
       Queue.Queue.put(self, msg)
       return
 
@@ -172,7 +174,7 @@ class BareQueue(Queue.Queue):
       try:
         decoded = ais.decode(body, fill_bits)
       except ais.DecodeError as error:
-        logging.error(
+        logger.error(
             'Unable to decode message: %s\n  %d %s', error, line_num, line)
         return
       decoded['md5'] = hashlib.md5(body.encode('utf-8')).hexdigest()
@@ -189,7 +191,7 @@ class BareQueue(Queue.Queue):
 
     if sentence_num == 1:
       if group_id in self.groups:
-        logging.error('Incomplete message overwritten by new start.  '
+        logger.error('Incomplete message overwritten by new start.  '
                       'Dropped:\n  %s', self.groups[group_id])
       self.groups[group_id] = {
           'line_nums': [line_num],
@@ -199,13 +201,13 @@ class BareQueue(Queue.Queue):
       return
 
     if group_id not in self.groups:
-      logging.error('Do not have the prior lines in group_id %d. '
+      logger.error('Do not have the prior lines in group_id %d. '
                     'Dropping: \n  %s', group_id, line)
       return
 
     entry = self.groups[group_id]
     if len(entry['lines']) != sentence_num - 1:
-      logging.error('Out of sequence message.  Dropping: %d != %d \n %s',
+      logger.error('Out of sequence message.  Dropping: %d != %d \n %s',
                     len(entry['lines']), sentence_num - 1, line)
       return
 
@@ -222,7 +224,7 @@ class BareQueue(Queue.Queue):
     try:
       decoded = ais.decode(body, fill_bits)
     except ais.DecodeError as error:
-      logging.error(
+      logger.error(
           'Unable to decode message: %s\n%s', error, entry)
       return
     decoded['md5'] = hashlib.md5(body.encode('utf-8')).hexdigest()
