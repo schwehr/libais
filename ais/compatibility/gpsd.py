@@ -58,7 +58,7 @@ class Mangler(object):
 
   def mangle__rot(self, res, msg):
     if msg['rot_over_range']:
-      res['turn'] = 'nan'
+      res['turn'] = None
     else:
       res['turn'] = msg['rot']
 
