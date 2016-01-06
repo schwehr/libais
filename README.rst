@@ -24,7 +24,7 @@ See Also
 Other open source AIS projects:
 
 - `GPSd <http://en.wikipedia.org/wiki/Gpsd>`_
-- `AisLib <http://github.com/DaMSA/AisLib>`_
+- `AisLib <https://github.com/dma-ais/AisLib>`_
 - `noaadata <http://github.com/schwehr/noaadata>`_
 - `ais-areanotice <https://github.com/schwehr/ais-areanotice-py>`_
 - `OpenCPN <https://github.com/OpenCPN/OpenCPN>`_
