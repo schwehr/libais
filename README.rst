@@ -24,12 +24,12 @@ See Also
 Other open source AIS projects:
 
 - `GPSd <http://en.wikipedia.org/wiki/Gpsd>`_
-- `FreeAIS.org <http://www.freeais.org/>`_ - does this actually decode AIS?
-- `AisLib <http://github.com/DaMSA/AisLib>`_
+- `AisLib <https://github.com/dma-ais/AisLib>`_
 - `noaadata <http://github.com/schwehr/noaadata>`_
 - `ais-areanotice <https://github.com/schwehr/ais-areanotice-py>`_
 - `OpenCPN <https://github.com/OpenCPN/OpenCPN>`_
 - `aisparser <https://github.com/bcl/aisparser>`_
+- `nmea_plus <https://github.com/ifreecarve/nmea_plus>`_
 
 Building
 ========
