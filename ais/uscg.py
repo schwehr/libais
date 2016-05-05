@@ -41,11 +41,14 @@ import hashlib
 import logging
 import re
 
+import six
+import six.moves.queue as Queue
+
 import ais
 from ais import util
 from ais import vdm
-import six.moves.queue as Queue
 
+logger = logging.getLogger('libais')
 
 # TODO(schwehr): Sort the parts.
 USCG_RE = re.compile(r"""
@@ -65,6 +68,18 @@ USCG_RE = re.compile(r"""
 )
 """, re.VERBOSE)
 
+NUMERIC_FIELDS = (
+  'counter',
+  'hour',
+  'minute',
+  'receiver_time',
+  'second',
+  'signal_strength',
+  'slot',
+  'time',
+  'time_of_arrival'
+)
+
 
 def Parse(data):
   """Unpack a USCG old metadata format line or return None.
@@ -78,9 +93,14 @@ def Parse(data):
     A vdm dict or None and a metadata dict or None.
   """
   try:
-    return USCG_RE.search(data).groupdict()
+    result = USCG_RE.search(data).groupdict()
   except AttributeError:
     return None
+
+  result.update({k: util.MaybeToNumber(v)
+                 for k, v in six.iteritems(result) if k in NUMERIC_FIELDS})
+
+  return result
 
 
 class UscgQueue(Queue.Queue):
@@ -103,7 +123,7 @@ class UscgQueue(Queue.Queue):
     match = vdm.Parse(line)
 
     if not match:
-      logging.info('not match')
+      logger.info('not match')
       msg = {
           'line_nums': [self.line_num],
           'lines': [line],
@@ -114,7 +134,7 @@ class UscgQueue(Queue.Queue):
       return
 
     if not metadata_match:
-      logging.info('not metadata match')
+      logger.info('not metadata match')
       self.unknown_queue.put(line)
       if not self.unknown_queue.empty():
         msg = Queue.Queue.get()
@@ -134,7 +154,7 @@ class UscgQueue(Queue.Queue):
       try:
         decoded = ais.decode(body, fill_bits)
       except ais.DecodeError as error:
-        logging.error(
+        logger.error(
             'Unable to decode message: %s\n  %d %s', error, self.line_num, line)
         return
       decoded['md5'] = hashlib.md5(body.encode('utf-8')).hexdigest()
@@ -149,7 +169,7 @@ class UscgQueue(Queue.Queue):
     station = match['station'] or 'rUnknown'
     sentence_num = int(match['sen_num'])
     sequence_id = match['seq_id'] or ''
-    group_id = station + sequence_id
+    group_id = station + str(sequence_id)
     time = util.MaybeToNumber(match['time'])
 
     if group_id not in self.groups:
@@ -184,7 +204,7 @@ class UscgQueue(Queue.Queue):
     if decoded:
       entry['decoded'] = decoded
     else:
-      logging.info('Unable to process: %s', entry)
+      logger.info('Unable to process: %s', entry)
     Queue.Queue.put(self, entry)
     self.groups.pop(group_id)
 
@@ -197,7 +217,7 @@ def DecodeMultiple(message):
   for line in vdm.VdmLines(payloads):
     q.put(line)
   if q.qsize() != 1:
-    logging.info('Error: Should get just one message decoded from this: %s',
+    logger.info('Error: Should get just one message decoded from this: %s',
                  message)
     return
   msg = q.get()

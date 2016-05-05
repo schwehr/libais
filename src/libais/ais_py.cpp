@@ -2409,7 +2409,10 @@ ais20_to_pydict(const char *nmea_payload, const size_t pad) {
     PyList_SetItem(list, 3, reservation);
   }
 
-  PyDict_SetItem(dict, PyUnicode_FromString("reservations"), list);
+  PyObject * reservations = PyUnicode_FromString("reservations");
+  PyDict_SetItem(dict, reservations, list);
+  Py_DECREF(reservations);
+  Py_DECREF(list);
 
   return dict;
 }

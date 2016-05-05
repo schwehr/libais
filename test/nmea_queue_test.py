@@ -1,7 +1,13 @@
 """Tests for ais.nmea_queue."""
 
+import contextlib
 import unittest
 
+import pytest
+import six
+from six.moves import StringIO
+
+import ais
 from ais import nmea
 from ais import nmea_queue
 
@@ -117,9 +123,9 @@ class NmeaQueueTest(unittest.TestCase):
              'body': '23?up2001gGRju>Ap:;R2APP08:c',
              'chan': 'B',
              'checksum': '0E',
-             'fill_bits': '0',
-             'sen_num': '1',
-             'sen_tot': '1',
+             'fill_bits': 0,
+             'sen_num': 1,
+             'sen_tot': 1,
              'seq_id': None,
              'talker': 'AI',
              'vdm_type': 'VDM',
@@ -136,10 +142,11 @@ class NmeaQueueTest(unittest.TestCase):
     while not queue.empty():
       msgs.append(queue.get())
 
-    self.assertNotIn('decoded', msgs[0])
+    # self.assertNotIn('decoded', msgs[0])
+    # TODO(schwehr): Check the ZDA message decoding.
     for msg_num in range(1, 5):
       self.assertIn('decoded', msgs[msg_num])
-    ids = [msg['decoded']['id'] for msg in msgs if 'decoded' in msg]
+    ids = [msg['decoded']['id'] for msg in msgs[1:] if 'decoded' in msg]
     self.assertEqual(ids, [11, 5, 5, 3, 27])
 
     self.assertEqual(
@@ -167,7 +174,7 @@ class NmeaQueueTest(unittest.TestCase):
              'dest': None,
              'group': None,
              'group_id': None,
-             'line_num': '80677',
+             'line_num': 80677,
              'metadata': 'n:80677,s:b003669952,c:1428884269*2A',
              'payload': '!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17',
              'quality': None,
@@ -178,7 +185,7 @@ class NmeaQueueTest(unittest.TestCase):
              'tag_checksum': '2A',
              'text': None,
              'text_date': None,
-             'time': '1428884269'}],
+             'time': 1428884269}],
          'times': [1428884269]})
 
   def testUscgLines(self):
@@ -222,22 +229,22 @@ class NmeaQueueTest(unittest.TestCase):
                 'chan': 'B',
                 'checksum': '17',
                 'counter': None,
-                'fill_bits': '0',
+                'fill_bits': 0,
                 'hour': None,
                 'minute': None,
                 'payload': '!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17',
                 'receiver_time': None,
                 'rssi': None,
                 'second': None,
-                'sen_num': '1',
-                'sen_tot': '1',
+                'sen_num': 1,
+                'sen_tot': 1,
                 'seq_id': None,
                 'signal_strength': None,
                 'slot': None,
                 'station': 'rMySat',
                 'station_type': 'r',
                 'talker': 'SA',
-                'time': '1429287258',
+                'time': 1429287258,
                 'time_of_arrival': None,
                 'uscg_metadata': ',rMySat,1429287258',
                 'vdm': '!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17',
@@ -263,6 +270,31 @@ class NmeaQueueTest(unittest.TestCase):
     self.assertEqual(
         line_types,
         [nmea.USCG, nmea.BARE, nmea.TAGB, nmea.TEXT])
+
+
+@pytest.mark.parametrize("nmea", [
+    six.text_type(BARE_NMEA.strip()),
+    six.text_type(TAG_BLOCK.strip()),
+    six.text_type(USCG.strip()),
+    six.text_type(MIXED.strip())
+])
+def test_NmeaFile_against_queue(nmea):
+
+    queue = nmea_queue.NmeaQueue()
+    for line in nmea.splitlines():
+        queue.put(line)
+
+    expected = []
+    msg = queue.GetOrNone()
+    while msg:
+        expected.append(msg)
+        msg = queue.GetOrNone()
+
+    with contextlib.closing(StringIO(nmea)) as f, ais.open(f) as src:
+        actual = list(src)
+
+    for e, a in zip(expected, actual):
+        assert e == a
 
 
 if __name__ == '__main__':

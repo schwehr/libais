@@ -1,4 +1,5 @@
 *.o
+*.so
 *.a
 [0-9]*
 build
@@ -12,3 +13,11 @@ test_libais
 *core*
 _ais.so
 dist
+.idea/
+venv/
+test/data/*.gpsdecode.json
+.eggs
+venv2
+.cache
+.coverage
+.DS_Store

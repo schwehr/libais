@@ -1,6 +1,4 @@
 prefix,country
-# prefix is used as DAC for binary messages or as the 1st three of the MMSI
-# http://www.itu.int/online/mms/glad/cga_mids.sh?lng=E
 201,"Albania (Republic of)"
 202,"Andorra (Principality of)"
 203,"Austria"
@@ -229,7 +227,7 @@ prefix,country
 617,"Cabo Verde (Republic of)"
 618,"Crozet Archipelago - France"
 619,"Cote d'Ivoire (Republic of)"
-"620,"Comoros (Union of the)"
+620,"Comoros (Union of the)"
 621,"Djibouti (Republic of)"
 622,"Egypt (Arab Republic of)"
 624,"Ethiopia (Federal Democratic Republic of)"

@@ -1,6 +1,6 @@
 # -*- makefile -*-
 
-VERSION:=${shell cat VERSION}
+VERSION:=${shell grep __version__ ais/__init__.py | cut -d\' -f 2}
 
 default:
 	@echo
@@ -18,10 +18,12 @@ default:
 	@echo
 	@echo "Read the README for more information"
 
-all: python2 python3
-	(cd src; make -f Makefile-custom all)
+all: python2 python3 lib
 
-DIST:=libais-${shell cat VERSION}
+lib:
+	(cd src/libais; make -f Makefile-custom all)
+
+DIST:=libais-${VERSION}
 TAR:=${DIST}.tar
 tar:
 	rm -f ${TAR}.bz2 ${TAR}
@@ -43,7 +45,7 @@ clean:
 	(cd ais && make -f Makefile-custom clean)
 	(cd src && make -f Makefile-custom clean)
 	(cd test && make -f Makefile-custom clean)
-	-rm -rf build
+	rm -rf build
 	rm -f _ais.so
 	rm -rf */__pycache__
 	rm -rf *.egg-info
@@ -53,14 +55,15 @@ real-clean: clean
 	rm -rf build dist
 	find . -name .DS_Store | xargs rm -f
 	rm -f test/typeexamples.gpsdecode.json
-	find . -name \*.o | xargs rm
-	find . -name \*.a | xargs rm
-	find . -name \*.la | xargs rm
+	find . -name \*.o | xargs rm -f
+	find . -name \*.a | xargs rm -f
+	find . -name \*.la | xargs rm -f
+	find . -name \*.so | xargs rm -f
 	echo "cmake files:"
 	rm -rf CMakeCache.txt
 	rm -f Makefile
-	find src -name Makefile | xargs rm
-	find . -name cmake_install.cmake | xargs rm
+	find src -name Makefile | xargs rm -f
+	find . -name cmake_install.cmake | xargs rm -rf
 	find . -name CMakeFiles | xargs rm -rf
 
 # This is more aggressive than the GNU idea of mainter-clean.
@@ -76,14 +79,12 @@ maintainer-clean: real-clean
 	rm -f ltmain.sh
 	rm -f m4/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m4
 	rm -f missing
-	find . -name .deps | xargs rm -r
-	find . -name .libs | xargs rm -r
+	find . -name .deps | xargs rm -rf
+	find . -name .libs | xargs rm -rf
 
 .PHONY: test
 test:
-	(cd src; make -f Makefile-custom test)
-	python2 setup.py test
-	python3 setup.py test
+	(cd src; $(MAKE) -f Makefile-custom test)
 
 # Hard coded depends
 src/libais/ais.o: src/libais/ais.h

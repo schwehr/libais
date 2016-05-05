@@ -2,24 +2,33 @@
 
 #include "ais.h"
 
+extern "C" {
+int LibAisVersionMajor() {
+  return LIBAIS_VERSION_MAJOR;
+}
+
+int LibAisVersionMinor() {
+  return LIBAIS_VERSION_MINOR;
+}
+}  // extern "C"
+
 namespace libais {
 
 vector<string> Split(const string &str, const string &delim_str) {
   assert(!delim_str.empty());
-  vector<string> r;
   if (str.empty()) {
-    r.push_back("");
-    return r;
+    return vector<string>({""});
   }
+  vector<string> parts;
   size_t prev = 0;
   for (size_t off = str.find(delim_str);
       off != string::npos;
       off = str.find(delim_str, off + 1)) {
-    r.push_back(str.substr(prev, off-prev));
+    parts.push_back(str.substr(prev, off-prev));
     prev = off + delim_str.size();
   }
-  r.push_back(str.substr(prev));
-  return r;
+  parts.push_back(str.substr(prev));
+  return parts;
 }
 
 string GetNthField(const string &str, const size_t n,
@@ -256,7 +265,8 @@ const char AisBitset::bits_to_char_tbl_[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
 AisMsg::AisMsg(const char *nmea_payload, const size_t pad)
-    : message_id(0), repeat_indicator(0), mmsi(0), status(AIS_UNINITIALIZED) {
+    : message_id(0), repeat_indicator(0), mmsi(0), status(AIS_UNINITIALIZED),
+      num_chars(0), num_bits(0) {
   assert(nmea_payload);
   assert(pad < 6);
 

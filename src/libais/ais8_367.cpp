@@ -108,7 +108,8 @@ Ais8_367_22_SubArea *ais8_367_22_subarea_factory(const AisBitset &bs,
 }
 
 Ais8_367_22::Ais8_367_22(const char *nmea_payload, const size_t pad)
-    : Ais8(nmea_payload, pad) {
+    : Ais8(nmea_payload, pad), version(0), link_id(0), notice_type(0),
+      month(0), day(0), hour(0), minute(0), duration_minutes(0), spare2(0) {
   assert(dac == 367);
   assert(fi == 22);
 

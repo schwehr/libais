@@ -6,7 +6,7 @@ namespace libais {
 
 Ais12::Ais12(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), seq_num(0), dest_mmsi(0), retransmitted(false),
-      spare(0) {
+      spare(0), spare2(0) {
 
   assert(message_id == 12);
 

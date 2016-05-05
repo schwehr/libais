@@ -3,7 +3,7 @@
 
 def MaybeToNumber(instance):
   """Convert to an int or float if possible."""
-  if isinstance(instance, float) or isinstance(instance, int):
+  if isinstance(instance, (float, int)) or instance is None:
     return instance
 
   try:

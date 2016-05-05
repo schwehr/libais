@@ -1,6 +1,6 @@
 # -*- makefile -*-
 
-#CXX:=g++-fsf-4.4 -m32
+# CXX := c++
 
 CXXFLAGS :=
 CXXFLAGS += -std=c++11
@@ -30,8 +30,9 @@ WARN += -Wno-sign-compare
 # WARN += -Wunreachable-code
 # WARN += -Wunused
 
-DEBUG := -g3 -DDEBUG=1
-DEBUG += -O0
+DEBUG := -g -O2
+# DEBUG := -g3 -DDEBUG=1
+# DEBUG += -O0
 # DEBUG += -O
 # DEBUG += -D_GLIBCXX_DEBUG # Bad things on the mac?  May be a gtest bug.
 # DEBUG += -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCPP_CONCEPT_CHECKS
@@ -87,10 +88,13 @@ SRCS += ais25.cpp
 SRCS += ais26.cpp
 SRCS += ais27.cpp
 #SRCS += ais28.cpp
+
+SRCS += decode_body.cpp
+SRCS += vdm.cpp
+
 OBJS := ${SRCS:.cpp=.o}
 
-all: libais.a test_libais
-	./test_libais
+all: libais.a
 
 libais.a: ${OBJS}
 	ls ${OBJS}
@@ -98,17 +102,10 @@ libais.a: ${OBJS}
 	ranlib $@
 
 clean:
-	-rm -rf *.o *.a *.pyc test_libais
-	-rm -rf *.d *_unittest *.dSYM
+	-rm -rf *.o *.a *.pyc
+	-rm -rf *.d *.dSYM
 
-test: libais.a test_libais
-	./test_libais
-
-test_libais: ${OBJS} test_libais.cpp ais.h
-	@echo SRCS: ${SRCS}
-	@echo OBJS: ${OBJS}
-	${CXX} -o $@ ${OBJS} test_libais.cpp ${CXXFLAGS}
-
+# Deprecated.
 ais_decode_normed: ${OBJS} ais_decode_normed.o ais.h
 	@echo SRCS: ${SRCS}
 	@echo OBJS: ${OBJS}
@@ -140,17 +137,5 @@ ais25.o: ais.h
 ais26.o: ais.h
 ais27.o: ais.h
 ais_py.o: ais.h
-test_libais.o: ais.h
+vdm.o: vdm.h ais.h
 
-test2: ais1_2_3_unittest ais8_1_22_unittest
-#ais8_1_22_unittest
-
-#LDFLAGS:=-L${FINK}/lib
-#GTESTFLAGS := ${shell gtest-config --cppflags --cxxflags --ldflags --libs}
-ais8_1_22_unittest: ais8_1_22_unittest.cpp ais8_1_22.cpp ais.cpp ais8.cpp
-	${CXX} -m32 -g ${WARN} $^ -o $@ ${GTESTFLAGS} -lgtest_main -lpthread
-	./$@
-
-ais1_2_3_unittest: ais1_2_3_unittest.cpp ais.cpp ais1_2_3.cpp
-	${CXX} -m32 -g ${WARN} $^ -o $@ ${GTESTFLAGS} -lgtest_main -lpthread
-	./$@

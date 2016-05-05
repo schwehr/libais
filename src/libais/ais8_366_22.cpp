@@ -145,7 +145,8 @@ const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = {
 
 
 Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad)
-    : Ais8(nmea_payload, pad) {
+    : Ais8(nmea_payload, pad), link_id(0), notice_type(0), month(0), day(0),
+      utc_hour(0), utc_minute(0), duration_minutes(0) {
   assert(dac == 366);
   assert(fi == 22);
 

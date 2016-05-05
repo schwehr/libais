@@ -88,12 +88,14 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad)
   position2 = bs.ToAisPoint(167, 55);
 
   type = bs.ToUnsignedInt(222, 4);
+  // TODO(schwehr): Handle the sign bit for min and max.
   min = bs.ToUnsignedInt(226, 9);
   max = bs.ToUnsignedInt(235, 9);
   classification = bs.ToUnsignedInt(244, 2);
   wind_dir = bs.ToUnsignedInt(246, 4);
   spare2 = bs.ToUnsignedInt(250, 6);
 
+  // TODO(schwehr): The above bit counts can't work.
   assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }

@@ -1,4 +1,10 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
+
+"""
+DEPRECATED: Will be removed in v1.0
+"""
+
+import warnings
 
 import ais
 import sys
@@ -14,6 +20,13 @@ try:
 except:
     msgpack = None
 
+
+warnings.warn(
+    "This utility is deprecated and will be removed in 1.0",
+    FutureWarning,
+    stacklevel=2)
+
+
 args = {"encoding": "json"}
 files = []
 for arg in sys.argv[1:]:
@@ -27,8 +40,17 @@ for arg in sys.argv[1:]:
     else:
         files.append(arg)
 
+# Support for legacy script
+if 'validateChecksum' in args: args['validate_checksum'] = args.pop('validateChecksum')
+if 'allowUnknown' in args: args['allow_unknown'] = args.pop('allowUnknown')
+if 'treatABequal' in args: args['treat_ab_equal'] = args.pop('treatABequal')
+
+for key in ("uscg", "validate_checksum", "verbose", "allow_unknown", "treat_ab_equal", "pass_invalid_checksums", "allow_missing_timestamps"):
+    if key in args and isinstance(args[key], str):
+        args[key] = args[key] == 'True'
+
 if "help" in args:
-    print """Usage: aisdecode [OPTIONS] < INFILE.nmea > OUTFILE.json
+    print("""Usage: aisdecode [OPTIONS] < INFILE.nmea > OUTFILE.json
 Available opptions:
     --gpsd Use gpsd compatible output
         --copy-tagblock-timestamp=False
@@ -36,15 +58,19 @@ Available opptions:
     --encoding=msgpack Use msgpack encoding
     --encoding=json Use json encoding (default)
 
+    --keep_nmea Include the raw nmea as a field in the decoded output
+
     --verbose
-    --allowUnknown
-    --treatABequal
+    --max_errors=NUM Terminate if error rate is > NUM%.
+    --allow_unknown
+    --ignore_tagblock_station
+    --treat_ab_equal
     --pass_invalid_checksums
     --allow_missing_timestamps
 
     --uscg=False
-    --validateChecksum=False
-"""
+    --validate_checksum=False
+""")
     sys.exit(0)
 
 encoding = args.pop('encoding', 'json')
@@ -61,11 +87,11 @@ use_gpsd = args.pop("gpsd", False)
 copy_tagblock_timestamp = args.pop("copy-tagblock-timestamp", True)
 
 
-for key in ("uscg", "validateChecksum", "verbose", "allowUnknown", "treatABequal", "pass_invalid_checksums", "allow_missing_timestamps"):
-    if key in args and isinstance(args[key], str):
-        args[key] = args[key] == True
 if 'window' in args:
     args['window'] = int('window')
+
+if "max_errors" in args:
+    args["max_errors"] = float(args["max_errors"])
 
 gpsd_mangle = ais.compatibility.gpsd.Mangler(copy_tagblock_timestamp=copy_tagblock_timestamp)
 

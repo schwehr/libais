@@ -8,11 +8,16 @@
 namespace libais {
 
 Ais6::Ais6(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad), seq(0), mmsi_dest(0), retransmit(false),
-      spare(0), dac(0), fi(0) {
+    : AisMsg(nmea_payload, pad),
+      seq(0),
+      mmsi_dest(0),
+      retransmit(false),
+      spare(0),
+      dac(0),
+      fi(0) {
   assert(message_id == 6);
 
-  // TODO(olafsinram): 46 or rather 56??
+  // TODO(olafsinram): 46 or rather 56?
   const int payload_len = num_bits - 46;  // in bits w/o DAC/FI
   if (num_bits < 88 || payload_len < 0 || payload_len > 952) {
     status = AIS_ERR_BAD_BIT_COUNT;
@@ -101,7 +106,7 @@ Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad)
 
   const size_t text_size = 6 * ((num_bits - 100) / 6);
   const size_t spare2_size = num_bits - 100 - text_size;
-  text =  bs.ToString(100, text_size);
+  text = bs.ToString(100, text_size);
 
   if (!spare2_size)
     spare2 = 0;

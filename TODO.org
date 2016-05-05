@@ -1,9 +1,0 @@
-
-* List of things that need to be done for this library.
-
-- Make a factory that handles the creation of all class instances.  It
-  should handle to the bitset so that it only has to create 1 MAX_LEN
-  bitset for each instance of the factory (or thread).
-- Python error handling
-- code all the messages that are around
-- build testing infrastructure (nose?)
