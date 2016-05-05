@@ -50,7 +50,7 @@ int main(int argc,  char* argv[]) {
       if (fields.size() < 7) continue;
       if (fields[5].size() < 5) continue;
       if (fields[5][0] != '5') continue;
-      Ais5 m5(fields[5].c_str(), 2);
+      libais::Ais5 m5(fields[5].c_str(), 2);
       if (m5.had_error()) continue;
       std::cout << m5.mmsi << "," << m5.name << "," << m5.callsign << ","
                 << m5.type_and_cargo << std::endl;
