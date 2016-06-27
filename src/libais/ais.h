@@ -622,6 +622,7 @@ class Ais6_1_5 : public Ais6 {
   bool ai_available;  // TODO(schwehr): AI?  Is this the dac/fi being acked?
   int ai_response;
   int spare;
+  int spare2;
 
   Ais6_1_5(const char *nmea_payload, const size_t pad);
 };

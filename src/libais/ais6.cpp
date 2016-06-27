@@ -254,7 +254,8 @@ Ais6_1_5::Ais6_1_5(const char *nmea_payload, const size_t pad)
   seq_num = bs.ToUnsignedInt(104, 11);
   ai_available = static_cast<bool>(bs[115]);
   ai_response = bs.ToUnsignedInt(116, 3);
-  spare = bs.ToUnsignedInt(119, 49);
+  spare = bs.ToUnsignedInt(119, 32);
+  spare2 = bs.ToUnsignedInt(151, 17);
 
   assert(bs.GetRemaining() == 0);
 
