@@ -19,7 +19,6 @@ addons:
     packages:
       - gcc-5
       - g++-5
-      - python-pytest
 
 python:
   - 2.7
@@ -27,6 +26,7 @@ python:
 
 before_install:
   - pip install pip setuptools --upgrade
+  - pip install pip pytest --upgrade
 
 install:
   - CC=g++-5 pip install .\[tests\] --upgrade
