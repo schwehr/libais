@@ -25,10 +25,10 @@ void Validate(
     const int repeat_indicator,
     const int mmsi,
     const int alt,
-    const int sog,
+    const float sog,
     const int position_accuracy,
-    const float x,
-    const float y,
+    const double x,
+    const double y,
     const float cog,
     const int timestamp,
     const int alt_sensor,
@@ -44,11 +44,11 @@ void Validate(
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);
   EXPECT_EQ(alt, msg->alt);
-  EXPECT_EQ(sog, msg->sog);
+  EXPECT_FLOAT_EQ(sog, msg->sog);
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
-  EXPECT_EQ(x, msg->position.lng_deg);
-  EXPECT_EQ(y, msg->position.lat_deg);
-  EXPECT_EQ(cog, msg->cog);
+  EXPECT_DOUBLE_EQ(x, msg->position.lng_deg);
+  EXPECT_DOUBLE_EQ(y, msg->position.lat_deg);
+  EXPECT_FLOAT_EQ(cog, msg->cog);
   EXPECT_EQ(timestamp, msg->timestamp);
   EXPECT_EQ(alt_sensor, msg->alt_sensor);
   EXPECT_EQ(spare, msg->spare);
@@ -64,7 +64,7 @@ TEST(Ais9Test, DecodeAnything) {
 
   Validate(
       msg.get(), 3, 509902149, 2324, 762, 1,
-      35.601200103759766, -11.229339599609375,
+      35.601198333333336, -11.229340000000001,
       50.3, 30, 0, 3, 1, 4, 1, true);
 
   // TODO(schwehr): Validate commstate.

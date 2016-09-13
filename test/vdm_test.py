@@ -175,8 +175,8 @@ class BareQueueTest(unittest.TestCase):
             'position_accuracy': 1,
             'nav_status': 5,
             'repeat_indicator': 0,
-            'y': 29.145000457763672,
-            'x': -90.2066650390625,
+            'y': 29.145,
+            'x': -90.20666666666666,
             'cog': 136,
             'md5': '6e1a4872825054e91ee7cfcfb9cc87e0',
             'mmsi': 577305000,
@@ -365,8 +365,8 @@ class BareQueueTest(unittest.TestCase):
                     'radius': 0,
                     'sub_area_type': 0,
                     'sub_area_type_str': 'point',
-                    'x': -69.80000305175781,
-                    'y': 42.84998321533203},
+                    'x': -69.8,
+                    'y': 42.849983333333334},
                 {
                     'sub_area_type': 5,
                     'sub_area_type_str': 'text',
@@ -475,7 +475,7 @@ class BareQueueTest(unittest.TestCase):
 
     # Spot check each message.
     self.assertEqual(msgs[0]['decoded']['id'], 18)
-    self.assertAlmostEqual(msgs[0]['decoded']['x'], -122.76744079589844)
+    self.assertAlmostEqual(msgs[0]['decoded']['x'], -122.767435)
     self.assertEqual(msgs[0]['matches'][0]['seq_id'], 1)
 
     self.assertEqual(msgs[1]['decoded']['id'], 5)

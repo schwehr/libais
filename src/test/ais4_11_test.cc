@@ -32,8 +32,8 @@ void Validate(
     const int minute,
     const int second,
     const int position_accuracy,
-    const float x,
-    const float y,
+    const double x,
+    const double y,
     const int fix_type,
     const int transmission_ctl,
     const int spare,
@@ -51,8 +51,8 @@ void Validate(
   EXPECT_EQ(minute, msg->minute);
   EXPECT_EQ(second, msg->second);
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
-  EXPECT_FLOAT_EQ(x, msg->position.lng_deg);
-  EXPECT_FLOAT_EQ(y, msg->position.lat_deg);
+  EXPECT_DOUBLE_EQ(x, msg->position.lng_deg);
+  EXPECT_DOUBLE_EQ(y, msg->position.lat_deg);
   EXPECT_EQ(fix_type, msg->fix_type);
   EXPECT_EQ(transmission_ctl, msg->transmission_ctl);
   EXPECT_EQ(spare, msg->spare);
@@ -105,8 +105,8 @@ TEST(Ais4Test, Decode4PosAcc1) {
       "!AIVDM,1,1,,B,4h3Owoiuiq000rdhR6G>oQ?020S:,0*10,raishub,1342569600");
 
   Validate(
-      msg.get(), 4, 3, 3669983, 2012, 7, 18, 0, 0, 0, 1, -74.10847473144531,
-      40.60139465332031, 15, 0, 0, true);
+      msg.get(), 4, 3, 3669983, 2012, 7, 18, 0, 0, 0, 1, -74.108474999999999,
+      40.601393333333334, 15, 0, 0, true);
 
   ValidateCommState(
       msg.get(), 0, 0, false, 0, false, 0, false, 0, 0, 0, true, 2250);
@@ -119,7 +119,7 @@ TEST(Ais4Test, Decode4UtcCommState) {
 
   Validate(
       msg.get(), 4, 0, 2311100, 2012, 7, 17, 23, 59, 50, 0,
-      -6.9665184021, 62.0688743591, 1, 0, 0, true);
+      -6.9665183333333331, 62.068874999999998, 1, 0, 0, true);
 
   ValidateCommState(
       msg.get(), 0, 1, false, 0, false, 0, true, 23, 59, false, 0, 0);
@@ -144,8 +144,8 @@ TEST(Ais4Test, Decode4SlotOffset) {
       "!AIVDM,1,1,,A,402VqV1uiq00e1KAk8OJHbC020S:,0*07,raishub,1342569645");
 
   Validate(
-      msg.get(), 4, 0, 2734488, 2012, 7, 18, 0, 0, 45, 0, 19.9400062561,
-      54.8969230652,  3, 0, 0, true);
+      msg.get(), 4, 0, 2734488, 2012, 7, 18, 0, 0, 45, 0, 19.940006666666665,
+      54.896921666666664,  3, 0, 0, true);
 
   ValidateCommState(
       msg.get(), 0, 0, false, 0, false, 0, false, 0, 0, 0, true, 2250);
@@ -157,8 +157,8 @@ TEST(Ais4Test, Decode4TransmissionCtl) {
       "!AIVDM,1,1,,B,4025bviuiq12e0hUg6OO?UbP0<=G,0*22,raishub,1342573365");
 
   Validate(
-      msg.get(), 4, 0, 2190075, 2012, 7, 18, 1, 2, 45, 0, 10.6145648956,
-      55.0295829773, 10, 1, 0, false);
+      msg.get(), 4, 0, 2190075, 2012, 7, 18, 1, 2, 45, 0, 10.614565,
+      55.029583333333335, 10, 1, 0, false);
 
   ValidateCommState(
       msg.get(), 0, 3, true, 855, false, 0, false, 0, 0, 0, false, 0);
@@ -170,8 +170,8 @@ TEST(Ais4Test, Decode4SyncState1) {
       "!AIVDM,1,1,,B,403v7B0000000`Vhfh<qtso00d2A,0*43,raishub,1342569602");
 
   Validate(
-      msg.get(), 4, 0, 4163400, 0, 0, 0, 0, 0, 0, 1, 120.315666199,
-      22.5539989471, 7, 0, 0, false);
+      msg.get(), 4, 0, 4163400, 0, 0, 0, 0, 0, 0, 1, 120.31566666666667,
+      22.553998333333332, 7, 0, 0, false);
 
   ValidateCommState(
       msg.get(), 1, 3, true, 145, false, 0, false, 0, 0, 0, false, 0);
@@ -183,8 +183,8 @@ TEST(Ais4Test, Decode4SyncState2) {
       "!AIVDM,1,1,,A,4FSR2mGO0oWdj<:TRhEM1oqrAFdE,0*1F,raishub,1342589098");
 
   Validate(
-      msg.get(), 4, 1, 439911125, 7664, 3, 15, 7, 44, 50, 0, 170.081420898,
-      37.4928512573, 9, 1, 420, false);
+      msg.get(), 4, 1, 439911125, 7664, 3, 15, 7, 44, 50, 0, 170.08142666666666,
+      37.492851666666667, 9, 1, 420, false);
 
   ValidateCommState(
       msg.get(), 2, 5, true, 11029, false, 0, false, 0, 0, 0, false, 0);
@@ -196,8 +196,8 @@ TEST(Ais4Test, Decode4SyncState3) {
       "!AIVDM,1,1,,B,4fBT7K`;RtT3wP42c2n0OgLS1hA=,0*3B,raishub,1342588546");
 
   Validate(
-      msg.get(), 4, 2, 958990190, 8376, 11, 25, 4, 3, 63, 1, 0.882934987545,
-      94.385383606, 12, 1, 48, false);
+      msg.get(), 4, 2, 958990190, 8376, 11, 25, 4, 3, 63, 1, 0.882935,
+      94.38538166666666, 12, 1, 48, false);
 
   ValidateCommState(
       msg.get(), 3, 4, false, 0, true, 1101, false, 0, 0, 0, false, 0);
@@ -209,8 +209,8 @@ TEST(Ais11Test, Decode11) {
       "!AIVDM,1,1,,B,;028j>iuiq0DoO0ARF@EEmG008Pb,0*25,raishub,1342570856");
 
   Validate(
-      msg.get(), 11, 0, 2241083, 2012, 7, 18, 0, 20, 55, 0, -13.9211549759,
-      28.5447807312, 7, 0, 0, false);
+      msg.get(), 11, 0, 2241083, 2012, 7, 18, 0, 20, 55, 0, -13.921155,
+      28.544781666666665, 7, 0, 0, false);
 
   ValidateCommState(
       msg.get(), 0, 2, false, 0, true, 2090, false, 0, 0, 0, false, 0);

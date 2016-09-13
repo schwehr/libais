@@ -30,10 +30,10 @@ void Validate(
     const int txrx_mode,
     const bool power_low,
     const bool pos_valid,
-    const float x1,
-    const float y1,
-    const float x2,
-    const float y2,
+    const double x1,
+    const double y1,
+    const double x2,
+    const double y2,
     const bool dest_valid,
     const int dest_mmsi_1,
     const int dest_mmsi_2,
@@ -53,10 +53,10 @@ void Validate(
   EXPECT_EQ(txrx_mode, msg->txrx_mode);
   EXPECT_EQ(power_low, msg->power_low);
   EXPECT_EQ(pos_valid, msg->pos_valid);
-  EXPECT_EQ(x1, msg->position1.lng_deg);
-  EXPECT_EQ(y1, msg->position1.lat_deg);
-  EXPECT_EQ(x2, msg->position2.lng_deg);
-  EXPECT_EQ(y2, msg->position2.lat_deg);
+  EXPECT_DOUBLE_EQ(x1, msg->position1.lng_deg);
+  EXPECT_DOUBLE_EQ(y1, msg->position1.lat_deg);
+  EXPECT_DOUBLE_EQ(x2, msg->position2.lng_deg);
+  EXPECT_DOUBLE_EQ(y2, msg->position2.lat_deg);
   EXPECT_EQ(dest_valid, msg->dest_valid);
   EXPECT_EQ(dest_mmsi_1, msg->dest_mmsi_1);
   EXPECT_EQ(dest_mmsi_2, msg->dest_mmsi_2);
@@ -74,8 +74,8 @@ TEST(Ais22Test, DecodeAnything) {
       msg.get(), 0, 3160063, 0,
       2087, 2088, 0, 0,
       true,  // Position valid.
-      -77.08333587646484, 45.33333206176758,
-      -79.83333587646484, 42.16666793823242,
+      -77.083333333333329, 45.333333333333336,
+      -79.833333333333329, 42.166666666666664,
       false,  // Destination invalid.
       0, 0,
       0, 0, 2, 0);

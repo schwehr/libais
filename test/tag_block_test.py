@@ -319,8 +319,8 @@ class DecodeTagBlockTest(TagTestCase):
             'repeat_indicator': 0,
             'sog': 0,
             'spare': 0,
-            'x': -90.2066650390625,
-            'y': 29.145000457763672},
+            'x': -90.20666666666666,
+            'y': 29.145},
         'line_nums': [1],
         # pylint: disable=line-too-long
         'lines': ['\\n:852057,s:b003669955,c:1428451729*1B\\!ABVDM,1,1,,A,K8VSqb9LdU28WP8p,0*49'],

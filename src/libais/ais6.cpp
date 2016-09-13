@@ -340,8 +340,8 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad)
     Ais6_1_14_Window w;
     const size_t start = 97 + window_num * 93;
     // Reversed order for lng/lat.
-    float y = bs.ToInt(start, 27) / 600000.;
-    float x = bs.ToInt(start + 27, 28) / 600000.;
+    double y = bs.ToInt(start, 27) / 600000.0;
+    double x = bs.ToInt(start + 27, 28) / 600000.0;
     w.position = AisPoint(x, y);
     w.utc_hour_from = bs.ToUnsignedInt(start + 55, 5);
     w.utc_min_from = bs.ToUnsignedInt(start + 60, 6);

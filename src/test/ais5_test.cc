@@ -35,7 +35,7 @@ void Validate(const Ais5 *msg, const int repeat_indicator, const int mmsi,
   EXPECT_EQ(eta_day, msg->eta_day);
   EXPECT_EQ(eta_hour, msg->eta_hour);
   EXPECT_EQ(eta_minute, msg->eta_minute);
-  EXPECT_EQ(draught, msg->draught);
+  EXPECT_FLOAT_EQ(draught, msg->draught);
   EXPECT_EQ(destination, msg->destination);
   EXPECT_EQ(dte, msg->dte);
   EXPECT_EQ(spare, msg->spare);

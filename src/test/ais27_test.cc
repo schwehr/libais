@@ -27,8 +27,8 @@ void Validate(
     const int position_accuracy,
     const bool raim,
     const int nav_status,
-    const float x,
-    const float y,
+    const double x,
+    const double y,
     const int sog,
     const int cog,
     const bool gnss,
@@ -42,8 +42,8 @@ void Validate(
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
   EXPECT_EQ(raim, msg->raim);
   EXPECT_EQ(nav_status, msg->nav_status);
-  EXPECT_EQ(x, msg->position.lng_deg);
-  EXPECT_EQ(y, msg->position.lat_deg);
+  EXPECT_DOUBLE_EQ(x, msg->position.lng_deg);
+  EXPECT_DOUBLE_EQ(y, msg->position.lat_deg);
   EXPECT_EQ(sog, msg->sog);
   EXPECT_EQ(cog, msg->cog);
   EXPECT_EQ(gnss, msg->gnss);
@@ -56,7 +56,7 @@ TEST(Ais27Test, DecodeAnything) {
 
   Validate(
       msg.get(), 0, 538005120, 1, false, 0,
-      -79.64167022705078, 24.68166732788086,
+      -79.641666666666666, 24.681666666666668,
       11, 223, true, 0);
 }
 

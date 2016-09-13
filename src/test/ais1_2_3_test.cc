@@ -31,8 +31,8 @@ void Validate(
     const bool rot_over_range,
     const float sog,
     const int position_accuracy,
-    const float x,
-    const float y,
+    const double x,
+    const double y,
     const int true_heading,
     const int timestamp,
     const bool special_manoeuvre,
@@ -50,8 +50,8 @@ void Validate(
   EXPECT_EQ(rot_over_range, msg->rot_over_range);
   EXPECT_FLOAT_EQ(sog, msg->sog);
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
-  EXPECT_FLOAT_EQ(x, msg->position.lng_deg);
-  EXPECT_FLOAT_EQ(y, msg->position.lat_deg);
+  EXPECT_DOUBLE_EQ(x, msg->position.lng_deg);
+  EXPECT_DOUBLE_EQ(y, msg->position.lat_deg);
   EXPECT_EQ(true_heading, msg->true_heading);
   EXPECT_EQ(timestamp, msg->timestamp);
   EXPECT_EQ(special_manoeuvre, msg->special_manoeuvre);
@@ -131,7 +131,7 @@ TEST(Ais123Test, Decode1ReceivedStations) {
       "!AIVDM,1,1,,A,100WhdhP0nJRdiFFHFvm??v00L12,0*13,raishub,1342569600");
   Validate(
       msg.get(), 1, 0, 651443, 0, -128, -731.386474609375, true, 5.4, 0,
-      -76.30584716796875, 39.112953186035156, 511, 0, 0, 0, false);
+      -76.30584833333333, 39.112951666666667, 511, 0, 0, 0, false);
 
   ValidateCommState(
       msg.get(), 0, true, 7, true, 66, false, 0, false, 0, 0, 0, false, 0,
@@ -145,7 +145,7 @@ TEST(Ais123Test, Decode1Utc) {
 
   Validate(
       msg.get(), 1, 0, 538090443, 0, 0, 0.0, false, 10.8999996185, 1,
-      -8.6611995697, 35.6906318665, 85, 59, 0, 0, false);
+      -8.6611999999999991, 35.690633333333331, 85, 59, 0, 0, false);
 
   ValidateCommState(
       msg.get(), 0, true, 1, false, 0, false, 0, true, 23, 59, 0, false, 0,
@@ -159,7 +159,7 @@ TEST(Ais123Test, Decode1SlotNumber) {
 
   Validate(
       msg.get(), 1, 0, 416176600, 0, -128, -731.386474609, true, 0.10000000149,
-      0, 118.287574768, 24.4166088104, 511, 55, 0, 0, false);
+      0, 118.28757833333333, 24.416608333333333, 511, 55, 0, 0, false);
 
   ValidateCommState(
       msg.get(), 0, true, 4, false, 0, true, 2096, false, 0, 0, 0, false, 0,
@@ -185,8 +185,8 @@ TEST(Ais123Test, Decode2Rot0) {
       "!AIVDM,1,1,,B,2341N:0000PCTfPMHAQoP8442<;0,0*33,raishub,1342569601");
 
   Validate(
-      msg.get(), 2, 0, 205545000, 0, 0, 0.0, false, 0.0, 1, 4.27597332001,
-      51.3440132141, 258, 2, 0, 0, true);
+      msg.get(), 2, 0, 205545000, 0, 0, 0.0, false, 0.0, 1, 4.275973333333333,
+      51.344011666666667, 258, 2, 0, 0, true);
 
   ValidateCommState(
       msg.get(), 0, true, 3, true, 704, false, 0, false, 0, 0, 0, false, 0,
@@ -200,7 +200,7 @@ TEST(Ais123Test, Decode2Turning) {
 
   Validate(
       msg.get(), 2, 0, 541255006, 4, -78, -271.591522217, false, 0.40000000596,
-      0, 41.9472007751, -62.6063957214, 114, 27, 1, 1, false);
+      0, 41.947201666666665, -62.606396666666669, 114, 27, 1, 1, false);
 
   ValidateCommState(
       msg.get(), 2, true, 4, false, 0, true, 1089, false, 0, 0, 0, false, 0,
@@ -213,8 +213,8 @@ TEST(Ais123Test, Decode3) {
       "!AIVDM,1,1,,B,34hoV<5000Jw95`GWokbFTuf0000,0*6C,raishub,1342569600");
 
   Validate(
-      msg.get(), 3, 0, 319678000, 5, 0, 0.0, false, 0.0, 0, -70.0924987793,
-      41.2841835022, 158, 55, 0, 0, false);
+      msg.get(), 3, 0, 319678000, 5, 0, 0.0, false, 0.0, 0, -70.0925,
+      41.284183333333331, 158, 55, 0, 0, false);
 
   ValidateCommState(
       msg.get(), 0, false, 0, false, 0, false, 0, false, 0, 0, 0, false, 0,
@@ -229,7 +229,7 @@ TEST(Ais123Test, Decode3KeepTrue) {
 
   Validate(
       msg.get(), 3, 0, 369494388, 0, -128, -731.386474609, true, 10.1999998093,
-      0, -74.05443573, 40.6452484131, 2, 59, 0, 0, false);;
+      0, -74.054433333333336, 40.64525, 2, 59, 0, 0, false);;
 
   ValidateCommState(
       msg.get(), 0, false, 0, false, 0, false, 0, false, 0, 0, 0, false, 0,
@@ -243,7 +243,7 @@ TEST(Ais123Test, Decode3Special) {
 
   Validate(
       msg.get(), 3, 0, 244730862, 0, -128, -731.386474609, true, 0.0, 1,
-      4.41319990158, 51.8861618042, 511, 0, 1, 0, true);
+      4.4132, 51.886163333333336, 511, 0, 1, 0, true);
 
   ValidateCommState(
       msg.get(), 0, false, 0, false, 0, false, 0, false, 0, 0, 0, false, 0,

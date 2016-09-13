@@ -34,8 +34,8 @@ void ValidateAis6_0_0(const Ais6_0_0 *msg, const int sub_id,
                       const int spare2) {
   ASSERT_NE(nullptr, msg);
   EXPECT_EQ(sub_id, msg->sub_id);
-  EXPECT_EQ(voltage, msg->voltage);
-  EXPECT_EQ(current, msg->current);
+  EXPECT_FLOAT_EQ(voltage, msg->voltage);
+  EXPECT_FLOAT_EQ(current, msg->current);
   EXPECT_EQ(dc_power_supply, msg->dc_power_supply);
   EXPECT_EQ(light_on, msg->light_on);
   EXPECT_EQ(battery_low, msg->battery_low);

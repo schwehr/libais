@@ -10,7 +10,7 @@ namespace {
 
 void Validate(const Ais19 *msg, const int repeat_indicator, const int mmsi,
               const int spare, const float sog, const int position_accuracy,
-              const float x, const float y, const float cog,
+              const double x, const double y, const float cog,
               const int true_heading, const int timestamp, const int spare2,
               const string name, const int type_and_cargo, const int dim_a,
               const int dim_b, const int dim_c, const int dim_d,
@@ -23,11 +23,11 @@ void Validate(const Ais19 *msg, const int repeat_indicator, const int mmsi,
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);
   EXPECT_EQ(spare, msg->spare);
-  EXPECT_EQ(sog, msg->sog);
+  EXPECT_FLOAT_EQ(sog, msg->sog);
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
-  EXPECT_EQ(x, msg->position.lng_deg);
-  EXPECT_EQ(y, msg->position.lat_deg);
-  EXPECT_EQ(cog, msg->cog);
+  EXPECT_DOUBLE_EQ(x, msg->position.lng_deg);
+  EXPECT_DOUBLE_EQ(y, msg->position.lat_deg);
+  EXPECT_FLOAT_EQ(cog, msg->cog);
   EXPECT_EQ(true_heading, msg->true_heading);
   EXPECT_EQ(timestamp, msg->timestamp);
   EXPECT_EQ(spare2, msg->spare2);
@@ -51,7 +51,7 @@ TEST(Ais19Test, DecodeAnything) {
   std::unique_ptr<Ais19> msg(
       new Ais19("C5NMbDQl0NNJC7VNuC<v`7NF4T28V@2g0J6F::000000J70<RRS0", 0));
   Validate(msg.get(), 0, 367487570, 29 /* spare - suspicious */, 0.1, 1,
-           -85.27464294433594, 45.324459075927734, 100.2, 14, 60,
+           -85.274641666666668, 45.324458333333332, 100.2, 14, 60,
            11 /* spare2 - suspicious */, "BRADSHAW MCKEE@@@@@@", 52, 112, 25, 5,
            5, 1, true, 0, 0, 0);
 }

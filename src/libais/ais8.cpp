@@ -98,8 +98,8 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad)
   bs.SeekTo(56);
   // Reverse order lat/lng!
   // TODO(schwehr): Reverse order, or just reverse bit count? Compare 6.1.14!
-  float y = bs.ToInt(56, 24) / 60000.;
-  float x = bs.ToInt(80, 25) / 60000.;
+  double y = bs.ToInt(56, 24) / 60000.0;
+  double x = bs.ToInt(80, 25) / 60000.0;
   position = AisPoint(x, y);
 
   day = bs.ToUnsignedInt(105, 5);
@@ -284,8 +284,8 @@ Ais8_1_17::Ais8_1_17(const char *nmea_payload, const size_t pad)
     target.id = bs.ToString(start + 2, 42);
     target.spare = bs.ToUnsignedInt(start + 44, 4);
     // booo - lat, lon inverse order
-    float y = bs.ToInt(start + 48, 24) / 60000.;
-    float x = bs.ToInt(start + 72, 25) / 60000.;
+    double y = bs.ToInt(start + 48, 24) / 60000.0;
+    double x = bs.ToInt(start + 72, 25) / 60000.0;
     target.position = AisPoint(x, y);
 
     target.cog = bs.ToUnsignedInt(start + 97, 9);
@@ -401,8 +401,8 @@ Ais8_1_21::Ais8_1_21(const char *nmea_payload, const size_t pad)
     spare2 = bs.ToUnsignedInt(357, 3);
   } else {
     // Type 1: WMO OBS from ship.
-    float x = (bs.ToUnsignedInt(57, 16) / 100.) - 180;
-    float y = (bs.ToUnsignedInt(73, 15) / 100.) - 180;
+    double x = (bs.ToUnsignedInt(57, 16) / 100.0) - 180;
+    double y = (bs.ToUnsignedInt(73, 15) / 100.0) - 180;
     position = AisPoint(x, y);
 
     utc_month = bs.ToUnsignedInt(88, 4);

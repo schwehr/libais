@@ -361,8 +361,8 @@ class UsgsQueueTest(unittest.TestCase):
                 'repeat_indicator': 0,
                 'sog': 0,
                 'spare': 0,
-                'x': -90.2066650390625,
-                'y': 29.145000457763672},
+                'x': -90.20666666666666,
+                'y': 29.145},
             'line_nums': [None],
             'lines': ['!SAVDM,1,1,,B,K8VSqb9LdU28WP8<,0*17,rMySat,1218999946'],
             'matches': [{

@@ -37,7 +37,7 @@ std::unique_ptr<Ais18> Init(const string &nmea_string) {
 
 void Validate(const Ais18 *msg, const int repeat_indicator, const int mmsi,
               const int spare, const float sog, const int position_accuracy,
-              const float x, const float y, const float cog,
+              const double x, const double y, const float cog,
               const int true_heading, const int timestamp, const int spare2,
               const int unit_flag, const int display_flag, const int dsc_flag,
               const int band_flag, const int m22_flag, const int mode_flag,
@@ -49,11 +49,11 @@ void Validate(const Ais18 *msg, const int repeat_indicator, const int mmsi,
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);
   EXPECT_EQ(spare, msg->spare);
-  EXPECT_EQ(sog, msg->sog);
+  EXPECT_FLOAT_EQ(sog, msg->sog);
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
-  EXPECT_EQ(x, msg->position.lng_deg);
-  EXPECT_EQ(y, msg->position.lat_deg);
-  EXPECT_EQ(cog, msg->cog);
+  EXPECT_DOUBLE_EQ(x, msg->position.lng_deg);
+  EXPECT_DOUBLE_EQ(y, msg->position.lat_deg);
+  EXPECT_FLOAT_EQ(cog, msg->cog);
   EXPECT_EQ(true_heading, msg->true_heading);
   EXPECT_EQ(timestamp, msg->timestamp);
   EXPECT_EQ(spare2, msg->spare2);
@@ -131,8 +131,8 @@ TEST(Ais18Test, DecodeAnything) {
   std::unique_ptr<Ais18> msg =
       Init("!SAVDM,1,1,4,B,B5NU=J000=l0BD6l590EkwuUoP06,0*61");
 
-  Validate(msg.get(), 0, 367611240, 0, 0.0, 1, -122.32996368408203,
-           47.63159942626953, 34.8, 511, 59, 0, 1,  // unit_flag
+  Validate(msg.get(), 0, 367611240, 0, 0.0, 1, -122.32996,
+           47.631599999999999, 34.8, 511, 59, 0, 1,  // unit_flag
            0, 1, 1, 1, 0, true);
 
   ValidateCommState(msg.get(),

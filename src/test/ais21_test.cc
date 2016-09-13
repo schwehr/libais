@@ -15,8 +15,8 @@ void Validate(
     const int aton_type,
     const string name,
     const int position_accuracy,
-    const float x,
-    const float y,
+    const double x,
+    const double y,
     const int dim_a,
     const int dim_b,
     const int dim_c,
@@ -39,8 +39,8 @@ void Validate(
   EXPECT_EQ(aton_type, msg->aton_type);
   EXPECT_EQ(name, msg->name);
   EXPECT_EQ(position_accuracy, msg->position_accuracy);
-  EXPECT_EQ(x, msg->position.lng_deg);
-  EXPECT_EQ(y, msg->position.lat_deg);
+  EXPECT_DOUBLE_EQ(x, msg->position.lng_deg);
+  EXPECT_DOUBLE_EQ(y, msg->position.lat_deg);
   EXPECT_EQ(dim_a, msg->dim_a);
   EXPECT_EQ(dim_b, msg->dim_b);
   EXPECT_EQ(dim_c, msg->dim_c);
@@ -63,7 +63,7 @@ TEST(Ais21Test, DecodeAnything) {
 
   Validate(
       msg.get(), 3, 993692023, 18, "COLUMBIA RIV LWB CR @", 0,
-      -124.18408203125, 46.18470001220703, 0, 0, 0, 0, 7, 61, false,
+      -124.18407833333333, 46.184701666666669, 0, 0, 0, 0, 7, 61, false,
       0, false, false, false, 0, 0);
 }
 
@@ -75,7 +75,7 @@ TEST(Ais21Test, TwoLine) {
 
   Validate(
       msg.get(), 1, 993672060, 14, "AMBROSE CHANNEL LBB 14", 0,
-      -74.00936889648438, 40.527950286865234, 0, 0, 0, 0, 7, 61, false,
+      -74.009366666666665, 40.527949999999997, 0, 0, 0, 0, 7, 61, false,
       0, false, false, false, 0, 0);
 }
 
@@ -85,7 +85,7 @@ TEST(Ais21Test, Short268BitMessage) {
       "ENjV2Bw0`bPQbV::a2hJ00000000L7kPBmfv@1088;v0@", 2));
   Validate(
       msg.get(), 1, 992576075, 30, "AQUACULTURE 4@@@@@@@", 0,
-      12.28666687, 65.84914398, 1, 1, 1, 1, 7, 60, false,
+      12.286666666666667, 65.849149999999995, 1, 1, 1, 1, 7, 60, false,
       4, false, false, false, 0, 0);
 }
 

@@ -25,10 +25,10 @@ void Validate(
     const int repeat_indicator,
     const int mmsi,
     const int spare,
-    const float x1,
-    const float y1,
-    const float x2,
-    const float y2,
+    const double x1,
+    const double y1,
+    const double x2,
+    const double y2,
     const int station_type,
     const int type_and_cargo,
     const int spare2,
@@ -43,10 +43,10 @@ void Validate(
   EXPECT_EQ(repeat_indicator, msg->repeat_indicator);
   EXPECT_EQ(mmsi, msg->mmsi);
   EXPECT_EQ(spare, msg->spare);
-  EXPECT_EQ(x1, msg->position1.lng_deg);
-  EXPECT_EQ(y1, msg->position1.lat_deg);
-  EXPECT_EQ(x2, msg->position2.lng_deg);
-  EXPECT_EQ(y2, msg->position2.lat_deg);
+  EXPECT_DOUBLE_EQ(x1, msg->position1.lng_deg);
+  EXPECT_DOUBLE_EQ(y1, msg->position1.lat_deg);
+  EXPECT_DOUBLE_EQ(x2, msg->position2.lng_deg);
+  EXPECT_DOUBLE_EQ(y2, msg->position2.lat_deg);
   EXPECT_EQ(station_type, msg->station_type);
   EXPECT_EQ(type_and_cargo, msg->type_and_cargo);
   EXPECT_EQ(spare2, msg->spare2);
@@ -62,8 +62,8 @@ TEST(Ais23Test, DecodeAnything) {
 
   Validate(
       msg.get(), 0, 2268130, 0,
-      2.630000114440918, 51.06999969482422,
-      1.8266667127609253, 50.68166732788086,
+      2.63, 51.07,
+      1.8266666666666667, 50.681666666666665,
       6, 0, 0, 0, 9, 0, 0);
 }
 

@@ -25,11 +25,11 @@ void Validate8_200_10(const Ais8_200_10 *msg, const int repeat_indicator,
   EXPECT_EQ(200, msg->dac);
   ASSERT_EQ(10, msg->fi);
 
-  EXPECT_EQ(length, msg->length);
-  EXPECT_EQ(beam, msg->beam);
+  EXPECT_FLOAT_EQ(length, msg->length);
+  EXPECT_FLOAT_EQ(beam, msg->beam);
   EXPECT_EQ(ship_type, msg->ship_type);
   EXPECT_EQ(haz_cargo, msg->haz_cargo);
-  EXPECT_EQ(draught, msg->draught);
+  EXPECT_FLOAT_EQ(draught, msg->draught);
   EXPECT_EQ(loaded, msg->loaded);
   EXPECT_EQ(speed_qual, msg->speed_qual);
   EXPECT_EQ(course_qual, msg->course_qual);
@@ -44,8 +44,8 @@ TEST(Ais8_200_10Test, DecodeAnything) {
 
   std::unique_ptr<Ais8_200_10> msg(
       new Ais8_200_10("85NLn@0j2d<8000000BhI?`50000", 0));
-  Validate8_200_10(msg.get(), 0, 367474240, string("foo"), 15, 5, 8000, 5, 0, 0,
-                   0, 0, 0, 0);
+  Validate8_200_10(msg.get(), 0, 367474240, string("foo"), 15, 5, 8000, 5,
+                   0, 0, 0, 0, 0, 0);
 }
 
 }  // namespace

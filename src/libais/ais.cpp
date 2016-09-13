@@ -203,17 +203,17 @@ const AisPoint AisBitset::ToAisPoint(const size_t start,
                                      const size_t point_size) const {
   int lng_bits;
   int lat_bits;
-  float divisor;
+  double divisor;
   switch (point_size) {
     case 35:
       lng_bits = 18;
       lat_bits = 17;
-      divisor = 600.;
+      divisor = 600.0;
       break;
     case 49:
       lng_bits = 25;
       lat_bits = 24;
-      divisor = 60000.;  // 1/1000th minute
+      divisor = 60000.0;  // 1/1000th minute
       break;
     case 55:
       lng_bits = 28;
@@ -225,8 +225,8 @@ const AisPoint AisBitset::ToAisPoint(const size_t start,
       assert(false);
       return AisPoint(-1, -1);
   }
-  float lng_deg = ToInt(start, lng_bits);
-  float lat_deg = ToInt(start + lng_bits, lat_bits);
+  double lng_deg = ToInt(start, lng_bits);
+  double lat_deg = ToInt(start + lng_bits, lat_bits);
   return AisPoint(lng_deg / divisor, lat_deg / divisor);
 }
 
