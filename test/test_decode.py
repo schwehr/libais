@@ -25,7 +25,7 @@ class AisTopLevelDecoders(unittest.TestCase):
       self.assertDictEqual(
           msg, expected,
           'Mismatch for id:%d\n%s\n%s\n  From: %s' % (
-              msg['id'], msg, expected, line))
+              msg['id'], msg, expected, entry['nmea']))
 
 
 class Ais6Decoders(unittest.TestCase):
