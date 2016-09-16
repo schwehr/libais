@@ -2,7 +2,6 @@
 
 """Tests for ais.vdm."""
 
-import datetime
 import unittest
 
 from ais import vdm
@@ -91,7 +90,7 @@ class ParseTest(TestCase):
 
   def testSingleLineParse(self):
     line = '!AIVDM,1,1,,A,B7OeqLP0mB4<LFKO7noASwcUoP06,0*51'
-    msg = vdm.Parse(line)
+    message = vdm.Parse(line)
     expected = {
         'body': 'B7OeqLP0mB4<LFKO7noASwcUoP06',
         'checksum': '51',
@@ -102,7 +101,7 @@ class ParseTest(TestCase):
         'sen_num': 1,
         'seq_id': None,
         'sen_tot': 1}
-    self.assertDictContainsSubset2(msg, expected)
+    self.assertDictContainsSubset2(message, expected)
 
 
 class BareQueueTest(unittest.TestCase):
@@ -127,9 +126,10 @@ class BareQueueTest(unittest.TestCase):
       expected = {
           'line_nums': [line_num + 1],
           'lines': [line.rstrip()]}
-      msg = self.queue.get()
-      self.assertEqual(msg, expected, 'pass through fail. %d "%s"\n  %s != %s'
-                       % (line_num, line, msg, expected))
+      message = self.queue.get()
+      self.assertEqual(message, expected,
+                       'pass through fail. %d "%s"\n  %s != %s'
+                       % (line_num, line, message, expected))
       self.assertEqual(self.queue.qsize(), 0)
 
   def testSingleLineNmeaSentencesIgnored(self):
@@ -141,18 +141,14 @@ class BareQueueTest(unittest.TestCase):
         '$GPVTG,268.6,T,284.0,M,0.1,N,0.1,K,D*2',
         '$GPGGA,000003,4308.1252,N,07056.3763,W,2,9,0.9,35.3,M,,,,*08')
 
-    decoded = [
-
-    ]
-
     for line_num, line in enumerate(lines):
       self.queue.put(line)
       self.assertEqual(self.queue.qsize(), 1)
       expected = {
           'line_nums': [line_num + 1],
           'lines': [line.rstrip()]}
-      msg = self.queue.get()
-      self.assertEqual(msg, expected)
+      message = self.queue.get()
+      self.assertEqual(message, expected)
       self.assertEqual(self.queue.qsize(), 0)
 
   def testSingleLineVdm(self):
@@ -193,8 +189,8 @@ class BareQueueTest(unittest.TestCase):
             'checksum': '7B',
             'vdm': '!SAVDM,1,1,,B,K8VSqb9LdU28WP8P,0*7B'}]
     }
-    msg = self.queue.get()
-    self.assertEqual(msg, expected)
+    message = self.queue.get()
+    self.assertEqual(message, expected)
     self.assertEqual(self.queue.qsize(), 0)
 
   def testManySingleLineVdms(self):
@@ -215,47 +211,47 @@ class BareQueueTest(unittest.TestCase):
       self.queue.put(line)
       self.assertEqual(self.queue.qsize(), count+1)
 
-    msgs = []
+    messages = []
     while not self.queue.empty():
-      msgs.append(self.queue.get())
+      messages.append(self.queue.get())
 
-    self.assertEqual(len(msgs), len(lines))
+    self.assertEqual(len(messages), len(lines))
     self.assertEqual(
-        [msg['line_nums'][0] for msg in msgs],
+        [message['line_nums'][0] for message in messages],
         [1, 2, 3, 4, 5, 6, 7])
-    for msg in msgs:
-      self.assertEqual(len(msg['line_nums']), 1)
-      self.assertEqual(len(msg['lines']), 1)
-      self.assertEqual(len(msg['matches']), 1)
+    for message in messages:
+      self.assertEqual(len(message['line_nums']), 1)
+      self.assertEqual(len(message['lines']), 1)
+      self.assertEqual(len(message['matches']), 1)
 
     # Spot check each message.
-    self.assertEqual(msgs[0]['decoded']['id'], 1)
-    self.assertEqual(msgs[0]['decoded']['true_heading'], 36)
-    self.assertEqual(msgs[0]['matches'][0]['chan'], 'A')
+    self.assertEqual(messages[0]['decoded']['id'], 1)
+    self.assertEqual(messages[0]['decoded']['true_heading'], 36)
+    self.assertEqual(messages[0]['matches'][0]['chan'], 'A')
 
-    self.assertEqual(msgs[1]['decoded']['id'], 4)
-    self.assertEqual(msgs[1]['decoded']['fix_type'], 7)
-    self.assertEqual(msgs[1]['matches'][0]['vdm_type'], 'VDO')
+    self.assertEqual(messages[1]['decoded']['id'], 4)
+    self.assertEqual(messages[1]['decoded']['fix_type'], 7)
+    self.assertEqual(messages[1]['matches'][0]['vdm_type'], 'VDO')
 
-    self.assertEqual(msgs[2]['decoded']['id'], 7)
-    self.assertEqual(msgs[2]['decoded']['acks'][0], (345070303, 1))
-    self.assertEqual(msgs[2]['matches'][0]['talker'], 'SA')
+    self.assertEqual(messages[2]['decoded']['id'], 7)
+    self.assertEqual(messages[2]['decoded']['acks'][0], (345070303, 1))
+    self.assertEqual(messages[2]['matches'][0]['talker'], 'SA')
 
-    self.assertEqual(msgs[3]['decoded']['id'], 9)
-    self.assertEqual(msgs[3]['decoded']['alt'], 2324)
-    self.assertEqual(msgs[3]['matches'][0]['sen_num'], 1)
+    self.assertEqual(messages[3]['decoded']['id'], 9)
+    self.assertEqual(messages[3]['decoded']['alt'], 2324)
+    self.assertEqual(messages[3]['matches'][0]['sen_num'], 1)
 
-    self.assertEqual(msgs[4]['decoded']['id'], 10)
-    self.assertEqual(msgs[4]['decoded']['dest_mmsi'], 235089435)
-    self.assertEqual(msgs[4]['matches'][0]['sen_tot'], 1)
+    self.assertEqual(messages[4]['decoded']['id'], 10)
+    self.assertEqual(messages[4]['decoded']['dest_mmsi'], 235089435)
+    self.assertEqual(messages[4]['matches'][0]['sen_tot'], 1)
 
-    self.assertEqual(msgs[5]['decoded']['id'], 11)
-    self.assertEqual(msgs[5]['decoded']['year'], 2012)
-    self.assertIsNone(msgs[5]['matches'][0]['seq_id'])
+    self.assertEqual(messages[5]['decoded']['id'], 11)
+    self.assertEqual(messages[5]['decoded']['year'], 2012)
+    self.assertIsNone(messages[5]['matches'][0]['seq_id'])
 
-    self.assertEqual(msgs[6]['decoded']['id'], 18)
-    self.assertEqual(msgs[6]['decoded']['band_flag'], 1)
-    self.assertEqual(msgs[6]['matches'][0]['checksum'], '23')
+    self.assertEqual(messages[6]['decoded']['id'], 18)
+    self.assertEqual(messages[6]['decoded']['band_flag'], 1)
+    self.assertEqual(messages[6]['matches'][0]['checksum'], '23')
 
   def testTwoLineMessage(self):
     lines = (
@@ -319,8 +315,8 @@ class BareQueueTest(unittest.TestCase):
                 'talker': 'AB',
                 'vdm_type': 'VDM',
                 'vdm': '!ABVDM,2,2,2,A,UQCU8888880,2*3F'}]}
-    msg = self.queue.get()
-    self.assertEqual(msg, expected)
+    message = self.queue.get()
+    self.assertEqual(message, expected)
     self.assertEqual(self.queue.qsize(), 0)
 
   def testThreeLineMessage(self):
@@ -438,12 +434,12 @@ class BareQueueTest(unittest.TestCase):
                 'fill_bits': 0,
                 'vdm': '!AIVDM,3,3,4,A,d0@d0IqhH:Pah:U54PD?75D85Bf00,0*03'}]
     }
-    msg = self.queue.get()
+    message = self.queue.get()
 
-    self.assertEqual(msg, expected)
+    self.assertEqual(message, expected)
     self.assertEqual(self.queue.qsize(), 0)
 
-  def testInterspersedMsgs(self):
+  def testInterspersedMessages(self):
     # The grand test of mixing messages between each other.  The
     # queue should correctly use all lines here to decode 4 messages.
     lines = (
@@ -463,33 +459,33 @@ class BareQueueTest(unittest.TestCase):
       self.queue.put(line)
       self.assertEqual(self.queue.qsize(), expected_queue_size[count])
 
-    msgs = []
+    messages = []
     while not self.queue.empty():
-      msgs.append(self.queue.get())
+      messages.append(self.queue.get())
 
-    self.assertEqual(len(msgs), 4)
+    self.assertEqual(len(messages), 4)
 
     self.assertEqual(
-        [msg['line_nums'] for msg in msgs],
+        [message['line_nums'] for message in messages],
         [[4], [5, 6], [1, 3, 7], [2, 8]])
 
     # Spot check each message.
-    self.assertEqual(msgs[0]['decoded']['id'], 18)
-    self.assertAlmostEqual(msgs[0]['decoded']['x'], -122.767435)
-    self.assertEqual(msgs[0]['matches'][0]['seq_id'], 1)
+    self.assertEqual(messages[0]['decoded']['id'], 18)
+    self.assertAlmostEqual(messages[0]['decoded']['x'], -122.767435)
+    self.assertEqual(messages[0]['matches'][0]['seq_id'], 1)
 
-    self.assertEqual(msgs[1]['decoded']['id'], 5)
-    self.assertEqual(msgs[1]['decoded']['name'], 'IRON EAGLE          ')
-    self.assertEqual(msgs[1]['matches'][0]['seq_id'], 6)
+    self.assertEqual(messages[1]['decoded']['id'], 5)
+    self.assertEqual(messages[1]['decoded']['name'], 'IRON EAGLE          ')
+    self.assertEqual(messages[1]['matches'][0]['seq_id'], 6)
 
-    self.assertEqual(msgs[2]['decoded']['id'], 8)
+    self.assertEqual(messages[2]['decoded']['id'], 8)
     self.assertEqual(
-        msgs[2]['decoded']['sub_areas'][8]['text'], 'ED TOGETHER.@@')
-    self.assertEqual(msgs[2]['matches'][0]['seq_id'], 4)
+        messages[2]['decoded']['sub_areas'][8]['text'], 'ED TOGETHER.@@')
+    self.assertEqual(messages[2]['matches'][0]['seq_id'], 4)
 
-    self.assertEqual(msgs[3]['decoded']['id'], 5)
-    self.assertEqual(msgs[3]['decoded']['callsign'], 'KHJL   ')
-    self.assertEqual(msgs[3]['matches'][0]['seq_id'], 7)
+    self.assertEqual(messages[3]['decoded']['id'], 5)
+    self.assertEqual(messages[3]['decoded']['callsign'], 'KHJL   ')
+    self.assertEqual(messages[3]['matches'][0]['seq_id'], 7)
 
   def testUnhandledSingleLineVdmMessageType(self):
     # AIS 6:669:11 not handled.
