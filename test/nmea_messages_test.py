@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Tests for ais.nmea_messages."""
 
 import datetime
@@ -7,32 +6,35 @@ import unittest
 from ais import nmea_messages
 
 
+# TODO(schwehr): Test TimeUtc.
+
+
 class AbkTest(unittest.TestCase):
 
   def testRegex(self):
     line = '$ANABK,,B,8,5,3*17'
-    msg = nmea_messages.ABK_RE.search(line).groupdict()
+    message = nmea_messages.ABK_RE.search(line).groupdict()
     self.assertEqual(
-        msg,
+        message,
         {'ack_type': '3',
          'chan': 'B',
          'checksum': '17',
          'mmsi': None,
-         'msg_id': '8',
+         'message_id': '8',
          'sentence': 'ABK',
          'seq_num': '5',
          'talker': 'AN'})
 
   def testDecode(self):
     line = '$ANABK,,A,8,4,3*15'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'ack_type': 3,
          'chan': 'A',
          'mmsi': None,
-         'msg_id': 8,
-         'msg': 'ABK',
+         'message_id': 8,
+         'message': 'ABK',
          'seq_num': 4,
          'talker': 'AN'})
 
@@ -41,9 +43,9 @@ class AdsTest(unittest.TestCase):
 
   def testRegex(self):
     line = '$ANADS,L3 AIS ID,024358.79,V,0,I,I*3E'
-    msg = nmea_messages.ADS_RE.search(line).groupdict()
+    message = nmea_messages.ADS_RE.search(line).groupdict()
     self.assertEqual(
-        msg,
+        message,
         {'alarm': '',
          'checksum': '3E',
          'hours': '02',
@@ -59,12 +61,12 @@ class AdsTest(unittest.TestCase):
 
   def testDecode(self):
     line = '$ANADS,L3 AIS ID,024829.51,V,0,I,I*39'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'alarm': '',
          'id': 'L3 AIS ID',
-         'msg': 'ADS',
+         'message': 'ADS',
          'pos_src': 'I',
          'talker': 'AN',
          'time_src': 'I',
@@ -72,12 +74,12 @@ class AdsTest(unittest.TestCase):
          'when': datetime.time(2, 48, 29, 510000)})
 
     line = '$BSADS,312670-BS,134839.00,A,3,N,N*22'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'alarm': '',
          'id': '312670-BS',
-         'msg': 'ADS',
+         'message': 'ADS',
          'pos_src': 'N',
          'talker': 'BS',
          'time_src': 'N',
@@ -89,9 +91,9 @@ class AlrTest(unittest.TestCase):
 
   def testRegex(self):
     line = '$ANALR,000000.00,007,A,V,AIS: UTC Lost*75'
-    msg = nmea_messages.ALR_RE.search(line).groupdict()
+    message = nmea_messages.ALR_RE.search(line).groupdict()
     self.assertEqual(
-        msg,
+        message,
         {'ack_state': 'V',
          'checksum': '75',
          'condition': 'A',
@@ -106,57 +108,57 @@ class AlrTest(unittest.TestCase):
 
   def testDecode(self):
     line = '$ANALR,000000.00,007,A,V,AIS: UTC Lost*75'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'ack_state': False,
          'ack_state_raw': 'V',
          'condition': True,
          'condition_raw': 'A',
          'id': '007',
-         'msg': 'ALR',
+         'message': 'ALR',
          'talker': 'AN',
          'text': 'AIS: UTC Lost',
          'time': datetime.time(0, 0)})
 
     line = '$BSALR,134239.00,002,A,V,AIS: Antenna VSWR exceeds limit*45'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'ack_state': False,
          'ack_state_raw': 'V',
          'condition': True,
          'condition_raw': 'A',
          'id': '002',
-         'msg': 'ALR',
+         'message': 'ALR',
          'talker': 'BS',
          'text': 'AIS: Antenna VSWR exceeds limit',
          'time': datetime.time(13, 42, 39)})
 
     line = '$BSALR,000000.00,006,V,V,AIS: General Failure*0D,rbs1,1206655746.11'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'ack_state': False,
          'ack_state_raw': 'V',
          'condition': False,
          'condition_raw': 'V',
          'id': '006',
-         'msg': 'ALR',
+         'message': 'ALR',
          'talker': 'BS',
          'text': 'AIS: General Failure',
          'time': datetime.time(0, 0)})
 
     line = '$BSALR,000000.00,051,V,V,AIS: IEC Comm Error*02,rbs1,1206655746.23'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'ack_state': False,
          'ack_state_raw': 'V',
          'condition': False,
          'condition_raw': 'V',
          'id': '051',
-         'msg': 'ALR',
+         'message': 'ALR',
          'talker': 'BS',
          'text': 'AIS: IEC Comm Error',
          'time': datetime.time(0, 0)})
@@ -166,14 +168,14 @@ class BbmTest(unittest.TestCase):
 
   def testRegex(self):
     line = '!UPBBM,1,1,8,0,8,Fv4:Rb11Jq;=0Gjl:4vT80,4*06'
-    msg = nmea_messages.BBM_RE.search(line).groupdict()
+    message = nmea_messages.BBM_RE.search(line).groupdict()
     self.assertEqual(
-        msg,
+        message,
         {'body': 'Fv4:Rb11Jq;=0Gjl:4vT80',
          'chan': '0',
          'checksum': '06',
          'fill_bits': '4',
-         'msg_id': '8',
+         'message_id': '8',
          'sen_num': '1',
          'sen_tot': '1',
          'sentence': 'BBM',
@@ -182,14 +184,14 @@ class BbmTest(unittest.TestCase):
 
   def testDecode(self):
     line = '!UPBBM,1,1,2,0,8,Fv4:3s3QJr<R@GoB64vT80,4*22'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'body': 'Fv4:3s3QJr<R@GoB64vT80',
          'chan': 0,
          'fill_bits': 4,
-         'msg': 'BBM',
-         'msg_id': 8,
+         'message': 'BBM',
+         'message_id': 8,
          'sen_num': 1,
          'sen_tot': 1,
          'seq_num': 2,
@@ -200,9 +202,9 @@ class FsrTest(unittest.TestCase):
 
   def testRegex(self):
     line = '$SAFSR,D07MN-CH-MTGBS1,000000,A,561,3,41,369,3,-122,696*0F'
-    msg = nmea_messages.FSR_RE.search(line).groupdict()
+    message = nmea_messages.FSR_RE.search(line).groupdict()
     self.assertEqual(
-        msg,
+        message,
         {'chan': 'A',
          'checksum': '0F',
          'crc_fails': '41',
@@ -222,13 +224,13 @@ class FsrTest(unittest.TestCase):
 
   def testDecodeFull(self):
     line = '$SAFSR,D09MN-SM-GULBS1,000000,B,115,3,5,86,3,-121,124*1F'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'chan': 'B',
          'crc_fails': 5,
          'id': 'D09MN-SM-GULBS1',
-         'msg': 'FSR',
+         'message': 'FSR',
          'noise_db': -121,
          'slots_above_noise': 124,
          'slots_recv': 115,
@@ -239,13 +241,13 @@ class FsrTest(unittest.TestCase):
 
   def testDecodeA(self):
     line = '$ARFSR,r17MANP1,000001,A,0005,0,0035,,,-128,*66'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'chan': 'A',
          'crc_fails': 35,
          'id': 'r17MANP1',
-         'msg': 'FSR',
+         'message': 'FSR',
          'noise_db': -128,
          'slots_recv': 5,
          'slots_self': 0,
@@ -253,12 +255,12 @@ class FsrTest(unittest.TestCase):
 
   def testDecodeX(self):
     line = '$ARFSR,b003669708,000004,X,488,0,,,,,*5B'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'chan': 'X',
          'id': 'b003669708',
-         'msg': 'FSR',
+         'message': 'FSR',
          'slots_recv': 488,
          'slots_self': 0,
          'time': datetime.time(0, 0, 4)})
@@ -270,9 +272,9 @@ class GgaTest(unittest.TestCase):
     line = (
         '$GPGGA,174246.00,7119.6369,N,15640.8432,W,1,06,2.39,00011,M,000,M,,'
         '*7D')  # ',rakbarrow85,1226943363.79')
-    msg = nmea_messages.GGA_RE.search(line).groupdict()
+    message = nmea_messages.GGA_RE.search(line).groupdict()
     self.assertEqual(
-        msg,
+        message,
         {'antenna_height': '00011',
          'antenna_height_units': 'M',
          'checksum': '7D',
@@ -302,9 +304,9 @@ class GgaTest(unittest.TestCase):
     line = (
         '$GPGGA,174246.00,7119.6369,N,15640.8432,W,1,06,2.39,00011,M,000,M,,'
         '*7D')
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
+        message,
         {'antenna_height': 11,
          'antenna_height_units': 'M',
          'geoidal_height': 0,
@@ -313,12 +315,12 @@ class GgaTest(unittest.TestCase):
          'hdop': 2.39,
          'latitude': 71.32728166666666,
          'longitude': -156.68072,
-         'msg': 'GGA',
+         'message': 'GGA',
          'satellites': 6,
          'time': datetime.time(17, 42, 46)})
 
 
-# TODO(schwehr): RMC.
+# TODO(schwehr): Recommended Minimum Specific GNSS Data (RMC).
 # $GPRMC,150959.51,V,4234.8141,N,07039.8693,W,0.00,0.0,120308,15.1,W,N*21
 
 
@@ -327,9 +329,9 @@ class TxtTest(unittest.TestCase):
   def testRegex(self):
     # From an SR-162.
     line = '$AITXT,01,01,91,FREQ,2087,2088*57'
-    msg = nmea_messages.TXT_RE.search(line).groupdict()
+    message = nmea_messages.TXT_RE.search(line).groupdict()
     self.assertEqual(
-        msg,
+        message,
         {'checksum': '57',
          'sen_num': '01',
          'sen_tot': '01',
@@ -340,31 +342,49 @@ class TxtTest(unittest.TestCase):
 
   def testDecode(self):
     line = '$AITXT,01,01,91,FREQ,2087,2088*57'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
-        {'msg': 'TXT',
+        message,
+        {'message': 'TXT',
          'sen_num': 1,
          'sen_tot': 1,
          'seq_num': 91,
          'talker': 'AI',
          'text': 'FREQ,2087,2088'})
 
-    # TODO(schwehr): Add more tests from these.
-    # $AITXT,01,01,01,WHALE NOTICES DATETIME 20110508T133349 UTC*58
-    # $AITXT,01,01,70,Entered a DSC Receivable Window Chan A*46
-    # $AITXT,01,01,70,Leaving a DSC Receivable Window^2C Chan A*7E
-    # $AITXT,01,01,64,AIS: RATDMA Overflow*00,B0003160048,1064982808
-    # $AITXT,1,1,007,AIS: UTC clock lost*08,1179172653.22
+  def testWithCaret(self):
+    # TODO(schwehr): ^2C should be replaced by a special character in decoding.
+    line = '$AITXT,01,01,70,Leaving a DSC Receivable Window^2C Chan A*7E'
+    message = nmea_messages.DecodeLine(line)
+    self.assertEqual(
+        message,
+        {'message': 'TXT',
+         'sen_num': 1,
+         'sen_tot': 1,
+         'seq_num': 70,
+         'talker': 'AI',
+         'text': 'Leaving a DSC Receivable Window^2C Chan A'})
+
+  def testWithSingleDigitSentenceAndSequence(self):
+    line = '$AITXT,1,1,007,AIS: UTC clock lost*08'
+    message = nmea_messages.DecodeLine(line)
+    self.assertEqual(
+        message,
+        {'message': 'TXT',
+         'sen_num': 1,
+         'sen_tot': 1,
+         'seq_num': 7,
+         'talker': 'AI',
+         'text': 'AIS: UTC clock lost'})
 
 
 class ZdaTest(unittest.TestCase):
 
   def testRegex(self):
     line = '$INZDA,082015.0007,30,04,2009,,*73'
-    msg = nmea_messages.ZDA_RE.search(line).groupdict()
+    message = nmea_messages.ZDA_RE.search(line).groupdict()
     self.assertEqual(
-        msg,
+        message,
         {'checksum': '73',
          'day': '30',
          'hours': '08',
@@ -380,14 +400,32 @@ class ZdaTest(unittest.TestCase):
 
   def testDecode(self):
     line = '$INZDA,082015.0007,30,04,2009,,*73'
-    msg = nmea_messages.Decode(line)
+    message = nmea_messages.DecodeLine(line)
     self.assertEqual(
-        msg,
-        {'msg': 'ZDA',
+        message,
+        {'message': 'ZDA',
          'datetime': datetime.datetime(2009, 4, 30, 8, 20, 15, 700),
          'talker': 'IN',
          'zone_hours': None,
          'zone_minutes': None})
+
+
+class NonNmeaTest(unittest.TestCase):
+
+  def testEmpty(self):
+    line = ''
+    message = nmea_messages.DecodeLine(line)
+    self.assertIsNone(message)
+
+  def testJunk(self):
+    line = '!@#$($#&^%('
+    message = nmea_messages.DecodeLine(line)
+    self.assertIsNone(message)
+
+  def testAlmostReal(self):
+    line = '$AAZZZ,JUNK*73'
+    message = nmea_messages.DecodeLine(line)
+    self.assertIsNone(message)
 
 
 if __name__ == '__main__':

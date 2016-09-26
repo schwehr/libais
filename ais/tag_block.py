@@ -132,7 +132,7 @@ class TagQueue(Queue.Queue):
         msg['decoded'] = decoded
       else:
         logger.info('Unable to decode. Passing without decoded block.')
-        decoded = nmea_messages.Decode(match['payload'])
+        decoded = nmea_messages.DecodeLine(match['payload'])
         if decoded:
           msg['decoded'] = decoded
         else:

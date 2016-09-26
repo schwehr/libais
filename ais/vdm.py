@@ -159,7 +159,7 @@ class BareQueue(Queue.Queue):
       msg = {
           'line_nums': [line_num],
           'lines': [line]}
-      decoded = nmea_messages.Decode(line)
+      decoded = nmea_messages.DecodeLine(line)
       if decoded:
         msg['decoded'] = decoded
       else:

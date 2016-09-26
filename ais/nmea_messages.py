@@ -1,5 +1,33 @@
+"""Parse non-AIS NMEA messages.
 
-# TODO(schwehr): Make sure this works with proprietary messages.
+National Marine Electronics Association (NMEA) messages are comma separated
+value lines of text that start with sender or "talker" code and the sentence
+type.  They finish up with a checksum.  For example, this is a time message
+(ZDA) from an "Integrated Navigation" (IN) system.
+
+This module is only concerned with the actual messages and not the wire level
+transfer of the data as defined in NMEA 0183 or NMEA 2000.
+
+Most users  of libais will eventually  want to parse the  surround NMEA messages
+for time, AIS  receiver status, station location, weather, etc.   The core theme
+of libais is  handling the AIVDM messages.  However, leaving  out the other NMEA
+messages means  that a use of  libais will have  to write their own  wrapper for
+other NMEA  messages or bring in  another library like GPSD.   Very few decoders
+have support  for messages like ABK,  ABM, BBM, etc. that  are often encountered
+with AIS logs.   Additionally, the official NMEA specification  is paywalled and
+public documentation covers only some of the messages.
+
+TODO(schwehr): Make sure this works with proprietary messages.
+TODO(schwehr): Factor our a generic handler for messages that do not need
+  customization of the result.  Should there be a handler parent class?
+TODO(schwehr): Consider using namedtuple rather than dict.
+
+See also:
+
+  http://www.catb.org/gpsd/NMEA.html
+  https://en.wikipedia.org/wiki/NMEA_0183
+
+"""
 
 import datetime
 import logging
@@ -18,9 +46,8 @@ NMEA_HEADER_RE = re.compile(NMEA_HEADER_RE_STR)
 NMEA_SENTENCE_RE = re.compile(NMEA_SENTENCE_RE_STR)
 NMEA_CHECKSUM_RE = re.compile(NMEA_CHECKSUM_RE_STR)
 
-HANDLERS = {}
 
-
+# TODO(schwehr): Rename TimeUtc.
 def TimeUtc(fields):
   seconds, fractional_seconds = FloatSplit(float(fields['seconds']))
   microseconds = int(math.floor(fractional_seconds * 1e6))
@@ -44,7 +71,7 @@ ABK_RE_STR = (
     r'(?P<sentence>ABK),'
     r'(?P<mmsi>\d+)?,'
     r'(?P<chan>[AB])?,'
-    r'(?P<msg_id>\d+)?,'
+    r'(?P<message_id>\d+)?,'
     r'(?P<seq_num>\d+)?,'
     r'(?P<ack_type>\d+)' +
     NMEA_CHECKSUM_RE_STR
@@ -53,7 +80,9 @@ ABK_RE_STR = (
 ABK_RE = re.compile(ABK_RE_STR)
 
 
-def Abk(line):
+# TODO(schwehr): Document that handlers return None if they fail to match
+#   the line to their message.
+def HandleAbk(line):
   """Decode AIS Addressed and Binary Broadcast Acknowledgement (ABK)."""
   try:
     fields = ABK_RE.match(line).groupdict()
@@ -61,18 +90,16 @@ def Abk(line):
     return
 
   result = {
-      'msg': 'ABK',
+      'message': 'ABK',
       'talker': fields['talker'],
       'chan': fields['chan'],
   }
 
-  for field in ('mmsi', 'msg_id', 'seq_num', 'ack_type'):
+  for field in ('mmsi', 'message_id', 'seq_num', 'ack_type'):
     result[field] = util.MaybeToNumber(fields[field])
 
   return result
 
-
-HANDLERS['ABK'] = Abk
 
 ADS_RE_STR = (
     NMEA_HEADER_RE_STR +
@@ -89,7 +116,7 @@ ADS_RE_STR = (
 ADS_RE = re.compile(ADS_RE_STR)
 
 
-def Ads(line):
+def HandleAds(line):
   """Decode Automatic Device Status (ADS)."""
   try:
     fields = ADS_RE.match(line).groupdict()
@@ -98,8 +125,8 @@ def Ads(line):
 
   TimeUtc(fields)
 
-  result = {
-      'msg': 'ADS',
+  return {
+      'message': 'ADS',
       'talker': fields['talker'],
       'id': fields['id'],
       'alarm': fields['alarm'],
@@ -109,10 +136,6 @@ def Ads(line):
       'when': fields['when'],
   }
 
-  return result
-
-
-HANDLERS['ADS'] = Ads
 
 ALR_RE_STR = (
     NMEA_HEADER_RE_STR +
@@ -128,7 +151,7 @@ ALR_RE_STR = (
 ALR_RE = re.compile(ALR_RE_STR)
 
 
-def Alr(line):
+def HandleAlr(line):
   """Decode Set Alarm State (ALR)."""
   try:
     fields = ALR_RE.match(line).groupdict()
@@ -149,7 +172,7 @@ def Alr(line):
       'ack_state_raw': fields['ack_state'],
       'condition_raw': fields['condition'],
       'id': fields['id'],
-      'msg': 'ALR',
+      'message': 'ALR',
       'talker': fields['talker'],
       'text': fields['text'],
       'time': when,
@@ -162,8 +185,6 @@ def Alr(line):
   return result
 
 
-HANDLERS['ALR'] = Alr
-
 BBM_RE_STR = (
     NMEA_HEADER_RE_STR +
     r'(?P<sentence>BBM),'
@@ -171,7 +192,7 @@ BBM_RE_STR = (
     r'(?P<sen_num>\d),'
     r'(?P<seq_num>\d),'
     r'(?P<chan>\d),'
-    r'(?P<msg_id>\d),'
+    r'(?P<message_id>\d),'
     r'(?P<body>[^,*]*),'
     r'(?P<fill_bits>\d)' +
     NMEA_CHECKSUM_RE_STR
@@ -180,7 +201,7 @@ BBM_RE_STR = (
 BBM_RE = re.compile(BBM_RE_STR)
 
 
-def Bbm(line):
+def HandleBbm(line):
   """Decode Binary Broadcast Message (BBM) sentence."""
   try:
     fields = BBM_RE.match(line).groupdict()
@@ -188,18 +209,17 @@ def Bbm(line):
     return
 
   result = {
-      'msg': 'BBM',
+      'message': 'BBM',
       'talker': fields['talker'],
       'body': fields['body'],
   }
 
-  for field in ('sen_tot', 'sen_num', 'seq_num', 'chan', 'msg_id', 'fill_bits'):
+  for field in ('sen_tot', 'sen_num', 'seq_num', 'chan', 'message_id',
+                'fill_bits'):
     result[field] = util.MaybeToNumber(fields[field])
 
   return result
 
-
-HANDLERS['BBM'] = Bbm
 
 FSR_RE_STR = (
     NMEA_HEADER_RE_STR +
@@ -219,7 +239,8 @@ FSR_RE_STR = (
 
 FSR_RE = re.compile(FSR_RE_STR)
 
-def Fsr(line):
+
+def HandleFsr(line):
   try:
     fields = FSR_RE.match(line).groupdict()
   except TypeError:
@@ -236,7 +257,7 @@ def Fsr(line):
   )
 
   result = {
-      'msg': 'FSR',
+      'message': 'FSR',
       'id': fields['id'],
       'chan': fields['chan'],
       'time': when,
@@ -248,7 +269,6 @@ def Fsr(line):
 
   return result
 
-HANDLERS['FSR'] = Fsr
 
 GGA_RE_STR = (
     NMEA_HEADER_RE_STR +
@@ -270,10 +290,10 @@ GGA_RE_STR = (
     + NMEA_CHECKSUM_RE_STR
 )
 
-GGA_RE = re.compile(GGA_RE_STR)  # ; GGA_RE.search(line).groupdict()
+GGA_RE = re.compile(GGA_RE_STR)
 
 
-def Gga(line):
+def HandleGga(line):
   try:
     fields = GGA_RE.match(line).groupdict()
   except TypeError:
@@ -298,7 +318,7 @@ def Gga(line):
     y = -y
 
   result = {
-      'msg': 'GGA',
+      'message': 'GGA',
       'time': when,
       'longitude': x,
       'latitude': y,
@@ -313,23 +333,20 @@ def Gga(line):
   return result
 
 
-HANDLERS['GGA'] = Gga
-
-
 TXT_RE_STR = (
     NMEA_HEADER_RE_STR +
     r'(?P<sentence>TXT),'
     r'(?P<sen_tot>\d+)?,'
     r'(?P<sen_num>\d+)?,'
     r'(?P<seq_num>\d+)?,'
-    r'(?P<text>[^*,][^\*]*)?'
+    r'(?P<text>[^*]*)?'
     + NMEA_CHECKSUM_RE_STR
 )
 
 TXT_RE = re.compile(TXT_RE_STR)
 
 
-def Txt(line):
+def HandleTxt(line):
   """Decode Text Transmission (TXT).
 
   TODO(schwehr): Handle encoded characters.  e.g. ^21 is a '!'.
@@ -337,8 +354,9 @@ def Txt(line):
   Args:
     line: A string containing a NMEA TXT message.
 
-  Return:
-    A dictionary with the decoded fields.
+  Returns:
+    A dictionary with the decoded fields or None if it cannot decode
+    the message.
   """
   try:
     fields = TXT_RE.match(line).groupdict()
@@ -346,7 +364,7 @@ def Txt(line):
     return
 
   result = {
-      'msg': 'TXT',
+      'message': 'TXT',
       'talker': fields['talker'],
       'text': fields['text'],
   }
@@ -356,8 +374,6 @@ def Txt(line):
 
   return result
 
-
-HANDLERS['TXT'] = Txt
 
 # Time in UTC.
 ZDA_RE_STR = (
@@ -381,7 +397,7 @@ def FloatSplit(value):
   return base, fractional
 
 
-def Zda(line):
+def HandleZda(line):
   try:
     fields = ZDA_RE.match(line).groupdict()
   except TypeError:
@@ -404,20 +420,37 @@ def Zda(line):
       microseconds)
 
   # TODO(schwehr): Convert this to Unix UTC seconds.
-  result = {
-      'msg': 'ZDA',
+  return {
+      'message': 'ZDA',
       'talker': fields['talker'],
       'datetime': when,
       'zone_hours': fields['zone_hours'],
       'zone_minutes': fields['zone_minutes'],
   }
 
-  return result
 
-HANDLERS['ZDA'] = Zda
+HANDLERS = {
+    'ABK': HandleAbk,
+    'ADS': HandleAds,
+    'ALR': HandleAlr,
+    'BBM': HandleBbm,
+    'FSR': HandleFsr,
+    'GGA': HandleGga,
+    'TXT': HandleTxt,
+    'ZDA': HandleZda
+}
 
 
-def Decode(line):
+def DecodeLine(line):
+  """Decode a NMEA line.
+
+  Args:
+    line: A string with single line containing a possible NMEA sentence.
+
+  Returns:
+    A dict mapping the message and sentence fields or None if it is unable
+    to decode the line.
+  """
   line = line.rstrip()
   try:
     sentence = NMEA_SENTENCE_RE.match(line).groupdict()['sentence']
@@ -430,9 +463,9 @@ def Decode(line):
     return
 
   try:
-    msg = HANDLERS[sentence](line)
+    message = HANDLERS[sentence](line)
   except AttributeError:
     logger.info('Unable to decode line with handle: %s', line)
     return
 
-  return msg
+  return message
