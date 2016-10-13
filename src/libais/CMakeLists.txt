@@ -1,3 +1,9 @@
+# Make sure that assert() is not active in a release build.
+# assert() is used for protocol sanity checks and would stop the program on a protocol error.
+#
+if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
+  add_definitions("-DNDEBUG")
+endif()
 
 add_library(ais 
 ais.cpp
