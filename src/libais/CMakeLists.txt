@@ -30,6 +30,8 @@ ais24.cpp
 ais25.cpp
 ais26.cpp
 ais27.cpp
+decode_body.cpp
+vdm.cpp
 )
 
 # Not yet handled:
