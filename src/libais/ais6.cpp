@@ -65,7 +65,6 @@ Ais6_0_0::Ais6_0_0(const char *nmea_payload, const size_t pad)
     status = r;
     return;
   }
-
   bs.SeekTo(88);
   sub_id = bs.ToUnsignedInt(88, 16);
   voltage = bs.ToUnsignedInt(104, 12) / 10.0;
@@ -188,7 +187,7 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad)
 
   bs.SeekTo(88);
   req_dac = bs.ToUnsignedInt(88, 10);
-  spare2 = bs.ToUnsignedInt(94, 6);
+  spare2 = bs.ToUnsignedInt(98, 6);
 
   assert(bs.GetRemaining() == 0);
   status = AIS_OK;
@@ -222,7 +221,7 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
     capabilities[cap_num] = bs[start];
     cap_reserved[cap_num] = bs[start + 1];
   }
-  // spare2 = bs.ToUnsignedInt(226, 6);  // OR NOT
+  spare2 = bs.ToUnsignedInt(226, 6);  // Read the last 6 bits to avoid triggering the assert
   // TODO(schwehr): add in the offset of the dest mmsi
 
   assert(bs.GetRemaining() == 0);
