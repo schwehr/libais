@@ -264,9 +264,7 @@ Ais6_1_5::Ais6_1_5(const char *nmea_payload, const size_t pad)
 // IMO Circ 289 - Dangerous cargo
 // See also Circ 236
 Ais6_1_12::Ais6_1_12(const char *nmea_payload, const size_t pad)
-    : Ais6(nmea_payload, pad), utc_month_dep(0), utc_day_dep(0),
-      utc_hour_dep(0), utc_min_dep(0), utc_month_next(0),
-      utc_day_next(0), utc_hour_next(0), utc_min_next(0),
+    : Ais6(nmea_payload, pad), 
       un(0), value(0), value_unit(0), spare2(0) {
   assert(dac == 1);
   assert(fi == 12);
