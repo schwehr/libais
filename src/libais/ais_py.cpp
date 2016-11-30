@@ -2695,7 +2695,7 @@ decode(PyObject *self, PyObject *args) {
   case ':':  // 10 - UTC Query
     return ais10_to_pydict(nmea_payload, pad);
 
-    // ':' 11 - See 4
+    // ';' 11 - See 4
 
   case '<':  // 12 - ASRM
     return ais12_to_pydict(nmea_payload, pad);
