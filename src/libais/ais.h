@@ -373,6 +373,16 @@ enum Dac {
 
 class AisBitset;
 
+class AisMdate
+{
+public:
+  int month; 
+  int day;
+  int hour;
+  int min;
+  AisMdate() { month = day = hour = min = 0; };
+};
+
 class AisPoint {
  public:
   double lng_deg;
@@ -631,15 +641,9 @@ class Ais6_1_5 : public Ais6 {
 class Ais6_1_12 : public Ais6 {
  public:
   string last_port;
-  int utc_month_dep;  // actual time of departure
-  int utc_day_dep;
-  int utc_hour_dep;
-  int utc_min_dep;
+  AisMdate utc_dep;  // actual time of departure
   string next_port;
-  int utc_month_next;  // estimated arrival
-  int utc_day_next;
-  int utc_hour_next;
-  int utc_min_next;
+  AisMdate utc_next; // estimated arrival
   string main_danger;
   string imo_cat;
   int un;

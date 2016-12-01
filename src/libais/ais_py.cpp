@@ -467,15 +467,15 @@ ais6_1_12_append_pydict(const char *nmea_payload, PyObject *dict,
   }
 
   DictSafeSetItem(dict, "last_port", msg.last_port);
-  DictSafeSetItem(dict, "utc_month_dep", msg.utc_month_dep);  // actual
-  DictSafeSetItem(dict, "utc_day_dep", msg.utc_day_dep);
-  DictSafeSetItem(dict, "utc_hour_dep", msg.utc_hour_dep);
-  DictSafeSetItem(dict, "utc_min_dep", msg.utc_min_dep);
+  DictSafeSetItem(dict, "utc_month_dep", msg.utc_dep.month);  // actual
+  DictSafeSetItem(dict, "utc_day_dep", msg.utc_dep.day);
+  DictSafeSetItem(dict, "utc_hour_dep", msg.utc_dep.hour);
+  DictSafeSetItem(dict, "utc_min_dep", msg.utc_dep.min);
   DictSafeSetItem(dict, "next_port", msg.next_port);
-  DictSafeSetItem(dict, "utc_month_next", msg.utc_month_next);  // estimated
-  DictSafeSetItem(dict, "utc_day_next", msg.utc_day_next);
-  DictSafeSetItem(dict, "utc_hour_next", msg.utc_hour_next);
-  DictSafeSetItem(dict, "utc_min_next", msg.utc_min_next);
+  DictSafeSetItem(dict, "utc_month_next", msg.utc_next.month);  // estimated
+  DictSafeSetItem(dict, "utc_day_next", msg.utc_next.day);
+  DictSafeSetItem(dict, "utc_hour_next", msg.utc_next.hour);
+  DictSafeSetItem(dict, "utc_min_next", msg.utc_next.min);
   DictSafeSetItem(dict, "main_danger", msg.main_danger);
   DictSafeSetItem(dict, "imo_cat", msg.imo_cat);
   DictSafeSetItem(dict, "un", msg.un);
