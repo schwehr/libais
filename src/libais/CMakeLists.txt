@@ -31,6 +31,17 @@ ais25.cpp
 ais26.cpp
 ais27.cpp
 )
+set_target_properties(ais PROPERTIES PUBLIC_HEADER "ais.h")
+
+include(GNUInstallDirs)
+
+install(TARGETS ais
+  EXPORT LibaisConfig
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
 # Not yet handled:
 # ais_py.cpp
