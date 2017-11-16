@@ -200,6 +200,22 @@ top_level = [
              'y': 37.43836666666667}
   },
 
+    {
+        # 8:200:24 EU River Information System (RIS) Water level
+        # https://github.com/schwehr/libais/issues/162
+        'nmea': ['!AIVDM,1,1,,A,801tME0j60E04QJp1hhL10G20DH1,0*11'],
+        'result': {
+            'id': 8,
+            'repeat_indicator': 0,
+            'mmsi': 2039124,
+            'spare': 0,
+            'dac': 200,
+            'fi': 24,
+            'country': 'AT',
+            'gauge_ids': [9, 7, 8, 5],
+            'levels': [4294966528.0, 4294966528.0, 4294966528.0, 4294965760.0]}
+    },
+
   {
     'nmea': [ '!AIVDM,1,1,,B,9oVAuAI5;rRRv2OqTi?1uoP?=a@1,0*74,raishub,1342572824' ],
     'result': {'alt': 2324,

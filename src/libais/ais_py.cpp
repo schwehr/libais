@@ -1763,8 +1763,8 @@ ais8_200_23_append_pydict(const char *nmea_payload, PyObject *dict,
 }
 
 
-// River Information System
-// Water levels
+// EU River Information System (RIS)
+// Water level
 AIS_STATUS
 ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict,
                           const size_t pad) {
@@ -1780,12 +1780,12 @@ ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict,
 
   PyObject *id_list = PyList_New(4);
   for (size_t i = 0; i < 4; i++)
-    PyList_SetItem(id_list, 0, PyLong_FromLong(msg.gauge_ids[i]));
+    PyList_SetItem(id_list, i, PyLong_FromLong(msg.gauge_ids[i]));
   DictSafeSetItem(dict, "gauge_ids", id_list);
 
   PyObject *level_list = PyList_New(4);
   for (size_t i = 0; i < 4; i++)
-    PyList_SetItem(level_list, 0, PyFloat_FromDouble(msg.levels[i]));
+    PyList_SetItem(level_list, i, PyFloat_FromDouble(msg.levels[i]));
   DictSafeSetItem(dict, "levels", level_list);
 
   return AIS_OK;
