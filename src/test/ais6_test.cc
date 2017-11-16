@@ -86,7 +86,42 @@ TEST(Ais6_1_0Test, DecodeAnything) {
 // TODO(schwehr): Test Ais6_1_2.
 // TODO(schwehr): Test Ais6_1_3.
 // TODO(schwehr): Test Ais6_1_4.
-// TODO(schwehr): Test Ais6_1_5.
+
+void ValidateAis6_1_5(const Ais6_1_5 &msg, int seq_num, bool ai_available,
+                      int ai_response, int spare, int spare2) {
+  ASSERT_EQ(AIS_OK, msg.get_error());
+  EXPECT_EQ(1, msg.dac);
+  EXPECT_EQ(5, msg.fi);
+  EXPECT_EQ(seq_num, msg.seq_num);
+  EXPECT_EQ(ai_available, msg.ai_available);
+  EXPECT_EQ(ai_response, msg.ai_response);
+  EXPECT_EQ(spare, msg.spare);
+  EXPECT_EQ(spare2, msg.spare2);
+}
+
+TEST(Ais6_1_5, Issue162) {
+  // 24804348,s:rORBCOMM999,q:u,c:1509794887,T:2017-11-04 11.28.07*59
+  //   !AIVDM,1,1,,B,677IKl=HQGw004D0@02000000000,0*5B
+  std::unique_ptr<Ais6_1_5> msg(
+      new Ais6_1_5("677IKl=HQGw004D0@02000000000", 0));
+  ValidateAis6_1_5(*msg, 4, false, 0, 0, 0);
+
+  // 24804513,s:rORBCOMM999,q:u,c:1509800116,T:2017-11-04 12.55.16*53
+  //   !AIVDM,1,1,,B,69NSH@AI746004D0@06B00000000,0*46
+  msg.reset(new Ais6_1_5("69NSH@AI746004D0@06B00000000", 0));
+  ValidateAis6_1_5(*msg, 12, true, 1, 0, 0);
+
+  // 11563363,s:rORBCOMM999,q:u,c:1509933658,T:2017-11-06 02.00.58*56
+  //   !AIVDM,1,1,,A,676ur660AE4F04D0@0;P00000000,0*3B
+  msg.reset(new Ais6_1_5("676ur660AE4F04D0@0;P00000000", 0));
+  ValidateAis6_1_5(*msg, 23, false, 0, 0, 0);
+
+  // 23545620,s:rORBCOMM000,q:u,c:1510271386,T:2017-11-09 23.49.46*52
+  //   !AIVDM,1,1,,A,69NSKE20ACVL04D0@03P00000000,0*43
+  msg.reset(new Ais6_1_5("69NSKE20ACVL04D0@03P00000000", 0));
+  ValidateAis6_1_5(*msg, 7, false, 0, 0, 0);
+}
+
 // TODO(schwehr): Test Ais6_1_12.
 // TODO(schwehr): Test Ais6_1_14.
 // TODO(schwehr): Test Ais6_1_18.
