@@ -53,6 +53,8 @@ enum AIS_FI {
   AIS_FI_8_1_31_MET_HYDRO = 31,
   AIS_FI_8_1_40_PERSONS_ON_BOARD = 40,
   AIS_FI_8_200_10_RIS_SHIP_AND_VOYAGE = 10,
+  AIS_FI_8_200_21_RIS_ETA_AT_LOCK_BRIDGE_TERMINAL = 21,
+  AIS_FI_8_200_22_RIS_RTA_AT_LOCK_BRIDGE_TERMINAL = 22,
   AIS_FI_8_200_23_RIS_EMMA_WARNING = 23,
   AIS_FI_8_200_24_RIS_WATERLEVEL = 24,
   AIS_FI_8_200_40_RIS_ATON_SIGNAL_STATUS = 40,
@@ -1641,6 +1643,7 @@ ais8_1_31_append_pydict(const char *nmea_payload, PyObject *dict,
 // no 32 broadcast
 
 // DAC 200 - River Information System
+// Inland ship static and voyage related data
 AIS_STATUS
 ais8_200_10_append_pydict(const char *nmea_payload, PyObject *dict,
                           const size_t pad) {
@@ -1667,8 +1670,65 @@ ais8_200_10_append_pydict(const char *nmea_payload, PyObject *dict,
   return AIS_OK;
 }
 
+// River Information System
+// ETA report
+AIS_STATUS
+ais8_200_21_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
+  assert(nmea_payload);
+  assert(dict);
+  assert(pad < 6);
+  Ais8_200_21 msg(nmea_payload, pad);
+  if (msg.had_error()) {
+    return msg.get_error();
+  }
+
+  DictSafeSetItem(dict, "country", msg.country);
+  DictSafeSetItem(dict, "location", msg.location);
+  DictSafeSetItem(dict, "section", msg.section);
+  DictSafeSetItem(dict, "terminal", msg.terminal);
+  DictSafeSetItem(dict, "hectometre", msg.hectometre);
+  DictSafeSetItem(dict, "eta_month", msg.eta_month);
+  DictSafeSetItem(dict, "eta_day", msg.eta_day);
+  DictSafeSetItem(dict, "eta_hour", msg.eta_hour);
+  DictSafeSetItem(dict, "eta_minute", msg.eta_minute);
+  DictSafeSetItem(dict, "tugboats", msg.tugboats);
+  DictSafeSetItem(dict, "air_draught", msg.air_draught);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
+
+  return AIS_OK;
+}
 
 // River Information System
+// RTA report
+AIS_STATUS
+ais8_200_22_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
+  assert(nmea_payload);
+  assert(dict);
+  assert(pad < 6);
+  Ais8_200_22 msg(nmea_payload, pad);
+  if (msg.had_error()) {
+    return msg.get_error();
+  }
+
+  DictSafeSetItem(dict, "country", msg.country);
+  DictSafeSetItem(dict, "location", msg.location);
+  DictSafeSetItem(dict, "section", msg.section);
+  DictSafeSetItem(dict, "terminal", msg.terminal);
+  DictSafeSetItem(dict, "hectometre", msg.hectometre);
+  DictSafeSetItem(dict, "rta_month", msg.rta_month);
+  DictSafeSetItem(dict, "rta_day", msg.rta_day);
+  DictSafeSetItem(dict, "rta_hour", msg.rta_hour);
+  DictSafeSetItem(dict, "rta_minute", msg.rta_minute);
+  DictSafeSetItem(dict, "lock_status", msg.lock_status);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
+
+  return AIS_OK;
+}
+
+// River Information System
+// EMMA warning
 AIS_STATUS
 ais8_200_23_append_pydict(const char *nmea_payload, PyObject *dict,
                           const size_t pad) {
@@ -1704,6 +1764,7 @@ ais8_200_23_append_pydict(const char *nmea_payload, PyObject *dict,
 
 
 // River Information System
+// Water levels
 AIS_STATUS
 ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict,
                           const size_t pad) {
@@ -1732,6 +1793,7 @@ ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict,
 
 
 // River Information System
+// Signal status
 AIS_STATUS
 ais8_200_40_append_pydict(const char *nmea_payload, PyObject *dict,
                           const size_t pad) {
@@ -1756,6 +1818,7 @@ ais8_200_40_append_pydict(const char *nmea_payload, PyObject *dict,
 
 
 // River Information System
+// Number of persons on board
 AIS_STATUS
 ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict,
                           const size_t pad) {
@@ -1997,8 +2060,12 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     case AIS_FI_8_200_10_RIS_SHIP_AND_VOYAGE:
       status = ais8_200_10_append_pydict(nmea_payload, dict, pad);
       break;
-      // 21: Addressed only
-      // 22: Addressed only
+    case AIS_FI_8_200_21_RIS_ETA_AT_LOCK_BRIDGE_TERMINAL:
+      status = ais8_200_21_append_pydict(nmea_payload, dict, pad);
+      break;
+    case AIS_FI_8_200_22_RIS_RTA_AT_LOCK_BRIDGE_TERMINAL:
+      status = ais8_200_22_append_pydict(nmea_payload, dict, pad);
+      break;
     case AIS_FI_8_200_23_RIS_EMMA_WARNING:
       status = ais8_200_23_append_pydict(nmea_payload, dict, pad);
       break;

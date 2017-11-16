@@ -1566,9 +1566,49 @@ class Ais8_200_10 : public Ais8 {
   Ais8_200_10(const char *nmea_payload, const size_t pad);
 };
 
-// 21 and 22 do not exist
+// vessel_traking_and_tracing_standard_ed1-2_ccnr_23-apr_2013_en.pdf
+// ETA at lock/bridge/terminal
+// Todo : complete this class
+class Ais8_200_21 : public Ais8 {
+ public:
+  string country;         // UN country code                    12 bits
+  string location;        // UN location code                   18 bits
+  string section;         // Fairway section number             30 bits
+  string terminal;        // Terminal code                      30 bits
+  string hectometre;      // Fairway hectometre                 30 bits
+  int eta_month;          // ETA at lock/bridge/terminal        20 bits 
+  int eta_day;
+  int eta_hour;
+  int eta_minute;
+  int tugboats;           // Number of assisting tugboats        3 bits
+  float air_draught;      // Maximum present static air draught 12 bits
+  int spare2;             // Spare                               5 bits
+
+  Ais8_200_21(const char *nmea_payload, const size_t pad);
+};
+
+// vessel_traking_and_tracing_standard_ed1-2_ccnr_23-apr_2013_en.pdf
+// RTA at lock/bridge/terminal
+// Todo : complete this class
+class Ais8_200_22 : public Ais8 {
+ public:
+  string country;         // UN country code                    12 bits
+  string location;        // UN location code                   18 bits
+  string section;         // Fairway section number             30 bits
+  string terminal;        // Terminal code                      30 bits
+  string hectometre;      // Fairway hectometre                 30 bits
+  int rta_month;          // RTA at lock/bridge/terminal        20 bits 
+  int rta_day;
+  int rta_hour;
+  int rta_minute;
+  int lock_status;       // Lock/bridge/terminal status         2 bits
+  int spare2;            // Spare                               5 bits
+  
+  Ais8_200_22(const char *nmea_payload, const size_t pad);
+};
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+// EMMA warning
 class Ais8_200_23 : public Ais8 {
  public:
   int utc_year_start;
@@ -1605,6 +1645,7 @@ class Ais8_200_24 : public Ais8 {
 };
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+// Signal status
 class Ais8_200_40 : public Ais8 {
  public:
   AisPoint position;
@@ -1619,6 +1660,7 @@ class Ais8_200_40 : public Ais8 {
 };
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+// Number of persons on board
 class Ais8_200_55 : public Ais8 {
  public:
   int crew;
