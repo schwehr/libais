@@ -1598,6 +1598,8 @@ class Ais8_200_23 : public Ais8 {
 // Water Level
 class Ais8_200_24 : public Ais8 {
  public:
+  // UN 2 letter code.  See Comtrade Country Code and Name.
+  // https://unstats.un.org/unsd/tradekb/Knowledgebase/50377/Comtrade-Country-Code-and-Name
   string country;
   std::array<int, 4> gauge_ids;
   std::array<float, 4> levels;  // m

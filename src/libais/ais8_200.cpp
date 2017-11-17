@@ -102,6 +102,7 @@ Ais8_200_23::Ais8_200_23(const char *nmea_payload, const size_t pad)
 
 
 // River Information Systems ECE-TRANS-SC3-2006-10r-RIS.pdf
+// Water level
 Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad)
     : Ais8(nmea_payload, pad) {
   assert(dac == 200);
@@ -120,7 +121,7 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad)
   }
 
   bs.SeekTo(56);
-  bs.ToString(56, 12);
+  country = bs.ToString(56, 12);
   for (size_t i = 0; i < 4; i++) {
     size_t start = 68 + 25*i;
     gauge_ids[i] = bs.ToUnsignedInt(start, 11);
