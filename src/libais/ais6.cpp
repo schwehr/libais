@@ -232,7 +232,7 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
 // IMO 1371-5 Ack
 Ais6_1_5::Ais6_1_5(const char *nmea_payload, const size_t pad)
     : Ais6(nmea_payload, pad), ack_dac(0), ack_fi(0), seq_num(0),
-      ai_available(false), ai_response(0), spare(0) {
+      ai_available(false), ai_response(0), spare(0), spare2(0) {
   assert(dac == 1);
   assert(fi == 5);
 
