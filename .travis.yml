@@ -17,8 +17,8 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gcc-5
-      - g++-5
+      - gcc-7
+      - g++-7
 
 python:
   - 2.7
@@ -32,5 +32,5 @@ install:
   - CC=g++-5 pip install .\[tests\] --upgrade
 
 script:
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then (cd src && CC=gcc-7 CXX=g++-7 make -f Makefile-custom -j 4 test); fi
   - py.test ais test --cov=ais --cov-report term-missing
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then (cd src && CC=gcc-5 CXX=g++-5 make -f Makefile-custom -j 4 test); fi
