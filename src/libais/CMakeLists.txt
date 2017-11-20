@@ -1,3 +1,9 @@
+# Make sure that assert() is not active in a release build.
+# assert() is used for protocol sanity checks and would stop the program on a protocol error.
+#
+if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
+  add_definitions("-DNDEBUG")
+endif()
 
 add_library(ais 
 ais.cpp
@@ -30,6 +36,8 @@ ais24.cpp
 ais25.cpp
 ais26.cpp
 ais27.cpp
+decode_body.cpp
+vdm.cpp
 )
 set_target_properties(ais PROPERTIES PUBLIC_HEADER "ais.h")
 
