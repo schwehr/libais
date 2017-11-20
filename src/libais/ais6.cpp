@@ -83,16 +83,17 @@ Ais6_0_0::Ais6_0_0(const char *nmea_payload, const size_t pad)
 Ais6_1_0::Ais6_1_0(const char *nmea_payload, const size_t pad)
     : Ais6(nmea_payload, pad), ack_required(false), msg_seq(0),
       spare2(0) {
-
   assert(dac == 1);
   assert(fi == 0);
 
-  if (num_bits < 88 || num_bits > 936) {
+  // ITU-1371-5 says 112 to 920 because there must be at least one character.
+  // TODO(schwehr): Are there any examples with no characters in the wild?
+  if (num_bits < 112 || num_bits > 920) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
-  AisBitset bs;  // TODO(schwehr): what is the real max size?
+  AisBitset bs;
   const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;

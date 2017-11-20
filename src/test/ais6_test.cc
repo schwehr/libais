@@ -82,6 +82,11 @@ TEST(Ais6_1_0Test, DecodeAnything) {
   ValidateAis6_1_0(msg.get(), true, 3, "AIS TEST PLS ACK.@", 0);
 }
 
+TEST(Ais6_1_0Test, b69511430TooFewBits) {
+  std::unique_ptr<Ais6_1_0> msg(new Ais6_1_0("6801tME4j60E041tM", 3));
+  EXPECT_EQ(AIS_ERR_BAD_BIT_COUNT, msg->get_error());
+}
+
 // TODO(schwehr): Test Ais6_1_1.
 // TODO(schwehr): Test Ais6_1_2.
 // TODO(schwehr): Test Ais6_1_3.
