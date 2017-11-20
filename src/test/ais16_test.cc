@@ -60,5 +60,18 @@ TEST(Ais16Test, DecodeAnything) {
       -1);
 }
 
+TEST(Ais16Test, BitsLeftOver) {
+  std::unique_ptr<Ais16> msg(new Ais16("@fffffhfffffffff", 4));
+  EXPECT_TRUE(msg->had_error());
+  EXPECT_EQ(AIS_ERR_BAD_BIT_COUNT, msg->get_error());
+}
+
+TEST(Ais16Test, InvalidButCommon168Bits) {
+  // !AIVDM,1,1,,B,@bQBNdhP010Fh<LMb;:GLOvJP4@d,0*7F
+  std::unique_ptr<Ais16> msg(new Ais16("@bQBNdhP010Fh<LMb;:GLOvJP4@d", 0));
+  Validate(msg.get(), 2, 705994419, 0, 134218757, 2819, 113, 916638301, 3199,
+           922, -1);
+}
+
 }  // namespace
 }  // namespace libais

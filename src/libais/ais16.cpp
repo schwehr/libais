@@ -12,8 +12,7 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad)
 
   // 96 or 144 bits
   // 168 bits violates the spec but is common
-  // TODO(schwehr): check the pad
-  if (num_chars != 16 && num_chars != 24 && num_chars != 28) {
+  if (num_bits != 96 && num_bits != 144 && num_bits != 168) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -45,6 +44,7 @@ Ais16::Ais16(const char *nmea_payload, const size_t pad)
   dest_mmsi_b = bs.ToUnsignedInt(92, 30);
   offset_b = bs.ToUnsignedInt(122, 12);
   inc_b = bs.ToUnsignedInt(134, 10);
+  // TODO(schwehr): Actually decode spare2.
   spare2 = -1;
 
   // Currently crashes with the check.
