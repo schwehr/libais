@@ -29,7 +29,7 @@ before_install:
   - pip install pip pytest --upgrade
 
 install:
-  - CC=g++-5 pip install .\[tests\] --upgrade
+  - CC=g++-7 pip install .\[tests\] --upgrade
 
 script:
   - if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then (cd src && CC=gcc-7 CXX=g++-7 make -f Makefile-custom -j 4 test); fi
