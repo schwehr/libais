@@ -6,7 +6,6 @@ CXXFLAGS :=
 CXXFLAGS += -std=c++11
 
 # CXXFLAGS += -O3 -funroll-loops -fexpensive-optimizations -DNDEBUG
-# CXXFLAGS += -ffast-math
 
 # CXXFLAGS += -g3 -O0 -m32
 
@@ -37,7 +36,7 @@ DEBUG := -g -O2
 # DEBUG += -D_GLIBCXX_DEBUG # Bad things on the mac?  May be a gtest bug.
 # DEBUG += -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCPP_CONCEPT_CHECKS
 
-OPT := -O3 -funroll-loops -fexpensive-optimizations -ffast-math
+OPT := -O3 -funroll-loops -fexpensive-optimizations
 OPT += -DNDEBUG
 
 ifdef OPTIMIZE
