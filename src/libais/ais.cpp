@@ -88,24 +88,26 @@ const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
 AisBitset::AisBitset() : num_bits(0), num_chars(0), current_position(0) {}
 
 AIS_STATUS AisBitset::ParseNmeaPayload(const char *nmea_payload, int pad) {
-  InitNmeaOrd();
-
-  num_bits = 0;
-  num_chars = 0;
-  current_position = 0;
-  reset();
-
   assert(nmea_payload);
   assert(pad >= 0 && pad < 6);
 
-  if (strlen(nmea_payload) > size()/6) {
-#ifndef NDEBUG
+  InitNmeaOrd();
+
+  num_bits = 0;
+  current_position = 0;
+  reset();
+
+  num_chars = strlen(nmea_payload);
+
+  if (num_chars > size()/6) {
+#ifdef LIBAIS_DEBUG
     std::cerr << "ERROR: message longer than max allowed size (" << size()/6
               << "): found " << strlen(nmea_payload) << " characters in "
               << nmea_payload << std::endl;
 #endif
     return AIS_ERR_MSG_TOO_LONG;
   }
+
   for (size_t idx = 0; nmea_payload[idx] != '\0' && idx < size()/6; idx++) {
     int c = static_cast<int>(nmea_payload[idx]);
     if (c < 48 || c > 119 || (c >= 88 && c <= 95)) {
@@ -115,7 +117,7 @@ AIS_STATUS AisBitset::ParseNmeaPayload(const char *nmea_payload, int pad) {
       set(idx*6 + offset, nmea_ord_[c].test(offset));
     }
   }
-  num_chars = strlen(nmea_payload);
+
   num_bits = num_chars * 6 - pad;
 
   return AIS_OK;
