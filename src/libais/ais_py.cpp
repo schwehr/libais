@@ -418,9 +418,10 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict,
   }
 
   DictSafeSetItem(dict, "ack_dac", msg.ack_dac);
-  PyObject *cap_list = PyList_New(26);
-  PyObject *res_list = PyList_New(26);
-  for (size_t cap_num = 0; cap_num < 128/2; cap_num++) {
+  constexpr int kNumFI = 64;
+  PyObject *cap_list = PyList_New(kNumFI);
+  PyObject *res_list = PyList_New(kNumFI);
+  for (size_t cap_num = 0; cap_num < kNumFI; cap_num++) {
     // TODO(schwehr): memory leak?
     PyObject *cap = PyLong_FromLong(long(msg.capabilities[cap_num]));  // NOLINT
     PyList_SetItem(cap_list, cap_num, cap);
