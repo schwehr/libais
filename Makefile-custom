@@ -36,7 +36,7 @@ tar:
 
 
 python2:
-	CFLAGS="-O3 -funroll-loops -fexpensive-optimizations -ffast-math" python2 setup.py build
+	CFLAGS="-O3 -funroll-loops -fexpensive-optimizations" python2 setup.py build
 
 python3:
 	CFLAGS="-std=c++11 -O0 -g -UNDEBUG" python3 setup.py build
