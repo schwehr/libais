@@ -42,7 +42,9 @@ TEST(Ais26Test, DecodeAnything) {
   // TODO(schwehr): Validate commstate.
 }
 
-TEST(Ais26Test, b69511642_TooFewAddressedUseAppId) {
+TEST(Ais26Test, b69511642_TooFewBits_Addressed_UseAppId) {
+  // An addressed message with the use app id flag set, but too few bits
+  // so it does not have the space required for the dac and fi.
   std::unique_ptr<Ais26> msg(new Ais26("JCwwwJwtbwwwww", 3));
   EXPECT_TRUE(msg->use_app_id);
   EXPECT_TRUE(msg->had_error());
