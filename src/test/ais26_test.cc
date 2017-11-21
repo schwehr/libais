@@ -42,5 +42,11 @@ TEST(Ais26Test, DecodeAnything) {
   // TODO(schwehr): Validate commstate.
 }
 
+TEST(Ais26Test, b69511642_TooFewAddressedUseAppId) {
+  std::unique_ptr<Ais26> msg(new Ais26("JCwwwJwtbwwwww", 3));
+  EXPECT_TRUE(msg->use_app_id);
+  EXPECT_TRUE(msg->had_error());
+}
+
 }  // namespace
 }  // namespace libais

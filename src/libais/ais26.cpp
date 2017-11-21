@@ -42,6 +42,10 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad)
     dest_mmsi_valid = true;
     dest_mmsi = bs.ToUnsignedInt(40, 30);
     if (use_app_id) {
+      if (num_bits < 86) {
+        status = AIS_ERR_BAD_BIT_COUNT;
+        return;
+      }
       dac = bs.ToUnsignedInt(70, 10);
       fi = bs.ToUnsignedInt(80, 6);
     }
