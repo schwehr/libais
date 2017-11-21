@@ -64,6 +64,8 @@ unique_ptr<AisMsg> CreateAisMsg6(const string &body, const int fill_bits) {
         case 40:
           return MakeUnique<libais::Ais6_1_40>(body.c_str(), fill_bits);
       }
+      // FI not handled.
+      break;
   }
   return nullptr;
 }
@@ -103,6 +105,8 @@ unique_ptr<AisMsg> CreateAisMsg8(const string &body, const int fill_bits) {
         case 31:
           return MakeUnique<libais::Ais8_1_31>(body.c_str(), fill_bits);
       }
+      // FI not handled.
+      break;
     // European River Information System (RIS).
     case libais::AIS_DAC_200_RIS:
       switch (msg.fi) {
@@ -117,12 +121,16 @@ unique_ptr<AisMsg> CreateAisMsg8(const string &body, const int fill_bits) {
         case 55:
           return MakeUnique<libais::Ais8_200_55>(body.c_str(), fill_bits);
       }
+      // FI not handled.
+      break;
     // TODO(schwehr): 366 US Coast Guard.
     case 367:  // US Coast Guard.
       switch (msg.fi) {
         case 22:
           return MakeUnique<libais::Ais8_367_22>(body.c_str(), fill_bits);
       }
+      // FI not handled.
+      break;
   }
   return nullptr;
 }
