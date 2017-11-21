@@ -87,7 +87,26 @@ TEST(Ais6_1_0Test, b69511430TooFewBits) {
   EXPECT_EQ(AIS_ERR_BAD_BIT_COUNT, msg->get_error());
 }
 
-// TODO(schwehr): Test Ais6_1_1.
+void ValidateAis6_1_1(const Ais6_1_1 &msg, int ack_dac, int msg_seq,
+                      int spare2) {
+  ASSERT_FALSE(msg.had_error());
+  EXPECT_EQ(ack_dac, msg.ack_dac);
+  EXPECT_EQ(msg_seq, msg.msg_seq);
+  EXPECT_EQ(spare2, msg.spare2);
+}
+
+TEST(Ais6_1_1, DecodeAnything) {
+  // !AIVDM,1,1,,A,63m95T8uBK:0044@00P,2*7A
+  std::unique_ptr<Ais6_1_1> msg(new Ais6_1_1("63m95T8uBK:0044@00P", 2));
+  ASSERT_NE(nullptr, msg);
+  ValidateAis6_1_1(*msg, 64, 1, 0);
+  ValidateAis6(msg.get(), 0, 257050000, 2, 257060000, 1, 0, 1, 1);
+
+  // !AIVDM,1,1,,B,63m9d`4uBAI00450008,2*70
+  msg.reset(new Ais6_1_1("63m9d`4uBAI00450008", 2));
+  ValidateAis6_1_1(*msg, 256, 0, 2);
+}
+
 // TODO(schwehr): Test Ais6_1_2.
 // TODO(schwehr): Test Ais6_1_3.
 // TODO(schwehr): Test Ais6_1_4.

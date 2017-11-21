@@ -145,6 +145,21 @@ top_level = [
              'text': '<OSAKA HARBOUR R42>INFORMATION: WIND W 4M/S AT OSAKA HARBOUR RADAR(34-39-12N 135-25-50E) 10:25JST.'}
   },
 
+    {
+        'nmea': ['!AIVDM,1,1,,A,63m95T8uBK:0044@00P,2*7A'],
+        'result': {
+            'id': 6,
+            'repeat_indicator': 0,
+            'mmsi': 257050000,
+            'seq': 2,
+            'mmsi_dest': 257060000,
+            'retransmit': True,
+            'spare': 0,
+            'dac': 1,
+            'fi': 1,
+            'ack_dac': 64,
+            'msg_seq': 1,
+            'spare2': 0}},
   {
     'nmea': [ '!AIVDM,1,1,,B,7l9B8LhP00PDLCvMdkg00?vD2D7w,0*3A,raishub,1342574351' ],
     'result': {'acks': [(134218245, 0),
