@@ -32,5 +32,5 @@ install:
   - CC=g++-6 pip install .\[tests\] --upgrade
 
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then (cd src && CC=gcc-6 CXX=g++-6 make -f Makefile-custom -j 4 test); fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then (cd src && CC=gcc-6 CXX=g++-6 make -f Makefile-custom -j 4 test); fi
   - py.test ais test --cov=ais --cov-report term-missing
