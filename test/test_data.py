@@ -160,6 +160,20 @@ top_level = [
             'ack_dac': 64,
             'msg_seq': 1,
             'spare2': 0}},
+    {
+        'nmea': ['!AIVDM,1,1,,B,65@<;:1inW@h0480J0,4*60'],
+        'result': {
+            'id': 6,
+            'repeat_indicator': 0,
+            'mmsi': 352521000,
+            'seq': 0,
+            'mmsi_dest': 477535500,
+            'retransmit': True,
+            'spare': 0,
+            'dac': 1,
+            'fi': 2,
+            'req_dac': 1,
+            'req_fi': 40}},
   {
     'nmea': [ '!AIVDM,1,1,,B,7l9B8LhP00PDLCvMdkg00?vD2D7w,0*3A,raishub,1342574351' ],
     'result': {'acks': [(134218245, 0),

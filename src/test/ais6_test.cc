@@ -107,7 +107,23 @@ TEST(Ais6_1_1, DecodeAnything) {
   ValidateAis6_1_1(*msg, 256, 0, 2);
 }
 
-// TODO(schwehr): Test Ais6_1_2.
+void ValidateAis6_1_2(const Ais6_1_2 &msg, int seq,
+                      int req_dac, int req_fi) {
+  ASSERT_EQ(AIS_OK, msg.get_error());
+  EXPECT_EQ(1, msg.dac);
+  EXPECT_EQ(2, msg.fi);
+  EXPECT_EQ(seq, msg.seq);
+  EXPECT_EQ(req_dac, msg.req_dac);
+  EXPECT_EQ(req_fi, msg.req_fi);
+}
+
+TEST(Ais6_1_2Test, DecodeAnything) {
+  // \s:rORBCOMM000,q:u,c:1510440135,T:2017-11-11 22.42.15*59
+  //   !AIVDM,1,1,,B,65@<;:1inW@h0480J0,4*60
+  std::unique_ptr<Ais6_1_2> msg(new Ais6_1_2("65@<;:1inW@h0480J0", 4));
+  ValidateAis6_1_2(*msg, 0, 1, 40);
+}
+
 // TODO(schwehr): Test Ais6_1_3.
 // TODO(schwehr): Test Ais6_1_4.
 
