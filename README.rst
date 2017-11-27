@@ -87,7 +87,7 @@ To use the low-level C++ interface directly, you need to handle multi-line messa
     import ais
     ais.decode('15PIIv7P00D5i9HNn2Q3G?wB0t0I', 0)
     ais.decode('402u=TiuaA000r5UJ`H4`?7000S:', 0)
-    ais.decode('55NBjP01mtGIL@CW;SM<D60P5Ld000000000000P0`<3557l0<50@kk@K5h@00000000000', 0)
+    ais.decode('55NBjP01mtGIL@CW;SM<D60P5Ld000000000000P0`<3557l0<50@kk@K5h@00000000000', 2)
 
 There is also support for converting parsed messages to the structure
 output by GPSD / gpsdecode. For full compatibility, you have to write
