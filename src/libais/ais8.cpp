@@ -83,7 +83,7 @@ Ais8_1_11::Ais8_1_11(const char *nmea_payload, const size_t pad)
   assert(dac == 1);
   assert(fi == 11);
 
-  if (num_chars != 59) {
+  if (num_bits != 352) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
