@@ -44,9 +44,9 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad)
 
 // ETA report
 Ais8_200_21::Ais8_200_21(const char *nmea_payload, const size_t pad)
-    : Ais8(nmea_payload, pad), eta_month(0), eta_day(0), eta_hour(0), eta_minute(0),
-      tugboats(0), air_draught(0.0) // TODO : add missing fields
-      {
+    : Ais8(nmea_payload, pad), eta_month(0), eta_day(0), eta_hour(0),
+      eta_minute(0), tugboats(0), air_draught(0.0) // TODO : add missing fields
+{
   assert(dac == 200);
   assert(fi == 21);
 
@@ -68,7 +68,7 @@ Ais8_200_21::Ais8_200_21(const char *nmea_payload, const size_t pad)
 
   // UN location code                   18 bits
   location = bs.ToString(100, 18);
-  
+
   // Fairway section number             30 bits
   section = bs.ToString(118, 30);
 
@@ -78,7 +78,7 @@ Ais8_200_21::Ais8_200_21(const char *nmea_payload, const size_t pad)
   // Fairway hectometre                 30 bits
   hectometre = bs.ToString(178, 30);
 
-  // ETA at lock/bridge/terminal        20 bits 
+  // ETA at lock/bridge/terminal        20 bits
   eta_month  = bs.ToUnsignedInt(208, 4);
   eta_day    = bs.ToUnsignedInt(212, 5);
   eta_hour   = bs.ToUnsignedInt(217, 5);
@@ -86,21 +86,22 @@ Ais8_200_21::Ais8_200_21(const char *nmea_payload, const size_t pad)
 
   // Number of assisting tugboats        3 bits
   tugboats = bs.ToUnsignedInt(229, 3);
-  
+
   // Maximum present static air draught 12 bits
   air_draught = bs.ToUnsignedInt(231, 12) / 10.;  // m
-  
+
   // Spare                               5 bits
   spare2 = bs.ToUnsignedInt(243, 5);
-  
+
   assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }
 
 // RTA report
 Ais8_200_22::Ais8_200_22(const char *nmea_payload, const size_t pad)
-    : Ais8(nmea_payload, pad), rta_month(0), rta_day(0), rta_hour(0), rta_minute(0) // TODO : add missing fields
-      {
+    : Ais8(nmea_payload, pad), rta_month(0), rta_day(0), rta_hour(0),
+      rta_minute(0) // TODO : add missing fields
+{
   assert(dac == 200);
   assert(fi == 22);
 
@@ -122,7 +123,7 @@ Ais8_200_22::Ais8_200_22(const char *nmea_payload, const size_t pad)
 
   // UN location code                   18 bits
   location = bs.ToString(100, 18);
-  
+
   // Fairway section number             30 bits
   section = bs.ToString(118, 30);
 
@@ -132,7 +133,7 @@ Ais8_200_22::Ais8_200_22(const char *nmea_payload, const size_t pad)
   // Fairway hectometre                 30 bits
   hectometre = bs.ToString(178, 30);
 
-  // RTA at lock/bridge/terminal        20 bits 
+  // RTA at lock/bridge/terminal        20 bits
   rta_month  = bs.ToUnsignedInt(208, 4);
   rta_day    = bs.ToUnsignedInt(212, 5);
   rta_hour   = bs.ToUnsignedInt(217, 5);
@@ -140,10 +141,10 @@ Ais8_200_22::Ais8_200_22(const char *nmea_payload, const size_t pad)
 
   // Lock/bridge/terminal status         2 bits
   lock_status = bs.ToUnsignedInt(229, 2);
-  
+
   // Spare                               2 bits
   spare2 = bs.ToUnsignedInt(231, 2);
-  
+
   assert(bs.GetRemaining() == 0);
   status = AIS_OK;
 }

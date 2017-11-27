@@ -1571,21 +1571,23 @@ class Ais8_200_10 : public Ais8 {
 // ETA at lock/bridge/terminal
 class Ais8_200_21 : public Ais8 {
  public:
-  string country;         // UN country code                    12 bits  0 = not available = default
-  string location;        // UN location code                   18 bits  0 = not available = default
-  string section;         // Fairway section number             30 bits  0 = not available = default
-  string terminal;        // Terminal code                      30 bits  0 = not available = default
-  string hectometre;      // Fairway hectometre                 30 bits  0 = not available = default
-  // Examples for previous fields. See http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
-  
-  // ETA at lock/bridge/terminal                                20 bits  Estimated Time of Arrival; MMDDHHMM UTC
-  int eta_month;          //                                     4 bits  1 - 12;  0 = not available = default
-  int eta_day;            //                                     5 bits  1 - 31;  0 = not available = default
-  int eta_hour;           //                                     5 bits  0 - 23; 24 = not available = default
-  int eta_minute;         //                                     6 bits  0 - 59; 60 = not available = default 
-  int tugboats;           // Number of assisting tugboats        3 bits  0 - 6,   7 = unknown = default
-  float air_draught;      // Maximum present static air draught 12 bits  0 - 4000 (rest not used), in 1/100m, 0 = default = not used
-  int spare2;             // Spare                               5 bits  Not used, should be set to zero. Reserved for future use.
+  string country;         // UN country code         0 = not available = default
+  string location;        // UN location code        0 = not available = default
+  string section;         // Fairway section number  0 = not available = default
+  string terminal;        // Terminal code           0 = not available = default
+  string hectometre;      // Fairway hectometre      0 = not available = default
+  // Examples for previous fields.  See:
+  // http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
+
+  // ETA at lock/bridge/terminal - Estimated Time of Arrival; MMDDHHMM UTC
+  int eta_month;          // 1 - 12;  0 = not available = default
+  int eta_day;            // 1 - 31;  0 = not available = default
+  int eta_hour;           // 0 - 23; 24 = not available = default
+  int eta_minute;         // 0 - 59; 60 = not available = default
+  int tugboats;           // 0 - 6,   7 = unknown = default
+  // Maximum present static air draught 0
+  float air_draught;      // 4000 (rest not used), in 1/100m, 0 = not used
+  int spare2;             // 5 bits  Not used, should be set to zero.
 
   Ais8_200_21(const char *nmea_payload, const size_t pad);
 };
@@ -1594,24 +1596,26 @@ class Ais8_200_21 : public Ais8 {
 // RTA at lock/bridge/terminal
 class Ais8_200_22 : public Ais8 {
  public:
-  string country;         // UN country code                    12 bits  0 = not available = default
-  string location;        // UN location code                   18 bits  0 = not available = default
-  string section;         // Fairway section number             30 bits  0 = not available = default
-  string terminal;        // Terminal code                      30 bits  0 = not available = default
-  string hectometre;      // Fairway hectometre                 30 bits  0 = not available = default
-  // Examples for previous fields. See http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
-  
-  // RTA at lock/bridge/terminal                                20 bits  Recommended Time of Arrival; MMDDHHMM UTC
-  int rta_month;          //                                     4 bits  1 - 12;  0 = not available = default
-  int rta_day;            //                                     5 bits  1 - 31;  0 = not available = default
-  int rta_hour;           //                                     5 bits  0 - 23; 24 = not available = default
-  int rta_minute;         //                                     6 bits  0 - 59; 60 = not available = default 
-  int lock_status;        // Lock/bridge/terminal status         2 bits  0 = operational
-                          //                                             1 = limited operation (e.g. obstructed by technical conditions, only one lock chamber available, etc.)
-                          //                                             2 = out of order
-                          //                                             3 = not available                          
-  int spare2;             // Spare                               2 bits  Not used, should be set to zero. Reserved for future use.
-  
+  string country;         // UN country code         0 = not available
+  string location;        // UN location code        0 = not available
+  string section;         // Fairway section number  0 = not available
+  string terminal;        // Terminal code           0 = not available
+  string hectometre;      // Fairway hectometre      0 = not available
+  // Examples for previous fields.  See:
+  // http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
+
+  // RTA at lock/bridge/terminal - Recommended Time of Arrival; MMDDHHMM UTC
+  int rta_month;          //  0 = not available
+  int rta_day;            //  0 = not available
+  int rta_hour;           // 24 = not available
+  int rta_minute;         // 60 = not available
+  int lock_status;        // Lock/bridge/terminal status
+                          // 0 = operational
+                          // 1 = limited operation
+                          // 2 = out of order
+                          // 3 = not available
+  int spare2;             // Spare
+
   Ais8_200_22(const char *nmea_payload, const size_t pad);
 };
 

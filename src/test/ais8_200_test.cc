@@ -50,6 +50,9 @@ TEST(Ais8_200_10Test, DecodeAnything) {
                    0, 0, 0, 0, 0, 0);
 }
 
+// TODO(pyrog): Test messages for 8:200:21.
+// TODO(pyrog): Test messages for 8:200:22.
+
 void Validate8_200_24(const Ais8_200_24 &msg, const int repeat_indicator,
                       const int mmsi, const string country,
                       std::array<int, 4> gauge_ids,

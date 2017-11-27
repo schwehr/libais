@@ -111,19 +111,26 @@ unique_ptr<AisMsg> CreateAisMsg8(const string &body, const int fill_bits) {
     case libais::AIS_DAC_200_RIS:
       switch (msg.fi) {
         case 10:
-          return MakeUnique<libais::Ais8_200_10>(body.c_str(), fill_bits); // Inland ship static and voyage related data
+          // Inland ship static and voyage related data
+          return MakeUnique<libais::Ais8_200_10>(body.c_str(), fill_bits);
         case 21:
-          return MakeUnique<libais::Ais8_200_21>(body.c_str(), fill_bits); // ETA at lock/bridge/terminal
+           // ETA at lock/bridge/terminal
+          return MakeUnique<libais::Ais8_200_21>(body.c_str(), fill_bits);
         case 22:
-          return MakeUnique<libais::Ais8_200_22>(body.c_str(), fill_bits); // RTA at lock/bridge/terminal
+          // RTA at lock/bridge/terminal
+          return MakeUnique<libais::Ais8_200_22>(body.c_str(), fill_bits);
         case 23:
-          return MakeUnique<libais::Ais8_200_23>(body.c_str(), fill_bits); // EMMA warning
+          // EMMA warning
+          return MakeUnique<libais::Ais8_200_23>(body.c_str(), fill_bits);
         case 24:
-          return MakeUnique<libais::Ais8_200_24>(body.c_str(), fill_bits); // water levels
+           // Water levels
+          return MakeUnique<libais::Ais8_200_24>(body.c_str(), fill_bits);
         case 40:
-          return MakeUnique<libais::Ais8_200_40>(body.c_str(), fill_bits); // signal status
+           // Signal status
+          return MakeUnique<libais::Ais8_200_40>(body.c_str(), fill_bits);
         case 55:
-          return MakeUnique<libais::Ais8_200_55>(body.c_str(), fill_bits); // number of persons on board
+           // Number of persons on board
+          return MakeUnique<libais::Ais8_200_55>(body.c_str(), fill_bits);
       }
       // FI not handled.
       break;
