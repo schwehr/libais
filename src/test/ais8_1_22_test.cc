@@ -94,5 +94,49 @@ TEST(Ais8_1_22Test, BadAreaNoticeAndWrongPad) {
   ASSERT_EQ(nullptr, msg);
 }
 
+TEST(Ais8_1_22Test, NoaaDMA) {
+  // Testing NOAA DMAs
+  // !AIVDM,2,1,1,A,803Ovrh0EPJ0Vvch00@=w52I9BK<00000VFHkP0>D>3,0*24
+  // !AIVDM,2,2,1,A,;J005>?11PBGP4=1PPP,0*3F
+
+  constexpr char payload[] =
+    "803Ovrh0EPJ0Vvch00@=w52I9BK<00000VFHkP0>D>3;J005>?11PBGP4=1PPP";
+  Ais8_1_22 msg(payload, 0);
+
+  ASSERT_EQ(AIS_OK,  msg.get_error());
+  EXPECT_EQ(3669739, msg.mmsi);
+  EXPECT_STREQ("Caution Area: Marine mammals in area - reduce speed",
+               ais8_1_22_notice_names[msg.notice_type]);
+  EXPECT_EQ(26, msg.link_id);
+  EXPECT_EQ(3, msg.month);
+  EXPECT_EQ(15, msg.day);
+  EXPECT_EQ(21, msg.hour);
+  EXPECT_EQ(30, msg.minute);
+  EXPECT_EQ(2, msg.duration_minutes);
+
+  ASSERT_EQ(AIS8_1_22_SHAPE_CIRCLE, msg.sub_areas[0]->getType());
+  Ais8_1_22_Circle* sub_area0 =
+    dynamic_cast<Ais8_1_22_Circle *>(msg.sub_areas[0]);
+  EXPECT_EQ(0, sub_area0->radius_m);
+  EXPECT_DOUBLE_EQ(-70.408216666666661, sub_area0->position.lng_deg);
+  EXPECT_DOUBLE_EQ(40.02495, sub_area0->position.lat_deg);
+
+  ASSERT_EQ(AIS8_1_22_SHAPE_POLYGON, msg.sub_areas[1]->getType());
+  Ais8_1_22_Polygon* sub_area1 =
+    dynamic_cast<Ais8_1_22_Polygon *>(msg.sub_areas[1]);
+  EXPECT_DOUBLE_EQ(103000.0, sub_area1->dists_m[0]);
+  EXPECT_DOUBLE_EQ(114000.0, sub_area1->dists_m[1]);
+  EXPECT_DOUBLE_EQ(101000.0, sub_area1->dists_m[2]);
+  // TODO(rolker): 89.5?
+  EXPECT_DOUBLE_EQ(179.0, sub_area1->angles[0]);
+  EXPECT_DOUBLE_EQ(0.0, sub_area1->angles[1]);
+  // TODO(rolker): 270?
+  EXPECT_DOUBLE_EQ(540.0, sub_area1->angles[2]);
+
+  ASSERT_EQ(AIS8_1_22_SHAPE_TEXT, msg.sub_areas[2]->getType());
+  Ais8_1_22_Text* sub_area2 = dynamic_cast<Ais8_1_22_Text*>(msg.sub_areas[2]);
+  EXPECT_EQ("NOAA RW DMA   ", sub_area2->text);
+}
+
 }  // namespace
 }  // namespace libais
