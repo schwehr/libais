@@ -117,6 +117,12 @@ Ais8_367_22::Ais8_367_22(const char *nmea_payload, const size_t pad)
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
+  // Is there more than spare bits after the last submessage?
+  if ((num_bits - 120) % SUB_AREA_BITS >= 6) {
+    // More than just spare.
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
 
   AisBitset bs;
   const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
