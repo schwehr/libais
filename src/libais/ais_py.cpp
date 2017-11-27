@@ -86,6 +86,17 @@ DictSafeSetItem(PyObject *dict, const string &key, const int val) {
 }
 
 void
+DictSafeSetItem(PyObject *dict, const string &key, const unsigned int val) {
+  PyObject *key_obj = PyUnicode_FromString(key.c_str());
+  PyObject *val_obj = PyLong_FromLong(val);
+  assert(key_obj);
+  assert(val_obj);
+  PyDict_SetItem(dict, key_obj, val_obj);
+  Py_DECREF(key_obj);
+  Py_DECREF(val_obj);
+}
+
+void
 DictSafeSetItem(PyObject *dict, const string &key, const string &val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyUnicode_FromString(val.c_str());
@@ -404,6 +415,8 @@ ais6_1_3_append_pydict(const char *nmea_payload, PyObject *dict,
 
   DictSafeSetItem(dict, "req_dac", msg.req_dac);
   DictSafeSetItem(dict, "spare2", msg.spare2);
+  DictSafeSetItem(dict, "spare3", msg.spare3);
+  DictSafeSetItem(dict, "spare4", msg.spare4);
 
   return AIS_OK;
 }

@@ -593,8 +593,10 @@ ostream& operator<< (ostream &o, const Ais6_1_2 &msg);
 // Capability interogation.  ITU 1371-1
 class Ais6_1_3 : public Ais6 {
  public:
-  int req_dac;
-  int spare2;
+  unsigned int req_dac;
+  unsigned int spare2;
+  unsigned int spare3;
+  unsigned int spare4;
 
   Ais6_1_3(const char *nmea_payload, const size_t pad);
 };

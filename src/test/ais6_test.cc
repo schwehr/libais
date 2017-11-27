@@ -27,6 +27,12 @@ void ValidateAis6(const Ais6 *msg, const int repeat_indicator, const int mmsi,
   ASSERT_EQ(fi, msg->fi);
 }
 
+TEST(Ais6Test, TooFewBits) {
+  const char kTooFew[] = "6";
+  std::unique_ptr<Ais6> msg(new Ais6(kTooFew, 0));
+  EXPECT_TRUE(msg->had_error());
+}
+
 void ValidateAis6_0_0(const Ais6_0_0 *msg, const int sub_id,
                       const float voltage, const float current,
                       const bool dc_power_supply, const bool light_on,
@@ -124,7 +130,32 @@ TEST(Ais6_1_2Test, DecodeAnything) {
   ValidateAis6_1_2(*msg, 0, 1, 40);
 }
 
-// TODO(schwehr): Test Ais6_1_3.
+void ValidateAis6_1_3(const Ais6_1_3 &msg, unsigned int req_dac,
+                      unsigned int spare2, unsigned int spare3,
+                      unsigned int spare4) {
+  ASSERT_FALSE(msg.had_error());
+  EXPECT_EQ(req_dac, msg.req_dac);
+  EXPECT_EQ(spare2, msg.spare2);
+  EXPECT_EQ(spare3, msg.spare3);
+  EXPECT_EQ(spare4, msg.spare4);
+}
+
+TEST(Ais6_1_3, DecodeAnything) {
+  // !AIVDM,1,1,,A,601uEO0hptsR04<0@00000000000,0*6B
+  std::unique_ptr<Ais6_1_3> msg(new Ais6_1_3("601uEO0hptsR04<0@00000000000", 0));
+  ASSERT_NE(nullptr, msg);
+  ValidateAis6_1_3(*msg, 1, 0, 0, 0);
+  ValidateAis6(msg.get(), 0, 2053500, 0, 205059000, false, 0, 1, 3);
+}
+
+TEST(Ais6_1_3, DecodeShort) {
+  // !AIVDM,1,1,,A,602a4KU29NHP04<0@0,4*78,rYADA,123456789
+  std::unique_ptr<Ais6_1_3> msg(new Ais6_1_3("602a4KU29NHP04<0@0", 4));
+  ASSERT_NE(nullptr, msg);
+  ValidateAis6_1_3(*msg, 1, 0, 0, 0);
+  ValidateAis6(msg.get(), 0, 2770030, 1, 277445000, true, 0, 1, 3);
+}
+
 // TODO(schwehr): Test Ais6_1_4.
 
 void ValidateAis6_1_5(const Ais6_1_5 &msg, int seq_num, bool ai_available,

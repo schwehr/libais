@@ -15,8 +15,6 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad)
       spare(0),
       dac(0),
       fi(0) {
-  assert(message_id == 6);
-
   // TODO(olafsinram): 46 or rather 56?
   const int payload_len = num_bits - 46;  // in bits w/o DAC/FI
   if (num_bits < 88 || payload_len < 0 || payload_len > 952) {
@@ -30,6 +28,8 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad)
     status = r;
     return;
   }
+
+  assert(message_id == 6);
 
   bs.SeekTo(38);
   seq = bs.ToUnsignedInt(38, 2);
@@ -65,6 +65,7 @@ Ais6_0_0::Ais6_0_0(const char *nmea_payload, const size_t pad)
     status = r;
     return;
   }
+
   bs.SeekTo(88);
   sub_id = bs.ToUnsignedInt(88, 16);
   voltage = bs.ToUnsignedInt(104, 12) / 10.0;
@@ -170,11 +171,11 @@ Ais6_1_2::Ais6_1_2(const char *nmea_payload, const size_t pad)
 
 // IFM 3: Capability interrogation - OLD ITU 1371-1
 Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad)
-    : Ais6(nmea_payload, pad), req_dac(0), spare2(0) {
+    : Ais6(nmea_payload, pad), req_dac(0), spare2(0), spare3(0), spare4(0) {
   assert(dac == 1);
   assert(fi == 3);
 
-  if (num_bits != 104) {
+  if (num_bits != 104 && num_bits != 168) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -188,7 +189,16 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad)
 
   bs.SeekTo(88);
   req_dac = bs.ToUnsignedInt(88, 10);
-  spare2 = bs.ToUnsignedInt(98, 6);
+  if (num_bits == 104) {
+    // Invalid but often used.
+    spare2 = bs.ToUnsignedInt(98, 6);
+    assert(bs.GetRemaining() == 0);
+    status = AIS_OK;
+    return;
+  }
+  spare2 = bs.ToUnsignedInt(98, 32);
+  spare3 = bs.ToUnsignedInt(130, 32);
+  spare4 = bs.ToUnsignedInt(162, 6);
 
   assert(bs.GetRemaining() == 0);
   status = AIS_OK;

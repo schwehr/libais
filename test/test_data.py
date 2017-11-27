@@ -174,6 +174,22 @@ top_level = [
             'fi': 2,
             'req_dac': 1,
             'req_fi': 40}},
+    {
+        'nmea': ['!AIVDM,1,1,,A,601uEQ8i02s:04<0@00000000000,0*12'],
+        'result': {
+            'dac': 1,
+            'fi': 3,
+            'id': 6,
+            'mmsi': 2053508,
+            'mmsi_dest': 205523890,
+            'repeat_indicator': 0,
+            'req_dac': 1,
+            'retransmit': False,
+            'seq': 2,
+            'spare': 0,
+            'spare2': 0,
+            'spare3': 0,
+            'spare4': 0}},
   {
     'nmea': [ '!AIVDM,1,1,,B,7l9B8LhP00PDLCvMdkg00?vD2D7w,0*3A,raishub,1342574351' ],
     'result': {'acks': [(134218245, 0),
