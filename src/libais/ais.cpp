@@ -99,7 +99,7 @@ AIS_STATUS AisBitset::ParseNmeaPayload(const char *nmea_payload, int pad) {
 
   num_chars = strlen(nmea_payload);
 
-  if (num_chars > size()/6) {
+  if (static_cast<size_t>(num_chars) > size()/6) {
 #ifdef LIBAIS_DEBUG
     std::cerr << "ERROR: message longer than max allowed size (" << size()/6
               << "): found " << strlen(nmea_payload) << " characters in "
