@@ -32,7 +32,8 @@ ais27.cpp
 decode_body.cpp
 vdm.cpp
 )
-set_target_properties(ais PROPERTIES PUBLIC_HEADER "ais.h")
+target_include_directories(ais PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+set_target_properties(ais PROPERTIES PUBLIC_HEADER ais.h)
 
 include(GNUInstallDirs)
 
