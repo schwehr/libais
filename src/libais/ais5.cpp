@@ -9,44 +9,39 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad)
       type_and_cargo(0), dim_a(0), dim_b(0), dim_c(0), dim_d(0),
       fix_type(0), eta_month(0), eta_day(0), eta_hour(0), eta_minute(0),
       draught(0.0), dte(0), spare(0) {
-
-  assert(message_id == 5);
-
+  if (!CheckStatus()) {
+    return;
+  }
   if (pad != 2 || num_chars != 71) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
-  AisBitset bs;
-  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
-  if (r != AIS_OK) {
-    status = r;
-    return;
-  }
+  assert(message_id == 5);
 
-  bs.SeekTo(38);
-  ais_version = bs.ToUnsignedInt(38, 2);
-  imo_num = bs.ToUnsignedInt(40, 30);
-  callsign = bs.ToString(70, 42);
+  bits.SeekTo(38);
+  ais_version = bits.ToUnsignedInt(38, 2);
+  imo_num = bits.ToUnsignedInt(40, 30);
+  callsign = bits.ToString(70, 42);
 
-  name = bs.ToString(112, 120);
+  name = bits.ToString(112, 120);
 
-  type_and_cargo = bs.ToUnsignedInt(232, 8);
-  dim_a = bs.ToUnsignedInt(240, 9);
-  dim_b = bs.ToUnsignedInt(249, 9);
-  dim_c = bs.ToUnsignedInt(258, 6);
-  dim_d = bs.ToUnsignedInt(264, 6);
-  fix_type = bs.ToUnsignedInt(270, 4);
-  eta_month = bs.ToUnsignedInt(274, 4);
-  eta_day = bs.ToUnsignedInt(278, 5);
-  eta_hour = bs.ToUnsignedInt(283, 5);
-  eta_minute = bs.ToUnsignedInt(288, 6);
-  draught = bs.ToUnsignedInt(294, 8) / 10.;
-  destination = bs.ToString(302, 120);
-  dte = bs[422];
-  spare = bs[423];
+  type_and_cargo = bits.ToUnsignedInt(232, 8);
+  dim_a = bits.ToUnsignedInt(240, 9);
+  dim_b = bits.ToUnsignedInt(249, 9);
+  dim_c = bits.ToUnsignedInt(258, 6);
+  dim_d = bits.ToUnsignedInt(264, 6);
+  fix_type = bits.ToUnsignedInt(270, 4);
+  eta_month = bits.ToUnsignedInt(274, 4);
+  eta_day = bits.ToUnsignedInt(278, 5);
+  eta_hour = bits.ToUnsignedInt(283, 5);
+  eta_minute = bits.ToUnsignedInt(288, 6);
+  draught = bits.ToUnsignedInt(294, 8) / 10.;
+  destination = bits.ToString(302, 120);
+  dte = bits[422];
+  spare = bits[423];
 
-  assert(bs.GetRemaining() == 0);
+  assert(bits.GetRemaining() == 0);
   status = AIS_OK;
 }
 

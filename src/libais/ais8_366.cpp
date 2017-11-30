@@ -21,29 +21,25 @@ Ais8_366_56::Ais8_366_56(const char *nmea_payload, const size_t pad)
   assert(dac == 366);
   assert(fi == 56);
 
+  if (!CheckStatus()) {
+    return;
+  }
   if (num_bits < 56 || num_bits > 1192) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
-  AisBitset bs;
-  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
-  if (r != AIS_OK) {
-    status = r;
-    return;
-  }
-
-  bs.SeekTo(56);
-  int num_full_bytes = bs.GetRemaining() / 8;
+  bits.SeekTo(56);
+  int num_full_bytes = bits.GetRemaining() / 8;
 
   for (int i = 0; i < num_full_bytes; i++) {
-    encrypted.push_back(bs.ToUnsignedInt(56 + i * 8, 8));
+    encrypted.push_back(bits.ToUnsignedInt(56 + i * 8, 8));
   }
 
-  if (bs.GetRemaining() > 0) {
-    assert(bs.GetRemaining() < 8);
+  if (bits.GetRemaining() > 0) {
+    assert(bits.GetRemaining() < 8);
     encrypted.push_back(
-        bs.ToUnsignedInt(bs.GetPosition(), bs.GetRemaining()));
+        bits.ToUnsignedInt(bits.GetPosition(), bits.GetRemaining()));
   }
 
   status = AIS_OK;

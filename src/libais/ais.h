@@ -371,8 +371,6 @@ enum Dac {
   AIS_DAC_775_VENEZUELA = 775
 };
 
-class AisBitset;
-
 class AisPoint {
  public:
   double lng_deg;
@@ -382,6 +380,62 @@ class AisPoint {
   AisPoint(double lng_deg_, double lat_deg_);
 };
 ostream& operator<< (ostream &o, const AisPoint &position);
+
+//////////////////////////////////////////////////////////////////////
+// Support class for decoding
+//////////////////////////////////////////////////////////////////////
+static const int MAX_BITS = 1192;
+
+class AisBitset : protected bitset<MAX_BITS> {
+ public:
+  AisBitset();
+
+  AIS_STATUS ParseNmeaPayload(const char *nmea_payload, int pad);
+
+  int GetNumBits() const { return num_bits; }
+  int GetNumChars() const { return num_chars; }
+  int GetPosition() const { return current_position; }
+  int GetRemaining() const { return num_bits - current_position; }
+
+  const AisBitset& SeekRelative(int d) const;
+  const AisBitset& SeekTo(size_t pos) const;
+
+  bool operator[](size_t pos) const;
+
+  unsigned int ToUnsignedInt(const size_t start, const size_t len) const;
+  int ToInt(const size_t start, const size_t len) const;
+  string ToString(const size_t start, const size_t len) const;
+
+  const AisPoint ToAisPoint(const size_t start, const size_t point_size) const;
+
+  // Visible for testing.
+  static bitset<6> Reverse(const bitset<6> &bits);
+
+ protected:
+  // TODO(schwehr): do not use long
+  typedef union {
+    long long_val;  // NOLINT
+    unsigned long ulong_val;  // NOLINT
+  } long_union;
+
+  int num_bits;
+  int num_chars;
+
+  static bool nmea_ord_initialized_;
+  static bitset<6> nmea_ord_[128];
+  static const char bits_to_char_tbl_[];
+
+  static void InitNmeaOrd();
+
+ private:
+  // This will help uncover dicontinuities when querying sequential bits, i.e.
+  // when we query a bit sequence that is not in direct succession of the
+  // previous one. In the future, we may use this to automatically determine
+  // the next read location.
+  // This field is also used to determine the number of remaining bits after the
+  // last read position.
+  mutable int current_position;
+};
 
 class AisMsg {
  public:
@@ -399,9 +453,14 @@ class AisMsg {
   AIS_STATUS status;  // AIS_OK or error code
   int num_chars;  // Number of characters in the nmea_payload.
   size_t num_bits;  // Number of bits in the nmea_payload.
+  AisBitset bits;  // The bitset that was constructed out of the nmea_payload.
 
-  AisMsg() : status(AIS_UNINITIALIZED), num_chars(0), num_bits(0) {}
+  AisMsg() : status(AIS_UNINITIALIZED), num_chars(0), num_bits(0), bits() {}
   AisMsg(const char *nmea_payload, const size_t pad);
+
+  // Returns true if the msg is in a good state "so far", i.e. either AIS_OK or
+  // AIS_UNINITIALIZED.
+  bool CheckStatus() const;
 };
 
 // TODO(schwehr): factor out commstate from all messages?
@@ -2377,63 +2436,6 @@ class Ais27 : public AisMsg {
   Ais27(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais27 &msg);
-
-//////////////////////////////////////////////////////////////////////
-// Support class for decoding
-//////////////////////////////////////////////////////////////////////
-static const int MAX_BITS = 1192;
-
-class AisBitset : protected bitset<MAX_BITS> {
- public:
-  AisBitset();
-
-  AIS_STATUS ParseNmeaPayload(const char *nmea_payload, int pad);
-
-  int GetNumBits() const { return num_bits; }
-  int GetNumChars() const { return num_chars; }
-  int GetPosition() const { return current_position; }
-  int GetRemaining() const { return num_bits - current_position; }
-
-  const AisBitset& SeekRelative(int d) const;
-  const AisBitset& SeekTo(size_t pos) const;
-
-  bool operator[](size_t pos) const;
-
-  unsigned int ToUnsignedInt(const size_t start, const size_t len) const;
-  int ToInt(const size_t start, const size_t len) const;
-  string ToString(const size_t start, const size_t len) const;
-
-  const AisPoint ToAisPoint(const size_t start, const size_t point_size) const;
-
-  // Visible for testing.
-  static bitset<6> Reverse(const bitset<6> &bits);
-
- protected:
-  // TODO(schwehr): do not use long
-  typedef union {
-    long long_val;  // NOLINT
-    unsigned long ulong_val;  // NOLINT
-  } long_union;
-
-  int num_bits;
-  int num_chars;
-
-  static bool nmea_ord_initialized_;
-  static bitset<6> nmea_ord_[128];
-  static const char bits_to_char_tbl_[];
-
-  static void InitNmeaOrd();
-
- private:
-  // This will help uncover dicontinuities when querying sequential bits, i.e.
-  // when we query a bit sequence that is not in direct succession of the
-  // previous one. In the future, we may use this to automatically determine
-  // the next read location.
-  // This field is also used to determine the number of remaining bits after the
-  // last read position.
-  mutable int current_position;
-};
-
 
 }  // namespace libais
 

@@ -13,25 +13,21 @@ namespace libais {
 Ais17::Ais17(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), spare2(0), gnss_type(0), z_cnt(0),
       station(0), seq(0), health(0) {
-  assert(message_id == 17);
-
+  if (!CheckStatus()) {
+    return;
+  }
   if (num_bits != 80 && (num_bits < 120 || num_bits > 816)) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
-  AisBitset bs;
-  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
-  if (r != AIS_OK) {
-    status = r;
-    return;
-  }
+  assert(message_id == 17);
 
-  bs.SeekTo(38);
-  spare = bs.ToUnsignedInt(38, 2);
+  bits.SeekTo(38);
+  spare = bits.ToUnsignedInt(38, 2);
 
-  position = bs.ToAisPoint(40, 35);
-  spare2 = bs.ToUnsignedInt(75, 5);
+  position = bits.ToAisPoint(40, 35);
+  spare2 = bits.ToUnsignedInt(75, 5);
 
   // Spec states that there might be no data.
   if (num_bits == 80) {
@@ -42,16 +38,16 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  gnss_type = bs.ToUnsignedInt(80, 6);
-  station = bs.ToUnsignedInt(86, 10);
-  z_cnt = bs.ToUnsignedInt(96, 13);
-  seq = bs.ToUnsignedInt(109, 3);
-  bs.SeekRelative(5);
-  health = bs.ToUnsignedInt(117, 3);
+  gnss_type = bits.ToUnsignedInt(80, 6);
+  station = bits.ToUnsignedInt(86, 10);
+  z_cnt = bits.ToUnsignedInt(96, 13);
+  seq = bits.ToUnsignedInt(109, 3);
+  bits.SeekRelative(5);
+  health = bits.ToUnsignedInt(117, 3);
 
   // TODO(schwehr): Implement parsing the payload.
 
-  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
+  // TODO(schwehr): Add assert(bits.GetRemaining() == 0);
 
   status = AIS_OK;  // TODO(schwehr): Not really okay yet.
 }

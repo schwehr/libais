@@ -11,68 +11,64 @@ Ais4_11::Ais4_11(const char *nmea_payload, const size_t pad)
       slot_timeout(0), received_stations_valid(false), received_stations(0),
       slot_number_valid(false), slot_number(0), utc_valid(false), utc_hour(0),
       utc_min(0), utc_spare(0), slot_offset_valid(false), slot_offset(0) {
+  if (!CheckStatus()) {
+    return;
+  }
   if (pad != 0 || num_chars != 28) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
-  AisBitset bs;
-  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
-  if (r != AIS_OK) {
-    status = r;
-    return;
-  }
-
   assert(message_id == 4 || message_id == 11);
 
-  bs.SeekTo(38);
-  year = bs.ToUnsignedInt(38, 14);
-  month = bs.ToUnsignedInt(52, 4);
-  day = bs.ToUnsignedInt(56, 5);
-  hour = bs.ToUnsignedInt(61, 5);
-  minute = bs.ToUnsignedInt(66, 6);
-  second = bs.ToUnsignedInt(72, 6);
+  bits.SeekTo(38);
+  year = bits.ToUnsignedInt(38, 14);
+  month = bits.ToUnsignedInt(52, 4);
+  day = bits.ToUnsignedInt(56, 5);
+  hour = bits.ToUnsignedInt(61, 5);
+  minute = bits.ToUnsignedInt(66, 6);
+  second = bits.ToUnsignedInt(72, 6);
 
-  position_accuracy = bs[78];
-  position = bs.ToAisPoint(79, 55);
+  position_accuracy = bits[78];
+  position = bits.ToAisPoint(79, 55);
 
-  fix_type = bs.ToUnsignedInt(134, 4);
-  transmission_ctl = bs[138];
-  spare = bs.ToUnsignedInt(139, 9);
-  raim = bs[148];
+  fix_type = bits.ToUnsignedInt(134, 4);
+  transmission_ctl = bits[138];
+  spare = bits.ToUnsignedInt(139, 9);
+  raim = bits[148];
 
   // SOTDMA commstate
-  sync_state = bs.ToUnsignedInt(149, 2);
-  slot_timeout = bs.ToUnsignedInt(151, 3);
+  sync_state = bits.ToUnsignedInt(149, 2);
+  slot_timeout = bits.ToUnsignedInt(151, 3);
 
   switch (slot_timeout) {
   case 0:
-    slot_offset = bs.ToUnsignedInt(154, 14);
+    slot_offset = bits.ToUnsignedInt(154, 14);
     slot_offset_valid = true;
     break;
   case 1:
-    utc_hour = bs.ToUnsignedInt(154, 5);
-    utc_min = bs.ToUnsignedInt(159, 7);
-    utc_spare = bs.ToUnsignedInt(166, 2);
+    utc_hour = bits.ToUnsignedInt(154, 5);
+    utc_min = bits.ToUnsignedInt(159, 7);
+    utc_spare = bits.ToUnsignedInt(166, 2);
     utc_valid = true;
     break;
   case 2:  // FALLTHROUGH
   case 4:  // FALLTHROUGH
   case 6:
-    slot_number = bs.ToUnsignedInt(154, 14);
+    slot_number = bits.ToUnsignedInt(154, 14);
     slot_number_valid = true;
     break;
   case 3:  // FALLTHROUGH
   case 5:  // FALLTHROUGH
   case 7:
-    received_stations = bs.ToUnsignedInt(154, 14);
+    received_stations = bits.ToUnsignedInt(154, 14);
     received_stations_valid = true;
     break;
   default:
     assert(false);
   }
 
-  assert(bs.GetRemaining() == 0);
+  assert(bits.GetRemaining() == 0);
   status = AIS_OK;
 }
 

@@ -108,13 +108,14 @@ AIS_STATUS AisBitset::ParseNmeaPayload(const char *nmea_payload, int pad) {
     return AIS_ERR_MSG_TOO_LONG;
   }
 
+  size_t bit = 0;
   for (size_t idx = 0; nmea_payload[idx] != '\0' && idx < size()/6; idx++) {
     int c = static_cast<int>(nmea_payload[idx]);
     if (c < 48 || c > 119 || (c >= 88 && c <= 95)) {
       return AIS_ERR_BAD_NMEA_CHR;
     }
     for (size_t offset = 0; offset < 6; offset++) {
-      set(idx*6 + offset, nmea_ord_[c].test(offset));
+      set(bit++, nmea_ord_[c].test(offset));
     }
   }
 
@@ -268,27 +269,38 @@ const char AisBitset::bits_to_char_tbl_[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 AisMsg::AisMsg(const char *nmea_payload, const size_t pad)
     : message_id(0), repeat_indicator(0), mmsi(0), status(AIS_UNINITIALIZED),
-      num_chars(0), num_bits(0) {
+      num_chars(0), num_bits(0), bits() {
   assert(nmea_payload);
   assert(pad < 6);
 
-  AisBitset bs;
-  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
+  const AIS_STATUS r = bits.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;
     return;
   }
-  num_bits = bs.GetNumBits();
-  num_chars = bs.GetNumChars();
+  num_bits = bits.GetNumBits();
+  num_chars = bits.GetNumChars();
 
-  if (bs.GetNumBits() < 38) {
+  if (bits.GetNumBits() < 38) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
-  message_id = bs.ToUnsignedInt(0, 6);
-  repeat_indicator = bs.ToUnsignedInt(6, 2);
-  mmsi = bs.ToUnsignedInt(8, 30);
+  message_id = bits.ToUnsignedInt(0, 6);
+  repeat_indicator = bits.ToUnsignedInt(6, 2);
+  mmsi = bits.ToUnsignedInt(8, 30);
+}
+
+bool AisMsg::CheckStatus() const {
+  if (status == AIS_OK || status == AIS_UNINITIALIZED) {
+    return true;
+  }
+#ifdef LIBAIS_DEBUG
+  std::cerr << "AisMsg::CheckStatus failed: "
+            << AIS_STATUS_STRINGS[status]
+            << std::endl;
+#endif
+  return false;
 }
 
 AisPoint::AisPoint() : lng_deg(0), lat_deg(0) {

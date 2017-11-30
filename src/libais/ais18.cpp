@@ -42,68 +42,64 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad)
       keep_flag(0),
       commstate_cs_fill_valid(false),
       commstate_cs_fill(0) {
-  assert(message_id == 18);
-
+  if (!CheckStatus()) {
+    return;
+  }
   if (pad != 0 || num_chars != 28) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
-  AisBitset bs;
-  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
-  if (r != AIS_OK) {
-    status = r;
-    return;
-  }
+  assert(message_id == 18);
 
-  bs.SeekTo(38);
-  spare = bs.ToUnsignedInt(38, 8);
-  sog = bs.ToUnsignedInt(46, 10) / 10.;
+  bits.SeekTo(38);
+  spare = bits.ToUnsignedInt(38, 8);
+  sog = bits.ToUnsignedInt(46, 10) / 10.;
 
-  position_accuracy = bs[56];
-  position = bs.ToAisPoint(57, 55);
+  position_accuracy = bits[56];
+  position = bits.ToAisPoint(57, 55);
 
-  cog = bs.ToUnsignedInt(112, 12) / 10.;
-  true_heading = bs.ToUnsignedInt(124, 9);
-  timestamp = bs.ToUnsignedInt(133, 6);
-  spare2 = bs.ToUnsignedInt(139, 2);
-  unit_flag = bs[141];
-  display_flag = bs[142];
-  dsc_flag = bs[143];
-  band_flag = bs[144];
-  m22_flag = bs[145];
-  mode_flag = bs[146];
-  raim = bs[147];
-  commstate_flag = bs[148];  // 0 SOTDMA, 1 ITDMA
+  cog = bits.ToUnsignedInt(112, 12) / 10.;
+  true_heading = bits.ToUnsignedInt(124, 9);
+  timestamp = bits.ToUnsignedInt(133, 6);
+  spare2 = bits.ToUnsignedInt(139, 2);
+  unit_flag = bits[141];
+  display_flag = bits[142];
+  dsc_flag = bits[143];
+  band_flag = bits[144];
+  m22_flag = bits[145];
+  mode_flag = bits[146];
+  raim = bits[147];
+  commstate_flag = bits[148];  // 0 SOTDMA, 1 ITDMA
 
   if (unit_flag == 0) {
-    sync_state = bs.ToUnsignedInt(149, 2);
+    sync_state = bits.ToUnsignedInt(149, 2);
     if (commstate_flag == 0) {
       // SOTDMA
-      slot_timeout = bs.ToUnsignedInt(151, 3);
+      slot_timeout = bits.ToUnsignedInt(151, 3);
       slot_timeout_valid = true;
 
       switch (slot_timeout) {
         case 0:
-          slot_offset = bs.ToUnsignedInt(154, 14);
+          slot_offset = bits.ToUnsignedInt(154, 14);
           slot_offset_valid = true;
           break;
         case 1:
-          utc_hour = bs.ToUnsignedInt(154, 5);
-          utc_min = bs.ToUnsignedInt(159, 7);
-          utc_spare = bs.ToUnsignedInt(166, 2);
+          utc_hour = bits.ToUnsignedInt(154, 5);
+          utc_min = bits.ToUnsignedInt(159, 7);
+          utc_spare = bits.ToUnsignedInt(166, 2);
           utc_valid = true;
           break;
         case 2:  // FALLTHROUGH
         case 4:  // FALLTHROUGH
         case 6:
-          slot_number = bs.ToUnsignedInt(154, 14);
+          slot_number = bits.ToUnsignedInt(154, 14);
           slot_number_valid = true;
           break;
         case 3:  // FALLTHROUGH
         case 5:  // FALLTHROUGH
         case 7:
-          received_stations = bs.ToUnsignedInt(154, 14);
+          received_stations = bits.ToUnsignedInt(154, 14);
           received_stations_valid = true;
           break;
         default:
@@ -112,22 +108,22 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad)
 
     } else {
       // ITDMA
-      slot_increment = bs.ToUnsignedInt(151, 13);
+      slot_increment = bits.ToUnsignedInt(151, 13);
       slot_increment_valid = true;
 
-      slots_to_allocate = bs.ToUnsignedInt(164, 3);
+      slots_to_allocate = bits.ToUnsignedInt(164, 3);
       slots_to_allocate_valid = true;
 
-      keep_flag = bs[167];
+      keep_flag = bits[167];
       keep_flag_valid = true;
     }
   } else {
     // Carrier Sense (CS) with unit_flag of 1.
-    commstate_cs_fill = bs.ToUnsignedInt(149, 19);
+    commstate_cs_fill = bits.ToUnsignedInt(149, 19);
     commstate_cs_fill_valid = true;
   }
 
-  assert(bs.GetRemaining() == 0);
+  assert(bits.GetRemaining() == 0);
   status = AIS_OK;
 }
 

@@ -6,27 +6,22 @@ namespace libais {
 
 Ais10::Ais10(const char *nmea_payload, const size_t pad)
     : AisMsg(nmea_payload, pad), spare(0), dest_mmsi(0), spare2(0) {
-
-  assert(message_id == 10);
-
+  if (!CheckStatus()) {
+    return;
+  }
   if (pad != 0 || num_chars != 12) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
-  AisBitset bs;
-  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
-  if (r != AIS_OK) {
-    status = r;
-    return;
-  }
+  assert(message_id == 10);
 
-  bs.SeekTo(38);
-  spare = bs.ToUnsignedInt(38, 2);
-  dest_mmsi = bs.ToUnsignedInt(40, 30);
-  spare2 = bs.ToUnsignedInt(70, 2);
+  bits.SeekTo(38);
+  spare = bits.ToUnsignedInt(38, 2);
+  dest_mmsi = bits.ToUnsignedInt(40, 30);
+  spare2 = bits.ToUnsignedInt(70, 2);
 
-  assert(bs.GetRemaining() == 0);
+  assert(bits.GetRemaining() == 0);
 
   status = AIS_OK;
 }
