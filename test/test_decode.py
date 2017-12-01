@@ -23,7 +23,7 @@ class AisTopLevelDecoders(unittest.TestCase):
       if msg.keys() != expected.keys():
         sys.stderr.write('key mismatch: %s\n' % set(msg).symmetric_difference(set(expected)))
       self.assertDictEqual(
-          msg, expected,
+          expected, msg,
           'Mismatch for id:%d\n%s\n%s\n  From: %s' % (
               msg['id'], msg, expected, entry['nmea']))
 
