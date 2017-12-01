@@ -154,13 +154,16 @@ unsigned int AisBitset::ToUnsignedInt(const size_t start,
 
   assert(current_position == start);
 
-  bitset<32> bs_tmp;
-  for (size_t i = 0; i < len; i++)
-    bs_tmp.set(i, test(start + len - i - 1));
+  unsigned int result = 0;
+  size_t end = start + len;
+  for (size_t i = start; i < end; ++i) {
+    result <<= 1;
+    if (test(i))
+      result |= 1;
+  }
 
-  current_position = start + len;
-
-  return bs_tmp.to_ulong();
+  current_position = end;
+  return result;
 }
 
 int AisBitset::ToInt(const size_t start, const size_t len)  const {
@@ -170,20 +173,18 @@ int AisBitset::ToInt(const size_t start, const size_t len)  const {
 
   assert(current_position == start);
 
-  bitset<32> bs32;
-  // pad 1's to the left if negative
-  if (len < 32 && test(start))
-    bs32.flip();
-
-  for (size_t i = 0; i < len; i++)
-    bs32[i] = test(start + len - i - 1);
-
-  long_union val;
-  val.ulong_val = bs32.to_ulong();
-
-  current_position = start + len;
-
-  return val.long_val;
+  // Converting the sub-bitset to a signed number, per "Two's complement":
+  // - If negative, invert all the bits, then add 1.
+  bool is_positive = (len == 32 || !test(start));
+  int result = 0;
+  size_t end = start + len;
+  for (size_t i = start; i < end; ++i) {
+    result <<= 1;
+    if (test(i) == is_positive)
+      result |= 1;
+  }
+  current_position = end;
+  return is_positive ? result : -(result + 1);
 }
 
 string AisBitset::ToString(const size_t start, const size_t len) const {

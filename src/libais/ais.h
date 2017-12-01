@@ -412,12 +412,6 @@ class AisBitset : protected bitset<MAX_BITS> {
   static bitset<6> Reverse(const bitset<6> &bits);
 
  protected:
-  // TODO(schwehr): do not use long
-  typedef union {
-    long long_val;  // NOLINT
-    unsigned long ulong_val;  // NOLINT
-  } long_union;
-
   int num_bits;
   int num_chars;
 
