@@ -19,7 +19,10 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad)
       slot_increment_valid(false), slot_increment(0),
       slots_to_allocate_valid(false), slots_to_allocate(0),
       keep_flag_valid(false), keep_flag(false) {
-  assert(message_id == 26);
+  if (!CheckStatus()) {
+    return;
+  }
+
   // TODO(schwehr): Check for off by one.
   const size_t comm_flag_offset = num_bits - 20;
 
@@ -28,66 +31,61 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  AisBitset bs;
-  const AIS_STATUS r = bs.ParseNmeaPayload(nmea_payload, pad);
-  if (r != AIS_OK) {
-    status = r;
-    return;
-  }
+  assert(message_id == 26);
 
-  bs.SeekTo(38);
-  const bool addressed = bs[38];
-  use_app_id = bs[39];
+  bits.SeekTo(38);
+  const bool addressed = bits[38];
+  use_app_id = bits[39];
   if (addressed) {
     dest_mmsi_valid = true;
-    dest_mmsi = bs.ToUnsignedInt(40, 30);
+    dest_mmsi = bits.ToUnsignedInt(40, 30);
     if (use_app_id) {
       if (num_bits < 86) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
       }
-      dac = bs.ToUnsignedInt(70, 10);
-      fi = bs.ToUnsignedInt(80, 6);
+      dac = bits.ToUnsignedInt(70, 10);
+      fi = bits.ToUnsignedInt(80, 6);
     }
     // TODO(schwehr): Handle the payload.
   } else {
     // broadcast
     if (use_app_id) {
-      dac = bs.ToUnsignedInt(40, 10);
-      fi = bs.ToUnsignedInt(50, 6);
+      dac = bits.ToUnsignedInt(40, 10);
+      fi = bits.ToUnsignedInt(50, 6);
     }
     // TODO(schwehr): Handle the payload.
   }
 
-  bs.SeekTo(comm_flag_offset);
-  commstate_flag = bs[comm_flag_offset];
-  sync_state = bs.ToUnsignedInt(comm_flag_offset + 1, 2);  // SOTDMA and TDMA.
+  bits.SeekTo(comm_flag_offset);
+  commstate_flag = bits[comm_flag_offset];
+  sync_state = bits.ToUnsignedInt(comm_flag_offset + 1, 2);  // SOTDMA and TDMA.
 
   if (!commstate_flag) {
     // SOTDMA
-    slot_timeout = bs.ToUnsignedInt(comm_flag_offset + 3, 3);
+    slot_timeout = bits.ToUnsignedInt(comm_flag_offset + 3, 3);
     slot_timeout_valid = true;
     switch (slot_timeout) {
     case 0:
-      slot_offset = bs.ToUnsignedInt(comm_flag_offset + 6, 14);
+      slot_offset = bits.ToUnsignedInt(comm_flag_offset + 6, 14);
       slot_offset_valid = true;
       break;
     case 1:
-      utc_hour = bs.ToUnsignedInt(comm_flag_offset + 6, 5);
-      utc_min = bs.ToUnsignedInt(comm_flag_offset + 11, 7);
-      utc_spare = bs.ToUnsignedInt(comm_flag_offset + 18, 2);
+      utc_hour = bits.ToUnsignedInt(comm_flag_offset + 6, 5);
+      utc_min = bits.ToUnsignedInt(comm_flag_offset + 11, 7);
+      utc_spare = bits.ToUnsignedInt(comm_flag_offset + 18, 2);
       utc_valid = true;
       break;
     case 2:  // FALLTHROUGH
     case 4:  // FALLTHROUGH
     case 6:
-      slot_number = bs.ToUnsignedInt(comm_flag_offset + 6, 14);
+      slot_number = bits.ToUnsignedInt(comm_flag_offset + 6, 14);
       slot_number_valid = true;
       break;
     case 3:  // FALLTHROUGH
     case 5:  // FALLTHROUGH
     case 7:
-      received_stations = bs.ToUnsignedInt(comm_flag_offset + 6, 14);
+      received_stations = bits.ToUnsignedInt(comm_flag_offset + 6, 14);
       received_stations_valid = true;
       break;
     default:
@@ -95,17 +93,17 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad)
     }
   } else {
     // ITDMA
-    slot_increment = bs.ToUnsignedInt(comm_flag_offset + 3, 13);
+    slot_increment = bits.ToUnsignedInt(comm_flag_offset + 3, 13);
     slot_increment_valid = true;
 
-    slots_to_allocate = bs.ToUnsignedInt(comm_flag_offset + 16, 3);
+    slots_to_allocate = bits.ToUnsignedInt(comm_flag_offset + 16, 3);
     slots_to_allocate_valid = true;
 
-    keep_flag = bs[comm_flag_offset + 19];
+    keep_flag = bits[comm_flag_offset + 19];
     keep_flag_valid = true;
   }
 
-  // TODO(schwehr): Add assert(bs.GetRemaining() == 0);
+  // TODO(schwehr): Add assert(bits.GetRemaining() == 0);
   status = AIS_OK;
 }
 

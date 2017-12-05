@@ -146,6 +146,14 @@ TEST(Ais8_367_22Test, PolylinesTest) {
                {19200, 24000, 24700}, 0);
 }
 
+TEST(Ais8_367_22Test, BadBitsAtEnd) {
+  std::unique_ptr<Ais8_367_22> msg(new Ais8_367_22(
+      "8888tMEKmblAb@IIIIIIIIQIIF20DH1b60bbd7l0<50@kk2Q5h@0010N000000<50@"
+      "kk2K5hQ5h@@0000N000000",
+      2));
+  ASSERT_TRUE(msg->had_error());
+}
+
 #if 0
 // TODO: Get this to work.
 TEST(Ais8_367_22Test, DecodeUscgWhaleBouyTest2) {

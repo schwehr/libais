@@ -371,8 +371,6 @@ enum Dac {
   AIS_DAC_775_VENEZUELA = 775
 };
 
-class AisBitset;
-
 class AisPoint {
  public:
   double lng_deg;
@@ -382,6 +380,56 @@ class AisPoint {
   AisPoint(double lng_deg_, double lat_deg_);
 };
 ostream& operator<< (ostream &o, const AisPoint &position);
+
+//////////////////////////////////////////////////////////////////////
+// Support class for decoding
+//////////////////////////////////////////////////////////////////////
+static const int MAX_BITS = 1192;
+
+class AisBitset : protected bitset<MAX_BITS> {
+ public:
+  AisBitset();
+
+  AIS_STATUS ParseNmeaPayload(const char *nmea_payload, int pad);
+
+  int GetNumBits() const { return num_bits; }
+  int GetNumChars() const { return num_chars; }
+  int GetPosition() const { return current_position; }
+  int GetRemaining() const { return num_bits - current_position; }
+
+  const AisBitset& SeekRelative(int d) const;
+  const AisBitset& SeekTo(size_t pos) const;
+
+  bool operator[](size_t pos) const;
+
+  unsigned int ToUnsignedInt(const size_t start, const size_t len) const;
+  int ToInt(const size_t start, const size_t len) const;
+  string ToString(const size_t start, const size_t len) const;
+
+  const AisPoint ToAisPoint(const size_t start, const size_t point_size) const;
+
+  // Visible for testing.
+  static bitset<6> Reverse(const bitset<6> &bits);
+
+ protected:
+  int num_bits;
+  int num_chars;
+
+  static bool nmea_ord_initialized_;
+  static bitset<6> nmea_ord_[128];
+  static const char bits_to_char_tbl_[];
+
+  static void InitNmeaOrd();
+
+ private:
+  // This will help uncover dicontinuities when querying sequential bits, i.e.
+  // when we query a bit sequence that is not in direct succession of the
+  // previous one. In the future, we may use this to automatically determine
+  // the next read location.
+  // This field is also used to determine the number of remaining bits after the
+  // last read position.
+  mutable int current_position;
+};
 
 class AisMsg {
  public:
@@ -399,9 +447,14 @@ class AisMsg {
   AIS_STATUS status;  // AIS_OK or error code
   int num_chars;  // Number of characters in the nmea_payload.
   size_t num_bits;  // Number of bits in the nmea_payload.
+  AisBitset bits;  // The bitset that was constructed out of the nmea_payload.
 
-  AisMsg() : status(AIS_UNINITIALIZED), num_chars(0), num_bits(0) {}
+  AisMsg() : status(AIS_UNINITIALIZED), num_chars(0), num_bits(0), bits() {}
   AisMsg(const char *nmea_payload, const size_t pad);
+
+  // Returns true if the msg is in a good state "so far", i.e. either AIS_OK or
+  // AIS_UNINITIALIZED.
+  bool CheckStatus() const;
 };
 
 // TODO(schwehr): factor out commstate from all messages?
@@ -593,8 +646,10 @@ ostream& operator<< (ostream &o, const Ais6_1_2 &msg);
 // Capability interogation.  ITU 1371-1
 class Ais6_1_3 : public Ais6 {
  public:
-  int req_dac;
-  int spare2;
+  unsigned int req_dac;
+  unsigned int spare2;
+  unsigned int spare3;
+  unsigned int spare4;
 
   Ais6_1_3(const char *nmea_payload, const size_t pad);
 };
@@ -1567,9 +1622,60 @@ class Ais8_200_10 : public Ais8 {
   Ais8_200_10(const char *nmea_payload, const size_t pad);
 };
 
-// 21 and 22 do not exist
+// http://www.ris.eu/docs/File/536/vessel_traking_and_tracing_standard_ed1-2_ccnr_23-apr_2013_en.pdf
+// ETA at lock/bridge/terminal
+class Ais8_200_21 : public Ais8 {
+ public:
+  string country;         // UN country code         0 = not available = default
+  string location;        // UN location code        0 = not available = default
+  string section;         // Fairway section number  0 = not available = default
+  string terminal;        // Terminal code           0 = not available = default
+  string hectometre;      // Fairway hectometre      0 = not available = default
+  // Examples for previous fields.  See:
+  // http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
+
+  // ETA at lock/bridge/terminal - Estimated Time of Arrival; MMDDHHMM UTC
+  int eta_month;          // 1 - 12;  0 = not available = default
+  int eta_day;            // 1 - 31;  0 = not available = default
+  int eta_hour;           // 0 - 23; 24 = not available = default
+  int eta_minute;         // 0 - 59; 60 = not available = default
+  int tugboats;           // 0 - 6,   7 = unknown = default
+  // Maximum present static air draught 0
+  float air_draught;      // 4000 (rest not used), in 1/100m, 0 = not used
+  int spare2;             // 5 bits  Not used, should be set to zero.
+
+  Ais8_200_21(const char *nmea_payload, const size_t pad);
+};
+
+// vessel_traking_and_tracing_standard_ed1-2_ccnr_23-apr_2013_en.pdf
+// RTA at lock/bridge/terminal
+class Ais8_200_22 : public Ais8 {
+ public:
+  string country;         // UN country code         0 = not available
+  string location;        // UN location code        0 = not available
+  string section;         // Fairway section number  0 = not available
+  string terminal;        // Terminal code           0 = not available
+  string hectometre;      // Fairway hectometre      0 = not available
+  // Examples for previous fields.  See:
+  // http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
+
+  // RTA at lock/bridge/terminal - Recommended Time of Arrival; MMDDHHMM UTC
+  int rta_month;          //  0 = not available
+  int rta_day;            //  0 = not available
+  int rta_hour;           // 24 = not available
+  int rta_minute;         // 60 = not available
+  int lock_status;        // Lock/bridge/terminal status
+                          // 0 = operational
+                          // 1 = limited operation
+                          // 2 = out of order
+                          // 3 = not available
+  int spare2;             // Spare
+
+  Ais8_200_22(const char *nmea_payload, const size_t pad);
+};
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+// EMMA warning
 class Ais8_200_23 : public Ais8 {
  public:
   int utc_year_start;
@@ -1608,6 +1714,7 @@ class Ais8_200_24 : public Ais8 {
 };
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+// Signal status
 class Ais8_200_40 : public Ais8 {
  public:
   AisPoint position;
@@ -1622,6 +1729,7 @@ class Ais8_200_40 : public Ais8 {
 };
 
 // ECE-TRANS-SC3-2006-10e-RIS.pdf - River Information System
+// Number of persons on board
 class Ais8_200_55 : public Ais8 {
  public:
   int crew;
@@ -2322,63 +2430,6 @@ class Ais27 : public AisMsg {
   Ais27(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais27 &msg);
-
-//////////////////////////////////////////////////////////////////////
-// Support class for decoding
-//////////////////////////////////////////////////////////////////////
-static const int MAX_BITS = 1192;
-
-class AisBitset : protected bitset<MAX_BITS> {
- public:
-  AisBitset();
-
-  AIS_STATUS ParseNmeaPayload(const char *nmea_payload, int pad);
-
-  int GetNumBits() const { return num_bits; }
-  int GetNumChars() const { return num_chars; }
-  int GetPosition() const { return current_position; }
-  int GetRemaining() const { return num_bits - current_position; }
-
-  const AisBitset& SeekRelative(int d) const;
-  const AisBitset& SeekTo(size_t pos) const;
-
-  bool operator[](size_t pos) const;
-
-  unsigned int ToUnsignedInt(const size_t start, const size_t len) const;
-  int ToInt(const size_t start, const size_t len) const;
-  string ToString(const size_t start, const size_t len) const;
-
-  const AisPoint ToAisPoint(const size_t start, const size_t point_size) const;
-
-  // Visible for testing.
-  static bitset<6> Reverse(const bitset<6> &bits);
-
- protected:
-  // TODO(schwehr): do not use long
-  typedef union {
-    long long_val;  // NOLINT
-    unsigned long ulong_val;  // NOLINT
-  } long_union;
-
-  int num_bits;
-  int num_chars;
-
-  static bool nmea_ord_initialized_;
-  static bitset<6> nmea_ord_[128];
-  static const char bits_to_char_tbl_[];
-
-  static void InitNmeaOrd();
-
- private:
-  // This will help uncover dicontinuities when querying sequential bits, i.e.
-  // when we query a bit sequence that is not in direct succession of the
-  // previous one. In the future, we may use this to automatically determine
-  // the next read location.
-  // This field is also used to determine the number of remaining bits after the
-  // last read position.
-  mutable int current_position;
-};
-
 
 }  // namespace libais
 

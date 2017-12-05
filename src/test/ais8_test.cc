@@ -93,5 +93,11 @@ TEST(Ais8_1_11Test, DecodeAnything) {
                     15, 92.3, 7, 51.1, 3, 0, 0);
 }
 
+TEST(Ais8_1_11Test, IncorrectBitCount) {
+  std::unique_ptr<Ais8_1_11> msg(new Ais8_1_11(
+      "8@2<HV@0BkLN:0frqMPaQPtBRRIrwwejwwwwwwwwwwwwwwwwwwwwwwwwwt0", 0));
+  EXPECT_TRUE(msg->had_error());
+}
+
 }  // namespace
 }  // namespace libais

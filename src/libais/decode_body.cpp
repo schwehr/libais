@@ -111,14 +111,25 @@ unique_ptr<AisMsg> CreateAisMsg8(const string &body, const int fill_bits) {
     case libais::AIS_DAC_200_RIS:
       switch (msg.fi) {
         case 10:
+          // Inland ship static and voyage related data
           return MakeUnique<libais::Ais8_200_10>(body.c_str(), fill_bits);
+        case 21:
+           // ETA at lock/bridge/terminal
+          return MakeUnique<libais::Ais8_200_21>(body.c_str(), fill_bits);
+        case 22:
+          // RTA at lock/bridge/terminal
+          return MakeUnique<libais::Ais8_200_22>(body.c_str(), fill_bits);
         case 23:
+          // EMMA warning
           return MakeUnique<libais::Ais8_200_23>(body.c_str(), fill_bits);
         case 24:
+           // Water levels
           return MakeUnique<libais::Ais8_200_24>(body.c_str(), fill_bits);
         case 40:
+           // Signal status
           return MakeUnique<libais::Ais8_200_40>(body.c_str(), fill_bits);
         case 55:
+           // Number of persons on board
           return MakeUnique<libais::Ais8_200_55>(body.c_str(), fill_bits);
       }
       // FI not handled.
