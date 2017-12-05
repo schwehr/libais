@@ -39,7 +39,8 @@ Ais8_1_0::Ais8_1_0(const char *nmea_payload, const size_t pad)
   if (!CheckStatus()) {
     return;
   }
-  if (num_bits < 56 || num_bits > 1024) {
+
+  if (num_bits < 68 || num_bits > 1024) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
