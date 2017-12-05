@@ -656,12 +656,17 @@ class Ais6_1_3 : public Ais6 {
 ostream& operator<< (ostream &o, const Ais6_1_3 &msg);
 
 // Capability interogation reply.  ITU 1371-1
+// 5.4 International function message 4: Capability reply
 class Ais6_1_4 : public Ais6 {
  public:
   int ack_dac;
   std::array<int, 64> capabilities;
   std::array<int, 64> cap_reserved;
+  // 126 bits of spare.  So dumb.
   int spare2;
+  int spare3;
+  int spare4;
+  int spare5;
 
   Ais6_1_4(const char *nmea_payload, const size_t pad);
 };

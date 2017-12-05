@@ -186,7 +186,7 @@ Ais6_1_3::Ais6_1_3(const char *nmea_payload, const size_t pad)
 // TODO(schwehr): WTF?  10 + 128 + 6 == 80  Is this 168 or 232 bits?
 Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
     : Ais6(nmea_payload, pad), ack_dac(0), capabilities(),
-      cap_reserved(), spare2(0) {
+      cap_reserved(), spare2(0), spare3(0), spare4(0), spare5(0) {
   assert(dac == 1);
   assert(fi == 4);
 
@@ -194,21 +194,25 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  // TODO(schwehr): num_bits for 6_1_4.  226 bits?
-  if (num_bits != 232) {
+  if (num_bits != 352) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
 
   bits.SeekTo(88);
   ack_dac = bits.ToUnsignedInt(88, 10);
-  for (size_t cap_num = 0; cap_num < 128/2; cap_num++) {
+  constexpr int kNumFI = 64;
+  for (size_t cap_num = 0; cap_num < kNumFI; cap_num++) {
     size_t start = 98 + cap_num * 2;
     capabilities[cap_num] = bits[start];
     cap_reserved[cap_num] = bits[start + 1];
   }
-  spare2 = bits.ToUnsignedInt(226, 6);  // Read the last 6 bits to avoid triggering the assert
-  // TODO(schwehr): add in the offset of the dest mmsi
+  spare2 = bits.ToUnsignedInt(226, 32);
+  spare3 = bits.ToUnsignedInt(258, 32);
+  spare4 = bits.ToUnsignedInt(290, 32);
+  // This last one is not a full 32 bits to cover the 126 bits of spare.
+  spare5 = bits.ToUnsignedInt(322, 30);
+
 
   assert(bits.GetRemaining() == 0);
   status = AIS_OK;

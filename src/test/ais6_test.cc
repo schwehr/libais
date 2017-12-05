@@ -142,21 +142,84 @@ void ValidateAis6_1_3(const Ais6_1_3 &msg, unsigned int req_dac,
 
 TEST(Ais6_1_3, DecodeAnything) {
   // !AIVDM,1,1,,A,601uEO0hptsR04<0@00000000000,0*6B
-  std::unique_ptr<Ais6_1_3> msg(new Ais6_1_3("601uEO0hptsR04<0@00000000000", 0));
+  std::unique_ptr<Ais6_1_3> msg(
+      new Ais6_1_3("601uEO0hptsR04<0@00000000000", 0));
   ASSERT_NE(nullptr, msg);
-  ValidateAis6_1_3(*msg, 1, 0, 0, 0);
   ValidateAis6(msg.get(), 0, 2053500, 0, 205059000, false, 0, 1, 3);
+  ValidateAis6_1_3(*msg, 1, 0, 0, 0);
 }
 
 TEST(Ais6_1_3, DecodeShort) {
   // !AIVDM,1,1,,A,602a4KU29NHP04<0@0,4*78,rYADA,123456789
   std::unique_ptr<Ais6_1_3> msg(new Ais6_1_3("602a4KU29NHP04<0@0", 4));
   ASSERT_NE(nullptr, msg);
-  ValidateAis6_1_3(*msg, 1, 0, 0, 0);
   ValidateAis6(msg.get(), 0, 2770030, 1, 277445000, true, 0, 1, 3);
+  ValidateAis6_1_3(*msg, 1, 0, 0, 0);
 }
 
-// TODO(schwehr): Test Ais6_1_4.
+void ValidateAis6_1_4(const Ais6_1_4 &msg,
+                      int ack_dac, const std::array<int, 64> &capabilities,
+                      const std::array<int, 64> &cap_reserved, int spare2,
+                      int spare3, int spare4, int spare5) {
+  ASSERT_EQ(AIS_OK, msg.get_error());
+  EXPECT_EQ(ack_dac, msg.ack_dac);
+
+  for (int i = 0; i < 64 - 1; i++) {
+    EXPECT_EQ(capabilities[i], msg.capabilities[i]);
+  }
+
+  for (int i = 0; i < 64 - 1; i++) {
+    EXPECT_EQ(cap_reserved[i], msg.cap_reserved[i]);
+  }
+  EXPECT_EQ(spare2, msg.spare2);
+  EXPECT_EQ(spare3, msg.spare3);
+  EXPECT_EQ(spare4, msg.spare4);
+  EXPECT_EQ(spare5, msg.spare5);
+}
+
+TEST(Ais6_1_4, TooShort) {
+  std::unique_ptr<Ais6_1_4> msg(new Ais6_1_4("633krv00OEGl04@0", 0));
+  EXPECT_TRUE(msg->had_error());
+  EXPECT_EQ(AIS_ERR_BAD_BIT_COUNT, msg->get_error());
+}
+
+TEST(Ais6_1_4, Issue164) {
+  // https://github.com/schwehr/libais/issues/164
+  // !AIVDM,1,1,,A,633krv00OEGl04@0Hb00020000000000000000000000000000000000000,2*30
+  std::unique_ptr<Ais6_1_4> msg(new Ais6_1_4(
+      "633krv00OEGl04@0Hb00020000000000000000000000000000000000000", 2));
+  ValidateAis6(msg.get(), 0, 205323000, 0, 2053501, true, 0, 1, 4);
+
+  const std::array<int, 64> kCapabilities = {
+      1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  const std::array<int, 64> kCapReserved = {
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  ValidateAis6_1_4(*msg, 1, kCapabilities, kCapReserved, 0, 0, 0, 0);
+}
+
+TEST(Ais6_1_4, ContentInSpare) {
+  std::unique_ptr<Ais6_1_4> msg(new Ais6_1_4(
+      "633kV>P0OEH@04@0@2000200000000000000000000000000T7L08611020", 2));
+  ValidateAis6(msg.get(), 0, 205317690, 0, 2053508, true, 0, 1, 4);
+
+  const std::array<int, 64> kCapabilities = {
+      0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  const std::array<int, 64> kCapReserved = {
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  ValidateAis6_1_4(*msg, 1, kCapabilities, kCapReserved, 0, 2, 1104937089,
+                   541130784);
+}
+
+// TODO(schwehr): What to do about messages without the trailing massive spare?
+// 63aIjB@0UBf`04@0@0000:00000000000000000 2
 
 void ValidateAis6_1_5(const Ais6_1_5 &msg, int seq_num, bool ai_available,
                       int ai_response, int spare, int spare2) {

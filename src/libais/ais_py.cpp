@@ -447,6 +447,9 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict,
   DictSafeSetItem(dict, "capabilities", cap_list);
   DictSafeSetItem(dict, "cap_reserved", res_list);
   DictSafeSetItem(dict, "spare2", msg.spare2);
+  DictSafeSetItem(dict, "spare3", msg.spare2);
+  DictSafeSetItem(dict, "spare4", msg.spare2);
+  DictSafeSetItem(dict, "spare5", msg.spare2);
 
   return AIS_OK;
 }
