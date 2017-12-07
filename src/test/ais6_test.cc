@@ -259,17 +259,17 @@ TEST(Ais6_1_5, Issue162) {
 TEST(Ais6_1_5, Issue137_Part1) {
   // !AIVDM,1,1,,B,65E4;r5I0Q9R04D0@01000000000,0*69
   std::unique_ptr<Ais6_1_5> msg(
-      new Ais6_1_5("677IKl=HQGw004D0@02000000000", 0));
-  ValidateAis6(msg.get(), 0, 477518800, 3, 371286000, true, 0, 1, 5);
-  ValidateAis6_1_5(*msg, 4, false, 0, 0, 0);
+      new Ais6_1_5("65E4;r5I0Q9R04D0@01000000000", 0));
+  ValidateAis6(msg.get(), 0, 357633000, 1, 373327000, false, 0, 1, 5);
+  ValidateAis6_1_5(*msg, 2, false, 0, 0, 0);
 }
 
 TEST(Ais6_1_5, Issue137_Part2) {
   // !AIVDM,1,1,,A,677Dg2<s=9o004D0@16P00000000,0*72
   std::unique_ptr<Ais6_1_5> msg(
-      new Ais6_1_5("677IKl=HQGw004D0@02000000000", 0));
-  ValidateAis6(msg.get(), 0, 477518800, 3, 371286000, true, 0, 1, 5);
-  ValidateAis6_1_5(*msg, 4, false, 0, 0, 0);
+      new Ais6_1_5("677Dg2<s=9o004D0@16P00000000", 0));
+  ValidateAis6(msg.get(), 0, 477441800, 3, 248326000, true, 0, 1, 5);
+  ValidateAis6_1_5(*msg, 141, false, 0, 0, 0);
 }
 
 // TODO(schwehr): Test Ais6_1_12.
