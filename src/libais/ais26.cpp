@@ -24,83 +24,102 @@ Ais26::Ais26(const char *nmea_payload, const size_t pad)
   }
 
   // TODO(schwehr): Check for off by one.
-  const size_t comm_flag_offset = num_bits - 20;
+  const int comm_flag_offset = num_bits - 20;
 
   if (num_bits < 52 || num_bits > 1064) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
-
+  
   assert(message_id == 26);
 
   bits.SeekTo(38);
-  const bool addressed = bits[38];
-  use_app_id = bits[39];
+
+  using BitGet = AisBitset::BitGetter;
+  using UIGet = AisBitset::UIntGetter;
+  
+  bool addressed = false;
+  status = bits.GetValues(BitGet{&addressed,  38},
+                          BitGet{&use_app_id, 39});
+  if (!CheckStatus()) return;
+
   if (addressed) {
     dest_mmsi_valid = true;
-    dest_mmsi = bits.ToUnsignedInt(40, 30);
+    status = bits.GetValues(UIGet{&dest_mmsi, 40, 30});
+    if (!CheckStatus()) return;
+    
     if (use_app_id) {
       if (num_bits < 86) {
         status = AIS_ERR_BAD_BIT_COUNT;
         return;
       }
-      dac = bits.ToUnsignedInt(70, 10);
-      fi = bits.ToUnsignedInt(80, 6);
+      status = bits.GetValues(UIGet{&dac, 70, 10},
+                              UIGet{&fi,  80,  6});
+      if (!CheckStatus()) return;
     }
     // TODO(schwehr): Handle the payload.
   } else {
     // broadcast
     if (use_app_id) {
-      dac = bits.ToUnsignedInt(40, 10);
-      fi = bits.ToUnsignedInt(50, 6);
+      status = bits.GetValues(UIGet{&dac, 40, 10},
+                              UIGet{&fi,  50,  6});
+      if (!CheckStatus()) return;
     }
-    // TODO(schwehr): Handle the payload.
   }
 
   bits.SeekTo(comm_flag_offset);
-  commstate_flag = bits[comm_flag_offset];
-  sync_state = bits.ToUnsignedInt(comm_flag_offset + 1, 2);  // SOTDMA and TDMA.
+  status = bits.GetValues(UIGet{&commstate_flag, comm_flag_offset,     1},
+                          // SOTDMA and TDMA
+                          UIGet{&sync_state,     comm_flag_offset + 1, 2});
+  if (!CheckStatus()) return;
 
   if (!commstate_flag) {
     // SOTDMA
-    slot_timeout = bits.ToUnsignedInt(comm_flag_offset + 3, 3);
     slot_timeout_valid = true;
+    status = bits.GetValues(UIGet{&slot_timeout, comm_flag_offset + 3, 3});
+    if (!CheckStatus()) return;
+
     switch (slot_timeout) {
     case 0:
-      slot_offset = bits.ToUnsignedInt(comm_flag_offset + 6, 14);
       slot_offset_valid = true;
+      status = bits.GetValues(UIGet{&slot_offset, comm_flag_offset + 6, 14});
+      if (!CheckStatus()) return;
       break;
     case 1:
-      utc_hour = bits.ToUnsignedInt(comm_flag_offset + 6, 5);
-      utc_min = bits.ToUnsignedInt(comm_flag_offset + 11, 7);
-      utc_spare = bits.ToUnsignedInt(comm_flag_offset + 18, 2);
       utc_valid = true;
+      status = bits.GetValues(UIGet{&utc_hour,  comm_flag_offset +  6, 5},
+                              UIGet{&utc_min,   comm_flag_offset + 11, 7},
+                              UIGet{&utc_spare, comm_flag_offset + 18, 2});
+      if (!CheckStatus()) return;
       break;
     case 2:  // FALLTHROUGH
     case 4:  // FALLTHROUGH
     case 6:
-      slot_number = bits.ToUnsignedInt(comm_flag_offset + 6, 14);
       slot_number_valid = true;
+      status = bits.GetValues(UIGet{&slot_number, comm_flag_offset + 6, 14});
+      if (!CheckStatus()) return;
       break;
     case 3:  // FALLTHROUGH
     case 5:  // FALLTHROUGH
     case 7:
-      received_stations = bits.ToUnsignedInt(comm_flag_offset + 6, 14);
       received_stations_valid = true;
+      status = bits.GetValues(UIGet{&received_stations, comm_flag_offset + 6, 14});
+      if (!CheckStatus()) return;
       break;
     default:
       assert(false);
     }
   } else {
     // ITDMA
-    slot_increment = bits.ToUnsignedInt(comm_flag_offset + 3, 13);
+
     slot_increment_valid = true;
-
-    slots_to_allocate = bits.ToUnsignedInt(comm_flag_offset + 16, 3);
     slots_to_allocate_valid = true;
-
-    keep_flag = bits[comm_flag_offset + 19];
     keep_flag_valid = true;
+
+    status = bits.GetValues(UIGet {&slot_increment,    comm_flag_offset +  3, 13},
+                            UIGet {&slots_to_allocate, comm_flag_offset + 16,  3},
+                            BitGet{&keep_flag,         comm_flag_offset + 19});
+    if (!CheckStatus()) return;
   }
 
   // TODO(schwehr): Add assert(bits.GetRemaining() == 0);
