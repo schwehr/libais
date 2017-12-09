@@ -234,7 +234,41 @@ const AisPoint AisBitset::ToAisPoint(const size_t start,
   return AisPoint(lng_deg / divisor, lat_deg / divisor);
 }
 
+int AisBitset::GetValue(BitGetter getter) const {
+  assert(getter.target);
+  assert(getter.start + 1 <= GetNumBits());
+  
+  if (getter.start + 1 > GetNumBits()) {
+    return -1;
+  } else {
+    *getter.target = operator[](getter.start);
+    return 0;
+  }
+}
+int AisBitset::GetValue(StringGetter getter) const {
+  assert(getter.target);
+  assert(getter.start + getter.len <= GetNumBits());
+  
+  if (getter.start + getter.len > GetNumBits()) {
+    return -1;
+  } else {
+    *getter.target = ToString(getter.start, getter.len);
+    return 0;
+  }
+}
+int AisBitset::GetValue(UIntGetter getter) const {
+  assert(getter.target);
+  assert(getter.start + getter.len <= GetNumBits());
 
+  if (getter.start + getter.len > GetNumBits()) {
+    return -1;
+  } else {
+    *getter.target = ToUnsignedInt(getter.start, getter.len);
+    return 0;
+  }
+}
+
+    
 // static private
 
 void AisBitset::InitNmeaOrd() {

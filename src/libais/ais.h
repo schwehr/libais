@@ -411,6 +411,50 @@ class AisBitset : protected bitset<MAX_BITS> {
   // Visible for testing.
   static bitset<6> Reverse(const bitset<6> &bits);
 
+  // Safe batch fetcher for multiple values stored within one AisBitset.
+  // Provide a list of 'getter' structs (defined below) to define the values to
+  // fetch and the addresses to write them to.
+  // These should be in start-position ascending order to preserve
+  // GetRemaining() etc.
+  // Note that GetValue() dies on an assert if an out of bounds request is made
+  // and they're compiled in.
+  template <class... Getters>
+  AIS_STATUS GetValues(Getters... getters) const {
+    // NB standard states order of evaluation in initlist is 0, 1, 2...
+    int rets[] = {GetValue(getters)...};
+    for (auto r : rets) {
+      if (r)
+        return AIS_ERR_BAD_BIT_COUNT;
+    }
+    return AIS_UNINITIALIZED;
+  }
+
+  // AisBitset sub-sequence 'Getter' objects for use in GetVal()/GetVals().
+  // The struct type states what type of value you want to interpret the
+  // sub-seq as, e.g. UIntGetter fetches unsigned integers (as ints).
+  // Their member variables define where the sub-seq is in the AisBitset, using
+  // the same numbering scheme as ToUnsignedInt() etc above.
+  // 'target' is an out parameter pointing where you want to write the value.
+  struct BitGetter {
+    bool *target = nullptr;
+    const int start = 0;
+    explicit BitGetter (bool *t, int s)
+        :target{t}, start{s} {}
+  };
+  struct StringGetter {
+    string *target = nullptr;
+    const int start = 0, len = 0;
+    explicit StringGetter (string *t, int s, int l)
+        :target{t}, start{s}, len{l} {}
+  };
+  // NB writes to an int target, not uint, fitting AisXXX classes member vars
+  struct UIntGetter {
+    int *target = nullptr;
+    const int start = 0, len = 0;
+    explicit UIntGetter (int *t, int s, int l)
+        :target{t}, start{s}, len{l} {}
+  };
+
  protected:
   int num_bits;
   int num_chars;
@@ -429,6 +473,19 @@ class AisBitset : protected bitset<MAX_BITS> {
   // This field is also used to determine the number of remaining bits after the
   // last read position.
   mutable int current_position;
+
+  // Memory safe fetchers for values stored in AisBitset.
+  // These depend on the above 'getter' structs to define the sub-sequence
+  // location in the AisBitset to fetch from, the value type to read, and the
+  // address to write the fetched read value to.
+  //
+  // If the requested sub-sequence falls inside the current AisBitset (success),
+  // sets *getter.target with the fetched value and returns 0.
+  // Otherwise (i.e. requested out of bounds), if asserts are enabled dies on an
+  // assert, or if not returns -1 and doesn't modify *getter.target.
+  int GetValue(BitGetter getter) const;
+  int GetValue(UIntGetter getter) const;
+  int GetValue(StringGetter getter) const;
 };
 
 class AisMsg {
