@@ -30,6 +30,7 @@ AIS_MODULE = Extension(
   sources=[os.path.join('src', 'libais', fn) for fn in (
     'ais_py.cpp',
     'ais.cpp',
+    'ais_bitset.cpp',
     'ais1_2_3.cpp',  # Class A position
     'ais4_11.cpp',  # Basestation report, '=' - UTC time response
     'ais5.cpp',  # Static data report / ship name
