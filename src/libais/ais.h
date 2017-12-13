@@ -29,12 +29,6 @@ int LibAisVersionMinor();
 
 namespace libais {
 
-// Returns vector of the text between the delimiters.  Uses an empty string
-// for empty fields.  Empty string returns a vector of length 1 containing an
-// empty string.
-// Empty delim_str is not allowed.
-vector<string> Split(const string &str, const string &delim_str);
-
 // Returns the text in the nth field starting with the first field being 0.
 // Empty delim_str is not allowed.
 string GetNthField(const string &str, const size_t n, const string &delim_str);
@@ -428,6 +422,9 @@ class AisBitset : protected bitset<MAX_BITS> {
   // the next read location.
   // This field is also used to determine the number of remaining bits after the
   // last read position.
+  // That being said, the 'start' argument in all the 'To...' methods above is
+  // redundant and the only purpose is to discover typos in the bit positions in
+  // each message's parse method, i.e. debugging.
   mutable int current_position;
 };
 

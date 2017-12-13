@@ -69,7 +69,7 @@ vector<string> Split(const string &line, char delim) {
 }
 
 bool ValidateChecksum(const string &line) {
-  vector<string> fields = Split(line, "*");
+  vector<string> fields = Split(line, '*');
 
   if (fields.size() != 2 || fields[1].size() != 2) {
     return false;
@@ -163,7 +163,7 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
     return nullptr;
   }
 
-  vector<string> fields = Split(line, ",");
+  vector<string> fields = Split(line, ',');
   if (fields.size() != 7) {
     return nullptr;
   }

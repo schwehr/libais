@@ -32,54 +32,6 @@ class AisBitsetTester : public AisBitset {
   }
 };
 
-// That properly splitting strings by a separator string.
-TEST(SplitTest, BasicSplitExamples) {
-  {
-    vector<string> v = Split("", ",");
-    ASSERT_THAT(v, ElementsAre(""));
-  }
-
-  {
-    vector<string> v = Split("a", ",");
-    ASSERT_THAT(v, ElementsAre("a"));
-  }
-
-  {
-    vector<string> v = Split(",", ",");
-    ASSERT_THAT(v, ElementsAre("", ""));
-  }
-
-  {
-    vector<string> v = Split(",,", ",");
-    ASSERT_THAT(v, ElementsAre("", "", ""));
-  }
-
-  {
-    vector<string> v = Split(",b,", ",");
-    ASSERT_THAT(v, ElementsAre("", "b", ""));
-  }
-
-  {
-    vector<string> v = Split("a,b,c", ",");
-    ASSERT_THAT(v, ElementsAre("a", "b", "c"));
-  }
-
-  {
-    vector<string> v = Split("a=bb=c", "=");
-    ASSERT_THAT(v, ElementsAre("a", "bb", "c"));
-  }
-
-  {
-    vector<string> v = Split("a!=bb!=c", "!=");
-    ASSERT_THAT(v, ElementsAre("a", "bb", "c"));
-  }
-
-  {
-    vector<string> v = Split("bbaa aa!@#$", "aa");
-    ASSERT_THAT(v, ElementsAre("bb", " ", "!@#$"));
-  }
-}
-
 TEST(GetNthFieldTestEmpty, EmptyStrGetNthField) {
   const string line("");
   ASSERT_TRUE(GetNthField(line, 0, ",").empty());
