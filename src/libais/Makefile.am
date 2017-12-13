@@ -7,6 +7,7 @@ libais_la_LDFLAGS = -version-info 0:0:0
 libais_la_SOURCES = \
 	$(libais_a_HEADERS) \
 	ais.cpp \
+	ais_bitset.cpp \
 	ais1_2_3.cpp \
 	ais4_11.cpp \
 	ais5.cpp \

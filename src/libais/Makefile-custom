@@ -49,6 +49,7 @@ endif
 CXXFLAGS += ${WARN}
 
 SRCS := ais.cpp
+SRCS += ais_bitset.cpp
 SRCS += ais1_2_3.cpp
 SRCS += ais4_11.cpp
 SRCS += ais5.cpp
