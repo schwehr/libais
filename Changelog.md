@@ -1,6 +1,19 @@
 Changelog and release history for libais
 ========================================
 
+0.17 - 2018-01-17
+-----------------
+
+* Fixes to 10, 12, 16, 26
+* Fixes to 6:1:0, 6:1:3, 6:1:4, 6:1:5, 8:1:0, 8:367:22, 8:200:24
+* Add 8:200:21, 8:200:22
+* Cleanup nmea_messages.py
+* Use a logger in python
+* Factor out ais_bitset.cpp
+* Stop calling ParseNmeaPayload mulitple times per message
+* Stay far away from -ffast-math
+* Fixes for CMake builds
+
 0.16 - 2015-11-12
 -----------------
 
