@@ -6,6 +6,7 @@ import warnings
 
 import ais
 from ais.stream import checksum
+import time
 
 warnings.warn(
   "The stream module is deprecated and will be removed in 1.0",
@@ -154,6 +155,7 @@ def normalize(nmea=sys.stdin,
               treat_ab_equal=False,
               pass_invalid_checksums=False,
               allow_missing_timestamps=False,
+              missing_timestamp_to_now=False,
               errorcb=ErrorPrinter,
               stats=None,
               **kw):
@@ -324,6 +326,7 @@ def decode(nmea=sys.stdin,
            errorcb=ErrorPrinter,
            keep_nmea=False,
            stats=None,
+           missing_timestamp_to_now=False,
            **kw):
   """Decodes a stream of AIS messages. Takes the same arguments as normalize."""
 
@@ -341,6 +344,8 @@ def decode(nmea=sys.stdin,
       res.update(tagblock)
       if keep_nmea:
         res['nmea'] = origline
+      if missing_timestamp_to_now and 'tagblock_timestamp' not in res:
+        res['tagblock_timestamp'] = time.time()
       yield res
     except TooManyErrorsError:
       raise
