@@ -1,5 +1,5 @@
 sudo: false
-dist: trusty
+dist: xenial
 
 language: python
 
@@ -21,7 +21,7 @@ addons:
       - g++-6
 
 python:
-  - 3.6
+  - 3.7
 
 before_install:
   - pip install pip setuptools --upgrade
