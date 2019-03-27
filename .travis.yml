@@ -21,7 +21,6 @@ addons:
       - g++-6
 
 python:
-  - 2.7
   - 3.6
 
 before_install:
@@ -32,5 +31,5 @@ install:
   - CC=g++-6 pip install .\[tests\] --upgrade
 
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then (cd src && CC=gcc-6 CXX=g++-6 make -f Makefile-custom -j 4 test); fi
+  - (cd src && CC=gcc-6 CXX=g++-6 make -f Makefile-custom -j 4 test)
   - py.test ais test --cov=ais --cov-report term-missing

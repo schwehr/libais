@@ -2848,8 +2848,6 @@ static PyMethodDef ais_methods[] = {
 
 // Python module initialization
 
-#if PY_MAJOR_VERSION >= 3
-
 static struct PyModuleDef aismodule = {
   PyModuleDef_HEAD_INIT,
   "_ais",  // Module name.
@@ -2869,23 +2867,6 @@ PyMODINIT_FUNC PyInit__ais(void) {
   PyModule_AddObject(module, exception_short, ais_py_exception);
   return module;
 }
-
-#else  // Python 2.7
-
-void init_ais(void) {
-  PyObject *module = Py_InitModule("_ais", ais_methods);
-
-  if (module == nullptr) {
-    return;
-  }
-
-  ais_py_exception = PyErr_NewException(
-      const_cast<char *>(exception_name), nullptr, nullptr);
-  Py_INCREF(ais_py_exception);
-  PyModule_AddObject(module, exception_short, ais_py_exception);
-}
-
-#endif  // PY_MAJOR_VERSION
 
 }  // extern "C"
 
