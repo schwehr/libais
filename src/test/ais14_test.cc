@@ -1,4 +1,4 @@
-// Test parsing message 14 '>' - Addressd safety related
+// Test parsing message 14 '>' - Addressed safety related
 
 // TODO(schwehr): Find more test cases.
 
