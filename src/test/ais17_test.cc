@@ -51,7 +51,6 @@ void Validate(
 }
 
 TEST(Ais17Test, DecodeAnything) {
-  // !SAVDO,1,1,,B,@03OwnQ9RgLP3h0000000000,0*32,b003669978,1426173689
   std::unique_ptr<Ais17> msg = Init(
       "!AIVDM,1,1,,A,A6WWW6gP00a3PDlEKLrarOwUr8Mg,0*03");
 
