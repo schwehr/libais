@@ -1,4 +1,4 @@
-// Test parsing message 17 - GNSS boradcast.
+// Test parsing message 17 - GNSS broadcast.
 
 #include <memory>
 
