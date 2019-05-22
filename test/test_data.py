@@ -673,4 +673,25 @@ top_level = [
              'y': -2.5533333333333332}
   },
 
+  {
+    'nmea': [ '!AIVDM,1,1,4,B,6>jR0600V:C0>da4P106P00,2*02' ],
+    'result': {'id': 6,
+              'repeat_indicator': 0,
+              'mmsi': 992509976,
+              'seq': 0,
+              'mmsi_dest': 2500912,
+              'retransmit': True,
+              'spare': 0,
+              'dac': 235,
+              'fi': 10,
+              'ana_int': 13.7,
+              'ana_ext1': 0.05,
+              'ana_ext2': 0.05,
+              'racon': 2,
+              'light': 2,
+              'health': False,
+              'stat_ext': 0,
+              'off_pos': False,
+              'spare2': 0}
+  },
 ]
