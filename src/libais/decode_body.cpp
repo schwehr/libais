@@ -66,6 +66,13 @@ unique_ptr<AisMsg> CreateAisMsg6(const string &body, const int fill_bits) {
       }
       // FI not handled.
       break;
+    case libais::AIS_DAC_235_UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND:
+      switch (msg.fi) {
+        case 10:
+          return MakeUnique<libais::Ais6_235_10>(body.c_str(), fill_bits);
+      }
+      // FI not handled.
+      break;
   }
   return nullptr;
 }

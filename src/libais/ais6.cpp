@@ -561,4 +561,37 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
+// This message provides AtoN (Aid to navigation) monitoring data for the General Lighthouse Authorities (GLA)
+Ais6_235_10::Ais6_235_10(const char *nmea_payload, const size_t pad)
+    : Ais6(nmea_payload, pad), ana_int(0), ana_ext1(0), ana_ext2(0), racon(0), light(0), health(0), stat_ext(0), off_pos(0), spare2(0) {
+  assert(dac == 235);
+  assert(fi == 10);
+
+  if (num_bits != 136) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  AisBitset bs;
+  const AIS_STATUS r = bits.ParseNmeaPayload(nmea_payload, pad);
+  if (r != AIS_OK) {
+    status = r;
+    return;
+  }
+
+  bits.SeekTo(88);
+  ana_int = bits.ToUnsignedInt(88, 10);
+  ana_ext1 = bits.ToUnsignedInt(98, 10);
+  ana_ext2 = bits.ToUnsignedInt(108, 10);
+  racon = bits.ToUnsignedInt(118, 2);
+  light = bits.ToUnsignedInt(120, 2);
+  health = static_cast<bool>(bits[122]);
+  stat_ext = bits.ToUnsignedInt(123, 8);
+  off_pos = static_cast<bool>(bits[131]);
+  spare2 = bits.ToUnsignedInt(132, 4);
+
+  assert(bits.GetRemaining() == 0);
+  status = AIS_OK;
+}
+
 }  // namespace libais
