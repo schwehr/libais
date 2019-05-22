@@ -27,7 +27,7 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad)
   bits.SeekTo(38);
   seq = bits.ToUnsignedInt(38, 2);
   mmsi_dest = bits.ToUnsignedInt(40, 30);
-  retransmit = !bits[70];
+  retransmit = static_cast<bool>(bits[70]);
   spare = bits[71];
   dac = bits.ToUnsignedInt(72, 10);
   fi = bits.ToUnsignedInt(82, 6);
@@ -563,7 +563,7 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad)
 
 // This message provides AtoN (Aid to navigation) monitoring data for the General Lighthouse Authorities (GLA)
 Ais6_235_10::Ais6_235_10(const char *nmea_payload, const size_t pad)
-    : Ais6(nmea_payload, pad), ana_int(0), ana_ext1(0), ana_ext2(0), racon(0), light(0), health(0), stat_ext(0), off_pos(0), spare2(0) {
+    : Ais6(nmea_payload, pad), ana_int(0.0), ana_ext1(0.0), ana_ext2(0.0), racon(0), light(0), health(0), stat_ext(0), off_pos(0), spare2(0) {
   assert(dac == 235);
   assert(fi == 10);
 
@@ -580,9 +580,9 @@ Ais6_235_10::Ais6_235_10(const char *nmea_payload, const size_t pad)
   }
 
   bits.SeekTo(88);
-  ana_int = bits.ToUnsignedInt(88, 10);
-  ana_ext1 = bits.ToUnsignedInt(98, 10);
-  ana_ext2 = bits.ToUnsignedInt(108, 10);
+  ana_int = bits.ToUnsignedInt(88, 10) / 20.;
+  ana_ext1 = bits.ToUnsignedInt(98, 10) / 20.;
+  ana_ext2 = bits.ToUnsignedInt(108, 10) / 20.;
   racon = bits.ToUnsignedInt(118, 2);
   light = bits.ToUnsignedInt(120, 2);
   health = static_cast<bool>(bits[122]);
