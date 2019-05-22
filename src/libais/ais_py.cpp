@@ -37,7 +37,6 @@ enum AIS_FI {
   AIS_FI_6_200_22_RIS_VTS_RTA = 22,
   AIS_FI_6_200_55_RIS_VTS_SAR = 55,
   AIS_FI_6_235_10_ATON_MONITORING_DATA = 10,
-  
   AIS_FI_8_1_0_TEXT = 0,
   AIS_FI_8_1_11_MET_HYDRO = 11,
   AIS_FI_8_1_13_FAIRWAY_CLOSED = 13,
@@ -747,64 +746,65 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
   AIS_STATUS status = AIS_UNINITIALIZED;
 
   switch (msg.dac) {
-  case AIS_DAC_1_INTERNATIONAL:  // IMO.
-    switch (msg.fi) {
-    case AIS_FI_6_1_0_TEXT:  // OLD ITU 1371-1.
-      status = ais6_1_0_append_pydict(nmea_payload, dict, pad);
+    case AIS_DAC_1_INTERNATIONAL:  // IMO.
+      switch (msg.fi) {
+        case AIS_FI_6_1_0_TEXT:  // OLD ITU 1371-1.
+          status = ais6_1_0_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_1_ACK:  // OLD ITU 1371-1.
+          status = ais6_1_1_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_2_FI_INTERROGATE:  // OLD ITU 1371-1.
+          status = ais6_1_2_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_3_CAPABILITY_INTERROGATE:  // OLD ITU 1371-1.
+          status = ais6_1_3_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_4_CAPABILITY_REPLY:  // OLD ITU 1371-1.
+          status = ais6_1_4_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_5_ACK:  // ITU 1371-5.
+          status = ais6_1_5_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_12_DANGEROUS_CARGO:  // Not to be used after 1 Jan 2013.
+          status = ais6_1_12_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_14_TIDAL_WINDOW:  // Not to be used after 1 Jan 2013.
+          status = ais6_1_14_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_18_ENTRY_TIME:
+          status = ais6_1_18_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_20_BERTHING:
+          status = ais6_1_20_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_25_DANGEROUS_CARGO:
+          status = ais6_1_25_append_pydict(nmea_payload, dict, pad);
+          break;
+          // TODO(schwehr): AIS_FI_6_1_28_ROUTE.
+          // TODO(schwehr): AIS_FI_6_1_30_TEXT.
+        case AIS_FI_6_1_32_TIDAL_WINDOW:  // IMO Circ 289
+          status = ais6_1_32_append_pydict(nmea_payload, dict, pad);
+          break;
+        case AIS_FI_6_1_40_PERSONS_ON_BOARD:  // OLD ITU 1371-1.
+          status = ais6_1_40_append_pydict(nmea_payload, dict, pad);
+          break;
+        default:
+          // TODO(schwehr): Raise an exception?
+          DictSafeSetItem(dict, "not_parsed", true);
+      }
       break;
-    case AIS_FI_6_1_1_ACK:  // OLD ITU 1371-1.
-      status = ais6_1_1_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_2_FI_INTERROGATE:  // OLD ITU 1371-1.
-      status = ais6_1_2_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_3_CAPABILITY_INTERROGATE:  // OLD ITU 1371-1.
-      status = ais6_1_3_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_4_CAPABILITY_REPLY:  // OLD ITU 1371-1.
-      status = ais6_1_4_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_5_ACK:  // ITU 1371-5.
-      status = ais6_1_5_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_12_DANGEROUS_CARGO:  // Not to be used after 1 Jan 2013.
-      status = ais6_1_12_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_14_TIDAL_WINDOW:  // Not to be used after 1 Jan 2013.
-      status = ais6_1_14_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_18_ENTRY_TIME:
-      status = ais6_1_18_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_20_BERTHING:
-      status = ais6_1_20_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_25_DANGEROUS_CARGO:
-      status = ais6_1_25_append_pydict(nmea_payload, dict, pad);
-      break;
-      // TODO(schwehr): AIS_FI_6_1_28_ROUTE.
-      // TODO(schwehr): AIS_FI_6_1_30_TEXT.
-    case AIS_FI_6_1_32_TIDAL_WINDOW:  // IMO Circ 289
-      status = ais6_1_32_append_pydict(nmea_payload, dict, pad);
-      break;
-    case AIS_FI_6_1_40_PERSONS_ON_BOARD:  // OLD ITU 1371-1.
-      status = ais6_1_40_append_pydict(nmea_payload, dict, pad);
+    case AIS_DAC_235_UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND:  // IMO.
+      switch (msg.fi) {
+        case AIS_FI_6_235_10_ATON_MONITORING_DATA:  //  IALA-A126.
+          status = ais6_235_10_append_pydict(nmea_payload, dict, pad);
+          break;
+        default:
+          // TODO(schwehr): Raise an exception?
+          DictSafeSetItem(dict, "not_parsed", true);
+        }  
       break;
     default:
-      // TODO(schwehr): Raise an exception?
-      DictSafeSetItem(dict, "not_parsed", true);
-    }
-  case AIS_DAC_235_UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND:  // IMO.
-    switch (msg.fi) {
-    case AIS_FI_6_235_10_ATON_MONITORING_DATA:  //  IALA-A126.
-      status = ais6_235_10_append_pydict(nmea_payload, dict, pad);
-      break;
-    default:
-      // TODO(schwehr): Raise an exception?
-      DictSafeSetItem(dict, "not_parsed", true);
-    }  
-  break;
-  default:
       // TODO(schwehr): Raise an exception?
       DictSafeSetItem(dict, "not_parsed", true);
   }
