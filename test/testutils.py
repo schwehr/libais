@@ -47,8 +47,6 @@ def DictDiff(a, b):
   def Compare(x, y):
     if x == y:
       return True
-    if x in [None, 'nan'] and y in [None, 'nan']:
-      return True
     x = TextToNumber(x)
     y = TextToNumber(y)
     if isinstance(x, six.string_types) and isinstance(y, six.string_types):
