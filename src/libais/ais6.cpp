@@ -27,7 +27,7 @@ Ais6::Ais6(const char *nmea_payload, const size_t pad)
   bits.SeekTo(38);
   seq = bits.ToUnsignedInt(38, 2);
   mmsi_dest = bits.ToUnsignedInt(40, 30);
-  retransmit = bits[70];
+  retransmit = !bits[70];
   spare = bits[71];
   dac = bits.ToUnsignedInt(72, 10);
   fi = bits.ToUnsignedInt(82, 6);
