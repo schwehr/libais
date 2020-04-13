@@ -1742,6 +1742,14 @@ class Ais8_200_55 : public Ais8 {
   Ais8_200_55(const char *nmea_payload, const size_t pad);
 };
 
+class Ais8_265_1 : public Ais8 {
+ public:
+  int month;
+  std::array<int, 3> spare2;  // 51 spare bits.
+
+  Ais8_265_1(const char *nmea_payload, const size_t pad);
+};
+
 enum Ais8_366_22_AreaShapeEnum {
   AIS8_366_22_SHAPE_ERROR = -1,
   AIS8_366_22_SHAPE_CIRCLE = 0,

@@ -1859,6 +1859,24 @@ ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict,
   return AIS_OK;
 }
 
+// STM Route Exchange
+AIS_STATUS
+ais8_265_1_append_pydict(const char *nmea_payload, PyObject *dict,
+                          const size_t pad) {
+  assert(nmea_payload);
+  assert(dict);
+  assert(pad < 6);
+  Ais8_265_1 msg(nmea_payload, pad);
+  if (msg.had_error()) {
+    return msg.get_error();
+  }
+
+  DictSafeSetItem(dict, "month", msg.month);
+
+  return AIS_OK;
+}
+
+
 void
 ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
                           const size_t pad) {
@@ -2109,6 +2127,16 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     default:
       DictSafeSetItem(dict, "parsed", false);
       break;
+    }
+    break;
+  case 265: // Sweden
+    switch (msg.fi) {
+      case 1: // STM Route Exchange
+        status = ais8_265_1_append_pydict(nmea_payload, dict, pad);
+        break;
+      default:
+        DictSafeSetItem(dict, "parsed", false);
+        break;
     }
     break;
   default:
