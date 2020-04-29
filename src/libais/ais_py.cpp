@@ -1871,8 +1871,259 @@ ais8_265_1_append_pydict(const char *nmea_payload, PyObject *dict,
     return msg.get_error();
   }
 
-  DictSafeSetItem(dict, "month", msg.month);
+  switch (msg.num_legs){
+    case -1:
+      break;
+    case 0:
+      DictSafeSetItem(dict, "first_waypoint_type", msg.first_waypoint_type);
+      DictSafeSetItem(dict, "first_waypoint_lng", "first_waypoint_lat", msg.position1);
+      break;
+    case 1:
+      DictSafeSetItem(dict, "first_waypoint_type", msg.first_waypoint_type);
+      DictSafeSetItem(dict, "first_waypoint_lng", "first_waypoint_lat", msg.position1);
 
+      DictSafeSetItem(dict, "leg_geometry1", msg.leg_geometry1);
+      DictSafeSetItem(dict, "sog1", msg.sog1);
+      DictSafeSetItem(dict, "turn_radius1", msg.turn_radius1);
+      DictSafeSetItem(dict, "lng_delta1", msg.lng_delta1);
+      DictSafeSetItem(dict, "lat_delta1", msg.lat_delta1);
+
+      DictSafeSetItem(dict, "leg_geometry_fin", msg.leg_geometry_fin);
+      DictSafeSetItem(dict, "sog_fin", msg.sog_fin);
+      DictSafeSetItem(dict, "last_waypoint_lng", "last_waypoint_lat", msg.position_fin);
+      
+      DictSafeSetItem(dict, "steering_mode", msg.steering_mode);
+      DictSafeSetItem(dict, "spare", msg.spare);
+      break;
+    case 2: 
+      DictSafeSetItem(dict, "first_waypoint_type", msg.first_waypoint_type);
+      DictSafeSetItem(dict, "first_waypoint_lng", "first_waypoint_lat", msg.position1);
+
+      DictSafeSetItem(dict, "leg_geometry1", msg.leg_geometry1);
+      DictSafeSetItem(dict, "sog1", msg.sog1);
+      DictSafeSetItem(dict, "turn_radius1", msg.turn_radius1);
+      DictSafeSetItem(dict, "lng_delta1", msg.lng_delta1);
+      DictSafeSetItem(dict, "lat_delta1", msg.lat_delta1);
+
+      DictSafeSetItem(dict, "leg_geometry2", msg.leg_geometry2);
+      DictSafeSetItem(dict, "sog2", msg.sog2);
+      DictSafeSetItem(dict, "turn_radius2", msg.turn_radius2);
+      DictSafeSetItem(dict, "lng_delta2", msg.lng_delta2);
+      DictSafeSetItem(dict, "lat_delta2", msg.lat_delta2);
+
+
+
+      DictSafeSetItem(dict, "leg_geometry_fin", msg.leg_geometry_fin);
+      DictSafeSetItem(dict, "sog_fin", msg.sog_fin);
+      DictSafeSetItem(dict, "last_waypoint_lng", "last_waypoint_lat", msg.position_fin);
+      
+      DictSafeSetItem(dict, "steering_mode", msg.steering_mode);
+      DictSafeSetItem(dict, "spare", msg.spare);
+      break;
+    case 3:
+      DictSafeSetItem(dict, "first_waypoint_type", msg.first_waypoint_type);
+      DictSafeSetItem(dict, "first_waypoint_lng", "first_waypoint_lat", msg.position1);
+
+      DictSafeSetItem(dict, "leg_geometry1", msg.leg_geometry1);
+      DictSafeSetItem(dict, "sog1", msg.sog1);
+      DictSafeSetItem(dict, "turn_radius1", msg.turn_radius1);
+      DictSafeSetItem(dict, "lng_delta1", msg.lng_delta1);
+      DictSafeSetItem(dict, "lat_delta1", msg.lat_delta1);
+
+      DictSafeSetItem(dict, "leg_geometry2", msg.leg_geometry2);
+      DictSafeSetItem(dict, "sog2", msg.sog2);
+      DictSafeSetItem(dict, "turn_radius2", msg.turn_radius2);
+      DictSafeSetItem(dict, "lng_delta2", msg.lng_delta2);
+      DictSafeSetItem(dict, "lat_delta2", msg.lat_delta2);
+
+      DictSafeSetItem(dict, "leg_geometry3", msg.leg_geometry3);
+      DictSafeSetItem(dict, "sog3", msg.sog3);
+      DictSafeSetItem(dict, "turn_radius3", msg.turn_radius3);
+      DictSafeSetItem(dict, "lng_delta3", msg.lng_delta3);
+      DictSafeSetItem(dict, "lat_delta3", msg.lat_delta3);
+
+      DictSafeSetItem(dict, "leg_geometry_fin", msg.leg_geometry_fin);
+      DictSafeSetItem(dict, "sog_fin", msg.sog_fin);
+      DictSafeSetItem(dict, "last_waypoint_lng", "last_waypoint_lat", msg.position_fin);
+      
+      DictSafeSetItem(dict, "steering_mode", msg.steering_mode);
+      DictSafeSetItem(dict, "spare", msg.spare);
+      break;
+    case 4:
+      DictSafeSetItem(dict, "first_waypoint_type", msg.first_waypoint_type);
+      DictSafeSetItem(dict, "first_waypoint_lng", "first_waypoint_lat", msg.position1);
+
+      DictSafeSetItem(dict, "leg_geometry1", msg.leg_geometry1);
+      DictSafeSetItem(dict, "sog1", msg.sog1);
+      DictSafeSetItem(dict, "turn_radius1", msg.turn_radius1);
+      DictSafeSetItem(dict, "lng_delta1", msg.lng_delta1);
+      DictSafeSetItem(dict, "lat_delta1", msg.lat_delta1);
+
+      DictSafeSetItem(dict, "leg_geometry2", msg.leg_geometry2);
+      DictSafeSetItem(dict, "sog2", msg.sog2);
+      DictSafeSetItem(dict, "turn_radius2", msg.turn_radius2);
+      DictSafeSetItem(dict, "lng_delta2", msg.lng_delta2);
+      DictSafeSetItem(dict, "lat_delta2", msg.lat_delta2);
+
+      DictSafeSetItem(dict, "leg_geometry3", msg.leg_geometry3);
+      DictSafeSetItem(dict, "sog3", msg.sog3);
+      DictSafeSetItem(dict, "turn_radius3", msg.turn_radius3);
+      DictSafeSetItem(dict, "lng_delta3", msg.lng_delta3);
+      DictSafeSetItem(dict, "lat_delta3", msg.lat_delta3);
+
+      DictSafeSetItem(dict, "leg_geometry4", msg.leg_geometry4);
+      DictSafeSetItem(dict, "sog4", msg.sog4);
+      DictSafeSetItem(dict, "turn_radius4", msg.turn_radius4);
+      DictSafeSetItem(dict, "lng_delta4", msg.lng_delta4);
+      DictSafeSetItem(dict, "lat_delta4", msg.lat_delta4);
+
+      DictSafeSetItem(dict, "leg_geometry_fin", msg.leg_geometry_fin);
+      DictSafeSetItem(dict, "sog_fin", msg.sog_fin);
+      DictSafeSetItem(dict, "last_waypoint_lng", "last_waypoint_lat", msg.position_fin);
+      
+      DictSafeSetItem(dict, "steering_mode", msg.steering_mode);
+      DictSafeSetItem(dict, "spare", msg.spare);
+      break;
+    case 5:
+      DictSafeSetItem(dict, "first_waypoint_type", msg.first_waypoint_type);
+      DictSafeSetItem(dict, "first_waypoint_lng", "first_waypoint_lat", msg.position1);
+
+      DictSafeSetItem(dict, "leg_geometry1", msg.leg_geometry1);
+      DictSafeSetItem(dict, "sog1", msg.sog1);
+      DictSafeSetItem(dict, "turn_radius1", msg.turn_radius1);
+      DictSafeSetItem(dict, "lng_delta1", msg.lng_delta1);
+      DictSafeSetItem(dict, "lat_delta1", msg.lat_delta1);
+
+      DictSafeSetItem(dict, "leg_geometry2", msg.leg_geometry2);
+      DictSafeSetItem(dict, "sog2", msg.sog2);
+      DictSafeSetItem(dict, "turn_radius2", msg.turn_radius2);
+      DictSafeSetItem(dict, "lng_delta2", msg.lng_delta2);
+      DictSafeSetItem(dict, "lat_delta2", msg.lat_delta2);
+
+      DictSafeSetItem(dict, "leg_geometry3", msg.leg_geometry3);
+      DictSafeSetItem(dict, "sog3", msg.sog3);
+      DictSafeSetItem(dict, "turn_radius3", msg.turn_radius3);
+      DictSafeSetItem(dict, "lng_delta3", msg.lng_delta3);
+      DictSafeSetItem(dict, "lat_delta3", msg.lat_delta3);
+
+      DictSafeSetItem(dict, "leg_geometry4", msg.leg_geometry4);
+      DictSafeSetItem(dict, "sog4", msg.sog4);
+      DictSafeSetItem(dict, "turn_radius4", msg.turn_radius4);
+      DictSafeSetItem(dict, "lng_delta4", msg.lng_delta4);
+      DictSafeSetItem(dict, "lat_delta4", msg.lat_delta4);
+
+      DictSafeSetItem(dict, "leg_geometry5", msg.leg_geometry5);
+      DictSafeSetItem(dict, "sog5", msg.sog5);
+      DictSafeSetItem(dict, "turn_radius5", msg.turn_radius5);
+      DictSafeSetItem(dict, "lng_delta5", msg.lng_delta5);
+      DictSafeSetItem(dict, "lat_delta5", msg.lat_delta5);
+
+      DictSafeSetItem(dict, "leg_geometry_fin", msg.leg_geometry_fin);
+      DictSafeSetItem(dict, "sog_fin", msg.sog_fin);
+      DictSafeSetItem(dict, "last_waypoint_lng", "last_waypoint_lat", msg.position_fin);
+      
+      DictSafeSetItem(dict, "steering_mode", msg.steering_mode);
+      DictSafeSetItem(dict, "spare", msg.spare);
+      break;
+    case 6:
+      DictSafeSetItem(dict, "first_waypoint_type", msg.first_waypoint_type);
+      DictSafeSetItem(dict, "first_waypoint_lng", "first_waypoint_lat", msg.position1);
+
+      DictSafeSetItem(dict, "leg_geometry1", msg.leg_geometry1);
+      DictSafeSetItem(dict, "sog1", msg.sog1);
+      DictSafeSetItem(dict, "turn_radius1", msg.turn_radius1);
+      DictSafeSetItem(dict, "lng_delta1", msg.lng_delta1);
+      DictSafeSetItem(dict, "lat_delta1", msg.lat_delta1);
+
+      DictSafeSetItem(dict, "leg_geometry2", msg.leg_geometry2);
+      DictSafeSetItem(dict, "sog2", msg.sog2);
+      DictSafeSetItem(dict, "turn_radius2", msg.turn_radius2);
+      DictSafeSetItem(dict, "lng_delta2", msg.lng_delta2);
+      DictSafeSetItem(dict, "lat_delta2", msg.lat_delta2);
+
+      DictSafeSetItem(dict, "leg_geometry3", msg.leg_geometry3);
+      DictSafeSetItem(dict, "sog3", msg.sog3);
+      DictSafeSetItem(dict, "turn_radius3", msg.turn_radius3);
+      DictSafeSetItem(dict, "lng_delta3", msg.lng_delta3);
+      DictSafeSetItem(dict, "lat_delta3", msg.lat_delta3);
+
+      DictSafeSetItem(dict, "leg_geometry4", msg.leg_geometry4);
+      DictSafeSetItem(dict, "sog4", msg.sog4);
+      DictSafeSetItem(dict, "turn_radius4", msg.turn_radius4);
+      DictSafeSetItem(dict, "lng_delta4", msg.lng_delta4);
+      DictSafeSetItem(dict, "lat_delta4", msg.lat_delta4);
+
+      DictSafeSetItem(dict, "leg_geometry5", msg.leg_geometry5);
+      DictSafeSetItem(dict, "sog5", msg.sog5);
+      DictSafeSetItem(dict, "turn_radius5", msg.turn_radius5);
+      DictSafeSetItem(dict, "lng_delta5", msg.lng_delta5);
+      DictSafeSetItem(dict, "lat_delta5", msg.lat_delta5);
+
+      DictSafeSetItem(dict, "leg_geometry6", msg.leg_geometry6);
+      DictSafeSetItem(dict, "sog6", msg.sog6);
+      DictSafeSetItem(dict, "turn_radius6", msg.turn_radius6);
+      DictSafeSetItem(dict, "lng_delta6", msg.lng_delta6);
+      DictSafeSetItem(dict, "lat_delta6", msg.lat_delta6);
+
+      DictSafeSetItem(dict, "leg_geometry_fin", msg.leg_geometry_fin);
+      DictSafeSetItem(dict, "sog_fin", msg.sog_fin);
+      DictSafeSetItem(dict, "last_waypoint_lng", "last_waypoint_lat", msg.position_fin);
+      
+      DictSafeSetItem(dict, "steering_mode", msg.steering_mode);
+      DictSafeSetItem(dict, "spare", msg.spare);
+      break;
+
+  }
+
+  /*
+  DictSafeSetItem(dict, "first_waypoint_type", msg.first_waypoint_type);
+  DictSafeSetItem(dict, "first_waypoint_lng", "first_waypoint_lat", msg.position1);
+  
+
+  DictSafeSetItem(dict, "leg_geometry1", msg.leg_geometry1);
+  DictSafeSetItem(dict, "sog1", msg.sog1);
+  DictSafeSetItem(dict, "turn_radius1", msg.turn_radius1);
+  DictSafeSetItem(dict, "lng_delta1", msg.lng_delta1);
+  DictSafeSetItem(dict, "lat_delta1", msg.lat_delta1);
+
+  DictSafeSetItem(dict, "leg_geometry2", msg.leg_geometry2);
+  DictSafeSetItem(dict, "sog2", msg.sog2);
+  DictSafeSetItem(dict, "turn_radius2", msg.turn_radius2);
+  DictSafeSetItem(dict, "lng_delta2", msg.lng_delta2);
+  DictSafeSetItem(dict, "lat_delta2", msg.lat_delta2);
+
+  DictSafeSetItem(dict, "leg_geometry3", msg.leg_geometry3);
+  DictSafeSetItem(dict, "sog3", msg.sog3);
+  DictSafeSetItem(dict, "turn_radius3", msg.turn_radius3);
+  DictSafeSetItem(dict, "lng_delta3", msg.lng_delta3);
+  DictSafeSetItem(dict, "lat_delta3", msg.lat_delta3);
+
+  DictSafeSetItem(dict, "leg_geometry4", msg.leg_geometry4);
+  DictSafeSetItem(dict, "sog4", msg.sog4);
+  DictSafeSetItem(dict, "turn_radius4", msg.turn_radius4);
+  DictSafeSetItem(dict, "lng_delta4", msg.lng_delta4);
+  DictSafeSetItem(dict, "lat_delta4", msg.lat_delta4);
+
+  DictSafeSetItem(dict, "leg_geometry5", msg.leg_geometry5);
+  DictSafeSetItem(dict, "sog5", msg.sog5);
+  DictSafeSetItem(dict, "turn_radius5", msg.turn_radius5);
+  DictSafeSetItem(dict, "lng_delta5", msg.lng_delta5);
+  DictSafeSetItem(dict, "lat_delta5", msg.lat_delta5);
+
+  DictSafeSetItem(dict, "leg_geometry6", msg.leg_geometry6);
+  DictSafeSetItem(dict, "sog6", msg.sog6);
+  DictSafeSetItem(dict, "turn_radius6", msg.turn_radius6);
+  DictSafeSetItem(dict, "lng_delta6", msg.lng_delta6);
+  DictSafeSetItem(dict, "lat_delta6", msg.lat_delta6);
+
+  DictSafeSetItem(dict, "leg_geometry_fin", msg.leg_geometry_fin);
+  DictSafeSetItem(dict, "sog_fin", msg.sog_fin);
+  DictSafeSetItem(dict, "last_waypoint_lng", "last_waypoint_lat", msg.position_fin);
+  
+  DictSafeSetItem(dict, "steering_mode", msg.steering_mode);
+  DictSafeSetItem(dict, "spare", msg.spare);
+  */
+  
   return AIS_OK;
 }
 
