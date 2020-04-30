@@ -1744,7 +1744,53 @@ class Ais8_200_55 : public Ais8 {
 
 class Ais8_265_1 : public Ais8 {
  public:
-  int month;
+  int first_waypoint_type; 
+  AisPoint position1;
+  
+  int leg_geometry1;
+  float sog1;
+  float turn_radius1;
+  double lng_delta1;
+  double lat_delta1;
+
+  int leg_geometry2;
+  float sog2;
+  float turn_radius2;
+  double lng_delta2;
+  double lat_delta2;
+
+  int leg_geometry3;
+  float sog3;
+  float turn_radius3;
+  double lng_delta3;
+  double lat_delta3;
+
+  int leg_geometry4;
+  float sog4;
+  float turn_radius4;
+  double lng_delta4;
+  double lat_delta4;
+
+  int leg_geometry5;
+  float sog5;
+  float turn_radius5;
+  double lng_delta5;
+  double lat_delta5;
+
+  int leg_geometry6;
+  float sog6;
+  float turn_radius6;
+  double lng_delta6;
+  double lat_delta6;
+
+  int leg_geometry_fin;
+  float sog_fin;
+  AisPoint position_fin;
+  int steering_mode;
+  int spare;
+
+  int num_legs;
+
   std::array<int, 3> spare2;  // 51 spare bits.
 
   Ais8_265_1(const char *nmea_payload, const size_t pad);
