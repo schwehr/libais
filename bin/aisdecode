@@ -9,7 +9,6 @@ import warnings
 import ais
 import sys
 import ais.compatibility.gpsd
-import ais.stream
 
 try:
     import json
@@ -95,7 +94,7 @@ if "max_errors" in args:
 
 gpsd_mangle = ais.compatibility.gpsd.Mangler(copy_tagblock_timestamp=copy_tagblock_timestamp)
 
-for msg in ais.stream.decode(sys.stdin, **args):
+for msg in ais.open(sys.stdin, **args):
     if use_gpsd:
-        msg = gpsd_mangle(msg)
+        msg = gpsd_mangle(msg["decoded"])
     write(msg)
