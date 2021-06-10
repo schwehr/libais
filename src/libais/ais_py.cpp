@@ -1134,7 +1134,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         PyObject *sub_area = PyDict_New();
         Ais8_1_22_Circle *c =
-            reinterpret_cast<Ais8_1_22_Circle*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_1_22_Circle*>(msg.sub_areas[i].get());
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_CIRCLE);
         if (c->radius_m == 0)
@@ -1153,7 +1153,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         PyObject *sub_area = PyDict_New();
         Ais8_1_22_Rect *c =
-            reinterpret_cast<Ais8_1_22_Rect*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_1_22_Rect*>(msg.sub_areas[i].get());
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_RECT);
         DictSafeSetItem(sub_area, "sub_area_type_str", "rect");
@@ -1171,7 +1171,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         PyObject *sub_area = PyDict_New();
         Ais8_1_22_Sector *c =
-            reinterpret_cast<Ais8_1_22_Sector*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_1_22_Sector*>(msg.sub_areas[i].get());
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_SECTOR);
         DictSafeSetItem(sub_area, "sub_area_type_str", "sector");
@@ -1189,7 +1189,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         PyObject *sub_area = PyDict_New();
         Ais8_1_22_Polyline *polyline =
-            reinterpret_cast<Ais8_1_22_Polyline*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_1_22_Polyline*>(msg.sub_areas[i].get());
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_POLYLINE);
         DictSafeSetItem(sub_area, "sub_area_type_str", "polyline");
@@ -1215,7 +1215,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         PyObject *sub_area = PyDict_New();
         Ais8_1_22_Polygon *polygon =
-            reinterpret_cast<Ais8_1_22_Polygon*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_1_22_Polygon*>(msg.sub_areas[i].get());
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_POLYGON);
         DictSafeSetItem(sub_area, "sub_area_type_str", "polygon");
@@ -1242,7 +1242,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
         PyObject *sub_area = PyDict_New();
 
         Ais8_1_22_Text *text =
-            reinterpret_cast<Ais8_1_22_Text*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_1_22_Text*>(msg.sub_areas[i].get());
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_1_22_SHAPE_TEXT);
         DictSafeSetItem(sub_area, "sub_area_type_str", "text");
 
@@ -1887,7 +1887,7 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         PyObject *sub_area = PyDict_New();
         Ais8_367_22_Circle *c =
-            reinterpret_cast<Ais8_367_22_Circle*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_367_22_Circle*>(msg.sub_areas[i].get());
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_CIRCLE);
         if (c->radius_m == 0)
@@ -1905,7 +1905,7 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         PyObject *sub_area = PyDict_New();
         Ais8_367_22_Rect *c =
-            reinterpret_cast<Ais8_367_22_Rect*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_367_22_Rect*>(msg.sub_areas[i].get());
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_RECT);
         DictSafeSetItem(sub_area, "sub_area_type_str", "rect");
@@ -1923,7 +1923,7 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         PyObject *sub_area = PyDict_New();
         Ais8_367_22_Sector *c =
-            reinterpret_cast<Ais8_367_22_Sector*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_367_22_Sector*>(msg.sub_areas[i].get());
 
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_SECTOR);
         DictSafeSetItem(sub_area, "sub_area_type_str", "sector");
@@ -1942,7 +1942,7 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         PyObject *sub_area = PyDict_New();
         Ais8_367_22_Poly *poly =
-            reinterpret_cast<Ais8_367_22_Poly*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_367_22_Poly*>(msg.sub_areas[i].get());
 
         DictSafeSetItem(sub_area, "sub_area_type", msg.sub_areas[i]->getType());
         if (msg.sub_areas[i]->getType() == AIS8_366_22_SHAPE_POLYLINE)
@@ -1971,7 +1971,7 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
         PyObject *sub_area = PyDict_New();
 
         Ais8_367_22_Text *text =
-            reinterpret_cast<Ais8_367_22_Text*>(msg.sub_areas[i]);
+            reinterpret_cast<Ais8_367_22_Text*>(msg.sub_areas[i].get());
         DictSafeSetItem(sub_area, "sub_area_type", AIS8_366_22_SHAPE_TEXT);
         DictSafeSetItem(sub_area, "sub_area_type_str", "text");
 
