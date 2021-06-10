@@ -755,6 +755,7 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
   }
 
   if (status != AIS_OK) {
+    Py_DECREF(dict);
     PyErr_Format(ais_py_exception,
                  "Ais6: DAC:FI not known.  6:%d:%d %s",
                  msg.dac,
@@ -2126,6 +2127,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
   }
 
   if (status != AIS_OK) {
+    Py_DECREF(dict);
     PyErr_Format(ais_py_exception, "Ais8: %s",
                  AIS_STATUS_STRINGS[status]);
     return nullptr;
@@ -2641,6 +2643,7 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
   default:
     // status = AIS_ERR_BAD_MSG_CONTENT;
     // TODO(schwehr): setup python exception
+    Py_DECREF(dict);
     return nullptr;
   }
 
