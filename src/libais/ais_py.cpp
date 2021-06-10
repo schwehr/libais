@@ -413,7 +413,6 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict,
   PyObject *cap_list = PyList_New(kNumFI);
   PyObject *res_list = PyList_New(kNumFI);
   for (size_t cap_num = 0; cap_num < kNumFI; cap_num++) {
-    // TODO(schwehr): memory leak?
     PyObject *cap = PyLong_FromLong(long(msg.capabilities[cap_num]));  // NOLINT
     PyList_SetItem(cap_list, cap_num, cap);
 
@@ -1264,10 +1263,8 @@ ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict,
   DictSafeSetItem(dict, "last_port", msg.last_port);
 
   PyObject *port_list = PyList_New(2);
-  PyObject *port0 = PyUnicode_FromString(msg.next_ports[0].c_str());
-  PyObject *port1 = PyUnicode_FromString(msg.next_ports[0].c_str());
-  PyList_SetItem(port_list, 0, port0); Py_DECREF(port0);
-  PyList_SetItem(port_list, 1, port1); Py_DECREF(port1);
+  PyList_SetItem(port_list, 0, PyUnicode_FromString(msg.next_ports[0].c_str()));
+  PyList_SetItem(port_list, 1, PyUnicode_FromString(msg.next_ports[0].c_str()));
 
   PyObject *solas_list = PyList_New(26);
   for (size_t solas_num = 0; solas_num < 26; solas_num++) {
