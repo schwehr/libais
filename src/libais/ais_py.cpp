@@ -65,57 +65,42 @@ enum AIS_FI {
 
 void
 DictSafeSetItem(PyObject *dict, const string &key, const long val) {  // NOLINT
-  PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyLong_FromLong(val);
-  assert(key_obj);
   assert(val_obj);
-  PyDict_SetItem(dict, key_obj, val_obj);
-  Py_DECREF(key_obj);
+  PyDict_SetItemString(dict, key.c_str(), val_obj);
   Py_DECREF(val_obj);
 }
 
 void
 DictSafeSetItem(PyObject *dict, const string &key, const int val) {
-  PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyLong_FromLong(val);
-  assert(key_obj);
   assert(val_obj);
-  PyDict_SetItem(dict, key_obj, val_obj);
-  Py_DECREF(key_obj);
+  PyDict_SetItemString(dict, key.c_str(), val_obj);
   Py_DECREF(val_obj);
 }
 
 void
 DictSafeSetItem(PyObject *dict, const string &key, const unsigned int val) {
-  PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyLong_FromLong(val);
-  assert(key_obj);
   assert(val_obj);
-  PyDict_SetItem(dict, key_obj, val_obj);
-  Py_DECREF(key_obj);
+  PyDict_SetItemString(dict, key.c_str(), val_obj);
   Py_DECREF(val_obj);
 }
 
 void
 DictSafeSetItem(PyObject *dict, const string &key, const string &val) {
-  PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyUnicode_FromString(val.c_str());
-  assert(key_obj);
   assert(val_obj);
-  PyDict_SetItem(dict, key_obj, val_obj);
-  Py_DECREF(key_obj);
+  PyDict_SetItemString(dict, key.c_str(), val_obj);
   Py_DECREF(val_obj);
 }
 
 
 void
 DictSafeSetItem(PyObject *dict, const string &key, const char *val) {
-  PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyUnicode_FromString(val);
-  assert(key_obj);
   assert(val_obj);
-  PyDict_SetItem(dict, key_obj, val_obj);
-  Py_DECREF(key_obj);
+  PyDict_SetItemString(dict, key.c_str(), val_obj);
   Py_DECREF(val_obj);
 }
 
@@ -134,37 +119,28 @@ DictSafeSetItem(PyObject *dict, const string &key, const bool val) {
 #else
 void
 DictSafeSetItem(PyObject *dict, const string &key, const bool val) {
-  PyObject *key_obj = PyUnicode_FromString(key.c_str());
-  assert(key_obj);
   if (val) {
-    PyDict_SetItem(dict, key_obj, Py_True);
+    PyDict_SetItemString(dict, key.c_str(), Py_True);
   } else {
-    PyDict_SetItem(dict, key_obj, Py_False);
+    PyDict_SetItemString(dict, key.c_str(), Py_False);
   }
-  Py_DECREF(key_obj);
 }
 #endif
 
 void
 DictSafeSetItem(PyObject *dict, const string &key, const float val) {
-  PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyFloat_FromDouble(val);
-  assert(key_obj);
   assert(val_obj);
-  PyDict_SetItem(dict, key_obj, val_obj);
-  Py_DECREF(key_obj);
+  PyDict_SetItemString(dict, key.c_str(), val_obj);
   Py_DECREF(val_obj);
 }
 
 // Python Floats are IEE-754 double precision.
 void
 DictSafeSetItem(PyObject *dict, const string &key, const double val) {
-  PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyFloat_FromDouble(val);
-  assert(key_obj);
   assert(val_obj);
-  PyDict_SetItem(dict, key_obj, val_obj);
-  Py_DECREF(key_obj);
+  PyDict_SetItemString(dict, key.c_str(), val_obj);
   Py_DECREF(val_obj);
 }
 
@@ -180,10 +156,7 @@ DictSafeSetItem(PyObject *dict, const string &key, PyObject *val_obj) {
   // When we need to add dictionaries and such to a dictionary
   assert(dict);
   assert(val_obj);
-  PyObject *key_obj = PyUnicode_FromString(key.c_str());
-  assert(key_obj);
-  PyDict_SetItem(dict, key_obj, val_obj);
-  Py_DECREF(key_obj);
+  PyDict_SetItemString(dict, key.c_str(), val_obj);
 }
 
 
@@ -536,7 +509,7 @@ ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict,
     DictSafeSetItem(window, "cur_speed", msg.windows[w_num].cur_speed);
     PyList_SetItem(window_list, w_num, window);
   }
-  PyDict_SetItem(dict, PyUnicode_FromString("windows"), window_list);
+  PyDict_SetItemString(dict, "windows", window_list);
 
   return AIS_OK;
 }
@@ -639,7 +612,7 @@ ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict,
       DictSafeSetItem(cargo, "marpol_cat", msg.cargos[cargo_num].marpol_cat);
     PyList_SetItem(cargo_list, cargo_num, cargo);
   }
-  PyDict_SetItem(dict, PyUnicode_FromString("cargos"), cargo_list);
+  PyDict_SetItemString(dict, "cargos", cargo_list);
 
   return AIS_OK;
 }
@@ -677,7 +650,7 @@ ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict,
     DictSafeSetItem(win, "cur_speed", msg.windows[win_num].cur_speed);
     PyList_SetItem(window_list, win_num, win);
   }
-  PyDict_SetItem(dict, PyUnicode_FromString("windows"), window_list);
+  PyDict_SetItemString(dict, "windows", window_list);
 
   return AIS_OK;
 }
@@ -808,7 +781,7 @@ ais7_13_to_pydict(const char *nmea_payload, const size_t pad) {
     PyTuple_SetItem(tuple, 1, PyLong_FromLong(msg.seq_num[i]));  // Steals ref
     PyList_SetItem(list, i, tuple);  // Steals ref
   }
-  PyDict_SetItem(dict, PyUnicode_FromString("acks"), list);
+  PyDict_SetItemString(dict, "acks", list);
   Py_DECREF(list);
   return dict;
 }
@@ -983,7 +956,7 @@ ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict,
     DictSafeSetItem(target, "sog", msg.targets[target_num].sog);
     PyList_SetItem(target_list, target_num, target);
   }
-  PyDict_SetItem(dict, PyUnicode_FromString("targets"), target_list);
+  PyDict_SetItemString(dict, "targets", target_list);
 
   return AIS_OK;
 }
@@ -1580,7 +1553,7 @@ ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict,
         waypoint, 1, PyFloat_FromDouble(msg.waypoints[point_num].lat_deg));
     PyList_SetItem(waypoint_list, point_num, waypoint);
   }
-  PyDict_SetItem(dict, PyUnicode_FromString("waypoints"), waypoint_list);
+  PyDict_SetItemString(dict, "waypoints", waypoint_list);
 
   return AIS_OK;
 }
@@ -2506,9 +2479,7 @@ ais20_to_pydict(const char *nmea_payload, const size_t pad) {
     PyList_SetItem(list, 3, reservation);
   }
 
-  PyObject * reservations = PyUnicode_FromString("reservations");
-  PyDict_SetItem(dict, reservations, list);
-  Py_DECREF(reservations);
+  PyDict_SetItemString(dict, "reservations", list);
   Py_DECREF(list);
 
   return dict;
