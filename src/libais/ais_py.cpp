@@ -421,7 +421,9 @@ ais6_1_4_append_pydict(const char *nmea_payload, PyObject *dict,
     PyList_SetItem(res_list, cap_num, res);
   }
   DictSafeSetItem(dict, "capabilities", cap_list);
+  Py_DECREF(cap_list);
   DictSafeSetItem(dict, "cap_reserved", res_list);
+  Py_DECREF(res_list);
   DictSafeSetItem(dict, "spare2", msg.spare2);
   DictSafeSetItem(dict, "spare3", msg.spare2);
   DictSafeSetItem(dict, "spare4", msg.spare2);
@@ -513,6 +515,7 @@ ais6_1_14_append_pydict(const char *nmea_payload, PyObject *dict,
     PyList_SetItem(window_list, w_num, window);
   }
   PyDict_SetItemString(dict, "windows", window_list);
+  Py_DECREF(window_list);
 
   return AIS_OK;
 }
@@ -572,6 +575,7 @@ ais6_1_20_append_pydict(const char *nmea_payload, PyObject *dict,
       PyList_SetItem(serv_list, serv_num, serv);
     }
     DictSafeSetItem(dict, "services", serv_list);
+    Py_DECREF(serv_list);
   }
   DictSafeSetItem(dict, "name", msg.name);
   DictSafeSetItem(dict, "x", "y", msg.position);
@@ -616,6 +620,7 @@ ais6_1_25_append_pydict(const char *nmea_payload, PyObject *dict,
     PyList_SetItem(cargo_list, cargo_num, cargo);
   }
   PyDict_SetItemString(dict, "cargos", cargo_list);
+  Py_DECREF(cargo_list);
 
   return AIS_OK;
 }
@@ -654,6 +659,7 @@ ais6_1_32_append_pydict(const char *nmea_payload, PyObject *dict,
     PyList_SetItem(window_list, win_num, win);
   }
   PyDict_SetItemString(dict, "windows", window_list);
+  Py_DECREF(window_list);
 
   return AIS_OK;
 }
@@ -961,6 +967,7 @@ ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict,
     PyList_SetItem(target_list, target_num, target);
   }
   PyDict_SetItemString(dict, "targets", target_list);
+  Py_DECREF(target_list);
 
   return AIS_OK;
 }
@@ -1187,6 +1194,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
 
         DictSafeSetItem(sub_area, "angles", angle_list);
         DictSafeSetItem(sub_area, "dists_m", dist_list);
+        Py_DECREF(angle_list);
+        Py_DECREF(dist_list);
 
         // TODO(schwehr): spare?
         PyList_SetItem(sub_area_list, i, sub_area);
@@ -1214,6 +1223,8 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
 
         DictSafeSetItem(sub_area, "angles", angle_list);
         DictSafeSetItem(sub_area, "dists_m", dist_list);
+        Py_DECREF(angle_list);
+        Py_DECREF(dist_list);
 
         // TODO(schwehr): spare?
         PyList_SetItem(sub_area_list, i, sub_area);
@@ -1240,6 +1251,7 @@ ais8_1_22_append_pydict(const char *nmea_payload, PyObject *dict,
     }
   }
   DictSafeSetItem(dict, "sub_areas", sub_area_list);
+  Py_DECREF(sub_area_list);
 
   return AIS_OK;
 }
@@ -1274,7 +1286,10 @@ ais8_1_24_append_pydict(const char *nmea_payload, PyObject *dict,
     PyObject *solas = PyLong_FromLong(msg.solas_status[solas_num]);
     PyList_SetItem(solas_list, solas_num, solas);
   }
+  DictSafeSetItem(dict, "port_list", port_list);
+  Py_DECREF(port_list);
   DictSafeSetItem(dict, "solas", solas_list);
+  Py_DECREF(solas_list);
   DictSafeSetItem(dict, "ice_class", msg.ice_class);
   DictSafeSetItem(dict, "shaft_power", msg.shaft_power);
   DictSafeSetItem(dict, "vhf", msg.vhf);
@@ -1404,6 +1419,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
           DictSafeSetItem(curr_dict, "depth", rpt->currents[idx].depth);
           PyList_SetItem(curr_list, idx, curr_dict);
         }
+        Py_DECREF(curr_list);
       }
       break;
     case AIS8_1_26_SENSOR_CURR_3D:
@@ -1424,6 +1440,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
           DictSafeSetItem(curr_dict, "up", rpt->currents[idx].up);
           DictSafeSetItem(curr_dict, "depth", rpt->currents[idx].depth);
         }
+        Py_DECREF(curr_list);
       }
       break;
     case AIS8_1_26_SENSOR_HORZ_FLOW:
@@ -1443,6 +1460,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
           DictSafeSetItem(curr_dict, "dir", rpt->currents[idx].dir);
           DictSafeSetItem(curr_dict, "level", rpt->currents[idx].level);
         }
+        Py_DECREF(curr_list);
       }
       break;
     case AIS8_1_26_SENSOR_SEA_STATE:
@@ -1521,6 +1539,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
       {}  // TODO(schwehr): mark a bad sensor type or raise exception
     }
   }
+  Py_DECREF(rpt_list);
 
   return AIS_OK;
 }
@@ -1558,6 +1577,7 @@ ais8_1_27_append_pydict(const char *nmea_payload, PyObject *dict,
     PyList_SetItem(waypoint_list, point_num, waypoint);
   }
   PyDict_SetItemString(dict, "waypoints", waypoint_list);
+  Py_DECREF(waypoint_list);
 
   return AIS_OK;
 }
@@ -1783,11 +1803,13 @@ ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict,
   for (size_t i = 0; i < 4; i++)
     PyList_SetItem(id_list, i, PyLong_FromLong(msg.gauge_ids[i]));
   DictSafeSetItem(dict, "gauge_ids", id_list);
+  Py_DECREF(id_list);
 
   PyObject *level_list = PyList_New(4);
   for (size_t i = 0; i < 4; i++)
     PyList_SetItem(level_list, i, PyFloat_FromDouble(msg.levels[i]));
   DictSafeSetItem(dict, "levels", level_list);
+  Py_DECREF(level_list);
 
   return AIS_OK;
 }
@@ -1839,6 +1861,7 @@ ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict,
   for (size_t i = 0; i < 3; i++)
     PyList_SetItem(spare2_list, 0,  PyLong_FromLong(msg.spare2[i]));
   DictSafeSetItem(dict, "spare2", spare2_list);
+  Py_DECREF(spare2_list);
 
   return AIS_OK;
 }
@@ -1950,6 +1973,8 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
 
         DictSafeSetItem(sub_area, "angles", angle_list);
         DictSafeSetItem(sub_area, "dists_m", dist_list);
+        Py_DECREF(angle_list);
+        Py_DECREF(dist_list);
 
         PyList_SetItem(sub_area_list, i, sub_area);
       }
@@ -1976,6 +2001,7 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
     }
   }
   DictSafeSetItem(dict, "sub_areas", sub_area_list);
+  Py_DECREF(sub_area_list);
 }
 
 // AIS Binary broadcast messages.  There will be a huge number of subtypes
