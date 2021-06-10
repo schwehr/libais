@@ -2642,8 +2642,9 @@ ais24_to_pydict(const char *nmea_payload, const size_t pad) {
   case 3:  // FALLTHROUGH - not yet defined by ITU
   default:
     // status = AIS_ERR_BAD_MSG_CONTENT;
-    // TODO(schwehr): setup python exception
     Py_DECREF(dict);
+    PyErr_Format(ais_py_exception, "Ais24: unknown part_num %d",
+                 msg.part_num);
     return nullptr;
   }
 
