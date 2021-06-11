@@ -12,10 +12,12 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <memory>
 
 using std::bitset;
 using std::ostream;
 using std::string;
+using std::unique_ptr;
 using std::vector;
 
 #define LIBAIS_VERSION_MAJOR 0
@@ -1136,7 +1138,7 @@ class Ais8_1_22_SubArea {
   virtual ~Ais8_1_22_SubArea() {}
 };
 
-Ais8_1_22_SubArea*
+unique_ptr<Ais8_1_22_SubArea>
 ais8_1_22_subarea_factory(const AisBitset &bs,
                           const size_t offset);
 
@@ -1239,10 +1241,9 @@ class Ais8_1_22 : public Ais8 {
   int duration_minutes;  // Time from the start until the notice expires.
 
   // 1 or more sub messages
-  vector<Ais8_1_22_SubArea *> sub_areas;
+  vector<unique_ptr<Ais8_1_22_SubArea>> sub_areas;
 
   Ais8_1_22(const char *nmea_payload, const size_t pad);
-  ~Ais8_1_22();
 };
 ostream& operator<< (ostream& o, Ais8_1_22 const& msg);
 
@@ -1762,7 +1763,7 @@ class Ais8_366_22_SubArea {
     virtual ~Ais8_366_22_SubArea() { }
 };
 
-Ais8_366_22_SubArea*
+unique_ptr<Ais8_366_22_SubArea>
 ais8_366_22_subarea_factory(const AisBitset &bs,
                             const size_t offset);
 
@@ -1861,10 +1862,9 @@ class Ais8_366_22 : public Ais8 {
   int duration_minutes;  // Time from the start until the notice expires
   // 1 or more sub messages
 
-  vector<Ais8_366_22_SubArea *> sub_areas;
+  vector<unique_ptr<Ais8_366_22_SubArea>> sub_areas;
 
   Ais8_366_22(const char *nmea_payload, const size_t pad);
-  ~Ais8_366_22();
 };
 ostream& operator<< (ostream& o, Ais8_366_22 const& msg);
 
@@ -1888,7 +1888,7 @@ class Ais8_367_22_SubArea {
   virtual ~Ais8_367_22_SubArea() { }
 };
 
-Ais8_367_22_SubArea*
+unique_ptr<Ais8_367_22_SubArea>
 ais8_367_22_subarea_factory(const AisBitset &bs,
                             const size_t offset);
 
@@ -1972,10 +1972,9 @@ class Ais8_367_22 : public Ais8 {
   int duration_minutes;
   int spare2;
 
-  vector<Ais8_367_22_SubArea *> sub_areas;
+  vector<unique_ptr<Ais8_367_22_SubArea>> sub_areas;
 
   Ais8_367_22(const char *nmea_payload, const size_t pad);
-  ~Ais8_367_22();
 };
 ostream& operator<< (ostream& o, Ais8_367_22 const& msg);
 
