@@ -13,6 +13,7 @@ ais8_200.cpp
 ais8_366.cpp
 ais8_366_22.cpp
 ais8_367.cpp
+ais8_367_33.cpp
 ais9.cpp
 ais10.cpp
 ais12.cpp

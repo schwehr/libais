@@ -42,6 +42,7 @@ AIS_MODULE = Extension(
     'ais8_200.cpp',
     'ais8_366.cpp',
     'ais8_367.cpp',
+    'ais8_367_33.cpp',
     'ais9.cpp',
     'ais10.cpp',  # :
     # 11 See 4 - ;

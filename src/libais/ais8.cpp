@@ -626,8 +626,104 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad)
   spare2 = bits.ToUnsignedInt(350, 10);
 
   assert(bits.GetRemaining() == 0);
+}
+
+// SSW FI23 Satellite Ship Weather 1-Slot Version
+Ais8_367_23::Ais8_367_23(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad), version(0), utc_day(0),
+      utc_hour(), utc_min(), position(), pressure(0.0), air_temp(0.0),
+      wind_speed(0), wind_gust(0.0), wind_dir(0) {
+  assert(dac == 367);
+  assert(fi == 23);
+
+  if (!CheckStatus()) {
+    return;
+  }
+
+  if ((num_bits != 168) && (num_bits != 192)) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  bits.SeekTo(56);
+
+  version = bits.ToUnsignedInt(56, 3);
+  utc_day = bits.ToUnsignedInt(59, 5);
+  utc_hour = bits.ToUnsignedInt(64, 5);
+  utc_min = bits.ToUnsignedInt(69, 6);
+  position = bits.ToAisPoint(75, 49);
+  pressure = bits.ToUnsignedInt(124, 9) + 800;  // hPa
+  air_temp = bits.ToInt(133, 11) / 10.;  // C
+  wind_speed = bits.ToUnsignedInt(144, 7);  // ave knots
+  wind_gust = bits.ToUnsignedInt(151, 7);  // ave knots
+  wind_dir = bits.ToUnsignedInt(158, 9);
+
+  spare = bits.ToUnsignedInt(167, 1);
+
+  // NOTE: I'm seeing 192-bit messages come in, which means 24 bits left.
+  // assert(bits.GetRemaining() == 0);
   status = AIS_OK;
 }
 
+// SSW FI24 Satellite Ship Weather Small - Less than 1-Slot Version
+Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad), version(0),
+      utc_hour(), utc_min(), position(), pressure(0.0) {
+  assert(dac == 367);
+  assert(fi == 24);
+
+  if (!CheckStatus()) {
+    return;
+  }
+
+  if ((num_bits != 128) && (num_bits != 144)) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  bits.SeekTo(56);
+
+  version = bits.ToUnsignedInt(56, 3);
+  utc_hour = bits.ToUnsignedInt(59, 5);
+  utc_min = bits.ToUnsignedInt(64, 6);
+  position = bits.ToAisPoint(70, 49);
+  pressure = bits.ToUnsignedInt(119, 9) + 800;  // hPa
+
+  // NOTE: If message comes in at 144, then there will be 16 bits remaining.
+  // assert(bits.GetRemaining() == 0);
+  status = AIS_OK;
+}
+
+// SSW FI25 Satellite Ship Weather Tiny Version
+Ais8_367_25::Ais8_367_25(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad), version(0),
+      utc_hour(), utc_min(), pressure(0.0) , wind_speed(0), wind_dir(0) {
+  assert(dac == 367);
+  assert(fi == 25);
+
+  if (!CheckStatus()) {
+    return;
+  }
+
+  if ((num_bits != 96) && (num_bits != 120)) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  bits.SeekTo(56);
+
+  version = bits.ToUnsignedInt(56, 3);
+  utc_hour = bits.ToUnsignedInt(59, 5);
+  utc_min = bits.ToUnsignedInt(64, 6);
+  pressure = bits.ToUnsignedInt(70, 9) + 800;  // hPa
+  wind_speed = bits.ToUnsignedInt(79, 7);  // Knots
+  wind_dir = bits.ToUnsignedInt(86, 9);  // Degrees
+
+  spare = bits.ToUnsignedInt(95, 1);
+
+  // NOTE: if num_bits is 120, then there will be 24 bits left.
+  // assert(bits.GetRemaining() == 0);
+  status = AIS_OK;
+}
 
 }  // namespace libais

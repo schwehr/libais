@@ -67,6 +67,7 @@ SRCS += ais8_200.cpp # River Information System (RIS)
 SRCS += ais8_366.cpp
 SRCS += ais8_366_22.cpp
 SRCS += ais8_367.cpp
+SRCS += ais8_367_33.cpp
 
 SRCS += ais9.cpp
 SRCS += ais10.cpp
