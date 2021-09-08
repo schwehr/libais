@@ -651,7 +651,7 @@ Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
   utc_hour = bits.ToUnsignedInt(59, 5);
   utc_min = bits.ToUnsignedInt(64, 6);
   position = bits.ToAisPoint(70, 49);
-  pressure = bits.ToUnsignedInt(119, 9) + 800;  // hPa
+  pressure = bits.ToUnsignedInt(119, 9) + 799;  // hPa
 
   // NOTE: If message comes in at 144, then there will be 16 bits remaining.
   // assert(bits.GetRemaining() == 0);

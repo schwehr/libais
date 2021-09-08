@@ -686,7 +686,7 @@ top_level = [
                'utc_min': 20,
                'x': -87.4372,
                'y': 41.6737,
-               'pressure': 1020}
+               'pressure': 1019}
   },
 
 
