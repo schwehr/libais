@@ -629,5 +629,34 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
+// SSW FI24 Satellite Ship Weather Small - Less than 1-Slot Version
+Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad), version(0),
+      utc_hour(), utc_min(), position(), pressure(0.0) {
+  assert(dac == 367);
+  assert(fi == 24);
+
+  if (!CheckStatus()) {
+    return;
+  }
+
+  if ((num_bits != 128) && (num_bits != 144)) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  bits.SeekTo(56);
+
+  version = bits.ToUnsignedInt(56, 3);
+  utc_hour = bits.ToUnsignedInt(59, 5);
+  utc_min = bits.ToUnsignedInt(64, 6);
+  position = bits.ToAisPoint(70, 49);
+  pressure = bits.ToUnsignedInt(119, 9) + 800;  // hPa
+
+  // NOTE: If message comes in at 144, then there will be 16 bits remaining.
+  // assert(bits.GetRemaining() == 0);
+  status = AIS_OK;
+}
+
 
 }  // namespace libais
