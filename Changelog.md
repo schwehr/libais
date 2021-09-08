@@ -1,5 +1,10 @@
 Changelog and release history for libais
 ========================================
+0.18 - 2021-09-08
+-----------------
+
+* First internal release of morise-libais fork
+* Add support for STM REX messages
 
 0.17 - 2018-01-17
 -----------------

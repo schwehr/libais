@@ -1,0 +1,41 @@
+name: Release - Python Package
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-n-release:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v2
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.1.1
+
+      - name: Build wheels
+        run: python -m cibuildwheel
+        env:
+          CIBW_SKIP: "cp36-* cp37-*"
+          CIBW_BUILD_FRONTEND: "build"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_MANYLINUX_I686_IMAGE: manylinux2014
+          CIBW_MANYLINUX_PYPY_X86_64_IMAGE: manylinux2014
+          CIBW_MANYLINUX_PYPY_I686_IMAGE: manylinux2014
+
+      - name: Publish package to MORISE PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: ${{ secrets.MORISE_PYPI_USER }}
+          password: ${{ secrets.MORISE_PYPI_PASS }}
+          repository_url: https://pypi.mo.ri.se
+          packages_dir: wheelhouse

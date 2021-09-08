@@ -74,7 +74,7 @@ tests_require = [
 ]
 
 setup(
-  name='libais',
+  name='morise-libais',
   version=VERSION,
   description='Automatic Identification System decoding - ship tracking',
   long_description=readme,
