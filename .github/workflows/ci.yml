@@ -1,0 +1,50 @@
+name: libais CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  PIP_WHEEL_DIR: /home/runner/.cache/pip/wheels
+  PIP_FIND_LINKS: file:///home/runner/.cache/pip/wheels
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10-dev']
+    steps:
+      - name: Add required sources and pkgs
+        run: |
+          sudo add-apt-repository --update --yes 'deb http://archive.ubuntu.com/ubuntu/ bionic main universe'
+          sudo apt-get install gcc-6 g++-6
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: 'x64'
+
+      - name: Before install
+        run: |
+          mkdir --parents --verbose ${{ env.PIP_WHEEL_DIR }}
+          pip install setuptools --upgrade
+          pip install pytest --upgrade
+
+      - name: Install
+        run: CC=g++-6 pip install .\[tests\] --upgrade
+        
+      - name: Script
+        run: |
+          (cd src && CC=gcc-6 CXX=g++-6 make -f Makefile-custom -j 4 test)
+          py.test ais test --cov=ais --cov-report term-missing
