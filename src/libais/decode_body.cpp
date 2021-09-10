@@ -139,8 +139,8 @@ unique_ptr<AisMsg> CreateAisMsg8(const string &body, const int fill_bits) {
       switch (msg.fi) {
         case 22:
           return MakeUnique<libais::Ais8_367_22>(body.c_str(), fill_bits);
-        case 33:
-          return MakeUnique<libais::Ais8_367_33>(body.c_str(), fill_bits);
+        case 24:
+          return MakeUnique<libais::Ais8_367_24>(body.c_str(), fill_bits);
       }
       // FI not handled.
       break;
