@@ -2004,7 +2004,12 @@ ais8_367_24_append_pydict(const char *nmea_payload, PyObject *dict,
   DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
   DictSafeSetItem(dict, "utc_min", msg.utc_min);
   DictSafeSetItem(dict, "x", "y", msg.position);
-  DictSafeSetItem(dict, "pressure", msg.pressure);
+  if (msg.pressure <= 1201) {
+    DictSafeSetItem(dict, "pressure", msg.pressure);
+  } else {
+    // Raw values was 403 (N/A), or reserved value.
+    DictSafeSetItem(dict, "pressure", Py_None);
+  }
 
   return AIS_OK;
 }
