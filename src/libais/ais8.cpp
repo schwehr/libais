@@ -626,8 +626,6 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad)
   spare2 = bits.ToUnsignedInt(350, 10);
 
   assert(bits.GetRemaining() == 0);
-  status = AIS_OK;
 }
-
 
 }  // namespace libais
