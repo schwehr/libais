@@ -1,3 +1,5 @@
+#include <string>
+
 #include "ais.h"
 
 namespace libais {
@@ -109,7 +111,7 @@ int AisBitset::ToInt(const size_t start, const size_t len)  const {
   return is_positive ? result : -(result + 1);
 }
 
-string AisBitset::ToString(const size_t start, const size_t len) const {
+std::string AisBitset::ToString(const size_t start, const size_t len) const {
   assert(len % 6 == 0);
   // TODO(schwehr): Prefer to use num_bits (includes pad) for checking bounds.
   assert(start + len <= num_chars * 6);
@@ -117,7 +119,7 @@ string AisBitset::ToString(const size_t start, const size_t len) const {
   assert(current_position == start);
 
   const size_t num_char = len / 6;
-  string result(num_char, '@');
+  std::string result(num_char, '@');
   for (size_t char_idx = 0; char_idx < num_char; char_idx++) {
     const int char_num = ToUnsignedInt(start + char_idx*6, 6);
     result[char_idx] = bits_to_char_tbl_[char_num];

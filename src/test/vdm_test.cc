@@ -143,7 +143,7 @@ TEST(NmeaSentenceTest, ReturnNullptrOnJunk) {
 TEST(NmeaSentenceTest, SingleLines) {
   // Message 27 - Low bit count position report.
   int64_t line_number = 12;
-  string line("!SAVDM,1,1,,B,K8VSqb9LdU28WP8P,0*7B");
+  std::string line("!SAVDM,1,1,,B,K8VSqb9LdU28WP8P,0*7B");
   auto sentence = NmeaSentence::Create(line, line_number);
   ASSERT_NE(nullptr, sentence);
   EXPECT_EQ("SA", sentence->talker());
@@ -297,12 +297,12 @@ static void BM_VdmStream(const int iters) {
   VdmStream stream;
 
   for (int i = 0; i < iters; i++) {
-    for (const string &line : single_line_messages) {
+    for (const std::string &line : single_line_messages) {
       EXPECT_TRUE(stream.AddLine(line));
       ASSERT_NE(nullptr, stream.PopOldestMessage().get());
     }
 
-    for (const string &line : two_line_message) {
+    for (const std::string &line : two_line_message) {
       EXPECT_TRUE(stream.AddLine(line));
     }
     ASSERT_NE(nullptr, stream.PopOldestMessage().get());
@@ -328,7 +328,7 @@ TEST_F(VdmTest, IgnoreNonAisMessages) {
 
   ASSERT_EQ(nullptr, stream_.PopOldestMessage());
 
-  for (const string &line : lines) {
+  for (const std::string &line : lines) {
     EXPECT_FALSE(stream_.AddLine(line));
     EXPECT_EQ(nullptr, stream_.PopOldestMessage());
   }
@@ -367,7 +367,7 @@ TEST_F(VdmTest, MultipleSingleLineAisMessages) {
       "!BSVDM,1,1,,A,B52HIjh00=ksdj6l448=wwQ5WP06,0*68",
       "!SAVDM,1,1,,B,K8VSqb9LdU28WP8d,0*4F"};
   ASSERT_EQ(nullptr, stream_.PopOldestMessage());
-  for (const string &line : lines) {
+  for (const std::string &line : lines) {
     EXPECT_TRUE(stream_.AddLine(line));
   }
 
@@ -411,9 +411,9 @@ TEST_F(VdmTest, MultipleSingleLineAisMessages) {
   ASSERT_EQ(27, ais_msg->message_id);
 }
 
-string RightStrip(const string &src) {
+std::string RightStrip(const std::string &src) {
   size_t pos = src.find_last_not_of(" \n\r\t");
-  if (string::npos == pos) {
+  if (std::string::npos == pos) {
     return src;
   }
   return src.substr(0, pos + 1);
@@ -455,7 +455,7 @@ TEST_F(VdmTest, ThreeLineAisMessage) {
       "!AIVDM,3,3,4,A,d0@d0IqhH:Pah:U54PD?75D85Bf00,0*03"};
   // clang-format off
 
-  for (const string &line : lines) {
+  for (const std::string &line : lines) {
     ASSERT_TRUE(stream_.AddLine(line));
   }
   auto ais_msg = stream_.PopOldestMessage();

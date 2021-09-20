@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iomanip>
+#include <string>
 
 #include "ais.h"
 
@@ -228,12 +229,12 @@ Ais8_1_22_Polygon::Ais8_1_22_Polygon(const AisBitset &bits,
 
 Ais8_1_22_Text::Ais8_1_22_Text(const AisBitset &bits,
                                    const size_t offset) {
-  text = string(bits.ToString(offset, 84));
+  text = std::string(bits.ToString(offset, 84));
   // TODO(schwehr): spare?
 }
 
 // Call the appropriate constructor
-Ais8_1_22_SubArea*
+std::unique_ptr<Ais8_1_22_SubArea>
 ais8_1_22_subarea_factory(const AisBitset &bits,
                             const size_t offset) {
   const Ais8_1_22_AreaShapeEnum area_shape =
@@ -241,17 +242,17 @@ ais8_1_22_subarea_factory(const AisBitset &bits,
 
   switch (area_shape) {
   case AIS8_1_22_SHAPE_CIRCLE:
-    return new Ais8_1_22_Circle(bits, offset + 3);
+    return std::unique_ptr<Ais8_1_22_SubArea>(new Ais8_1_22_Circle(bits, offset + 3));
   case AIS8_1_22_SHAPE_RECT:
-    return new Ais8_1_22_Rect(bits, offset + 3);
+    return std::unique_ptr<Ais8_1_22_SubArea>(new Ais8_1_22_Rect(bits, offset + 3));
   case AIS8_1_22_SHAPE_SECTOR:
-    return new Ais8_1_22_Sector(bits, offset + 3);
+    return std::unique_ptr<Ais8_1_22_SubArea>(new Ais8_1_22_Sector(bits, offset + 3));
   case AIS8_1_22_SHAPE_POLYLINE:
-    return new Ais8_1_22_Polyline(bits, offset + 3);
+    return std::unique_ptr<Ais8_1_22_SubArea>(new Ais8_1_22_Polyline(bits, offset + 3));
   case AIS8_1_22_SHAPE_POLYGON:
-    return new Ais8_1_22_Polygon(bits, offset + 3);
+    return std::unique_ptr<Ais8_1_22_SubArea>(new Ais8_1_22_Polygon(bits, offset + 3));
   case AIS8_1_22_SHAPE_TEXT:
-    return new Ais8_1_22_Text(bits, offset + 3);
+    return std::unique_ptr<Ais8_1_22_SubArea>(new Ais8_1_22_Text(bits, offset + 3));
   case AIS8_1_22_SHAPE_RESERVED_6:  // FALLTHROUGH
   case AIS8_1_22_SHAPE_RESERVED_7:  // FALLTHROUGH
     // Keep area==0 to indicate error.
@@ -261,7 +262,7 @@ ais8_1_22_subarea_factory(const AisBitset &bits,
   default:
     assert(false);
   }
-  return nullptr;
+  return {};
 }
 
 
@@ -299,9 +300,9 @@ Ais8_1_22::Ais8_1_22(const char *nmea_payload, const size_t pad)
   const int num_sub_areas = static_cast<int>(floor((num_bits - 111)/87.));
   for (int sub_area_idx = 0; sub_area_idx < num_sub_areas; sub_area_idx++) {
     const size_t start = 111 + AIS8_1_22_SUBAREA_SIZE*sub_area_idx;
-    Ais8_1_22_SubArea *sub_area = ais8_1_22_subarea_factory(bits, start);
+    std::unique_ptr<Ais8_1_22_SubArea> sub_area = ais8_1_22_subarea_factory(bits, start);
     if (sub_area) {
-      sub_areas.push_back(sub_area);
+      sub_areas.push_back(std::move(sub_area));
     } else {
       status = AIS_ERR_BAD_SUB_SUB_MSG;
     }
@@ -314,14 +315,6 @@ Ais8_1_22::Ais8_1_22(const char *nmea_payload, const size_t pad)
   // TODO(schwehr): Add assert(bits.GetRemaining() == 0);
   if (status == AIS_UNINITIALIZED)
     status = AIS_OK;
-}
-
-// TODO(schwehr): Use unique_ptr to manage memory.
-Ais8_1_22::~Ais8_1_22() {
-  for (size_t i = 0; i < sub_areas.size(); i++) {
-    delete sub_areas[i];
-    sub_areas[i] = nullptr;
-  }
 }
 
 }  // namespace libais

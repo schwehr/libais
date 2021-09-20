@@ -1,6 +1,7 @@
 // Test parsing message 21 - ATON Status.
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -13,7 +14,7 @@ void Validate(
     const int repeat_indicator,
     const int mmsi,
     const int aton_type,
-    const string name,
+    const std::string name,
     const int position_accuracy,
     const double x,
     const double y,

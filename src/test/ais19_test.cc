@@ -1,6 +1,7 @@
 // Test parsing message 19 "C" - Class B.
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -12,7 +13,7 @@ void Validate(const Ais19 *msg, const int repeat_indicator, const int mmsi,
               const int spare, const float sog, const int position_accuracy,
               const double x, const double y, const float cog,
               const int true_heading, const int timestamp, const int spare2,
-              const string name, const int type_and_cargo, const int dim_a,
+              const std::string name, const int type_and_cargo, const int dim_a,
               const int dim_b, const int dim_c, const int dim_d,
               const int fix_type, const bool raim, const int dte,
               const int assigned_mode, const int spare3) {

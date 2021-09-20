@@ -2,7 +2,7 @@
 
 #include <array>
 #include <memory>
-// #include "third_party/absl/memory/memory.h"
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -12,7 +12,7 @@ namespace {
 
 // TODO(schwehr): Test eu_id.
 void Validate8_200_10(const Ais8_200_10 *msg, const int repeat_indicator,
-                      const int mmsi, const string & /* eu_id */,
+                      const int mmsi, const std::string & /* eu_id */,
                       const float length, const float beam, const int ship_type,
                       const int haz_cargo, const float draught,
                       const int loaded, const int speed_qual,
@@ -46,7 +46,7 @@ TEST(Ais8_200_10Test, DecodeAnything) {
 
   std::unique_ptr<Ais8_200_10> msg(
       new Ais8_200_10("85NLn@0j2d<8000000BhI?`50000", 0));
-  Validate8_200_10(msg.get(), 0, 367474240, string("foo"), 15, 5, 8000, 5,
+  Validate8_200_10(msg.get(), 0, 367474240, std::string("foo"), 15, 5, 8000, 5,
                    0, 0, 0, 0, 0, 0);
 }
 
@@ -54,7 +54,7 @@ TEST(Ais8_200_10Test, DecodeAnything) {
 // TODO(pyrog): Test messages for 8:200:22.
 
 void Validate8_200_24(const Ais8_200_24 &msg, const int repeat_indicator,
-                      const int mmsi, const string country,
+                      const int mmsi, const std::string country,
                       std::array<int, 4> gauge_ids,
                       std::array<float, 4> levels) {
   EXPECT_FALSE(msg.had_error());

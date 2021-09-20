@@ -1,4 +1,5 @@
 // General helper functions for working with AIS and NMEA.
+#include <string>
 
 #include "ais.h"
 
@@ -14,8 +15,8 @@ int LibAisVersionMinor() {
 
 namespace libais {
 
-string GetNthField(const string &str, const size_t n,
-                   const string &delim_str) {
+std::string GetNthField(const std::string &str, const size_t n,
+                        const std::string &delim_str) {
   assert(!delim_str.empty());
   if (str.empty())
     return "";
@@ -24,7 +25,7 @@ string GetNthField(const string &str, const size_t n,
   size_t off = str.find(delim_str);
   size_t count = 0;
 
-  for (; off != string::npos && count != n;
+  for (; off != std::string::npos && count != n;
        off = str.find(delim_str, off + 1), count++) {
     prev = off + delim_str.size();
   }
@@ -35,9 +36,9 @@ string GetNthField(const string &str, const size_t n,
   return "";
 }
 
-int GetPad(const string &nmea_str) {
+int GetPad(const std::string &nmea_str) {
   // -1 on error
-  const string chksum_block(GetNthField(nmea_str, 6, ","));
+  const std::string chksum_block(GetNthField(nmea_str, 6, ","));
   if (chksum_block.size() != 4 || chksum_block[1] != '*')
     return -1;
   const char pad = chksum_block[0];
@@ -46,7 +47,7 @@ int GetPad(const string &nmea_str) {
   return static_cast<int>(pad - '0');
 }
 
-string GetBody(const string &nmea_str) {
+std::string GetBody(const std::string &nmea_str) {
   return GetNthField(nmea_str, 5, ",");
 }
 

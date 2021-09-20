@@ -3,6 +3,7 @@
 // TODO(schwehr): Find more test cases.
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -21,7 +22,7 @@ void Validate(
     const int dest_mmsi,
     const bool retransmitted,
     const int spare,
-    const string &text) {
+    const std::string &text) {
   ASSERT_NE(nullptr, msg);
   EXPECT_FALSE(msg->had_error());
 
@@ -41,8 +42,9 @@ TEST(Ais12Test, DecodeAnything) {
   // !AIVDM,2,1,1,A,<02PeAPpIkF06B?=PB?31P3?>DB?<rP@<51C5P3?>D13DPB?31P3?>DB,0*13 NOLINT
   // !AIVDM,2,2,1,A,?<P?>PF86P381>>5<PoqP6?BP=1>41D?BIPB5@?BD@,4*66
   // clang-format on
-  const string body("<02PeAPpIkF06B?=PB?31P3?>DB?<rP@<51C5P3?>D13DPB?31P3?>"
-                    "DB?<P?>PF86P381>>5<PoqP6?BP=1>41D?BIPB5@?BD@");
+  const std::string body(
+      "<02PeAPpIkF06B?=PB?31P3?>DB?<rP@<51C5P3?>D13DPB?31P3?>"
+      "DB?<P?>PF86P381>>5<PoqP6?BP=1>41D?BIPB5@?BD@");
   const int pad = 4;
 
   std::unique_ptr<Ais12> msg(new Ais12(body.c_str(), pad));
