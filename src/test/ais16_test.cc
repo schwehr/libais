@@ -1,6 +1,7 @@
 // Test parsing message 16 - assigned mode command.
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -8,8 +9,8 @@
 namespace libais {
 namespace {
 
-std::unique_ptr<Ais16> Init(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais16> Init(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.

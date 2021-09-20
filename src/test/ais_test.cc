@@ -1,5 +1,7 @@
 // Test basic AIS infrastructure for AIVDM NMEA and AIS bit handling.
 
+#include <string>
+
 #include "ais.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -33,7 +35,7 @@ class AisBitsetTester : public AisBitset {
 };
 
 TEST(GetNthFieldTestEmpty, EmptyStrGetNthField) {
-  const string line("");
+  const std::string line("");
   ASSERT_TRUE(GetNthField(line, 0, ",").empty());
   ASSERT_TRUE(GetNthField(line, 0, "yada").empty());
   ASSERT_TRUE(GetNthField(line, 1, ",").empty());
@@ -42,7 +44,7 @@ TEST(GetNthFieldTestEmpty, EmptyStrGetNthField) {
 
 // Test that GetNthField finds the correct field for single character fields.
 TEST(GetNthFieldTest, FindCorrectFieldSimple) {
-  const string line("a,b,c,d,e,f,g");
+  const std::string line("a,b,c,d,e,f,g");
 
   ASSERT_EQ("a", GetNthField(line, 0, ","));
   ASSERT_EQ("b", GetNthField(line, 1, ","));
@@ -62,7 +64,7 @@ TEST(GetNthFieldTest, FindCorrectFieldSimple) {
 // Test some trickier strings.
 TEST(GetNthFieldTest, FindMoreComplicated) {
   {
-    const string line("");
+    const std::string line("");
     ASSERT_TRUE(GetNthField(line, 0, ",").empty());
     ASSERT_TRUE(GetNthField(line, 0, "yada").empty());
     ASSERT_TRUE(GetNthField(line, 1, ",").empty());
@@ -70,21 +72,21 @@ TEST(GetNthFieldTest, FindMoreComplicated) {
   }
 
   {
-    const string line("ab,cd,ef,gh");
+    const std::string line("ab,cd,ef,gh");
     ASSERT_EQ("ab", GetNthField(line, 0, ","));
     ASSERT_EQ("cd", GetNthField(line, 1, ","));
     ASSERT_EQ("gh", GetNthField(line, 3, ","));
   }
 
   {
-    const string line("ab,,,gh");
+    const std::string line("ab,,,gh");
     ASSERT_EQ("ab", GetNthField(line, 0, ","));
     ASSERT_EQ("gh", GetNthField(line, 3, ","));
     ASSERT_EQ("", GetNthField(line, 2, ","));
   }
 
   {
-    const string line(",yada,,");
+    const std::string line(",yada,,");
     ASSERT_EQ("", GetNthField(line, 0, ","));
     ASSERT_EQ("yada", GetNthField(line, 1, ","));
     ASSERT_EQ("", GetNthField(line, 2, ","));
@@ -94,7 +96,7 @@ TEST(GetNthFieldTest, FindMoreComplicated) {
 
 // Test that invalid indices return an empty string.
 TEST(GetNthFieldTest, InvalidIndices) {
-  const string line("a,b,c");
+  const std::string line("a,b,c");
   ASSERT_TRUE(GetNthField(line, -1, ",").empty());
   ASSERT_TRUE(GetNthField(line, 4, ",").empty());
   ASSERT_TRUE(GetNthField(line, 13, ",").empty());

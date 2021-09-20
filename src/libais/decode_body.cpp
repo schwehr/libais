@@ -17,6 +17,7 @@
 #include "decode_body.h"
 
 #include <memory>
+#include <string>
 
 #include "ais.h"
 
@@ -31,7 +32,7 @@ std::unique_ptr<T> MakeUnique(Args &&... args) {
   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-unique_ptr<AisMsg> CreateAisMsg6(const string &body, const int fill_bits) {
+unique_ptr<AisMsg> CreateAisMsg6(const std::string &body, const int fill_bits) {
   libais::Ais6 msg(body.c_str(), fill_bits);
   switch (msg.dac) {
     // International Maritime Organization (IMO).
@@ -70,7 +71,7 @@ unique_ptr<AisMsg> CreateAisMsg6(const string &body, const int fill_bits) {
   return nullptr;
 }
 
-unique_ptr<AisMsg> CreateAisMsg8(const string &body, const int fill_bits) {
+unique_ptr<AisMsg> CreateAisMsg8(const std::string &body, const int fill_bits) {
   libais::Ais8 msg(body.c_str(), fill_bits);
   switch (msg.dac) {
     // International Maritime Organization (IMO).
@@ -146,7 +147,7 @@ unique_ptr<AisMsg> CreateAisMsg8(const string &body, const int fill_bits) {
   return nullptr;
 }
 
-unique_ptr<AisMsg> CreateAisMsg(const string &body, const int fill_bits) {
+unique_ptr<AisMsg> CreateAisMsg(const std::string &body, const int fill_bits) {
   if (body.empty()) {
     return nullptr;
   }

@@ -15,6 +15,7 @@
 // clang-format on
 
 #include <memory>
+#include <string>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -23,8 +24,8 @@
 namespace libais {
 namespace {
 
-std::unique_ptr<Ais8_367_22> Init(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais8_367_22> Init(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.

@@ -16,6 +16,7 @@
 // !AIVDM,1,1,,B,:CFlQi3vqjM8;W98tPnSK`g<W9cqE;h<tP,1*12
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -23,8 +24,8 @@
 namespace libais {
 namespace {
 
-std::unique_ptr<Ais18> Init(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais18> Init(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.

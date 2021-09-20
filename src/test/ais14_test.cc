@@ -3,6 +3,7 @@
 // TODO(schwehr): Find more test cases.
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -10,8 +11,8 @@
 namespace libais {
 namespace {
 
-std::unique_ptr<Ais14> Init(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais14> Init(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.
@@ -27,7 +28,7 @@ void Validate(
     const int repeat_indicator,
     const int mmsi,
     const int spare,
-    const string &text) {
+    const std::string &text) {
   ASSERT_NE(nullptr, msg);
   EXPECT_FALSE(msg->had_error());
 
