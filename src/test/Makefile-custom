@@ -102,92 +102,92 @@ gmock.a : gmock-all.o gtest-all.o
 gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
-LIBAIS=../libais/.libs/libais.a
+
 ais1_2_3_test: ais1_2_3_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais4_11_test: ais4_11_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais5_test: ais5_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais6_test: ais6_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais7_13_test: ais7_13_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais8_1_22_test: ais8_1_22_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais8_200_test: ais8_200_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais8_366_test: ais8_366_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais8_367_test: ais8_367_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais9_test: ais9_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais10_test: ais10_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais12_test: ais12_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais14_test: ais14_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais15_test: ais15_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais16_test: ais16_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais17_test: ais17_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais18_test: ais18_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais19_test: ais19_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais20_test: ais20_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais21_test: ais21_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais22_test: ais23_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais23_test: ais23_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais24_test: ais24_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais25_test: ais25_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais26_test: ais26_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 ais27_test: ais27_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 
 ais_test: ais_test.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 decode_body_test: decode_body_test.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
 vdm_test: vdm_test.o gmock_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ $(LIBAIS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@ ../libais/libais.a
 
