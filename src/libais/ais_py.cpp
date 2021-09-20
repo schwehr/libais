@@ -1,5 +1,6 @@
 // TODO(schwehr): check for reference counting leaks
 // TODO(schwehr): better error handling for all messages
+#include <string>
 
 #include <Python.h>
 
@@ -64,7 +65,8 @@ enum AIS_FI {
 };
 
 void
-DictSafeSetItem(PyObject *dict, const string &key, const long val) {  // NOLINT
+DictSafeSetItem(
+    PyObject *dict, const std::string &key, const long val) {  // NOLINT
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyLong_FromLong(val);
   assert(key_obj);
@@ -75,7 +77,7 @@ DictSafeSetItem(PyObject *dict, const string &key, const long val) {  // NOLINT
 }
 
 void
-DictSafeSetItem(PyObject *dict, const string &key, const int val) {
+DictSafeSetItem(PyObject *dict, const std::string &key, const int val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyLong_FromLong(val);
   assert(key_obj);
@@ -86,7 +88,8 @@ DictSafeSetItem(PyObject *dict, const string &key, const int val) {
 }
 
 void
-DictSafeSetItem(PyObject *dict, const string &key, const unsigned int val) {
+DictSafeSetItem(
+    PyObject *dict, const std::string &key, const unsigned int val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyLong_FromLong(val);
   assert(key_obj);
@@ -97,7 +100,7 @@ DictSafeSetItem(PyObject *dict, const string &key, const unsigned int val) {
 }
 
 void
-DictSafeSetItem(PyObject *dict, const string &key, const string &val) {
+DictSafeSetItem(PyObject *dict, const std::string &key, const string &val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyUnicode_FromString(val.c_str());
   assert(key_obj);
@@ -109,7 +112,7 @@ DictSafeSetItem(PyObject *dict, const string &key, const string &val) {
 
 
 void
-DictSafeSetItem(PyObject *dict, const string &key, const char *val) {
+DictSafeSetItem(PyObject *dict, const std::string &key, const char *val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyUnicode_FromString(val);
   assert(key_obj);
@@ -122,7 +125,7 @@ DictSafeSetItem(PyObject *dict, const string &key, const char *val) {
 
 #if 0
 void
-DictSafeSetItem(PyObject *dict, const string &key, const bool val) {
+DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyBool_FromLong(val);
   assert(key_obj);
@@ -133,7 +136,7 @@ DictSafeSetItem(PyObject *dict, const string &key, const bool val) {
 }
 #else
 void
-DictSafeSetItem(PyObject *dict, const string &key, const bool val) {
+DictSafeSetItem(PyObject *dict, const std::string &key, const bool val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   assert(key_obj);
   if (val) {
@@ -146,7 +149,7 @@ DictSafeSetItem(PyObject *dict, const string &key, const bool val) {
 #endif
 
 void
-DictSafeSetItem(PyObject *dict, const string &key, const float val) {
+DictSafeSetItem(PyObject *dict, const std::string &key, const float val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyFloat_FromDouble(val);
   assert(key_obj);
@@ -158,7 +161,7 @@ DictSafeSetItem(PyObject *dict, const string &key, const float val) {
 
 // Python Floats are IEE-754 double precision.
 void
-DictSafeSetItem(PyObject *dict, const string &key, const double val) {
+DictSafeSetItem(PyObject *dict, const std::string &key, const double val) {
   PyObject *key_obj = PyUnicode_FromString(key.c_str());
   PyObject *val_obj = PyFloat_FromDouble(val);
   assert(key_obj);
@@ -169,14 +172,14 @@ DictSafeSetItem(PyObject *dict, const string &key, const double val) {
 }
 
 void
-DictSafeSetItem(PyObject *dict, const string &x_key, const string& y_key,
+DictSafeSetItem(PyObject *dict, const std::string &x_key, const string& y_key,
                 const AisPoint& position) {
   DictSafeSetItem(dict, x_key, position.lng_deg);
   DictSafeSetItem(dict, y_key, position.lat_deg);
 }
 
 void
-DictSafeSetItem(PyObject *dict, const string &key, PyObject *val_obj) {
+DictSafeSetItem(PyObject *dict, const std::string &key, PyObject *val_obj) {
   // When we need to add dictionaries and such to a dictionary
   assert(dict);
   assert(val_obj);

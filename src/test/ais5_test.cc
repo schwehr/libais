@@ -1,6 +1,7 @@
 // Test parsing message 5 - Class A static data.
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -9,12 +10,13 @@ namespace libais {
 namespace {
 
 void Validate(const Ais5 *msg, const int repeat_indicator, const int mmsi,
-              const int ais_version, const int imo_num, const string callsign,
-              const string name, const int type_and_cargo, const int dim_a,
+              const int ais_version, const int imo_num,
+              const std::string callsign,
+              const std::string name, const int type_and_cargo, const int dim_a,
               const int dim_b, const int dim_c, const int dim_d,
               const int fix_type, const int eta_month, const int eta_day,
               const int eta_hour, const int eta_minute, const float draught,
-              const string destination, const int dte, const int spare) {
+              const std::string destination, const int dte, const int spare) {
   ASSERT_NE(nullptr, msg);
   EXPECT_FALSE(msg->had_error());
 

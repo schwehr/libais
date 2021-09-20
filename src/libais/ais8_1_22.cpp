@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iomanip>
+#include <string>
 
 #include "ais.h"
 
@@ -228,7 +229,7 @@ Ais8_1_22_Polygon::Ais8_1_22_Polygon(const AisBitset &bits,
 
 Ais8_1_22_Text::Ais8_1_22_Text(const AisBitset &bits,
                                    const size_t offset) {
-  text = string(bits.ToString(offset, 84));
+  text = std::string(bits.ToString(offset, 84));
   // TODO(schwehr): spare?
 }
 

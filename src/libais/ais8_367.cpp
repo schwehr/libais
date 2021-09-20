@@ -6,6 +6,7 @@
 // http://www.e-navigation.nl/sites/default/files/asm_files/GN%20Release%20Version%201b.pdf
 
 #include <cmath>
+#include <string>
 
 #include "ais.h"
 
@@ -78,7 +79,7 @@ Ais8_367_22_Poly::Ais8_367_22_Poly(const AisBitset &bits, const size_t offset,
 }
 
 Ais8_367_22_Text::Ais8_367_22_Text(const AisBitset &bits, const size_t offset) {
-  text = string(bits.ToString(offset, 90));
+  text = std::string(bits.ToString(offset, 90));
   spare = bits.ToUnsignedInt(offset + 90, 3);
 }
 

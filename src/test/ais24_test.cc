@@ -1,6 +1,7 @@
 // Test parsing message 24 - Class B Static Data Report.
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -8,8 +9,8 @@
 namespace libais {
 namespace {
 
-std::unique_ptr<Ais24> Init(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais24> Init(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.
@@ -25,10 +26,10 @@ void Validate(
     const int repeat_indicator,
     const int mmsi,
     const int part_num,
-    const string name,
+    const std::string name,
     const int type_and_cargo,
-    const string vendor_id,
-    const string callsign,
+    const std::string vendor_id,
+    const std::string callsign,
     const int dim_a,
     const int dim_b,
     const int dim_c,

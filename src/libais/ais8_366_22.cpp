@@ -3,6 +3,7 @@
 // will be harmonized with the IMO Circ 289.
 
 #include <cmath>
+#include <string>
 
 #include "ais.h"
 
@@ -255,7 +256,7 @@ Ais8_366_22_Polygon::Ais8_366_22_Polygon(const AisBitset &bits,
 
 Ais8_366_22_Text::Ais8_366_22_Text(const AisBitset &bits,
                                    const size_t offset) {
-  text = string(bits.ToString(offset + 3, 84));
+  text = std::string(bits.ToString(offset + 3, 84));
   spare = bits.ToUnsignedInt(offset + 87, 3);
 }
 
