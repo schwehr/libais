@@ -1979,6 +1979,22 @@ class Ais8_367_22 : public Ais8 {
 };
 ostream& operator<< (ostream& o, Ais8_367_22 const& msg);
 
+// SSW Satellite Ship Weather 1-Slot Version
+// https://www.e-navigation.nl/content/satellite-ship-weather-small
+class Ais8_367_24 : public Ais8 {
+ public:
+  unsigned int version = 0;
+
+  unsigned int utc_hour = 0;
+  unsigned int utc_min = 0;
+
+  AisPoint position = {0.0, 0.0};  // 25, 24 bits
+  unsigned int pressure = 0;  // hPa
+
+  Ais8_367_24(const char *nmea_payload, const size_t pad);
+};
+ostream& operator<< (ostream &o, const Ais8_367_24 &msg);
+
 class Ais9 : public AisMsg {
  public:
   int alt;  // m above sea level
@@ -2432,23 +2448,6 @@ class Ais27 : public AisMsg {
   Ais27(const char *nmea_payload, const size_t pad);
 };
 ostream& operator<< (ostream &o, const Ais27 &msg);
-
-//
-// SSW Satellite Ship Weather 1-Slot Version
-class Ais8_367_24 : public Ais8 {
- public:
-  int version;
-
-  int utc_day;
-  int utc_hour;
-  int utc_min;
-
-  AisPoint position;  // 25, 24 bits
-  int pressure;  // hPa
-
-  Ais8_367_24(const char *nmea_payload, const size_t pad);
-};
-ostream& operator<< (ostream &o, const Ais8_367_24 &msg);
 
 }  // namespace libais
 
