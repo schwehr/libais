@@ -97,7 +97,8 @@ TEST(Ais8_367_22Test, DecodeSingleTest) {
 
   ASSERT_EQ(AIS8_366_22_SHAPE_TEXT, msg->sub_areas[0]->getType());
 
-  Ais8_367_22_Text *text = dynamic_cast<Ais8_367_22_Text *>(msg->sub_areas[0]);
+  Ais8_367_22_Text *text =
+    dynamic_cast<Ais8_367_22_Text *>(msg->sub_areas[0].get());
 
   EXPECT_EQ("USCG-TEST@@@@@@", text->text);
   EXPECT_EQ(0, text->spare);
@@ -114,7 +115,7 @@ TEST(Ais8_367_22Test, DecodeUscgWhaleBouyTest) {
   ASSERT_EQ(AIS8_366_22_SHAPE_CIRCLE, msg->sub_areas[0]->getType());
 
   Ais8_367_22_Circle *circle =
-      dynamic_cast<Ais8_367_22_Circle *>(msg->sub_areas[0]);
+      dynamic_cast<Ais8_367_22_Circle *>(msg->sub_areas[0].get());
   EXPECT_NEAR(-70.1184, circle->position.lng_deg, 0.0001);
   EXPECT_NEAR(42.3113, circle->position.lat_deg, 0.0001);
   EXPECT_EQ(2, circle->precision);
@@ -139,10 +140,10 @@ TEST(Ais8_367_22Test, PolylinesTest) {
   ASSERT_EQ(AIS8_366_22_SHAPE_POLYLINE, msg->sub_areas[1]->getType());
   ASSERT_EQ(AIS8_366_22_SHAPE_POLYLINE, msg->sub_areas[2]->getType());
 
-  ValidateCircle(msg->sub_areas[0], {-175.829, 59.3672}, 4, 0, 0);
-  ValidatePoly(msg->sub_areas[1], AIS8_366_22_SHAPE_POLYLINE,
+  ValidateCircle(msg->sub_areas[0].get(), {-175.829, 59.3672}, 4, 0, 0);
+  ValidatePoly(msg->sub_areas[1].get(), AIS8_366_22_SHAPE_POLYLINE,
                {225, 230, 265, 315}, {13000, 27300, 17400, 17200}, 0);
-  ValidatePoly(msg->sub_areas[2], AIS8_366_22_SHAPE_POLYLINE, {291, 263, 279},
+  ValidatePoly(msg->sub_areas[2].get(), AIS8_366_22_SHAPE_POLYLINE, {291, 263, 279},
                {19200, 24000, 24700}, 0);
 }
 
