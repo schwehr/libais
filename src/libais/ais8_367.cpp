@@ -8,6 +8,7 @@
 // https://www.e-navigation.nl/content/satellite-ship-weather-small
 
 #include <cmath>
+#include <string>
 
 #include "ais.h"
 
@@ -80,27 +81,28 @@ Ais8_367_22_Poly::Ais8_367_22_Poly(const AisBitset &bits, const size_t offset,
 }
 
 Ais8_367_22_Text::Ais8_367_22_Text(const AisBitset &bits, const size_t offset) {
-  text = string(bits.ToString(offset, 90));
+  text = std::string(bits.ToString(offset, 90));
   spare = bits.ToUnsignedInt(offset + 90, 3);
 }
 
-Ais8_367_22_SubArea *ais8_367_22_subarea_factory(const AisBitset &bits,
-                                                 const size_t offset) {
+std::unique_ptr<Ais8_367_22_SubArea>
+ais8_367_22_subarea_factory(const AisBitset &bits,
+                            const size_t offset) {
   const Ais8_366_22_AreaShapeEnum area_shape =
       static_cast<Ais8_366_22_AreaShapeEnum>(bits.ToUnsignedInt(offset, 3));
 
   switch (area_shape) {
     case AIS8_366_22_SHAPE_CIRCLE:
-      return new Ais8_367_22_Circle(bits, offset + 3);
+      return std::unique_ptr<Ais8_367_22_SubArea>(new Ais8_367_22_Circle(bits, offset + 3));
     case AIS8_366_22_SHAPE_RECT:
-      return new Ais8_367_22_Rect(bits, offset + 3);
+      return std::unique_ptr<Ais8_367_22_SubArea>(new Ais8_367_22_Rect(bits, offset + 3));
     case AIS8_366_22_SHAPE_SECTOR:
-      return new Ais8_367_22_Sector(bits, offset + 3);
+      return std::unique_ptr<Ais8_367_22_SubArea>(new Ais8_367_22_Sector(bits, offset + 3));
     case AIS8_366_22_SHAPE_POLYLINE:  // FALLTHROUGH
     case AIS8_366_22_SHAPE_POLYGON:
-      return new Ais8_367_22_Poly(bits, offset + 3, area_shape);
+      return std::unique_ptr<Ais8_367_22_SubArea>(new Ais8_367_22_Poly(bits, offset + 3, area_shape));
     case AIS8_366_22_SHAPE_TEXT:
-      return new Ais8_367_22_Text(bits, offset + 3);
+      return std::unique_ptr<Ais8_367_22_SubArea>(new Ais8_367_22_Text(bits, offset + 3));
     case AIS8_366_22_SHAPE_RESERVED_6:  // FALLTHROUGH
     case AIS8_366_22_SHAPE_RESERVED_7:  // FALLTHROUGH
       // Leave area as 0 to indicate error.
@@ -149,9 +151,9 @@ Ais8_367_22::Ais8_367_22(const char *nmea_payload, const size_t pad)
 
   for (int area_idx = 0; area_idx < num_sub_areas; area_idx++) {
     const size_t start = 120 + area_idx * SUB_AREA_BITS;
-    Ais8_367_22_SubArea *area = ais8_367_22_subarea_factory(bits, start);
+    std::unique_ptr<Ais8_367_22_SubArea> area = ais8_367_22_subarea_factory(bits, start);
     if (area != nullptr) {
-      sub_areas.push_back(area);
+      sub_areas.push_back(std::move(area));
     } else {
       status = AIS_ERR_BAD_SUB_SUB_MSG;
       return;
@@ -209,6 +211,5 @@ Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
 ostream& operator<< (ostream &o, const Ais8_367_24 &msg) {
   return o << msg.mmsi << ": " << msg.version << ": " << msg.utc_hour << ": " << msg.utc_min << ": " << msg.pressure;
 }
-
 
 }  // namespace libais

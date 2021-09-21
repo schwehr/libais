@@ -41,34 +41,34 @@ using std::unique_ptr;
 
 namespace libais {
 
-uint8_t Checksum(const string &line) {
+uint8_t Checksum(const std::string &line) {
   return std::accumulate(line.begin(), line.end(), 0, std::bit_xor<uint8_t>());
 }
 
-string ToHex2(int32_t val) {
+std::string ToHex2(int32_t val) {
   std::ostringstream out;
   out << std::hex << std::setfill('0') << std::setw(2) << val;
   return out.str();
 }
 
-string ChecksumHexString(const string &base) {
-  string checksum = ToHex2(Checksum(base));
+std::string ChecksumHexString(const std::string &base) {
+  std::string checksum = ToHex2(Checksum(base));
   std::transform(checksum.begin(), checksum.end(), checksum.begin(), ::toupper);
   return checksum;
 }
 
-vector<string> Split(const string &line, char delim) {
+vector<string> Split(const std::string &line, char delim) {
   vector<string> result;
   std::stringstream ss(line);
   while (!ss.eof()) {
-    string next;
+    std::string next;
     std::getline(ss, next, delim);
     result.push_back(next);
   }
   return result;
 }
 
-bool ValidateChecksum(const string &line) {
+bool ValidateChecksum(const std::string &line) {
   vector<string> fields = Split(line, '*');
 
   if (fields.size() != 2 || fields[1].size() != 2) {
@@ -76,7 +76,7 @@ bool ValidateChecksum(const string &line) {
   }
 
   try {
-    const string checksum_str(fields[1]);
+    const std::string checksum_str(fields[1]);
     int32_t checksum = std::stoi(checksum_str, nullptr, 16);
 
     int32_t checksum_calculated = Checksum(line.substr(1, line.size() - 4));
@@ -90,13 +90,13 @@ bool ValidateChecksum(const string &line) {
   return true;
 }
 
-string ReportErrorLine(const string &msg, const string &line,
-                       int64_t line_number) {
+std::string ReportErrorLine(const std::string &msg, const std::string &line,
+                            int64_t line_number) {
   return "Error on line:" + std::to_string(line_number) + ": " + msg + "\n  " +
          line;
 }
 
-bool GetSentenceSequenceNumbers(const string & /* line */,
+bool GetSentenceSequenceNumbers(const std::string & /* line */,
                                 const int64_t /* line_number */,
                                 const vector<string> &fields,
                                 int32_t *sentence_total,
@@ -157,7 +157,7 @@ std::unique_ptr<T> MakeUnique(Args &&... args) {
 }
 
 // static
-unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
+unique_ptr<NmeaSentence> NmeaSentence::Create(const std::string &line,
                                               int64_t line_number) {
   if (line.size() < 9 || line[0] != '!') {
     return nullptr;
@@ -177,8 +177,8 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
     return nullptr;
   }
 
-  const string talker(fields[0].substr(1, 2));
-  const string sentence_type(fields[0].substr(3));
+  const std::string talker(fields[0].substr(1, 2));
+  const std::string sentence_type(fields[0].substr(3));
 
   int32_t sentence_total;
   int32_t sentence_number;
@@ -213,7 +213,7 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const string &line,
 }
 
 // TODO(schwehr): Is if faster to just use string.append?
-string Join(const vector<string> &parts, char delim) {
+std::string Join(const vector<std::string> &parts, char delim) {
   ostringstream out;
   for (const auto &part : parts) {
     if (&part != &parts[0]) {
@@ -243,7 +243,7 @@ unique_ptr<NmeaSentence> NmeaSentence::Merge(
     }
   }
 
-  string body;
+  std::string body;
   for (const auto &sentence : prior_sentences) {
     body.append(sentence->body());
   }
@@ -254,13 +254,13 @@ unique_ptr<NmeaSentence> NmeaSentence::Merge(
                                   line_number_);
 }
 
-string NmeaSentence::ToString() const {
-  string channel;
+std::string NmeaSentence::ToString() const {
+  std::string channel;
   channel += channel_;
-  string sequence((sequence_number_ != -1) ? std::to_string(sequence_number_)
-                                           : "");
+  std::string sequence(
+      (sequence_number_ != -1) ? std::to_string(sequence_number_) : "");
 
-  string result = "";
+  std::string result = "";
   result.append(talker_ + sentence_type_);
   result.append(",");
   result.append(std::to_string(sentence_total_));
@@ -274,13 +274,13 @@ string NmeaSentence::ToString() const {
   result.append(body_);
   result.append(",");
   result.append(std::to_string(fill_bits_));
-  string checksum_str = ChecksumHexString(result);
+  std::string checksum_str = ChecksumHexString(result);
   result.append("*");
   result.append(checksum_str);
   return "!" + result;
 }
 
-string NmeaSentence::ToMd5Digest() const {
+std::string NmeaSentence::ToMd5Digest() const {
   // TODO(schwehr): md5 digest.
   return "";
 }
@@ -307,7 +307,7 @@ bool NmeaSentence::VerifyInSameMessage(const NmeaSentence &sentence) const {
   return true;
 }
 
-bool VdmStream::AddLine(const string &line) {
+bool VdmStream::AddLine(const std::string &line) {
   line_number_++;
   auto sentence = NmeaSentence::Create(line, line_number_);
   if (sentence == nullptr) {

@@ -1,6 +1,7 @@
 // Test parsing AIS 6 address binary messages.
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -72,7 +73,7 @@ TEST(Ais6_0_0Test, DecodeAnything3) {
 }
 
 void ValidateAis6_1_0(const Ais6_1_0 *msg, const bool ack_required,
-                      const int msg_seq, const string &text, const int spare2) {
+                      const int msg_seq, const std::string &text, const int spare2) {
   ASSERT_NE(nullptr, msg);
   EXPECT_EQ(ack_required, msg->ack_required);
   EXPECT_EQ(msg_seq, msg->msg_seq);

@@ -14,17 +14,18 @@
 using std::stringstream;
 
 // http://stackoverflow.com/questions/236129/c-how-to-split-a-string
-vector<string> &split(const string &s, char delim, vector<string> &elems) {
+vector<std::string> &split(
+    const std::string &s, char delim, vector<std::string> &elems) {
   stringstream ss(s);
-  string item;
+  std::string item;
   while (std::getline(ss, item, delim)) {
     elems.push_back(item);
   }
   return elems;
 }
 
-vector<string> split(const string &s, char delim) {
-  vector<string> elems;
+vector<std::string> split(const std::string &s, char delim) {
+  vector<std::string> elems;
   return split(s, delim, elems);
 }
 
@@ -38,13 +39,13 @@ int main(int argc,  char* argv[]) {
   }
 
   int i = 0;
-  string line;
+  std::string line;
   while (!infile.eof()) {
     i++;
     getline(infile, line);  // G++ problem with this and a string
     if (line.size() < 20) {continue;}
     if ('!' != line[0]  ||  'A' != line[1] ) {continue;}
-    string line_str(line);
+    std::string line_str(line);
     vector<string> fields = split(line_str, ',');
     {
       if (fields.size() < 7) continue;

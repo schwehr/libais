@@ -3,6 +3,7 @@
 // will be harmonized with the IMO Circ 289.
 
 #include <cmath>
+#include <string>
 
 #include "ais.h"
 
@@ -169,10 +170,10 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad)
 
   const int num_sub_areas = static_cast<int>(floor((num_bits - 111)/90.));
   for (int area_idx = 0; area_idx < num_sub_areas; area_idx++) {
-    Ais8_366_22_SubArea *area =
+    std::unique_ptr<Ais8_366_22_SubArea> area =
         ais8_366_22_subarea_factory(bits, 111 + 90*area_idx);
     if (area) {
-      sub_areas.push_back(area);
+      sub_areas.push_back(std::move(area));
     } else {
       status = AIS_ERR_BAD_SUB_SUB_MSG;
       return;
@@ -181,16 +182,6 @@ Ais8_366_22::Ais8_366_22(const char *nmea_payload, const size_t pad)
 
   assert(bits.GetRemaining() == 0);
   status = AIS_OK;
-}
-
-Ais8_366_22::~Ais8_366_22() {
-  // Switch to unique_ptr.
-  for (size_t i = 0; i < sub_areas.size(); i++) {
-    delete sub_areas[i];
-#ifndef NDEBUG
-    sub_areas[i] = NULL;
-#endif
-  }
 }
 
 // Lookup table for the scale factors to decode the length / distance fields.
@@ -265,12 +256,12 @@ Ais8_366_22_Polygon::Ais8_366_22_Polygon(const AisBitset &bits,
 
 Ais8_366_22_Text::Ais8_366_22_Text(const AisBitset &bits,
                                    const size_t offset) {
-  text = string(bits.ToString(offset + 3, 84));
+  text = std::string(bits.ToString(offset + 3, 84));
   spare = bits.ToUnsignedInt(offset + 87, 3);
 }
 
 // Call the appropriate constructor
-Ais8_366_22_SubArea *
+std::unique_ptr<Ais8_366_22_SubArea>
 ais8_366_22_subarea_factory(const AisBitset &bits,
                             const size_t offset) {
   const Ais8_366_22_AreaShapeEnum area_shape =
@@ -278,17 +269,17 @@ ais8_366_22_subarea_factory(const AisBitset &bits,
 
   switch (area_shape) {
   case AIS8_366_22_SHAPE_CIRCLE:
-    return new Ais8_366_22_Circle(bits, offset);
+    return std::unique_ptr<Ais8_366_22_SubArea>(new Ais8_366_22_Circle(bits, offset));
   case AIS8_366_22_SHAPE_RECT:
-    return new Ais8_366_22_Rect(bits, offset);
+    return std::unique_ptr<Ais8_366_22_SubArea>(new Ais8_366_22_Rect(bits, offset));
   case AIS8_366_22_SHAPE_SECTOR:
-    return new Ais8_366_22_Sector(bits, offset);
+    return std::unique_ptr<Ais8_366_22_SubArea>(new Ais8_366_22_Sector(bits, offset));
   case AIS8_366_22_SHAPE_POLYLINE:
-    return new Ais8_366_22_Polyline(bits, offset);
+    return std::unique_ptr<Ais8_366_22_SubArea>(new Ais8_366_22_Polyline(bits, offset));
   case AIS8_366_22_SHAPE_POLYGON:
-    return new Ais8_366_22_Polygon(bits, offset);
+    return std::unique_ptr<Ais8_366_22_SubArea>(new Ais8_366_22_Polygon(bits, offset));
   case AIS8_366_22_SHAPE_TEXT:
-    return new Ais8_366_22_Text(bits, offset);
+    return std::unique_ptr<Ais8_366_22_SubArea>(new Ais8_366_22_Text(bits, offset));
   case AIS8_366_22_SHAPE_RESERVED_6:  // FALLTHROUGH
   case AIS8_366_22_SHAPE_RESERVED_7:  // FALLTHROUGH
     // Leave area as 0 to indicate error
@@ -298,7 +289,7 @@ ais8_366_22_subarea_factory(const AisBitset &bits,
   default:
     assert(false);
   }
-  return nullptr;
+  return {};
 }
 
 }  // namespace libais

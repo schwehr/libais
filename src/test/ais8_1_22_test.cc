@@ -1,6 +1,7 @@
 // Test parsing 8:1:22.
 
 #include <memory>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "ais.h"
@@ -8,8 +9,8 @@
 namespace libais {
 namespace {
 
-std::unique_ptr<Ais8_1_22> Init(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais8_1_22> Init(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.
@@ -65,7 +66,7 @@ TEST(Ais8_1_22Test, CircleAndTextForMarineMammals) {
   EXPECT_EQ(AIS8_1_22_SHAPE_TEXT, msg->sub_areas[1]->getType());
 
   Ais8_1_22_Circle *circle =
-      dynamic_cast<Ais8_1_22_Circle *>(msg->sub_areas[0]);
+      dynamic_cast<Ais8_1_22_Circle *>(msg->sub_areas[0].get());
 
   EXPECT_FLOAT_EQ(-70.22429656982422, circle->position.lng_deg);
   EXPECT_FLOAT_EQ(42.105865478515625, circle->position.lat_deg);
@@ -73,7 +74,8 @@ TEST(Ais8_1_22Test, CircleAndTextForMarineMammals) {
   EXPECT_EQ(14810, circle->radius_m);
   EXPECT_EQ(0, circle->spare);
 
-  Ais8_1_22_Text *text = dynamic_cast<Ais8_1_22_Text *>(msg->sub_areas[1]);
+  Ais8_1_22_Text *text =
+      dynamic_cast<Ais8_1_22_Text *>(msg->sub_areas[1].get());
 
   EXPECT_STREQ("NOAA RW SGHTNG", text->text.c_str());
 }
@@ -116,14 +118,14 @@ TEST(Ais8_1_22Test, NoaaDMA) {
 
   ASSERT_EQ(AIS8_1_22_SHAPE_CIRCLE, msg.sub_areas[0]->getType());
   Ais8_1_22_Circle* sub_area0 =
-    dynamic_cast<Ais8_1_22_Circle *>(msg.sub_areas[0]);
+      dynamic_cast<Ais8_1_22_Circle *>(msg.sub_areas[0].get());
   EXPECT_EQ(0, sub_area0->radius_m);
   EXPECT_DOUBLE_EQ(-70.408216666666661, sub_area0->position.lng_deg);
   EXPECT_DOUBLE_EQ(40.02495, sub_area0->position.lat_deg);
 
   ASSERT_EQ(AIS8_1_22_SHAPE_POLYGON, msg.sub_areas[1]->getType());
   Ais8_1_22_Polygon* sub_area1 =
-    dynamic_cast<Ais8_1_22_Polygon *>(msg.sub_areas[1]);
+      dynamic_cast<Ais8_1_22_Polygon *>(msg.sub_areas[1].get());
   EXPECT_DOUBLE_EQ(103000.0, sub_area1->dists_m[0]);
   EXPECT_DOUBLE_EQ(114000.0, sub_area1->dists_m[1]);
   EXPECT_DOUBLE_EQ(101000.0, sub_area1->dists_m[2]);
@@ -134,7 +136,8 @@ TEST(Ais8_1_22Test, NoaaDMA) {
   EXPECT_DOUBLE_EQ(540.0, sub_area1->angles[2]);
 
   ASSERT_EQ(AIS8_1_22_SHAPE_TEXT, msg.sub_areas[2]->getType());
-  Ais8_1_22_Text* sub_area2 = dynamic_cast<Ais8_1_22_Text*>(msg.sub_areas[2]);
+  Ais8_1_22_Text* sub_area2 =
+      dynamic_cast<Ais8_1_22_Text*>(msg.sub_areas[2].get());
   EXPECT_EQ("NOAA RW DMA   ", sub_area2->text);
 }
 
