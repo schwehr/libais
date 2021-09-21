@@ -194,8 +194,15 @@ Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
   position = bits.ToAisPoint(70, 49);
   pressure = bits.ToUnsignedInt(119, 9) + 799;  // hPa
 
-  // NOTE: If message comes in at 144, then there will be 16 bits remaining.
-  // assert(bits.GetRemaining() == 0);
+  // NOTE: If message was 144 bits, then there will be 16 bits remaining.
+  if (num_bits == 144) {
+    int extra_padding = bits.ToUnsignedInt(128, 16);
+    if (extra_padding != 0) {
+      return;
+    }
+  }
+
+  assert(bits.GetRemaining() == 0);
   status = AIS_OK;
 }
 
