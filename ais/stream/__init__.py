@@ -73,7 +73,7 @@ class DifferingTimestampsError(StreamError):
     return '%(description)s for %(timestamp)s: %(line_num)s: %(line)s, parts: %(parts)s' % self.kw
 
 class OnlyMessageEndError(StreamError):
-  description = 'Do not have the preceeding packets for'
+  description = 'Do not have the preceding packets for'
 
   def __str__(self):
     return '%(description)s for %(bufferSlot)s:\n%(line)s\n' % self.kw

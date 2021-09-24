@@ -10,7 +10,7 @@ Changelog and release history for libais
 * Cleanup nmea_messages.py
 * Use a logger in python
 * Factor out ais_bitset.cpp
-* Stop calling ParseNmeaPayload mulitple times per message
+* Stop calling ParseNmeaPayload multiple times per message
 * Stay far away from -ffast-math
 * Fixes for CMake builds
 
@@ -99,11 +99,11 @@ Changelog and release history for libais
 * Begin cleanup of test_libais.cpp
 * Almost all decoders require pad bits now
 * linted - lots of formatting changes
-* Start implmenting Msg 17 GNSS differential corrections
+* Start implementing Msg 17 GNSS differential corrections
 * Convert FIX to TODO and put (schwehr) after each to assign them to myself.
 * remove bool casting of bitset[offset]
 * Implemented 8 1 26
-* Clean up c++ logical oprators.  Do not use and, or, and not
+* Clean up c++ logical operators.  Do not use and, or, and not
 * Message 24 needed pad.  Fixed
 * Removed print()
 * remove almost all cout/cerr that were not in print()
@@ -116,8 +116,8 @@ Changelog and release history for libais
 
 * ais.decode now requires the pad bits in python
 * Added RIS 8_200_{10,23,24,40,55}
-* Implmented the rest of Circ 236 BBM
-* Implmented all Circ 289 messages except ABM route and BBM env sensors
+* Implemented the rest of Circ 236 BBM
+* Implemented all Circ 289 messages except ABM route and BBM env sensors
 * Implemented AIS messages 6, 9, 10, 12, 15-17, 20-22, 23, 25-27. Still payload work to do.
 * Imported rolker's CMakeList.txt
 

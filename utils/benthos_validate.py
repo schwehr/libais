@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 
-
 """
 Validator to ensure libais can produce Benthos's expected input
 """
-
 
 import json
 import os
 import unittest
 import sys
-
 
 # In order to ease test maintenance as outputs and inputs change the data structure below contains a test for every
 # field, a value that will pass the test, and a value that will fail the test.  All information is pulled from GPSD
@@ -195,7 +192,7 @@ MSG_VALIDATION_LOOKUP = {
         'bad': 2 * 2
     },
     'dte': {
-        'test': lambda x: isinstance(x, int) and not isinstance(x, bool) and x in (0, 1),  # TODO: Switch to a more Pythonic bool if this is actually bolean and not a status
+        'test': lambda x: isinstance(x, int) and not isinstance(x, bool) and x in (0, 1),  # TODO: Switch to a more Pythonic bool if this is actually boolean and not a status
         'good': 0,
         'bad': 8
     },
