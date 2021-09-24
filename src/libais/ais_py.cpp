@@ -37,7 +37,7 @@ enum AIS_FI {
   AIS_FI_6_200_21_RIS_VTS_ETA = 21,
   AIS_FI_6_200_22_RIS_VTS_RTA = 22,
   AIS_FI_6_200_55_RIS_VTS_SAR = 55,
-
+  AIS_FI_6_235_10_ATON_MONITORING_DATA = 10,
   AIS_FI_8_1_0_TEXT = 0,
   AIS_FI_8_1_11_MET_HYDRO = 11,
   AIS_FI_8_1_13_FAIRWAY_CLOSED = 13,
@@ -679,6 +679,30 @@ ais6_1_40_append_pydict(const char *nmea_payload, PyObject *dict,
   return AIS_OK;
 }
 
+AIS_STATUS
+ais6_235_10_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
+  assert(nmea_payload);
+  assert(dict);
+  assert(pad < 6);
+  Ais6_235_10 msg(nmea_payload, pad);
+  if (msg.had_error()) {
+    return msg.get_error();
+  }
+
+  DictSafeSetItem(dict, "ana_int", msg.ana_int);
+  DictSafeSetItem(dict, "ana_ext1", msg.ana_ext1);
+  DictSafeSetItem(dict, "ana_ext2", msg.ana_ext2);
+  DictSafeSetItem(dict, "racon", msg.racon);
+  DictSafeSetItem(dict, "light", msg.light);
+  DictSafeSetItem(dict, "health", msg.health);
+  DictSafeSetItem(dict, "stat_ext", msg.stat_ext);
+  DictSafeSetItem(dict, "off_pos", msg.off_pos);
+  DictSafeSetItem(dict, "spare2", msg.spare2);
+
+  return AIS_OK;
+}
+
 PyObject*
 ais6_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
@@ -751,10 +775,19 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
       DictSafeSetItem(dict, "not_parsed", true);
     }
     break;
-
+  case AIS_DAC_235_UNITED_KINGDOM_OF_GREAT_BRITAIN_AND_NORTHERN_IRELAND:  // IMO.
+    switch (msg.fi) {
+    case AIS_FI_6_235_10_ATON_MONITORING_DATA:  //  IALA-A126.
+      status = ais6_235_10_append_pydict(nmea_payload, dict, pad);
+      break;
     default:
       // TODO(schwehr): Raise an exception?
       DictSafeSetItem(dict, "not_parsed", true);
+    }  
+    break;
+  default:
+    // TODO(schwehr): Raise an exception?
+    DictSafeSetItem(dict, "not_parsed", true);
   }
 
   if (status != AIS_OK) {

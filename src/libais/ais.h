@@ -852,6 +852,23 @@ class Ais6_1_40 : public Ais6 {
 };
 ostream& operator<< (ostream &o, const Ais6_1_40 &msg);
 
+// Number of persons on board.  ITU 1371-1
+class Ais6_235_10 : public Ais6 {
+ public:
+  float ana_int;
+  float ana_ext1;
+  float ana_ext2;
+  int racon;
+  int light;
+  bool health;
+  int stat_ext;
+  bool off_pos;
+  int spare2;
+
+  Ais6_235_10(const char *nmea_payload, const size_t pad);
+};
+ostream& operator<< (ostream &o, const Ais6_235_10 &msg);
+
 //////////////////////////////////////////////////////////////////////
 
 // 7 and 13 are ACKs for msg 6 and 12
