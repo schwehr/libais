@@ -57,8 +57,8 @@ std::string ChecksumHexString(const std::string &base) {
   return checksum;
 }
 
-vector<string> Split(const std::string &line, char delim) {
-  vector<string> result;
+vector<std::string> Split(const std::string &line, char delim) {
+  vector<std::string> result;
   std::stringstream ss(line);
   while (!ss.eof()) {
     std::string next;
@@ -69,7 +69,7 @@ vector<string> Split(const std::string &line, char delim) {
 }
 
 bool ValidateChecksum(const std::string &line) {
-  vector<string> fields = Split(line, '*');
+  vector<std::string> fields = Split(line, '*');
 
   if (fields.size() != 2 || fields[1].size() != 2) {
     return false;
@@ -98,7 +98,7 @@ std::string ReportErrorLine(const std::string &msg, const std::string &line,
 
 bool GetSentenceSequenceNumbers(const std::string & /* line */,
                                 const int64_t /* line_number */,
-                                const vector<string> &fields,
+                                const vector<std::string> &fields,
                                 int32_t *sentence_total,
                                 int32_t *sentence_number,
                                 int32_t *sequence_number, char *channel) {
@@ -163,7 +163,7 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const std::string &line,
     return nullptr;
   }
 
-  vector<string> fields = Split(line, ',');
+  vector<std::string> fields = Split(line, ',');
   if (fields.size() != 7) {
     return nullptr;
   }
