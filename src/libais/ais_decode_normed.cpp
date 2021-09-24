@@ -46,7 +46,7 @@ int main(int argc,  char* argv[]) {
     if (line.size() < 20) {continue;}
     if ('!' != line[0]  ||  'A' != line[1] ) {continue;}
     std::string line_str(line);
-    vector<string> fields = split(line_str, ',');
+    vector<std::string> fields = split(line_str, ',');
     {
       if (fields.size() < 7) continue;
       if (fields[5].size() < 5) continue;
