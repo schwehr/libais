@@ -77,7 +77,7 @@ import ais.nmea_queue
 
 def open(name, mode='r', **kwargs):
   """Open a file containing NMEA and instantiate an instance of `NmeaFile()`.
-  Lke Python's `open()`, set the `mode` parameter to 'r' for normal reading or
+  Like Python's `open()`, set the `mode` parameter to 'r' for normal reading or
   or 'rU' for opening the file in universal newline mode.
 
   Args:
@@ -136,8 +136,8 @@ class NmeaFile(object):
     return self._fobj.name
 
   def close(self):
-    """Close the file-like object from which we are reading and dump whats left
-    in the queue."""
+    """Close the file-like object from which we are reading and dump what is
+    left in the queue."""
     return self._fobj.close()
 
   def __iter__(self):

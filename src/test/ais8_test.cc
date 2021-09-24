@@ -78,7 +78,7 @@ void ValidateAis8_1_11(
   EXPECT_EQ(extended_water_level, msg->extended_water_level);
 }
 
-// Internation Maritime Organization (IMO) Circ 289 meteorology and hydrography.
+// International Maritime Organization (IMO) Circ 289 meteorology and hydrography.
 TEST(Ais8_1_11Test, DecodeAnything) {
   // clang-format off
   // !AIVDM,1,1,,A,8@2<HV@0BkLN:0frqMPaQPtBRRIrwwejwwwwwwwwwwwwwwwwwwwwwwwwwt0,2*34  // NOLINT

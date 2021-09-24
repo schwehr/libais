@@ -2547,7 +2547,7 @@ ais21_to_pydict(const char *nmea_payload, const size_t pad) {
   return dict;
 }
 
-// 22 - 'F' - Channel mangement
+// 22 - 'F' - Channel management
 PyObject*
 ais22_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);

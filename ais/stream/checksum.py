@@ -12,7 +12,7 @@ def checksumStr(data):
     """Take a NMEA 0183 string and compute the checksum.
     @param data: NMEA message.  Leading ?/! and training checksum are optional
     @type data: str
-    @return: hexidecimal value
+    @return: hexadecimal value
     @rtype: str
 
     Checksum is calculated by xor'ing everything between ? or ! and the *
