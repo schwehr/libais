@@ -674,19 +674,19 @@ top_level = [
   },
 
 {
-    'nmea': ['!SAVDM,1,1,3,A,85Mr6<1Kn15CGvG@C4r<o000,0*34'],
+    'nmea': ['!SAVDM,1,1,0,A,85Oqf`1Kn1Sk:Gj:>uosTP,4*5E'],
     'result': {'id': 8,
                'repeat_indicator': 0,
-               'mmsi': 366904880,
+               'mmsi': 368996000,
                'spare': 0,
                'dac': 367,
                'fi': 24,
                'version': 0,
-               'utc_hour': 17,
-               'utc_min': 20,
-               'x': -87.4372,
-               'y': 41.6737,
-               'pressure': 1019}
+               'utc_hour': None,
+               'utc_min': None,
+               'x': -117.15298333333334,
+               'y': 32.69541666666667,
+               'pressure': 1201}
   },
 
 ]

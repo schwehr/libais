@@ -165,14 +165,6 @@ Ais8_367_22::Ais8_367_22(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-Ais8_367_22::~Ais8_367_22() {
-  // Switch to unique_ptr.
-  for (size_t i = 0; i < sub_areas.size(); i++) {
-    delete sub_areas[i];
-    sub_areas[i] = nullptr;
-  }
-}
-
 // SSW FI24 Satellite Ship Weather Small - Less than 1-Slot Version
 Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
     : Ais8(nmea_payload, pad) {
@@ -183,7 +175,7 @@ Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  if ((num_bits != 128) && (num_bits != 144)) {
+  if (num_bits != 128) {
     status = AIS_ERR_BAD_BIT_COUNT;
     return;
   }
@@ -195,14 +187,6 @@ Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
   utc_min = bits.ToUnsignedInt(64, 6);
   position = bits.ToAisPoint(70, 49);
   pressure = bits.ToUnsignedInt(119, 9) + 799;  // hPa
-
-  // NOTE: If message was 144 bits, then there will be 16 bits remaining.
-  if (num_bits == 144) {
-    int extra_padding = bits.ToUnsignedInt(128, 16);
-    if (extra_padding != 0) {
-      return;
-    }
-  }
 
   assert(bits.GetRemaining() == 0);
   status = AIS_OK;
