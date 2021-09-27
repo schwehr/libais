@@ -4,6 +4,8 @@
 //
 // http://www.e-navigation.nl/content/geographic-notice
 // http://www.e-navigation.nl/sites/default/files/asm_files/GN%20Release%20Version%201b.pdf
+// 8:367:24
+// https://www.e-navigation.nl/content/satellite-ship-weather-small
 
 #include <cmath>
 #include <string>
@@ -161,6 +163,37 @@ Ais8_367_22::Ais8_367_22(const char *nmea_payload, const size_t pad)
   // TODO(schwehr): Save the spare bits at the end of the message.
   assert(bits.GetRemaining() < 6);
   status = AIS_OK;
+}
+
+// SSW FI24 Satellite Ship Weather Small - Less than 1-Slot Version
+Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
+  assert(dac == 367);
+  assert(fi == 24);
+
+  if (!CheckStatus()) {
+    return;
+  }
+
+  if (num_bits != 128) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  bits.SeekTo(56);
+
+  version = bits.ToUnsignedInt(56, 3);
+  utc_hour = bits.ToUnsignedInt(59, 5);
+  utc_min = bits.ToUnsignedInt(64, 6);
+  position = bits.ToAisPoint(70, 49);
+  pressure = bits.ToUnsignedInt(119, 9) + 799;  // hPa
+
+  assert(bits.GetRemaining() == 0);
+  status = AIS_OK;
+}
+
+ostream& operator<< (ostream &o, const Ais8_367_24 &msg) {
+  return o << msg.mmsi << ": " << msg.version << ": " << msg.utc_hour << ": " << msg.utc_min << ": " << msg.pressure;
 }
 
 }  // namespace libais

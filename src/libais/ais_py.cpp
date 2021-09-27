@@ -62,6 +62,7 @@ enum AIS_FI {
   AIS_FI_8_200_55_RIS_PERSONS_ON_BOARD = 50,
   AIS_FI_8_366_22_AREA_NOTICE = 22,  // USCG.
   AIS_FI_8_367_22_AREA_NOTICE = 22,  // USCG.
+  AIS_FI_8_367_24_SSW_SMALL = 24,  // USCG Satellite Ship Weather Small
 };
 
 void
@@ -2001,6 +2002,43 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
   Py_DECREF(sub_area_list);
 }
 
+AIS_STATUS
+ais8_367_24_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
+  assert(nmea_payload);
+  assert(dict);
+  assert(pad < 6);
+  Ais8_367_24 msg(nmea_payload, pad);
+  if (msg.had_error()) {
+    return msg.get_error();
+  }
+
+  DictSafeSetItem(dict, "version", msg.version);
+
+  if (msg.utc_hour <= 23) {
+    DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
+  } else {
+    DictSafeSetItem(dict, "utc_hour", Py_None);
+  }
+
+  if (msg.utc_min <= 59) {
+    DictSafeSetItem(dict, "utc_min", msg.utc_min);
+  } else {
+    DictSafeSetItem(dict, "utc_min", Py_None);
+  }
+
+  DictSafeSetItem(dict, "x", "y", msg.position);
+
+  if (msg.pressure <= (403 + 799)) {
+    DictSafeSetItem(dict, "pressure", msg.pressure);
+  } else {
+    // Raw value was 403 (N/A), or reserved value.
+    DictSafeSetItem(dict, "pressure", Py_None);
+  }
+
+  return AIS_OK;
+}
+
 // AIS Binary broadcast messages.  There will be a huge number of subtypes
 // If we don't know how to decode it, just return the dac, fi
 PyObject*
@@ -2118,6 +2156,9 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     switch (msg.fi) {
     case 22:  // USCG Area Notice 2012 (v5?).
       ais8_367_22_append_pydict(nmea_payload, dict, pad);
+      break;
+    case AIS_FI_8_367_24_SSW_SMALL:
+      status = ais8_367_24_append_pydict(nmea_payload, dict, pad);
       break;
     default:
       DictSafeSetItem(dict, "parsed", false);

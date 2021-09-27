@@ -673,4 +673,20 @@ top_level = [
              'y': -2.5533333333333332}
   },
 
+{
+    'nmea': ['!SAVDM,1,1,0,A,85Oqf`1Kn1Sk:Gj:>uosTP,4*5E'],
+    'result': {'id': 8,
+               'repeat_indicator': 0,
+               'mmsi': 368996000,
+               'spare': 0,
+               'dac': 367,
+               'fi': 24,
+               'version': 0,
+               'utc_hour': None,
+               'utc_min': None,
+               'x': -117.15298333333334,
+               'y': 32.69541666666667,
+               'pressure': 1201}
+  },
+
 ]

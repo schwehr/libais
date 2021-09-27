@@ -629,5 +629,4 @@ Ais8_1_31::Ais8_1_31(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-
 }  // namespace libais
