@@ -673,7 +673,28 @@ top_level = [
              'y': -2.5533333333333332}
   },
 
-{
+  {
+    'nmea': ['!SAVDM,1,1,1,A,85MrbQ1KmhB:nsE=HSaKIdRv<824,0*54'],
+    'result': {'id': 8,
+               'repeat_indicator': 0,
+               'mmsi': 366914180,
+               'spare': 0,
+               'dac': 367,
+               'fi': 23,
+               'version': 0,
+               'utc_day': 4,
+               'utc_hour': 17,
+               'utc_min': 22,
+               'x': -75.00443333333334,
+               'y': 38.936366666666665,
+               'pressure': 1016,
+               'air_temp': 19.0,
+               'wind_speed': 24,
+               'wind_gust': 32,
+               'wind_dir': 66}
+  },
+
+  {
     'nmea': ['!SAVDM,1,1,0,A,85Oqf`1Kn1Sk:Gj:>uosTP,4*5E'],
     'result': {'id': 8,
                'repeat_indicator': 0,

@@ -4,6 +4,9 @@
 //
 // http://www.e-navigation.nl/content/geographic-notice
 // http://www.e-navigation.nl/sites/default/files/asm_files/GN%20Release%20Version%201b.pdf
+//
+// 8:367:23
+// https://www.e-navigation.nl/content/satellite-ship-weather
 // 8:367:24
 // https://www.e-navigation.nl/content/satellite-ship-weather-small
 
@@ -163,6 +166,45 @@ Ais8_367_22::Ais8_367_22(const char *nmea_payload, const size_t pad)
   // TODO(schwehr): Save the spare bits at the end of the message.
   assert(bits.GetRemaining() < 6);
   status = AIS_OK;
+}
+
+// SSW FI23 Satellite Ship Weather 1-Slot Version
+Ais8_367_23::Ais8_367_23(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
+  assert(dac == 367);
+  assert(fi == 23);
+
+  if (!CheckStatus()) {
+    return;
+  }
+
+  if (num_bits != 168) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  bits.SeekTo(56);
+
+  version = bits.ToUnsignedInt(56, 3);
+  utc_day = bits.ToUnsignedInt(59, 5);
+  utc_hour = bits.ToUnsignedInt(64, 5);
+  utc_min = bits.ToUnsignedInt(69, 6);
+  position = bits.ToAisPoint(75, 49);
+  pressure = bits.ToUnsignedInt(124, 9) + 799;  // hPa
+  air_temp_raw = bits.ToInt(133, 11);
+  air_temp = air_temp_raw / 10.;  // C
+  wind_speed = bits.ToUnsignedInt(144, 7);  // ave knots
+  wind_gust = bits.ToUnsignedInt(151, 7);  // ave knots
+  wind_dir = bits.ToUnsignedInt(158, 9);
+
+  spare2 = bits.ToUnsignedInt(167, 1);
+
+  assert(bits.GetRemaining() == 0);
+  status = AIS_OK;
+}
+
+ostream& operator<< (ostream &o, const Ais8_367_23 &msg) {
+  return o << msg.mmsi << ": " << msg.version << ": " << msg.utc_day << ": " << msg.utc_hour << ": " << msg.utc_min << ": " << msg.position << ": " << msg.pressure << ": " << msg.air_temp << ": " << msg.wind_speed << ": " << msg.wind_gust << ": " << msg.wind_dir;
 }
 
 // SSW FI24 Satellite Ship Weather Small - Less than 1-Slot Version

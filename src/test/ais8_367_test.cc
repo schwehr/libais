@@ -180,6 +180,48 @@ TEST(Ais8_367_22Test, DecodeUscgWhaleBouyTest2) {
 }
 #endif
 
+std::unique_ptr<Ais8_367_23> Init_23(const string &nmea_string) {
+  const string body(GetBody(nmea_string));
+  const int pad = GetPad(nmea_string);
+
+  // TODO(schwehr): Switch to c++14 make_unique.
+  std::unique_ptr<Ais8_367_23> msg(new Ais8_367_23(body.c_str(), pad));
+  if (!msg || msg->had_error()) {
+    return nullptr;
+  }
+
+  return msg;
+}
+
+TEST(Ais8_367_23Test, DecodeSingleTest_23) {
+  std::unique_ptr<Ais8_367_23> msg =
+      Init_23("!SAVDM,1,1,7,A,85Oqf`1Kmh37VDgTDMsgo9@0uNc@,0*47");
+
+  ASSERT_EQ(8, msg->message_id);
+  ASSERT_EQ(0, msg->repeat_indicator);
+  ASSERT_EQ(368996000, msg->mmsi);
+  ASSERT_EQ(0, msg->spare);
+  ASSERT_EQ(367, msg->dac);
+  ASSERT_EQ(23, msg->fi);
+
+  ASSERT_EQ(0, msg->version);
+  ASSERT_EQ(0, msg->utc_day);
+  ASSERT_EQ(24, msg->utc_hour);
+  ASSERT_EQ(60, msg->utc_min);
+  EXPECT_NEAR(msg->position.lng_deg, -117.15298333333334, 0.001);
+  EXPECT_NEAR(msg->position.lat_deg, 32.69541666666667, 0.001);
+  ASSERT_EQ(1201, msg->pressure);
+
+  ASSERT_EQ(-1024, msg->air_temp_raw);
+  EXPECT_NEAR(msg->air_temp, -102.4, 0.001);
+
+  ASSERT_EQ(122, msg->wind_speed);
+  ASSERT_EQ(122, msg->wind_gust);
+  ASSERT_EQ(360, msg->wind_dir);
+
+  ASSERT_EQ(0, msg->spare2);
+}
+
 std::unique_ptr<Ais8_367_24> Init_24(const string &nmea_string) {
   const string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
