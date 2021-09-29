@@ -1990,7 +1990,7 @@ class Ais8_367_23 : public Ais8 {
 
   AisPoint position = {0.0, 0.0};  // 25, 24 bits
   int pressure = 0;  // hPa
-  int air_temp_raw;  // raw reading, used for detecting N/A values
+  int air_temp_raw = 0;  // raw reading, used for detecting N/A values
   float air_temp = 0.0;  // C
   int wind_speed = 0;  // knots
   int wind_gust = 0;  // knots
