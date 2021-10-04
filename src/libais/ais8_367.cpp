@@ -9,6 +9,8 @@
 // https://www.e-navigation.nl/content/satellite-ship-weather
 // 8:367:24
 // https://www.e-navigation.nl/content/satellite-ship-weather-small
+// 8:367:25
+// https://www.e-navigation.nl/content/satellite-ship-weather-tiny
 
 #include <cmath>
 #include <string>
@@ -237,5 +239,40 @@ Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
 ostream& operator<< (ostream &o, const Ais8_367_24 &msg) {
   return o << msg.mmsi << ": " << msg.version << ": " << msg.utc_hour << ": " << msg.utc_min << ": " << msg.pressure;
 }
+
+// SSW FI25 Satellite Ship Weather Tiny Version
+Ais8_367_25::Ais8_367_25(const char *nmea_payload, const size_t pad)
+    : Ais8(nmea_payload, pad) {
+  assert(dac == 367);
+  assert(fi == 25);
+
+  if (!CheckStatus()) {
+    return;
+  }
+
+  if (num_bits != 96) {
+    status = AIS_ERR_BAD_BIT_COUNT;
+    return;
+  }
+
+  bits.SeekTo(56);
+
+  version = bits.ToUnsignedInt(56, 3);
+  utc_hour = bits.ToUnsignedInt(59, 5);
+  utc_min = bits.ToUnsignedInt(64, 6);
+  pressure = bits.ToUnsignedInt(70, 9) + 799;  // hPa
+  wind_speed = bits.ToUnsignedInt(79, 7);  // Knots
+  wind_dir = bits.ToUnsignedInt(86, 9);  // Degrees
+
+  spare = bits.ToUnsignedInt(95, 1);
+
+  assert(bits.GetRemaining() == 0);
+  status = AIS_OK;
+}
+
+ostream& operator<< (ostream &o, const Ais8_367_25 &msg) {
+  return o << msg.mmsi << ": " << msg.version << ": " << msg.utc_hour << ": " << msg.utc_min << ": " << msg.pressure << ": " << msg.wind_speed << ": " << msg.wind_dir;
+}
+
 
 }  // namespace libais

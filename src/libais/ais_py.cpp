@@ -64,6 +64,7 @@ enum AIS_FI {
   AIS_FI_8_367_22_AREA_NOTICE = 22,  // USCG.
   AIS_FI_8_367_23_SSW = 23,  // USCG Satellite Ship Weather
   AIS_FI_8_367_24_SSW_SMALL = 24,  // USCG Satellite Ship Weather Small
+  AIS_FI_8_367_25_SSW_TINY = 25,  // USCG Satellite Ship Weather Tiny
 };
 
 void
@@ -2110,6 +2111,55 @@ ais8_367_24_append_pydict(const char *nmea_payload, PyObject *dict,
   return AIS_OK;
 }
 
+AIS_STATUS
+ais8_367_25_append_pydict(const char *nmea_payload, PyObject *dict,
+                        const size_t pad) {
+  assert(nmea_payload);
+  assert(dict);
+  assert(pad < 6);
+  Ais8_367_25 msg(nmea_payload, pad);
+  if (msg.had_error()) {
+    return msg.get_error();
+  }
+
+  DictSafeSetItem(dict, "version", msg.version);
+
+  if (msg.utc_hour <= 23) {
+    DictSafeSetItem(dict, "utc_hour", msg.utc_hour);
+  } else {
+    DictSafeSetItem(dict, "utc_hour", Py_None);
+  }
+
+  if (msg.utc_min <= 59) {
+    DictSafeSetItem(dict, "utc_min", msg.utc_min);
+  } else {
+    DictSafeSetItem(dict, "utc_min", Py_None);
+  }
+
+  if (msg.pressure <= (799 + 402)) {
+    DictSafeSetItem(dict, "pressure", msg.pressure);
+  } else {
+    // Raw value was 403 (N/A), or reserved value.
+    DictSafeSetItem(dict, "pressure", Py_None);
+  }
+
+  if (msg.wind_speed <= 121) {
+    DictSafeSetItem(dict, "wind_speed", msg.wind_speed);
+  } else {
+    // Raw value was 122 (N/A) or reserved value.
+    DictSafeSetItem(dict, "wind_speed", Py_None);
+  }
+
+  if (msg.wind_dir <= 359) {
+    DictSafeSetItem(dict, "wind_dir", msg.wind_dir);
+  } else {
+    // Raw value was 360 (N/A), or reserved value.
+    DictSafeSetItem(dict, "wind_dir", Py_None);
+  }
+
+  return AIS_OK;
+}
+
 // AIS Binary broadcast messages.  There will be a huge number of subtypes
 // If we don't know how to decode it, just return the dac, fi
 PyObject*
@@ -2233,6 +2283,9 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
       break;
     case AIS_FI_8_367_24_SSW_SMALL:
       status = ais8_367_24_append_pydict(nmea_payload, dict, pad);
+      break;
+  case AIS_FI_8_367_25_SSW_TINY:
+      status = ais8_367_25_append_pydict(nmea_payload, dict, pad);
       break;
     default:
       DictSafeSetItem(dict, "parsed", false);

@@ -255,6 +255,38 @@ TEST(Ais8_367_24Test, DecodeSingleTest_24) {
   ASSERT_EQ(1023, msg->pressure);
 }
 
+std::unique_ptr<Ais8_367_25> Init_25(const string &nmea_string) {
+  const string body(GetBody(nmea_string));
+  const int pad = GetPad(nmea_string);
+
+  // TODO(schwehr): Switch to c++14 make_unique.
+  std::unique_ptr<Ais8_367_25> msg(new Ais8_367_25(body.c_str(), pad));
+  if (!msg || msg->had_error()) {
+    return nullptr;
+  }
+
+  return msg;
+}
+
+TEST(Ais8_367_25Test, DecodeSingleTest_25) {
+  std::unique_ptr<Ais8_367_25> msg =
+      Init_25("!SAVDM,1,1,7,A,85MrbQ1KnA5IdV24,0*17");
+
+  ASSERT_EQ(8, msg->message_id);
+  ASSERT_EQ(0, msg->repeat_indicator);
+  ASSERT_EQ(366914180, msg->mmsi);
+  ASSERT_EQ(0, msg->spare);
+  ASSERT_EQ(367, msg->dac);
+  ASSERT_EQ(25, msg->fi);
+
+  ASSERT_EQ(0, msg->version);
+  ASSERT_EQ(17, msg->utc_hour);
+  ASSERT_EQ(22, msg->utc_min);
+
+  ASSERT_EQ(1016, msg->pressure);
+  ASSERT_EQ(24, msg->wind_speed);
+  ASSERT_EQ(66, msg->wind_dir);
+}
 
 }  // namespace
 }  // namespace libais
