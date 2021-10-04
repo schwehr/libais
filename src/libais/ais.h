@@ -2018,6 +2018,25 @@ class Ais8_367_24 : public Ais8 {
 };
 ostream& operator<< (ostream &o, const Ais8_367_24 &msg);
 
+//
+// SSW Satellite Ship Weather Tiny Version
+// https://www.e-navigation.nl/content/satellite-ship-weather-tiny
+class Ais8_367_25 : public Ais8 {
+ public:
+  int version = 0;
+
+  int utc_day = 0;
+  int utc_hour = 0;
+  int utc_min = 0;
+
+  int pressure = 0;  // hPa
+  int wind_speed = 0;  // Knots
+  int wind_dir = 0;  // Degrees
+
+  Ais8_367_25(const char *nmea_payload, const size_t pad);
+};
+ostream& operator<< (ostream &o, const Ais8_367_25 &msg);
+
 class Ais9 : public AisMsg {
  public:
   int alt;  // m above sea level

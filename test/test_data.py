@@ -710,4 +710,20 @@ top_level = [
                'pressure': 1201}
   },
 
+  {
+    'nmea': ['!SAVDM,1,1,7,A,85MrbQ1KnA5IdV24,0*17'],
+    'result': {'id': 8,
+               'repeat_indicator': 0,
+               'mmsi': 366914180,
+               'spare': 0,
+               'dac': 367,
+               'fi': 25,
+               'version': 0,
+               'utc_hour': 17,
+               'utc_min': 22,
+               'pressure': 1016,
+               'wind_speed': 24,
+               'wind_dir': 66}
+  },
+
 ]
