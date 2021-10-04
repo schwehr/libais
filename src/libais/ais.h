@@ -1979,6 +1979,30 @@ class Ais8_367_22 : public Ais8 {
 ostream& operator<< (ostream& o, Ais8_367_22 const& msg);
 
 // SSW Satellite Ship Weather 1-Slot Version
+// https://www.e-navigation.nl/content/satellite-ship-weather
+class Ais8_367_23 : public Ais8 {
+ public:
+  int version = 0;
+
+  int utc_day = 0;
+  int utc_hour = 0;
+  int utc_min = 0;
+
+  AisPoint position = {0.0, 0.0};  // 25, 24 bits
+  int pressure = 0;  // hPa
+  int air_temp_raw = 0;  // raw reading, used for detecting N/A values
+  float air_temp = 0.0;  // C
+  int wind_speed = 0;  // knots
+  int wind_gust = 0;  // knots
+  int wind_dir = 0;  // degrees
+
+  int spare2 = 0;
+
+  Ais8_367_23(const char *nmea_payload, const size_t pad);
+};
+ostream& operator<< (ostream &o, const Ais8_367_23 &msg);
+
+// SSW Satellite Ship Weather 1-Slot Version
 // https://www.e-navigation.nl/content/satellite-ship-weather-small
 class Ais8_367_24 : public Ais8 {
  public:
