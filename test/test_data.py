@@ -726,4 +726,32 @@ top_level = [
                'wind_dir': 66}
   },
 
+  {
+    'nmea': ['!AIVDM,1,1,,B,8>k1oFAKpB95?AruFRl7mre0<N00,0*6A'],
+    'result': {'id': 8,
+               'repeat_indicator': 0,
+               'mmsi': 993032025,
+               'spare': 0,
+               'dac': 367,
+               'fi': 33,
+               'reports': [{'report_type': 2,
+                            'utc_day': 4,
+                            'utc_hr': 17,
+                            'utc_min': 19,
+                            'site_id': 104,
+                            'wind_speed': None,
+                            'wind_gust': None,
+                            'wind_dir': None,
+                            'wind_gust_dir': None,
+                            'sensor_type': 1,
+                            'wind_forecast': None,
+                            'wind_gust_forecast': None,
+                            'wind_dir_forecast': None,
+                            'utc_day_forecast': None,
+                            'utc_hour_forecast': None,
+                            'utc_min_forecast': None,
+                            'duration': 0,
+                            'spare2': 0}]}
+  },
+
 ]
