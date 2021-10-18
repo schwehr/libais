@@ -2096,7 +2096,7 @@ class Ais8_367_33_Location : public Ais8_367_33_SensorReport {
 
 class Ais8_367_33_Station : public Ais8_367_33_SensorReport {
  public:
-  string name = "";
+  std::string name;
   int spare2 = 0;
 
   Ais8_367_33_Station(const AisBitset &bs, const size_t offset);
@@ -2155,7 +2155,7 @@ class Ais8_367_33_Curr2D_Current {
 
 class Ais8_367_33_Curr2D : public Ais8_367_33_SensorReport {
  public:
-  Ais8_367_33_Curr2D_Current currents[3];
+  std::array<Ais8_367_33_Curr2D_Current, 3> currents;
   int type = 0;
   int spare2 = 0;
 
@@ -2180,7 +2180,7 @@ class Ais8_367_33_Curr3D_Current {
 
 class Ais8_367_33_Curr3D : public Ais8_367_33_SensorReport {
  public:
-  Ais8_367_33_Curr3D_Current currents[2];
+  std::array<Ais8_367_33_Curr3D_Current, 2> currents;
   int type = 0;
   int spare2 = 0;
 
@@ -2200,7 +2200,7 @@ class Ais8_367_33_HorzFlow_Current {
 
 class Ais8_367_33_HorzFlow : public Ais8_367_33_SensorReport {
  public:
-  Ais8_367_33_HorzFlow_Current currents[2];
+  std::array<Ais8_367_33_HorzFlow_Current, 2> currents;
   int bearing = 0;  // Degrees
   int type = 0;
   int spare2 = 0;
