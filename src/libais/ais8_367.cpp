@@ -294,7 +294,7 @@ Ais8_367_33_Station::Ais8_367_33_Station(const AisBitset &bits,
                                          const size_t offset) {
   name = bits.ToString(offset, 84);
   // Remove any trailing '@' characters.  Spec says they are not to be shown in the presentation.
-  while (name.back() == '@') {
+  while (!name.empty() && name.back() == '@') {
     name.pop_back();
   }
   spare2 = bits.ToUnsignedInt(offset + 84, 1);
@@ -336,7 +336,7 @@ Ais8_367_33_WaterLevel::Ais8_367_33_WaterLevel(const AisBitset &bits,
 Ais8_367_33_Curr2D::Ais8_367_33_Curr2D(const AisBitset &bits,
                                        const size_t offset) {
   for (size_t idx = 0; idx < 3; idx++) {
-    size_t start = offset + idx * 26;
+    const size_t start = offset + idx * 26;
     currents[idx].speed_raw = bits.ToUnsignedInt(start, 8);
     currents[idx].speed = currents[idx].speed_raw / 10.;
     currents[idx].dir = bits.ToUnsignedInt(start + 8, 9);
@@ -349,7 +349,7 @@ Ais8_367_33_Curr2D::Ais8_367_33_Curr2D(const AisBitset &bits,
 Ais8_367_33_Curr3D::Ais8_367_33_Curr3D(const AisBitset &bits,
                                        const size_t offset) {
   for (size_t idx = 0; idx < 2; idx++) {
-    size_t start = offset + idx * 36;
+    const size_t start = offset + idx * 36;
 
     currents[idx].north_raw = bits.ToUnsignedInt(start, 9);
     currents[idx].north = currents[idx].north_raw / 10.;
@@ -370,7 +370,7 @@ Ais8_367_33_HorzFlow::Ais8_367_33_HorzFlow(const AisBitset &bits,
                                            const size_t offset) {
   bearing = bits.ToUnsignedInt(offset, 9);
   for (size_t idx = 0; idx < 2; idx++) {
-    size_t start = offset + 9 + (idx * 35);
+    const size_t start = offset + 9 + (idx * 35);
 
     currents[idx].dist = bits.ToUnsignedInt(start, 9);
 
@@ -553,7 +553,7 @@ ais8_367_33_sensor_report_factory(const AisBitset &bits,
     return {};
   }
 
-	// Parse header
+  // Parse header
   rpt->report_type = rpt_type;
   bits.SeekTo(offset + 4);
   rpt->utc_day = bits.ToUnsignedInt(offset + 4, 5);
@@ -577,13 +577,13 @@ Ais8_367_33::Ais8_367_33(const char *nmea_payload, const size_t pad)
     return;
   }
 
-	const size_t report_start = 56;
+  const size_t report_start = 56;
   const size_t num_sensor_reports = (num_bits - report_start) / AIS8_367_33_REPORT_SIZE;
 
   const size_t extra_bits = (num_bits - report_start) % AIS8_367_33_REPORT_SIZE;
   if (extra_bits > 0) {
     status = AIS_ERR_BAD_BIT_COUNT;
-	  return;
+    return;
   }
 
   for (size_t report_idx = 0; report_idx < num_sensor_reports; report_idx++) {
@@ -603,128 +603,128 @@ Ais8_367_33::Ais8_367_33(const char *nmea_payload, const size_t pad)
 }
 
 ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
-	int num_reports = msg.reports.size();
-	for (int report_idx = 0; report_idx < num_reports; report_idx++) {
-		Ais8_367_33_SensorEnum report_type = msg.reports[report_idx]->report_type;
-		switch(report_type) {
-			case AIS8_367_33_SENSOR_LOCATION: {
-				Ais8_367_33_Location *rpt = dynamic_cast<Ais8_367_33_Location *>(msg.reports[report_idx].get());
+  const int num_reports = msg.reports.size();
+  for (int report_idx = 0; report_idx < num_reports; report_idx++) {
+    Ais8_367_33_SensorEnum report_type = msg.reports[report_idx]->report_type;
+    switch(report_type) {
+      case AIS8_367_33_SENSOR_LOCATION: {
+        Ais8_367_33_Location *rpt = dynamic_cast<Ais8_367_33_Location *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " version: " << rpt->version << " position: " << rpt->position << " precision: " << rpt->precision << " altitude: " << rpt->altitude << " owner: " << rpt->owner << "]";
-				break;
-			}
-			case AIS8_367_33_SENSOR_STATION: {
-				Ais8_367_33_Station *rpt = dynamic_cast<Ais8_367_33_Station *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " version: " << rpt->version << " position: " << rpt->position << " precision: " << rpt->precision << " altitude: " << rpt->altitude << " owner: " << rpt->owner << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_STATION: {
+        Ais8_367_33_Station *rpt = dynamic_cast<Ais8_367_33_Station *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " name: " << rpt->name << "]"; 
-				break;
-			}
-			case AIS8_367_33_SENSOR_WIND: {
-				Ais8_367_33_Wind *rpt = dynamic_cast<Ais8_367_33_Wind *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " name: " << rpt->name << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_WIND: {
+        Ais8_367_33_Wind *rpt = dynamic_cast<Ais8_367_33_Wind *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " speed: " << rpt->wind_speed << " gust: " << rpt->wind_gust << " dir: " << rpt->wind_dir;
-				o << " wind_gust_dir: " << rpt->wind_gust_dir << " sensor_type: " << rpt->sensor_type;
-				o << " wind_forecast: " << rpt->wind_forecast << " wind_gust_forecast: " << rpt->wind_gust_forecast << " wind_dir_forecast: " << rpt->wind_dir_forecast;
-				o << " utc_day_forecast: " << rpt->utc_day_forecast << " utc_hour_forecast: " << rpt->utc_hour_forecast << " utc_min_forecast: " << rpt->utc_min_forecast << " duration: " << rpt->duration << "]";
-				break;
-			}
-			case AIS8_367_33_SENSOR_WATER_LEVEL: {
-				Ais8_367_33_WaterLevel *rpt = dynamic_cast<Ais8_367_33_WaterLevel *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " speed: " << rpt->wind_speed << " gust: " << rpt->wind_gust << " dir: " << rpt->wind_dir;
+        o << " wind_gust_dir: " << rpt->wind_gust_dir << " sensor_type: " << rpt->sensor_type;
+        o << " wind_forecast: " << rpt->wind_forecast << " wind_gust_forecast: " << rpt->wind_gust_forecast << " wind_dir_forecast: " << rpt->wind_dir_forecast;
+        o << " utc_day_forecast: " << rpt->utc_day_forecast << " utc_hour_forecast: " << rpt->utc_hour_forecast << " utc_min_forecast: " << rpt->utc_min_forecast << " duration: " << rpt->duration << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_WATER_LEVEL: {
+        Ais8_367_33_WaterLevel *rpt = dynamic_cast<Ais8_367_33_WaterLevel *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " type: " << rpt->type << " level: " << rpt->level << " trend: " << rpt->trend << " vdatum: " << rpt->vdatum;
-				o << " sensor_type: " << rpt->sensor_type << " forecast_type: " << rpt->forecast_type;
-				o << " level_forecast: " << rpt->level_forecast;
-			  o	<< " utc_day_forecast: " << rpt->utc_day_forecast << " utc_hour_forecast: " << rpt->utc_hour_forecast << " utc_min_forecast: " << rpt->utc_min_forecast << " duration: " << rpt->duration << "]";
-				break;
-			}
-			case AIS8_367_33_SENSOR_CURR_2D: {
-				Ais8_367_33_Curr2D *rpt = dynamic_cast<Ais8_367_33_Curr2D *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " type: " << rpt->type << " level: " << rpt->level << " trend: " << rpt->trend << " vdatum: " << rpt->vdatum;
+        o << " sensor_type: " << rpt->sensor_type << " forecast_type: " << rpt->forecast_type;
+        o << " level_forecast: " << rpt->level_forecast;
+        o << " utc_day_forecast: " << rpt->utc_day_forecast << " utc_hour_forecast: " << rpt->utc_hour_forecast << " utc_min_forecast: " << rpt->utc_min_forecast << " duration: " << rpt->duration << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_CURR_2D: {
+        Ais8_367_33_Curr2D *rpt = dynamic_cast<Ais8_367_33_Curr2D *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				for (size_t idx = 0; idx < 3; idx++) {
-					o << " [speed: " << rpt->currents[idx].speed << " dir: " << rpt->currents[idx].dir << " depth: " << rpt->currents[idx].depth << "]";
-				}
-				o << " type: " << rpt->type << "]";
-				break;
-			}
-			case AIS8_367_33_SENSOR_CURR_3D: {
-				Ais8_367_33_Curr3D *rpt = dynamic_cast<Ais8_367_33_Curr3D *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        for (size_t idx = 0; idx < 3; idx++) {
+          o << " [speed: " << rpt->currents[idx].speed << " dir: " << rpt->currents[idx].dir << " depth: " << rpt->currents[idx].depth << "]";
+        }
+        o << " type: " << rpt->type << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_CURR_3D: {
+        Ais8_367_33_Curr3D *rpt = dynamic_cast<Ais8_367_33_Curr3D *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				for (size_t idx = 0; idx < 2; idx++) {
-					o << " [north: " << rpt->currents[idx].north << " east: " << rpt->currents[idx].east << " up: " << rpt->currents[idx].up << " depth: " << rpt->currents[idx].depth << "]";
-				}
-				o << " type: " << rpt->type << "]";
-				break;
-			}
-			case AIS8_367_33_SENSOR_HORZ_FLOW: {
-				Ais8_367_33_HorzFlow *rpt = dynamic_cast<Ais8_367_33_HorzFlow *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        for (size_t idx = 0; idx < 2; idx++) {
+          o << " [north: " << rpt->currents[idx].north << " east: " << rpt->currents[idx].east << " up: " << rpt->currents[idx].up << " depth: " << rpt->currents[idx].depth << "]";
+        }
+        o << " type: " << rpt->type << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_HORZ_FLOW: {
+        Ais8_367_33_HorzFlow *rpt = dynamic_cast<Ais8_367_33_HorzFlow *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " bearing: " << rpt->bearing;
-				for (size_t idx = 0; idx < 2; idx++) {
-					o << " [dist: " << rpt->currents[idx].dist << " speed: " << rpt->currents[idx].speed << " dir: " << rpt->currents[idx].dir << " level: " << rpt->currents[idx].level << "]";
-				o << " type: " << rpt->type << "]";
-				}
-				break;
-			}
-			case AIS8_367_33_SENSOR_SEA_STATE: {
-				Ais8_367_33_SeaState *rpt = dynamic_cast<Ais8_367_33_SeaState *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " bearing: " << rpt->bearing;
+        for (size_t idx = 0; idx < 2; idx++) {
+          o << " [dist: " << rpt->currents[idx].dist << " speed: " << rpt->currents[idx].speed << " dir: " << rpt->currents[idx].dir << " level: " << rpt->currents[idx].level << "]";
+        o << " type: " << rpt->type << "]";
+        }
+        break;
+      }
+      case AIS8_367_33_SENSOR_SEA_STATE: {
+        Ais8_367_33_SeaState *rpt = dynamic_cast<Ais8_367_33_SeaState *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " swell_height: " << rpt->swell_height << " swell_period: " << rpt->swell_period << " swell_dir: " << rpt->swell_dir;
-				o << " sea_state: " << rpt->sea_state << " sensor_type: " << rpt->swell_sensor_type;
-				o << " water_temp: " << rpt->water_temp << " water_temp_depth: " << rpt->water_temp_depth << " water_sensor_type: " << rpt->water_sensor_type;
-				o << " wave_height: " << rpt->wave_height << " wave_period: " << rpt->wave_period << " wave_dir: " << rpt->wave_dir << " wave_sensor_type: " << rpt->wave_sensor_type;
-				o << " salinity: " << rpt->salinity << "]";
-				break;
-			}
-			case AIS8_367_33_SENSOR_SALINITY: {
-				Ais8_367_33_Salinity *rpt = dynamic_cast<Ais8_367_33_Salinity *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " swell_height: " << rpt->swell_height << " swell_period: " << rpt->swell_period << " swell_dir: " << rpt->swell_dir;
+        o << " sea_state: " << rpt->sea_state << " sensor_type: " << rpt->swell_sensor_type;
+        o << " water_temp: " << rpt->water_temp << " water_temp_depth: " << rpt->water_temp_depth << " water_sensor_type: " << rpt->water_sensor_type;
+        o << " wave_height: " << rpt->wave_height << " wave_period: " << rpt->wave_period << " wave_dir: " << rpt->wave_dir << " wave_sensor_type: " << rpt->wave_sensor_type;
+        o << " salinity: " << rpt->salinity << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_SALINITY: {
+        Ais8_367_33_Salinity *rpt = dynamic_cast<Ais8_367_33_Salinity *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " water_temp: " << rpt->water_temp << " conductivity: " << rpt->conductivity << " water_pressure: " << rpt->pressure;
-				o << " salinity: " << rpt->salinity << " salinity_type: " << rpt->salinity_type << " sensor_type: " << rpt->sensor_type << "]";
-				break;
-			}
-			case AIS8_367_33_SENSOR_WX: {
-				Ais8_367_33_Wx *rpt = dynamic_cast<Ais8_367_33_Wx *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " water_temp: " << rpt->water_temp << " conductivity: " << rpt->conductivity << " water_pressure: " << rpt->pressure;
+        o << " salinity: " << rpt->salinity << " salinity_type: " << rpt->salinity_type << " sensor_type: " << rpt->sensor_type << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_WX: {
+        Ais8_367_33_Wx *rpt = dynamic_cast<Ais8_367_33_Wx *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " air_temp: " << rpt->air_temp << " air_temp_sensor_type: " << rpt->air_temp_sensor_type << " precip: " << rpt->precip;
-				o << " horz_vis: " << rpt->horz_vis << " dew_point: " << rpt->dew_point << " dew_point_type: " << rpt->dew_point_type;
-				o << " air_pressure: " << rpt->air_pressure << " air_pressure_trend: " << rpt->air_pressure_trend << " air_pressure_sensor_type: " << rpt->air_pressure_sensor_type;
-				o << " salinity: " << rpt->salinity << "]";
-				break;
-			}
-			case AIS8_367_33_SENSOR_AIR_GAP: {
-				Ais8_367_33_AirGap *rpt = dynamic_cast<Ais8_367_33_AirGap *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " air_temp: " << rpt->air_temp << " air_temp_sensor_type: " << rpt->air_temp_sensor_type << " precip: " << rpt->precip;
+        o << " horz_vis: " << rpt->horz_vis << " dew_point: " << rpt->dew_point << " dew_point_type: " << rpt->dew_point_type;
+        o << " air_pressure: " << rpt->air_pressure << " air_pressure_trend: " << rpt->air_pressure_trend << " air_pressure_sensor_type: " << rpt->air_pressure_sensor_type;
+        o << " salinity: " << rpt->salinity << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_AIR_GAP: {
+        Ais8_367_33_AirGap *rpt = dynamic_cast<Ais8_367_33_AirGap *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " air_draught: " << rpt->air_draught << " air_gap: " << rpt->air_gap << " air_gap_trend: " << rpt->air_gap_trend;
-				o << " predicted_air_gap: " << rpt->predicted_air_gap;
-				o << " utc_day_forecast: " << rpt->utc_day_forecast << " utc_hour_forecast: " << rpt->utc_hour_forecast << " utc_min_forecast: " << rpt->utc_min_forecast << " type: " << rpt->type << "]";
-				break;
-			}
-			case AIS8_367_33_SENSOR_WIND_REPORT_2: {
-				Ais8_367_33_Wind_V2 *rpt = dynamic_cast<Ais8_367_33_Wind_V2 *>(msg.reports[report_idx].get());
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " air_draught: " << rpt->air_draught << " air_gap: " << rpt->air_gap << " air_gap_trend: " << rpt->air_gap_trend;
+        o << " predicted_air_gap: " << rpt->predicted_air_gap;
+        o << " utc_day_forecast: " << rpt->utc_day_forecast << " utc_hour_forecast: " << rpt->utc_hour_forecast << " utc_min_forecast: " << rpt->utc_min_forecast << " type: " << rpt->type << "]";
+        break;
+      }
+      case AIS8_367_33_SENSOR_WIND_REPORT_2: {
+        Ais8_367_33_Wind_V2 *rpt = dynamic_cast<Ais8_367_33_Wind_V2 *>(msg.reports[report_idx].get());
 
-				o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
-				o << " wind_speed: " << rpt->wind_speed << " wind_gust: " << rpt->wind_gust << " wind_dir: " << rpt->wind_dir;
-				o << " averaging_time: " << rpt->averaging_time << " sensor_type: " << rpt->sensor_type;
-				o << " wind_speed_forecast: " << rpt->wind_speed_forecast << " wind_gust_forecast: " << rpt->wind_gust_forecast;
-				o << " wind_dir_forecast: " << rpt->wind_dir_forecast;
+        o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
+        o << " wind_speed: " << rpt->wind_speed << " wind_gust: " << rpt->wind_gust << " wind_dir: " << rpt->wind_dir;
+        o << " averaging_time: " << rpt->averaging_time << " sensor_type: " << rpt->sensor_type;
+        o << " wind_speed_forecast: " << rpt->wind_speed_forecast << " wind_gust_forecast: " << rpt->wind_gust_forecast;
+        o << " wind_dir_forecast: " << rpt->wind_dir_forecast;
 
-				o << " utc_hour_forecast: " << rpt->utc_hour_forecast << " utc_min_forecast: " << rpt->utc_min_forecast << " duration: " << rpt->duration << "]";
-				break;
-			}
-		  default: break;
-		} // switch
-	} // for
+        o << " utc_hour_forecast: " << rpt->utc_hour_forecast << " utc_min_forecast: " << rpt->utc_min_forecast << " duration: " << rpt->duration << "]";
+        break;
+      }
+      default: break;
+    } // switch
+  } // for
 
   return o;
 }

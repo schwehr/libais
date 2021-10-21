@@ -2884,7 +2884,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
     case AIS_FI_8_367_25_SSW_TINY:
       status = ais8_367_25_append_pydict(nmea_payload, dict, pad);
       break;
-  case AIS_FI_8_367_33_ENVIRONMENTAL:
+    case AIS_FI_8_367_33_ENVIRONMENTAL:
       status = ais8_367_33_append_pydict(nmea_payload, dict, pad);
       break;
     default:
