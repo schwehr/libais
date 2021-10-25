@@ -12,13 +12,12 @@ default:
 	@echo "  clean    - remove all objects and executables"
 	@echo "  tar      - create a release source tar using VERSION"
 	@echo
-	@echo "  test     - C++, python2, and python3 unittests"
-	@echo "  python2  - build the python2 module"
-	@echo "  python3  - build the python3 module"
+	@echo "  test     - C++ and python unittests"
+	@echo "  python   - build the python module"
 	@echo
 	@echo "Read the README for more information"
 
-all: python2 python3 lib
+all: python lib
 
 lib:
 	(cd src/libais; make -f Makefile-custom all)
@@ -35,11 +34,8 @@ tar:
 	rm -rf ${DIST}
 
 
-python2:
-	CFLAGS="-O3 -funroll-loops -fexpensive-optimizations" python2 setup.py build
-
-python3:
-	CFLAGS="-std=c++11 -O0 -g -UNDEBUG" python3 setup.py build
+python:
+	CFLAGS="-std=c++17 -O2 -g -UNDEBUG" python3 setup.py build
 
 clean:
 	(cd ais && make -f Makefile-custom clean)
