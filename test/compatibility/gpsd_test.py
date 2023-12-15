@@ -32,6 +32,14 @@ class SingleMessageTestsTest(unittest.TestCase):
   def setUp(self):
     self.mangle = ais.compatibility.gpsd.Mangler()
 
+  def assertDictContainsSubset2(self, actual, expected):
+    # assertDictContainsSubset was deprecated because of incorrect arg order.
+    # This method has the correct order.
+    self.assertIsInstance(expected, dict)
+    self.assertIsInstance(actual, dict)
+    for key, value in expected.items():
+      self.assertEqual(actual[key], value, 'kv: %s, %s' % (key, value))
+
   def testMsg1(self):
     fields = '!AIVDM,1,1,,B,169A91O005KbT4gUoUl9d;5j0D0U,0*2D'.split(',')
     decoded = ais.decode(fields[5], int(fields[6][0]))
@@ -50,7 +58,7 @@ class SingleMessageTestsTest(unittest.TestCase):
         'second': 57,
         'maneuver': 0,
         'raim': False}
-    self.assertDictContainsSubset(expected, mangled)
+    self.assertDictContainsSubset2(mangled, expected)
 
     # Float values will not match, so just test existence.
     for field in ('lat', 'lon'):
@@ -69,7 +77,7 @@ class SingleMessageTestsTest(unittest.TestCase):
         'shiptype': 204,
         'shiptype_text': '204 - Unknown',
         'type': 5}
-    self.assertDictContainsSubset(expected, mangled)
+    self.assertDictContainsSubset2(mangled, expected)
 
   def testTimestamps(self):
     msg = {
@@ -89,7 +97,7 @@ class SingleMessageTestsTest(unittest.TestCase):
         'timestamp': '2015-05-15T09:27:23Z',
         'tagblock_timestamp': '2015-05-15T09:27:23.000000Z'
         }
-    self.assertDictContainsSubset(expected, mangled)
+    self.assertDictContainsSubset2(mangled, expected)
 
 
 class StreamingTest(unittest.TestCase):
