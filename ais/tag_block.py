@@ -134,7 +134,7 @@ class TagQueue(Queue.Queue):
         if decoded:
           msg['decoded'] = decoded
         else:
-          logger.info('No NMEA match for line: %d, %s', line_num, line)
+          logger.info('No NMEA match for line: %d, %s', self.line_num, line)
       Queue.Queue.put(self, msg)
       return
 
