@@ -22,8 +22,8 @@ jobs:
         python-version: [
 	  '3.9',
 	  '3.10',
-	  '3.11',
-	  '3.12'
+	  '3.11'
+	  # '3.12' does not have assertDictContainsSubset. 
 	  ]
     steps:
       - name: Add required sources and pkgs
