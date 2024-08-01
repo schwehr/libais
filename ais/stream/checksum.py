@@ -27,7 +27,7 @@ def checksumStr(data):
     if data[0]=='!' or data[0]=='?': data = data[1:]
     if data[-1]=='*': data = data[:-1]
     if data[-3]=='*': data = data[:-3]
-    # FIX: rename sum to not shadown builting function
+    # FIX: rename sum to not shadow builtin function
     checksum = 0
     for c in data:
       checksum = checksum ^ ord(c)

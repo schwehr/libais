@@ -1,6 +1,6 @@
 // 'J' - Multi slot binary message with comm state
 // TODO(schwehr): handle payload
-// BAD: the comm-state is after the veriable payload.  This is a bad design.
+// BAD: the comm-state is after the variable payload.  This is a bad design.
 
 // See also: http://www.e-navigation.nl/asm
 

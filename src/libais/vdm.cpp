@@ -316,7 +316,7 @@ bool VdmStream::AddLine(const std::string &line) {
   int seq = sentence->sequence_number();
   int tot = sentence->sentence_total();
 
-  // These are enforced by NmeaSentence, so only check wehen debugging.
+  // These are enforced by NmeaSentence, so only check when debugging.
   assert(seq < kNumSequenceChannels);
   assert(tot < kMaxSentences);
 

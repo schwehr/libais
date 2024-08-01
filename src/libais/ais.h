@@ -2479,7 +2479,7 @@ class Ais16 : public AisMsg {
 ostream& operator<< (ostream &o, const Ais16 &msg);
 
 // ITU-R M.823  http://www.itu.int/rec/R-REC-M.823/en
-// 17 - 'A' - GNSS broacast - TODO(schwehr): only partially coded
+// 17 - 'A' - GNSS broadcast - TODO(schwehr): only partially coded
 class Ais17 : public AisMsg {
  public:
   int spare;
