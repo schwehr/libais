@@ -24,7 +24,7 @@ jobs:
       - name: Add required sources and pkgs
         run: |
           sudo add-apt-repository --update --yes 'deb http://archive.ubuntu.com/ubuntu/ bionic main universe'
-          sudo apt-get install gcc-6 g++-6
+          sudo apt-get install gcc g++
 
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -46,5 +46,5 @@ jobs:
         
       - name: Script
         run: |
-          (cd src && CC=gcc-6 CXX=g++-6 make -f Makefile-custom -j 4 test)
+          (cd src && CC=gcc CXX=g++ make -f Makefile-custom -j 4 test)
           py.test ais test --cov=ais --cov-report term-missing
