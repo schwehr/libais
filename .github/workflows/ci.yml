@@ -42,7 +42,7 @@ jobs:
           pip install pytest --upgrade
 
       - name: Install
-        run: CC=g++-6 pip install .\[tests\] --upgrade
+        run: CC=g++ pip install .\[tests\] --upgrade
         
       - name: Script
         run: |
