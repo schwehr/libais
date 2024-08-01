@@ -1,4 +1,4 @@
-// A - GNSS broacast -
+// A - GNSS broadcast -
 // TODO(schwehr): only partially coded - need to finish
 // http://www.itu.int/rec/R-REC-M.823/en
 // http://www.iala-aism.org/iala/publications/documentspdf/doc_348_eng.pdf
