@@ -456,10 +456,29 @@ class AisMsg {
   bool CheckStatus() const;
 };
 
+enum AIS_NAVIGATIONAL_STATUS {
+  AIS_NV_STATUS_UNDER_WAY_USING_ENGINE = 0,
+  AIS_NV_STATUS_AT_ANCHOR = 1,
+  AIS_NV_STATUS_NOT_UNDER_COMMAND = 2,
+  AIS_NV_STATUS_RESTRICTED_MANEUVERABILITY = 3,
+  AIS_NV_STATUS_CONSTRAINED_BY_DRAUGHT = 4,
+  AIS_NV_STATUS_MOORED = 5,
+  AIS_NV_STATUS_AGROUND = 6,
+  AIS_NV_STATUS_ENGAGED_IN_FISHING = 7,
+  AIS_NV_STATUS_UNDER_WAY_SAILING = 8,
+  AIS_NV_STATUS_RESERVED1 = 9, // reserved for future amendment of navigational status for ships carrying DG, HS, or MP, or IMO hazard or pollutant category C, high-speed craft (HSC)
+  AIS_NV_STATUS_RESERVED2 = 10, // reserved for future amendment of navigational status for ships carrying dangerous goods (DG), harmful substances (HS) or marine pollutants (MP), or IMO hazard or pollutant category A, wing in ground (WIG)
+  AIS_NV_STATUS_TOWING_ASTERN = 11, // power-driven vessel towing astern (regional use)
+  AIS_NV_STATUS_PUSHING_AHEAD_OR_TOWING_ALONGSIDE = 12, // power-driven vessel pushing ahead or towing alongside (regional use)
+  AIS_NV_STATUS_RESERVED3 = 13, // reserved for future use
+  AIS_NV_STATUS_SART = 14, // AIS-SART (active), MOB-AIS, EPIRB-AIS
+  AIS_NV_STATUS_UNDEFINED = 15, // undefined = default (also used by AIS-SART, MOB-AIS and EPIRB-AIS under test)
+};
+
 // TODO(schwehr): factor out commstate from all messages?
 class Ais1_2_3 : public AisMsg {
  public:
-  int nav_status;
+  AIS_NAVIGATIONAL_STATUS nav_status;
   bool rot_over_range;
   int rot_raw;
   float rot;
