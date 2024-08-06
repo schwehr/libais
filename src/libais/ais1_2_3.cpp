@@ -9,7 +9,7 @@ using std::abs;
 namespace libais {
 
 Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad), nav_status(0), rot_over_range(false),
+    : AisMsg(nmea_payload, pad), nav_status(AIS_NV_STATUS_UNDEFINED), rot_over_range(false),
       rot_raw(0), rot(0.0), sog(0.0), position_accuracy(0),
       cog(0.0), true_heading(0), timestamp(0), special_manoeuvre(0), spare(0),
       raim(false), sync_state(0),
@@ -32,7 +32,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad)
   assert(message_id >= 1 && message_id <= 3);
 
   bits.SeekTo(38);
-  nav_status = bits.ToUnsignedInt(38, 4);
+  nav_status = (AIS_NAVIGATIONAL_STATUS)bits.ToUnsignedInt(38, 4);
 
   rot_raw = bits.ToInt(42, 8);
   rot_over_range = abs(rot_raw) > 126 ? true : false;
