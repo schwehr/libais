@@ -89,7 +89,6 @@ setup(
     'Operating System :: iOS',
     'Operating System :: POSIX',
     'Programming Language :: C++',
-    'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: Implementation :: CPython',
     'Topic :: Communications',
@@ -109,7 +108,6 @@ setup(
 
   ext_modules=[AIS_MODULE],
   packages=find_packages(exclude=['test']),
-  install_requires=['six'],
   extras_require={
       'tests': tests_require,
   },

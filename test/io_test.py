@@ -2,11 +2,11 @@
 
 import contextlib
 import sys
+from io import StringIO
 
 import ais
 
 import pytest
-from six.moves import StringIO
 
 
 def test_open_right_object(typeexamples_nmea_path):

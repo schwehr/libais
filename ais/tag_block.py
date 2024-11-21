@@ -14,9 +14,7 @@ TODO(schwehr): Compute running stats in the queue.
 import hashlib
 import logging
 import re
-
-import six
-import six.moves.queue as Queue
+import queue as Queue
 
 import ais
 from ais import nmea
@@ -80,7 +78,7 @@ def Parse(data):
     return
 
   result.update({k: util.MaybeToNumber(v)
-                 for k, v in six.iteritems(result) if k in NUMERIC_FIELDS})
+                 for k, v in result.items() if k in NUMERIC_FIELDS})
 
   actual = nmea.Checksum(result['metadata'])
   expected = result['tag_checksum'].upper()
