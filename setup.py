@@ -108,7 +108,7 @@ setup(
   },
 
   ext_modules=[AIS_MODULE],
-  packages=find_packages(exclude=['test']),
+  packages=find_packages(exclude=['test', 'test.*']),
   extras_require={
       'tests': tests_require,
   },
