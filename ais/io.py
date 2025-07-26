@@ -70,8 +70,6 @@
 import codecs
 import sys
 
-import six
-
 import ais.nmea_queue
 
 

@@ -34,7 +34,7 @@ with open('dacs.h', 'w') as dac_out, open('mid2.csv', 'w') as mid_out:
       text = td.get_text()
     except AttributeError:
       continue
-    if re.match('^\d{3}', text):
+    if re.match(r'^\d{3}', text):
       # print 'td', td
       # print text
       mid_vals = [int(val) for val in text.split(',')]
@@ -47,7 +47,7 @@ with open('dacs.h', 'w') as dac_out, open('mid2.csv', 'w') as mid_out:
         mid_out.write('%s,"%s"\n' % (mid, country))
       except UnicodeEncodeError:
         mid_out.write('BAD mid %s\n"' % mid)
-        print 'BAD mid', mid
+        print('BAD mid', mid)
 
     for mid in mid_vals:
       try:

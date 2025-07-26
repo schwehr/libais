@@ -5,7 +5,6 @@
 import unittest
 
 from ais import vdm
-import six
 
 
 class TestCase(unittest.TestCase):
@@ -82,8 +81,8 @@ class VdmLinesTest(unittest.TestCase):
         r'\g:3-3-42349,n:111460*1E\$',
     )
     generator = vdm.VdmLines(lines)
-    self.assertEqual(six.next(generator), '!AIVDM,2,2,2,B,00000000000,2*25')
-    self.assertRaises(StopIteration, six.next, generator)
+    self.assertEqual(next(generator), '!AIVDM,2,2,2,B,00000000000,2*25')
+    self.assertRaises(StopIteration, next, generator)
 
 
 class ParseTest(TestCase):

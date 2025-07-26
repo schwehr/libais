@@ -11,7 +11,6 @@ import json
 import os
 import re
 import subprocess
-import six
 from .. import testutils
 
 known_problems = {
@@ -123,10 +122,10 @@ class StreamingTest(unittest.TestCase):
 
     try:
       while True:
-        gmsg = six.advance_iterator(g)
-        amsg = six.advance_iterator(a)
+        gmsg = next(g)
+        amsg = next(a)
         while amsg['type'] != gmsg['type']:
-          amsg = six.advance_iterator(a)
+          amsg = next(a)
 
         if gmsg['type'] in known_problems:
           for key in known_problems[gmsg['type']]:
@@ -189,10 +188,10 @@ class TestActualGPSDCompatibility(unittest.TestCase):
 
       try:
         while True:
-          gmsg = six.advance_iterator(g)
-          amsg = six.advance_iterator(a)
+          gmsg = next(g)
+          amsg = next(a)
           while amsg['type'] != gmsg['type']:
-            amsg = six.advance_iterator(a)
+            amsg = next(a)
 
           if gmsg['type'] in known_problems:
             for key in known_problems[gmsg['type']]:

@@ -39,10 +39,8 @@ Example two line message:
 
 import hashlib
 import logging
-import re
-
-import six
 import queue as Queue
+import re
 
 import ais
 from ais import util
