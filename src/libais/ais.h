@@ -21,7 +21,7 @@ using std::unique_ptr;
 using std::vector;
 
 #define LIBAIS_VERSION_MAJOR 0
-#define LIBAIS_VERSION_MINOR 15
+#define LIBAIS_VERSION_MINOR 17
 
 extern "C" {
 // For configuration scripts to detect libais and the version numbers.
