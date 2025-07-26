@@ -7,7 +7,7 @@ from ais import nmea
 from ais import tag_block
 from ais import uscg
 from ais import vdm
-import six.moves.queue as Queue
+import queue as Queue
 
 
 class Error(Exception):

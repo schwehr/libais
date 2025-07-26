@@ -100,7 +100,7 @@ def open(name, mode='r', **kwargs):
 
   if name == '-':
     fobj = sys.stdin
-  elif isinstance(name, six.string_types):
+  elif isinstance(name, str):
     fobj = codecs.open(name, **kwargs)
   elif hasattr(name, 'close') and \
           (hasattr(name, 'next') or hasattr(name, '__next__')):
@@ -112,7 +112,7 @@ def open(name, mode='r', **kwargs):
   return NmeaFile(fobj)
 
 
-class NmeaFile(object):
+class NmeaFile:
   """Provides a file-like object interface to the `ais.nmea_queue` module."""
 
   def __init__(self, fobj):

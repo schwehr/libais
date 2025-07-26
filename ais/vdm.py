@@ -63,7 +63,7 @@ import logging
 import re
 
 import six
-import six.moves.queue as Queue
+import queue as Queue
 
 import ais
 from ais import nmea
@@ -108,7 +108,7 @@ def VdmLines(lines):
 def Parse(data):
   """Unpack a NMEA VDM AIS message line(s)."""
 
-  if not isinstance(data, six.string_types):
+  if not isinstance(data, str):
     raise NotImplementedError
 
   try:
@@ -117,7 +117,7 @@ def Parse(data):
     return
 
   result.update({k: util.MaybeToNumber(v)
-                 for k, v in six.iteritems(result) if k in NUMERIC_FIELDS})
+                 for k, v in result.items() if k in NUMERIC_FIELDS})
 
   actual = nmea.Checksum(result['vdm'])
   expected = result['checksum']
