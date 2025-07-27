@@ -5,9 +5,9 @@
 
 #include "ais.h"
 
+#include <cstring>
 #include <fstream>
 #include <iostream>
-#include <cstring>
 #include <sstream>
 #include <string>
 

@@ -9,10 +9,10 @@
 #include <bitset>
 #include <cassert>
 #include <cstring>
-#include <string>
 #include <iostream>
-#include <vector>
 #include <memory>
+#include <string>
+#include <vector>
 
 using std::bitset;
 using std::ostream;

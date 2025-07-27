@@ -32,8 +32,8 @@
 #include <string>
 #include <tuple>
 
-#include "decode_body.h"
 #include "ais.h"
+#include "decode_body.h"
 
 using libais::AisMsg;
 using std::ostringstream;
