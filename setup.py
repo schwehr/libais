@@ -21,7 +21,7 @@ with open(os.path.join('ais', '__init__.py')) as f:
 
 EXTRA_COMPILE_ARGS = []
 if sys.platform in ('darwin', 'linux', 'linux2'):
-  EXTRA_COMPILE_ARGS = ['-std=c++11']
+  EXTRA_COMPILE_ARGS = ['-std=c++20']
 
 
 AIS_MODULE = Extension(
