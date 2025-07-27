@@ -3,7 +3,7 @@
 # CXX := c++
 
 CXXFLAGS :=
-CXXFLAGS += -std=c++11
+CXXFLAGS += -std=c++20
 
 # CXXFLAGS += -O3 -funroll-loops -fexpensive-optimizations -DNDEBUG
 

@@ -35,7 +35,7 @@ tar:
 
 
 python:
-	CFLAGS="-std=c++17 -O2 -g -UNDEBUG" python3 setup.py build
+	CFLAGS="-std=c++20 -O2 -g -UNDEBUG" python3 setup.py build
 
 clean:
 	(cd ais && make -f Makefile-custom clean)

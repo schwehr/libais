@@ -60,7 +60,7 @@ CPPFLAGS += -I$(GTEST_DIR) -I$(GMOCK_DIR)
 
 CXXFLAGS += -g -Wall -Wextra
 CXXFLAGS += -pthread
-CXXFLAGS += -std=c++11
+CXXFLAGS += -std=c++20
 
 
 GTEST_HEADERS := $(GTEST_DIR)/include/gtest/*.h
