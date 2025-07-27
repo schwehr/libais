@@ -15,7 +15,7 @@ class TestCase(unittest.TestCase):
     self.assertIsInstance(expected, dict)
     self.assertIsInstance(actual, dict)
     for key, value in expected.items():
-      self.assertEqual(actual[key], value, 'kv: %s, %s' % (key, value))
+      self.assertEqual(actual[key], value, f'kv: {key}, {value}')
 
 
 class VdmRegexTest(unittest.TestCase):

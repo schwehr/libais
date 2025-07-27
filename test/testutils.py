@@ -1,6 +1,6 @@
 import re
 
-known_bad = set((
+known_bad = {
     'addressed',
     'app_id',
     'data',
@@ -9,7 +9,7 @@ known_bad = set((
     'regional',
     'reserved',
     'structured',
-))
+}
 
 precision = 5.0
 
