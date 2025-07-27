@@ -21,10 +21,10 @@
 #include <memory>
 #include <string>
 
-#include "gtest/gtest.h"
+#include "ais.h"
 #include "gmock/gmock-matchers.h"
 #include "gmock/gmock.h"
-#include "ais.h"
+#include "gtest/gtest.h"
 
 using std::unique_ptr;
 

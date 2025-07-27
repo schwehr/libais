@@ -21,8 +21,8 @@
 #include <memory>
 #include <string>
 
-#include "gtest/gtest.h"
 #include "ais.h"
+#include "gtest/gtest.h"
 
 namespace libais {
 namespace {

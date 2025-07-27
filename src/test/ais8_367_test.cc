@@ -17,9 +17,9 @@
 #include <memory>
 #include <string>
 
+#include "ais.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "ais.h"
 
 namespace libais {
 namespace {
