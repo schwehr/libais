@@ -92,7 +92,7 @@ class TooManyErrorsError(StreamError):
     res = dict(self.kw)
     res['error_lines'] = ""
     if 'error_num' in res:
-      res['error_lines'] = "\n" + "\n".join("  %s: %s" % (error, num) for error, num in res['error_num'].iteritems())
+      res['error_lines'] = "\n" + "\n".join(f"  {error}: {num}" for error, num in res['error_num'].iteritems())
     return '%(description)s: %(error_num_total)s errors in %(line_num)s lines:%(error_lines)s' % res
 
 

@@ -21,7 +21,7 @@ with open(os.path.join('ais', '__init__.py')) as f:
 
 EXTRA_COMPILE_ARGS = []
 if sys.platform in ('darwin', 'linux', 'linux2'):
-  EXTRA_COMPILE_ARGS = ['-std=c++11']
+  EXTRA_COMPILE_ARGS = ['-std=c++20']
 
 
 AIS_MODULE = Extension(
@@ -89,8 +89,8 @@ setup(
     'Operating System :: iOS',
     'Operating System :: POSIX',
     'Programming Language :: C++',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
     'Programming Language :: Python :: Implementation :: CPython',
     'Topic :: Communications',
     'Topic :: Scientific/Engineering :: Information Analysis',
@@ -109,7 +109,6 @@ setup(
 
   ext_modules=[AIS_MODULE],
   packages=find_packages(exclude=['test', 'test.*']),
-  install_requires=['six'],
   extras_require={
       'tests': tests_require,
   },

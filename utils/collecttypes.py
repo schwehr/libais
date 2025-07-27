@@ -19,10 +19,10 @@ for arg in sys.argv[1:]:
         files.append(arg)
 
 if "help" in args:
-    print """Usage: collecttypes.py < INFILE.nmea > OUTFILE.nmea
+    print("""Usage: collecttypes.py < INFILE.nmea > OUTFILE.nmea
 
 Collects one message of each type.
-"""
+""")
     sys.exit(0)
 
 types = set()

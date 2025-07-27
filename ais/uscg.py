@@ -39,10 +39,8 @@ Example two line message:
 
 import hashlib
 import logging
+import queue as Queue
 import re
-
-import six
-import six.moves.queue as Queue
 
 import ais
 from ais import util
@@ -98,7 +96,7 @@ def Parse(data):
     return None
 
   result.update({k: util.MaybeToNumber(v)
-                 for k, v in six.iteritems(result) if k in NUMERIC_FIELDS})
+                 for k, v in result.items() if k in NUMERIC_FIELDS})
 
   return result
 

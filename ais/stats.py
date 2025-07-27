@@ -12,7 +12,7 @@ from ais import nmea_queue
 logger = logging.getLogger('libais')
 
 
-class TrackRange(object):
+class TrackRange:
 
   def __init__(self):
     self.min = None
@@ -32,7 +32,7 @@ class TrackRange(object):
     self.max = max(self.max, *values)
 
 
-class Stats(object):
+class Stats:
 
   def __init__(self):
     self.counts = collections.Counter()

@@ -3,7 +3,7 @@
 import datetime
 
 
-class Mangler(object):
+class Mangler:
   """Convert libais dictionaries to gpsd dictionaries."""
 
   def __init__(self, copy_tagblock_timestamp=True):
@@ -12,12 +12,12 @@ class Mangler(object):
   def __call__(self, msg):
     res = {}
     self.mangle(res, msg)
-    method = 'mangle__%s' % (msg['id'],)
+    method = 'mangle__{}'.format(msg['id'])
     if hasattr(self, method):
       getattr(self, method)(res, msg)
     for key in msg:
-      method1 = 'mangle__%s__%s' % (key, msg['id'])
-      method2 = 'mangle__%s' % (key,)
+      method1 = 'mangle__{}__{}'.format(key, msg['id'])
+      method2 = f'mangle__{key}'
       if hasattr(self, method1):
         getattr(self, method1)(res, msg)
       elif hasattr(self, method2):
@@ -198,7 +198,7 @@ class Mangler(object):
 
   def mangle__acks(self, res, msg):
     for idx, (mmsi, unused_seq_num) in enumerate(msg['acks']):
-      res['mmsi%s' % (idx+1,)] = mmsi
+      res[f'mmsi{idx+1}'] = mmsi
 
   # Type 8: Binary Broadcast Message
 

@@ -1,7 +1,6 @@
 import re
-import six
 
-known_bad = set((
+known_bad = {
     'addressed',
     'app_id',
     'data',
@@ -10,7 +9,7 @@ known_bad = set((
     'regional',
     'reserved',
     'structured',
-))
+}
 
 precision = 5.0
 
@@ -24,7 +23,7 @@ def TextToNumber(text):
 def IsNumber(value):
   if isinstance(value, float):
     return True
-  if isinstance(value, six.integer_types):
+  if isinstance(value, int):
     return True
   return False
 
@@ -49,10 +48,10 @@ def DictDiff(a, b):
       return True
     x = TextToNumber(x)
     y = TextToNumber(y)
-    if isinstance(x, six.string_types) and isinstance(y, six.string_types):
+    if isinstance(x, str) and isinstance(y, str):
       # Collapse strings to just lower case a-z to avoid simple mismatches.
-      new_x = re.sub(r'[^a-z]', r'', six.text_type(x).lower())
-      new_y = re.sub(r'[^a-z]', r'', six.text_type(y).lower())
+      new_x = re.sub(r'[^a-z]', r'', str(x).lower())
+      new_y = re.sub(r'[^a-z]', r'', str(y).lower())
       if new_x == new_y:
         return True
     if IsNumber(x) and IsNumber(y):

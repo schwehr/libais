@@ -11,19 +11,18 @@ import json
 import os
 import re
 import subprocess
-import six
 from .. import testutils
 
 known_problems = {
-    2: set(('turn', 'status_text')),
-    9: set(['speed']),
-    15: set(['mmsi2']),
-    17: set(('lat', 'lon')),
-    20: set((
+    2: {'turn', 'status_text'},
+    9: {'speed'},
+    15: {'mmsi2'},
+    17: {'lat', 'lon'},
+    20: {
         'increment3', 'number3', 'offset3', 'timeout3',
         'increment4', 'number4', 'offset4', 'timeout4',
-    )),
-    27: set(['status']),
+    },
+    27: {'status'},
 }
 
 
@@ -31,6 +30,14 @@ class SingleMessageTestsTest(unittest.TestCase):
 
   def setUp(self):
     self.mangle = ais.compatibility.gpsd.Mangler()
+
+  def assertDictContainsSubset2(self, actual, expected):
+    # assertDictContainsSubset was deprecated because of incorrect arg order.
+    # This method has the correct order.
+    self.assertIsInstance(expected, dict)
+    self.assertIsInstance(actual, dict)
+    for key, value in expected.items():
+      self.assertEqual(actual[key], value, f'kv: {key}, {value}')
 
   def testMsg1(self):
     fields = '!AIVDM,1,1,,B,169A91O005KbT4gUoUl9d;5j0D0U,0*2D'.split(',')
@@ -50,7 +57,7 @@ class SingleMessageTestsTest(unittest.TestCase):
         'second': 57,
         'maneuver': 0,
         'raim': False}
-    self.assertDictContainsSubset(expected, mangled)
+    self.assertDictContainsSubset2(mangled, expected)
 
     # Float values will not match, so just test existence.
     for field in ('lat', 'lon'):
@@ -69,7 +76,7 @@ class SingleMessageTestsTest(unittest.TestCase):
         'shiptype': 204,
         'shiptype_text': '204 - Unknown',
         'type': 5}
-    self.assertDictContainsSubset(expected, mangled)
+    self.assertDictContainsSubset2(mangled, expected)
 
   def testTimestamps(self):
     msg = {
@@ -89,7 +96,7 @@ class SingleMessageTestsTest(unittest.TestCase):
         'timestamp': '2015-05-15T09:27:23Z',
         'tagblock_timestamp': '2015-05-15T09:27:23.000000Z'
         }
-    self.assertDictContainsSubset(expected, mangled)
+    self.assertDictContainsSubset2(mangled, expected)
 
 
 class StreamingTest(unittest.TestCase):
@@ -115,10 +122,10 @@ class StreamingTest(unittest.TestCase):
 
     try:
       while True:
-        gmsg = six.advance_iterator(g)
-        amsg = six.advance_iterator(a)
+        gmsg = next(g)
+        amsg = next(a)
         while amsg['type'] != gmsg['type']:
-          amsg = six.advance_iterator(a)
+          amsg = next(a)
 
         if gmsg['type'] in known_problems:
           for key in known_problems[gmsg['type']]:
@@ -129,7 +136,7 @@ class StreamingTest(unittest.TestCase):
         self.assertFalse(diff['changed'])
         self.assertFalse(
             diff['removed'],
-            'Removed not empty: %s\n  %s\n  %s' % (
+            'Removed not empty: {}\n  {}\n  {}'.format(
                 diff['removed'],
                 amsg,
                 gmsg))
@@ -162,7 +169,7 @@ class TestActualGPSDCompatibility(unittest.TestCase):
     nmea_name = os.path.join(self.dir, base + '.nmea')
     json_name = os.path.join(self.dir, base + '.gpsdecode.json')
 
-    subprocess.check_call('gpsdecode < %s > %s' % (nmea_name, json_name),
+    subprocess.check_call(f'gpsdecode < {nmea_name} > {json_name}',
                           shell=True)
 
     try:
@@ -181,10 +188,10 @@ class TestActualGPSDCompatibility(unittest.TestCase):
 
       try:
         while True:
-          gmsg = six.advance_iterator(g)
-          amsg = six.advance_iterator(a)
+          gmsg = next(g)
+          amsg = next(a)
           while amsg['type'] != gmsg['type']:
-            amsg = six.advance_iterator(a)
+            amsg = next(a)
 
           if gmsg['type'] in known_problems:
             for key in known_problems[gmsg['type']]:
@@ -195,7 +202,7 @@ class TestActualGPSDCompatibility(unittest.TestCase):
           self.assertFalse(diff['changed'])
           self.assertFalse(
               diff['removed'],
-              'Removed not empty: %s\n  %s\n  %s' % (
+              'Removed not empty: {}\n  {}\n  {}'.format(
                   diff['removed'],
                   amsg,
                   gmsg))

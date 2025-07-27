@@ -363,7 +363,7 @@ def validate_messages(messages, err=None):
             for field in MSG_TYPE_FIELDS[msg_type]:
                 if not MSG_VALIDATION_LOOKUP[field]['test'](msg[field]):
                     if err is not None:
-                        sys.stdout.write("Field `%s' failed: %s" % (field, json.dumps(msg) + os.linesep))
+                        sys.stdout.write(f"Field `{field}' failed: {json.dumps(msg) + os.linesep}")
                     return_val = False
 
     return return_val
@@ -394,7 +394,7 @@ class TestValidateMessages(unittest.TestCase):
                     bad_message = good_message.copy()
                     bad_message[field] = MSG_VALIDATION_LOOKUP[field]['bad']
                     assert not validate_messages([bad_message]), \
-                        "Field `%s' should have caused message to fail: %s" % (field, bad_message)
+                        f"Field `{field}' should have caused message to fail: {bad_message}"
 
 
 if __name__ == '__main__':
