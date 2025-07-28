@@ -1,7 +1,0 @@
-# -*- makefile -*-
-all:
-	echo "NOP"
-
-clean:
-	rm -f *.pyc
-
