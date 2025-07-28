@@ -80,7 +80,7 @@ setup(
   author='Kurt Schwehr',
   author_email='schwehr@gmail.com',
   url='https://github.com/schwehr/libais',
-  license='Apache 2.0',
+  license='Apache-2.0',
   classifiers=[
     'License :: OSI Approved :: Apache Software License',
     'Development Status :: 4 - Beta',
