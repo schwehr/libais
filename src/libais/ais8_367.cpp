@@ -12,8 +12,12 @@
 // 8:367:25
 // https://www.e-navigation.nl/content/satellite-ship-weather-tiny
 
+#include <cassert>
 #include <cmath>
+#include <cstddef>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "ais.h"
 

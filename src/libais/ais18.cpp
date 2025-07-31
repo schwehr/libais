@@ -1,5 +1,8 @@
 // Class B position report - 18 "B"
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

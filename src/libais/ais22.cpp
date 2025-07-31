@@ -1,5 +1,8 @@
 // Msg 22 - F - Channel Management
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

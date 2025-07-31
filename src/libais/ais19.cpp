@@ -1,5 +1,8 @@
 // Msg 19 C - Extended Class B equipment position report
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

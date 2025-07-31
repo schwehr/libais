@@ -4,6 +4,9 @@
 // http://www.dtic.mil/cgi-bin/GetTRDoc?AD=ADA504755
 // Phase I Summary Report on AIS Transmit Project (Environmental Message)
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

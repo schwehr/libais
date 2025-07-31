@@ -1,5 +1,8 @@
 // USCG binary application messages (BBM).
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

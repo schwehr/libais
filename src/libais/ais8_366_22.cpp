@@ -2,8 +2,12 @@
 // will hopefully become a RTCM standard.  Also hoping that this
 // will be harmonized with the IMO Circ 289.
 
+#include <cassert>
 #include <cmath>
+#include <cstddef>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "ais.h"
 

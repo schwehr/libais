@@ -1,5 +1,8 @@
 // : UTC and date query
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

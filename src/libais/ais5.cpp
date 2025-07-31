@@ -1,5 +1,8 @@
 // Class A shipdata
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

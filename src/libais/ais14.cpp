@@ -1,5 +1,8 @@
 // Safety related broadcast message (SRBM)
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

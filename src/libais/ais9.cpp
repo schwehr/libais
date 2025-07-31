@@ -1,4 +1,6 @@
 #include "ais.h"
+#include <cstddef>
+#include <cassert>
 
 namespace libais {
 

@@ -2,7 +2,9 @@
 
 // See also: http://www.e-navigation.nl/asm
 
-#include <iomanip>
+#include <cassert>
+#include <cstddef>
+
 
 #include "ais.h"
 

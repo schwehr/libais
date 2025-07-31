@@ -1,5 +1,8 @@
 // Msg 21 - ATON status - 'E'
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

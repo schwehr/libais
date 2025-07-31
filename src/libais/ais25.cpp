@@ -2,6 +2,9 @@
 
 // See also: http://www.e-navigation.nl/asm
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

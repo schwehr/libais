@@ -21,16 +21,18 @@
 #include "vdm.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cctype>
+#include <cstdint>
 #include <deque>
 #include <functional>
 #include <iomanip>
-#include <locale>
+#include <ios>
 #include <memory>
 #include <numeric>
 #include <sstream>
 #include <string>
-#include <tuple>
+#include <utility>
 
 #include "ais.h"
 #include "decode_body.h"

@@ -1,6 +1,8 @@
 // Since Apr 2010
 
+#include <cassert>
 #include <cmath>
+#include <cstddef>
 
 #include "ais.h"
 

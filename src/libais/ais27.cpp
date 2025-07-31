@@ -1,5 +1,8 @@
 // 'K' - 27 - Long-range AIS broadcast message
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

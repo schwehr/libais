@@ -1,6 +1,9 @@
 // Class B static data report.  Can be one of 4 different parts.  Only
 // A and B defined for ITU 1371-3
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

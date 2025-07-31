@@ -1,6 +1,9 @@
 // @ - Assigned mode command
 // TODO(schwehr): Use valid flags rather than negative numbers.
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

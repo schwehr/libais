@@ -1,5 +1,8 @@
 // ? - Interrogation
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

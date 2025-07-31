@@ -1,5 +1,7 @@
 // TODO(schwehr): check for reference counting leaks
 // TODO(schwehr): better error handling for all messages
+#include <cstddef>
+#include <cstddef>
 #include <string>
 
 #include <Python.h>

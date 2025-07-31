@@ -1,5 +1,8 @@
 // Msg 20 D - data link management
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais{

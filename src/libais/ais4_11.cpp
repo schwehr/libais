@@ -1,5 +1,8 @@
 // AIS message 4 or 11
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

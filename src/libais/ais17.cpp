@@ -6,6 +6,9 @@
 // In 823, 30 bit words = 24 bits data followed by 6 parity bits.
 // Parity bits are left out of the AIS payload?
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {

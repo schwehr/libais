@@ -1,5 +1,8 @@
 // ACK to ABM or safety ABM.
 
+#include <cassert>
+#include <cstddef>
+
 #include "ais.h"
 
 namespace libais {
