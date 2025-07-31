@@ -37,10 +37,10 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad)
   rot = pow((rot_raw/4.733), 2);
   if (rot_raw < 0) rot = -rot;
 
-  sog = bits.ToUnsignedInt(50, 10) / 10.0;  // Knots.
+  sog = bits.ToUnsignedInt(50, 10) / 10.0F;  // Knots.
   position_accuracy = bits[60];
   position = bits.ToAisPoint(61, 55);
-  cog = bits.ToUnsignedInt(116, 12) / 10.0;  // Degrees.
+  cog = bits.ToUnsignedInt(116, 12) / 10.0F;  // Degrees.
   true_heading = bits.ToUnsignedInt(128, 9);
   timestamp = bits.ToUnsignedInt(137, 6);
   special_manoeuvre = bits.ToUnsignedInt(143, 2);
