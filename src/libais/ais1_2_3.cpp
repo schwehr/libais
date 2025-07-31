@@ -32,7 +32,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad)
   assert(message_id >= 1 && message_id <= 3);
 
   bits.SeekTo(38);
-  nav_status = (AIS_NAVIGATIONAL_STATUS)bits.ToUnsignedInt(38, 4);
+  nav_status = static_cast<AIS_NAVIGATIONAL_STATUS>(bits.ToUnsignedInt(38, 4));
 
   rot_raw = bits.ToInt(42, 8);
   rot_over_range = abs(rot_raw) > 126;
