@@ -1,6 +1,7 @@
 // Test parsing of the Class A position report messages 1-3.
 
 #include <memory>
+#include <string>
 
 #include "ais.h"
 #include "gtest/gtest.h"
