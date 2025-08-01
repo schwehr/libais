@@ -42,7 +42,7 @@ Ais18::Ais18(const char *nmea_payload, const size_t pad)
       slots_to_allocate_valid(false),
       slots_to_allocate(0),
       keep_flag_valid(false),
-      keep_flag(0),
+      keep_flag(false),
       commstate_cs_fill_valid(false),
       commstate_cs_fill(0) {
   if (!CheckStatus()) {
