@@ -157,7 +157,7 @@ Ais8_1_26_AirDraught::Ais8_1_26_AirDraught(const AisBitset &bits,
 Ais8_1_26_SensorReport*
 ais8_1_26_sensor_report_factory(const AisBitset &bits,
                                 const size_t offset) {
-  const Ais8_1_26_SensorEnum rpt_type =
+  const auto rpt_type =
       (Ais8_1_26_SensorEnum)bits.ToUnsignedInt(offset, 4);
 
   // WARNING: out of order decoding

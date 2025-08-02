@@ -240,7 +240,7 @@ Ais8_1_22_Text::Ais8_1_22_Text(const AisBitset &bits,
 std::unique_ptr<Ais8_1_22_SubArea>
 ais8_1_22_subarea_factory(const AisBitset &bits,
                             const size_t offset) {
-  const Ais8_1_22_AreaShapeEnum area_shape =
+  const auto area_shape =
       (Ais8_1_22_AreaShapeEnum)bits.ToUnsignedInt(offset, 3);
 
   switch (area_shape) {

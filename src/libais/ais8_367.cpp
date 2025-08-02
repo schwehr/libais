@@ -97,7 +97,7 @@ Ais8_367_22_Text::Ais8_367_22_Text(const AisBitset &bits, const size_t offset) {
 std::unique_ptr<Ais8_367_22_SubArea>
 ais8_367_22_subarea_factory(const AisBitset &bits,
                             const size_t offset) {
-  const Ais8_366_22_AreaShapeEnum area_shape =
+  const auto area_shape =
       static_cast<Ais8_366_22_AreaShapeEnum>(bits.ToUnsignedInt(offset, 3));
 
   switch (area_shape) {
@@ -497,7 +497,7 @@ Ais8_367_33_Wind_V2::Ais8_367_33_Wind_V2(const AisBitset &bits,
 std::unique_ptr<Ais8_367_33_SensorReport>
 ais8_367_33_sensor_report_factory(const AisBitset &bits,
                                   const size_t offset) {
-  const Ais8_367_33_SensorEnum rpt_type =
+  const auto rpt_type =
       (Ais8_367_33_SensorEnum)bits.ToUnsignedInt(offset, 4);
 
   // WARNING: out of order decoding
@@ -612,21 +612,21 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
     Ais8_367_33_SensorEnum report_type = msg.reports[report_idx]->report_type;
     switch(report_type) {
       case AIS8_367_33_SENSOR_LOCATION: {
-        Ais8_367_33_Location *rpt = dynamic_cast<Ais8_367_33_Location *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_Location *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " version: " << rpt->version << " position: " << rpt->position << " precision: " << rpt->precision << " altitude: " << rpt->altitude << " owner: " << rpt->owner << "]";
         break;
       }
       case AIS8_367_33_SENSOR_STATION: {
-        Ais8_367_33_Station *rpt = dynamic_cast<Ais8_367_33_Station *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_Station *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " name: " << rpt->name << "]";
         break;
       }
       case AIS8_367_33_SENSOR_WIND: {
-        Ais8_367_33_Wind *rpt = dynamic_cast<Ais8_367_33_Wind *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_Wind *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " speed: " << rpt->wind_speed << " gust: " << rpt->wind_gust << " dir: " << rpt->wind_dir;
@@ -636,7 +636,7 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
         break;
       }
       case AIS8_367_33_SENSOR_WATER_LEVEL: {
-        Ais8_367_33_WaterLevel *rpt = dynamic_cast<Ais8_367_33_WaterLevel *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_WaterLevel *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " type: " << rpt->type << " level: " << rpt->level << " trend: " << rpt->trend << " vdatum: " << rpt->vdatum;
@@ -646,7 +646,7 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
         break;
       }
       case AIS8_367_33_SENSOR_CURR_2D: {
-        Ais8_367_33_Curr2D *rpt = dynamic_cast<Ais8_367_33_Curr2D *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_Curr2D *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         for (size_t idx = 0; idx < 3; idx++) {
@@ -656,7 +656,7 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
         break;
       }
       case AIS8_367_33_SENSOR_CURR_3D: {
-        Ais8_367_33_Curr3D *rpt = dynamic_cast<Ais8_367_33_Curr3D *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_Curr3D *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         for (size_t idx = 0; idx < 2; idx++) {
@@ -666,7 +666,7 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
         break;
       }
       case AIS8_367_33_SENSOR_HORZ_FLOW: {
-        Ais8_367_33_HorzFlow *rpt = dynamic_cast<Ais8_367_33_HorzFlow *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_HorzFlow *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " bearing: " << rpt->bearing;
@@ -677,7 +677,7 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
         break;
       }
       case AIS8_367_33_SENSOR_SEA_STATE: {
-        Ais8_367_33_SeaState *rpt = dynamic_cast<Ais8_367_33_SeaState *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_SeaState *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " swell_height: " << rpt->swell_height << " swell_period: " << rpt->swell_period << " swell_dir: " << rpt->swell_dir;
@@ -688,7 +688,7 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
         break;
       }
       case AIS8_367_33_SENSOR_SALINITY: {
-        Ais8_367_33_Salinity *rpt = dynamic_cast<Ais8_367_33_Salinity *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_Salinity *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " water_temp: " << rpt->water_temp << " conductivity: " << rpt->conductivity << " water_pressure: " << rpt->pressure;
@@ -696,7 +696,7 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
         break;
       }
       case AIS8_367_33_SENSOR_WX: {
-        Ais8_367_33_Wx *rpt = dynamic_cast<Ais8_367_33_Wx *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_Wx *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " air_temp: " << rpt->air_temp << " air_temp_sensor_type: " << rpt->air_temp_sensor_type << " precip: " << rpt->precip;
@@ -706,7 +706,7 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
         break;
       }
       case AIS8_367_33_SENSOR_AIR_GAP: {
-        Ais8_367_33_AirGap *rpt = dynamic_cast<Ais8_367_33_AirGap *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_AirGap *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " air_draught: " << rpt->air_draught << " air_gap: " << rpt->air_gap << " air_gap_trend: " << rpt->air_gap_trend;
@@ -715,7 +715,7 @@ ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
         break;
       }
       case AIS8_367_33_SENSOR_WIND_REPORT_2: {
-        Ais8_367_33_Wind_V2 *rpt = dynamic_cast<Ais8_367_33_Wind_V2 *>(msg.reports[report_idx].get());
+        auto *rpt = dynamic_cast<Ais8_367_33_Wind_V2 *>(msg.reports[report_idx].get());
 
         o << " [report_type: " << rpt->report_type << " day: " << rpt->utc_day << " hour: " << rpt->utc_hr << " min: " << rpt->utc_min << " site: " << rpt->site_id;
         o << " wind_speed: " << rpt->wind_speed << " wind_gust: " << rpt->wind_gust << " wind_dir: " << rpt->wind_dir;
