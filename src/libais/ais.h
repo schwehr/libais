@@ -9,6 +9,7 @@
 #include <bitset>
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -46,7 +47,7 @@ string GetBody(const string &nmea_str);
 
 
 // Note: Needs to be kept in sync with AIS_STATUS_STRINGS list in ais.cpp.
-enum AIS_STATUS {
+enum AIS_STATUS : std::int8_t {
   AIS_UNINITIALIZED,  // Message is not yet completely decoded.
   AIS_OK,
   AIS_ERR_BAD_BIT_COUNT,
@@ -73,7 +74,7 @@ extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
 // River Information System (RIS):
 //   ECE-TRANS-SC3-2006-10r-RIS.pdf
 
-enum Dac {
+enum Dac : std::int16_t {
   AIS_DAC_0_TEST = 0,
   AIS_DAC_1_INTERNATIONAL,
   AIS_DAC_200_RIS = 200,
@@ -457,7 +458,7 @@ class AisMsg {
   bool CheckStatus() const;
 };
 
-enum AIS_NAVIGATIONAL_STATUS {
+enum AIS_NAVIGATIONAL_STATUS : std::int8_t {
   AIS_NV_STATUS_UNDER_WAY_USING_ENGINE = 0,
   AIS_NV_STATUS_AT_ANCHOR = 1,
   AIS_NV_STATUS_NOT_UNDER_COMMAND = 2,
@@ -1136,7 +1137,7 @@ const size_t AIS8_1_22_NUM_NAMES = 128;
 const size_t AIS8_1_22_SUBAREA_SIZE = 87;
 extern const char *ais8_1_22_notice_names[AIS8_1_22_NUM_NAMES];
 
-enum Ais8_1_22_AreaShapeEnum {
+enum Ais8_1_22_AreaShapeEnum : std::int8_t {
   AIS8_1_22_SHAPE_ERROR = -1,
   AIS8_1_22_SHAPE_CIRCLE = 0,  // OR Point.
   AIS8_1_22_SHAPE_RECT = 1,
@@ -1300,7 +1301,7 @@ ostream& operator<< (ostream &o, const Ais8_1_24 &msg);
 
 const size_t AIS8_1_26_REPORT_SIZE = 112;
 
-enum Ais8_1_26_SensorEnum {
+enum Ais8_1_26_SensorEnum : std::int8_t {
   AIS8_1_26_SENSOR_ERROR = -1,
   AIS8_1_26_SENSOR_LOCATION = 0,
   AIS8_1_26_SENSOR_STATION = 1,
@@ -1763,7 +1764,7 @@ class Ais8_200_55 : public Ais8 {
   Ais8_200_55(const char *nmea_payload, size_t pad);
 };
 
-enum Ais8_366_22_AreaShapeEnum {
+enum Ais8_366_22_AreaShapeEnum : std::int8_t {
   AIS8_366_22_SHAPE_ERROR = -1,
   AIS8_366_22_SHAPE_CIRCLE = 0,
   AIS8_366_22_SHAPE_RECT = 1,
@@ -2062,7 +2063,7 @@ ostream& operator<< (ostream &o, const Ais8_367_25 &msg);
 // https://www.e-navigation.nl/sites/default/files/asm_files/em_version_release_3-23mar15_0.pdf
 const size_t AIS8_367_33_REPORT_SIZE = 112;
 
-enum Ais8_367_33_SensorEnum {
+enum Ais8_367_33_SensorEnum : std::int8_t {
   AIS8_367_33_SENSOR_ERROR = -1,
   AIS8_367_33_SENSOR_LOCATION = 0,
   AIS8_367_33_SENSOR_STATION = 1,
