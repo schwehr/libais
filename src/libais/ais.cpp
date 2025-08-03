@@ -53,7 +53,7 @@ std::string GetBody(const std::string &nmea_str) {
 }
 
 // Note: Needs to be kept in sync with enum AIS_STATUS list in ais.h.
-const char * const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES] = {
+const std::array<const char * const, AIS_STATUS_NUM_CODES> AIS_STATUS_STRINGS{
   "AIS_UNINITIALIZED",
   "AIS_OK",
   "AIS_ERR_BAD_BIT_COUNT",

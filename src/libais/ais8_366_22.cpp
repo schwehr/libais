@@ -2,6 +2,7 @@
 // will hopefully become a RTCM standard.  Also hoping that this
 // will be harmonized with the IMO Circ 289.
 
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -13,10 +14,11 @@
 
 namespace libais {
 
-const char *shape_names[8] = {"Circle/Pt", "Rect", "Sector", "Polyline",
-                              "Polygon", "Text", "Reserved_6", "Reserved_7"};
+const std::array<const char * const, 8> shape_names{
+  "Circle/Pt", "Rect", "Sector", "Polyline",
+  "Polygon", "Text", "Reserved_6", "Reserved_7"};
 
-const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES] = {
+const std::array<const char * const, AIS8_366_22_NUM_NAMES> ais8_366_22_notice_names{
   "Caution Area: Marine mammals habitat (no whales obs)",  // 0
   "Caution Area: Marine mammals in area – reduce speed",  // 1
   "Caution Area: Marine mammals in area – stay clear",  // 2

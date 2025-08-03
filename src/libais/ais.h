@@ -64,7 +64,7 @@ enum AIS_STATUS : std::int8_t {
   AIS_STATUS_NUM_CODES
 };
 
-extern const char *const AIS_STATUS_STRINGS[AIS_STATUS_NUM_CODES];
+extern const std::array<const char * const, AIS_STATUS_NUM_CODES> AIS_STATUS_STRINGS;
 
 // Designated Area Codes (DAC) / Maritime Identification Digits define
 // which country controls a subset of the submessage spaces within
@@ -1135,7 +1135,8 @@ ostream& operator<< (ostream &o, const Ais8_1_21 &msg);
 
 const size_t AIS8_1_22_NUM_NAMES = 128;
 const size_t AIS8_1_22_SUBAREA_SIZE = 87;
-extern const char *ais8_1_22_notice_names[AIS8_1_22_NUM_NAMES];
+// extern const char *ais8_1_22_notice_names[AIS8_1_22_NUM_NAMES];
+extern const std::array<const char * const, AIS8_1_22_NUM_NAMES> ais8_1_22_notice_names;
 
 enum Ais8_1_22_AreaShapeEnum : std::int8_t {
   AIS8_1_22_SHAPE_ERROR = -1,
@@ -1149,7 +1150,7 @@ enum Ais8_1_22_AreaShapeEnum : std::int8_t {
   AIS8_1_22_SHAPE_RESERVED_7 = 7
 };
 
-extern const char *ais8_1_22_shape_names[8];
+extern const std::array<const char * const, 8> ais8_1_22_shape_names;
 
 // Sub-Areas for the Area Notice class
 
@@ -1776,7 +1777,7 @@ enum Ais8_366_22_AreaShapeEnum : std::int8_t {
   AIS8_366_22_SHAPE_RESERVED_7 = 7
 };
 
-extern const char *shape_names[8];
+extern const std::array<const char * const, 8> shape_names;
 
 class Ais8_366_22_SubArea {
  public:
@@ -1890,7 +1891,7 @@ class Ais8_366_22 : public Ais8 {
 ostream& operator<< (ostream& o, Ais8_366_22 const& msg);
 
 const size_t AIS8_366_22_NUM_NAMES = 128;
-extern const char *ais8_366_22_notice_names[AIS8_366_22_NUM_NAMES];
+extern const std::array<const char * const, AIS8_366_22_NUM_NAMES> ais8_366_22_notice_names;
 
 // 366 34 - Kurt older whale message 2008-2010
 // TODO(schwehr): Ais8_366_34

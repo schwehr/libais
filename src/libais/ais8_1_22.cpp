@@ -1,3 +1,4 @@
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -10,11 +11,11 @@
 namespace libais {
 
 // TODO(schwehr): field on class
-const char *ais8_1_22_shape_names[8] = {"Circle/Pt", "Rect", "Sector",
-                                          "Polyline", "Polygon", "Text",
-                                          "Reserved_6", "Reserved_7"};
+const std::array<const char *const, 8> ais8_1_22_shape_names{
+  "Circle/Pt", "Rect", "Sector", "Polyline", "Polygon", "Text",
+  "Reserved_6", "Reserved_7"};
 
-const char *ais8_1_22_notice_names[AIS8_1_22_NUM_NAMES] = {
+const std::array<const char * const, AIS8_1_22_NUM_NAMES> ais8_1_22_notice_names{
   // 0 has extra text compared to the spec
   "Caution Area: Marine mammals habitat (implies whales NOT observed)",  // 0
   "Caution Area: Marine mammals in area - reduce speed",  // 1
