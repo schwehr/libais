@@ -1104,7 +1104,7 @@ class Ais8_1_21 : public Ais8 {
   // sea_temp_k
   int water_temp_raw;  // TODO(schwehr): fix this
   // hor_viz
-  int wx[3];  // current, past 1, past 2
+  std::array<int, 3> wx;  // current, past 1, past 2
   int cloud_total;
   int cloud_low;
   int cloud_low_type;
@@ -1410,7 +1410,7 @@ class Ais8_1_26_Curr2D_Current {
 
 class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
  public:
-  Ais8_1_26_Curr2D_Current currents[3];
+  std::array<Ais8_1_26_Curr2D_Current, 3> currents;
   int type;
   int spare;
 
@@ -1429,7 +1429,7 @@ class Ais8_1_26_Curr3D_Current {
 
 class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
  public:
-  Ais8_1_26_Curr3D_Current currents[2];
+  std::array<Ais8_1_26_Curr3D_Current, 2> currents;;
   int type;
   int spare;
 
@@ -1449,7 +1449,7 @@ class Ais8_1_26_HorzFlow_Current {
 
 class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
  public:
-  Ais8_1_26_HorzFlow_Current currents[2];
+  std::array<Ais8_1_26_HorzFlow_Current, 2> currents;;
   int spare;
 
   Ais8_1_26_HorzFlow(const AisBitset &bs, size_t offset);
@@ -1486,7 +1486,7 @@ class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
   float salinity;  // 0/00 ppt
   int salinity_type;
   int sensor_type;
-  int spare[2];
+  std::array<int, 2> spare{0, 0};
 
   Ais8_1_26_Salinity(const AisBitset &bs, size_t offset);
   Ais8_1_26_Salinity() = default;
@@ -2280,7 +2280,7 @@ class Ais8_367_33_Salinity : public Ais8_367_33_SensorReport {
 
   int salinity_type = 0;
   int sensor_type = 0;
-  int spare2[2] = {0, 0};
+  std::array<int, 2> spare2{0, 0};
 
   Ais8_367_33_Salinity(const AisBitset &bs, size_t offset);
   ~Ais8_367_33_Salinity() override = default;
