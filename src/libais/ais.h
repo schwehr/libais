@@ -1172,8 +1172,8 @@ class Ais8_1_22_Circle : public Ais8_1_22_SubArea {
   unsigned int spare;  // 18 bits.
 
   Ais8_1_22_Circle(const AisBitset &bs, size_t offset);
-  ~Ais8_1_22_Circle() = default;
-  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_CIRCLE;}
+  ~Ais8_1_22_Circle() override = default;
+  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const override {return AIS8_1_22_SHAPE_CIRCLE;}
 };
 
 class Ais8_1_22_Rect : public Ais8_1_22_SubArea {
@@ -1186,8 +1186,8 @@ class Ais8_1_22_Rect : public Ais8_1_22_SubArea {
   unsigned int spare;  // 5 bits.
 
   Ais8_1_22_Rect(const AisBitset &bs, size_t offset);
-  ~Ais8_1_22_Rect() = default;
-  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_RECT;}
+  ~Ais8_1_22_Rect() override = default;
+  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const override {return AIS8_1_22_SHAPE_RECT;}
 };
 
 class Ais8_1_22_Sector : public Ais8_1_22_SubArea {
@@ -1200,8 +1200,8 @@ class Ais8_1_22_Sector : public Ais8_1_22_SubArea {
   int right_bound_deg;
 
   Ais8_1_22_Sector(const AisBitset &bs, size_t offset);
-  ~Ais8_1_22_Sector() = default;
-  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_SECTOR;}
+  ~Ais8_1_22_Sector() override = default;
+  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const override {return AIS8_1_22_SHAPE_SECTOR;}
 };
 
 // Or Waypoint
@@ -1217,8 +1217,8 @@ class Ais8_1_22_Polyline : public Ais8_1_22_SubArea {
   unsigned int spare;  // 2 bit.
 
   Ais8_1_22_Polyline(const AisBitset &bs, size_t offset);
-  ~Ais8_1_22_Polyline() = default;
-  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_POLYLINE;}
+  ~Ais8_1_22_Polyline() override = default;
+  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const override {return AIS8_1_22_SHAPE_POLYLINE;}
 };
 
 // TODO(schwehr): Bring in the prior point?  And do we fold the sub area data
@@ -1233,8 +1233,8 @@ class Ais8_1_22_Polygon : public Ais8_1_22_SubArea {
   unsigned int spare;  // 2 bit
 
   Ais8_1_22_Polygon(const AisBitset &bs, size_t offset);
-  ~Ais8_1_22_Polygon() = default;
-  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_POLYGON;}
+  ~Ais8_1_22_Polygon() override = default;
+  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const override {return AIS8_1_22_SHAPE_POLYGON;}
 };
 
 
@@ -1244,8 +1244,8 @@ class Ais8_1_22_Text : public Ais8_1_22_SubArea {
   // TODO(schwehr): spare?
 
   Ais8_1_22_Text(const AisBitset &bs, size_t offset);
-  ~Ais8_1_22_Text() = default;
-  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const {return AIS8_1_22_SHAPE_TEXT;}
+  ~Ais8_1_22_Text() override = default;
+  [[nodiscard]] Ais8_1_22_AreaShapeEnum getType() const override {return AIS8_1_22_SHAPE_TEXT;}
 };
 
 // Area Notice class
@@ -1346,7 +1346,7 @@ class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_Location(const AisBitset &bs, size_t offset);
   Ais8_1_26_Location() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const { return AIS8_1_26_SENSOR_LOCATION; }
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override { return AIS8_1_26_SENSOR_LOCATION; }
 };
 
 class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
@@ -1356,7 +1356,7 @@ class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_Station(const AisBitset &bs, size_t offset);
   Ais8_1_26_Station() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_STATION;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_STATION;}
 };
 
 class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
@@ -1377,7 +1377,7 @@ class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_Wind(const AisBitset &bs, size_t offset);
   Ais8_1_26_Wind() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WIND;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_WIND;}
 };
 
 class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
@@ -1397,7 +1397,7 @@ class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_WaterLevel(const AisBitset &bs, size_t offset);
   Ais8_1_26_WaterLevel() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WATER_LEVEL;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_WATER_LEVEL;}
 };
 
 class Ais8_1_26_Curr2D_Current {
@@ -1415,7 +1415,7 @@ class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_Curr2D(const AisBitset &bs, size_t offset);
   Ais8_1_26_Curr2D() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_2D;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_CURR_2D;}
 };
 
 class Ais8_1_26_Curr3D_Current {
@@ -1434,7 +1434,7 @@ class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_Curr3D(const AisBitset &bs, size_t offset);
   Ais8_1_26_Curr3D() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_CURR_3D;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_CURR_3D;}
 };
 
 class Ais8_1_26_HorzFlow_Current {
@@ -1453,7 +1453,7 @@ class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_HorzFlow(const AisBitset &bs, size_t offset);
   Ais8_1_26_HorzFlow() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_HORZ_FLOW;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_HORZ_FLOW;}
 };
 
 class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
@@ -1474,7 +1474,7 @@ class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_SeaState(const AisBitset &bs, size_t offset);
   Ais8_1_26_SeaState() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SEA_STATE;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_SEA_STATE;}
 };
 
 class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
@@ -1489,7 +1489,7 @@ class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_Salinity(const AisBitset &bs, size_t offset);
   Ais8_1_26_Salinity() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_SALINITY;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_SALINITY;}
 };
 
 class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
@@ -1508,7 +1508,7 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_Wx(const AisBitset &bs, size_t offset);
   Ais8_1_26_Wx() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_WX;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_WX;}
 };
 
 class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
@@ -1524,7 +1524,7 @@ class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
 
   Ais8_1_26_AirDraught(const AisBitset &bs, size_t offset);
   Ais8_1_26_AirDraught() = default;
-  [[nodiscard]] Ais8_1_26_SensorEnum getType() const {return AIS8_1_26_SENSOR_AIR_DRAUGHT;}
+  [[nodiscard]] Ais8_1_26_SensorEnum getType() const override {return AIS8_1_26_SENSOR_AIR_DRAUGHT;}
 };
 
 // IMO Circ 289 Environmental
@@ -1533,7 +1533,7 @@ class Ais8_1_26 : public Ais8 {
   vector<Ais8_1_26_SensorReport *> reports;
 
   Ais8_1_26(const char *nmea_payload, size_t pad);
-  ~Ais8_1_26();
+  ~Ais8_1_26() override;
 };
 ostream& operator<< (ostream &o, const Ais8_1_26 &msg);
 
@@ -1796,8 +1796,8 @@ class Ais8_366_22_Circle : public Ais8_366_22_SubArea {
   unsigned int spare;
 
   Ais8_366_22_Circle(const AisBitset &bs, size_t offset);
-  ~Ais8_366_22_Circle() = default;
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_CIRCLE;}
+  ~Ais8_366_22_Circle() override = default;
+  Ais8_366_22_AreaShapeEnum getType() override {return AIS8_366_22_SHAPE_CIRCLE;}
 };
 
 class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
@@ -1810,8 +1810,8 @@ class Ais8_366_22_Rect : public Ais8_366_22_SubArea {
   unsigned int spare;  // 5 bits
 
   Ais8_366_22_Rect(const AisBitset &bs, size_t offset);
-  ~Ais8_366_22_Rect() = default;
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_RECT;}
+  ~Ais8_366_22_Rect() override = default;
+  Ais8_366_22_AreaShapeEnum getType() override {return AIS8_366_22_SHAPE_RECT;}
 };
 
 class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
@@ -1824,8 +1824,8 @@ class Ais8_366_22_Sector : public Ais8_366_22_SubArea {
   // TODO(schwehr): spare?
 
   Ais8_366_22_Sector(const AisBitset &bs, size_t offset);
-  ~Ais8_366_22_Sector() = default;
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_SECTOR;}
+  ~Ais8_366_22_Sector() override = default;
+  Ais8_366_22_AreaShapeEnum getType() override {return AIS8_366_22_SHAPE_SECTOR;}
 };
 
 // Or Waypoint
@@ -1841,8 +1841,8 @@ class Ais8_366_22_Polyline : public Ais8_366_22_SubArea {
   unsigned int spare;
 
   Ais8_366_22_Polyline(const AisBitset &bs, size_t offset);
-  ~Ais8_366_22_Polyline() = default;
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYLINE;}
+  ~Ais8_366_22_Polyline() override = default;
+  Ais8_366_22_AreaShapeEnum getType() override {return AIS8_366_22_SHAPE_POLYLINE;}
 };
 
 class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
@@ -1856,8 +1856,8 @@ class Ais8_366_22_Polygon : public Ais8_366_22_SubArea {
   unsigned int spare;
 
   Ais8_366_22_Polygon(const AisBitset &bs, size_t offset);
-  ~Ais8_366_22_Polygon() = default;
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_POLYGON;}
+  ~Ais8_366_22_Polygon() override = default;
+  Ais8_366_22_AreaShapeEnum getType() override {return AIS8_366_22_SHAPE_POLYGON;}
 };
 
 class Ais8_366_22_Text : public Ais8_366_22_SubArea {
@@ -1866,8 +1866,8 @@ class Ais8_366_22_Text : public Ais8_366_22_SubArea {
   unsigned int spare;  // 3 bits
 
   Ais8_366_22_Text(const AisBitset &bs, size_t offset);
-  ~Ais8_366_22_Text() = default;
-  Ais8_366_22_AreaShapeEnum getType() {return AIS8_366_22_SHAPE_TEXT;}
+  ~Ais8_366_22_Text() override = default;
+  Ais8_366_22_AreaShapeEnum getType() override {return AIS8_366_22_SHAPE_TEXT;}
 };
 
 class Ais8_366_22 : public Ais8 {
@@ -1920,8 +1920,8 @@ class Ais8_367_22_Circle : public Ais8_367_22_SubArea {
   unsigned int spare;
 
   Ais8_367_22_Circle(const AisBitset &bs, size_t offset);
-  ~Ais8_367_22_Circle() = default;
-  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const {return AIS8_366_22_SHAPE_CIRCLE;}
+  ~Ais8_367_22_Circle() override = default;
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const override {return AIS8_366_22_SHAPE_CIRCLE;}
 };
 
 class Ais8_367_22_Rect : public Ais8_367_22_SubArea {
@@ -1934,8 +1934,8 @@ class Ais8_367_22_Rect : public Ais8_367_22_SubArea {
   unsigned int spare;
 
   Ais8_367_22_Rect(const AisBitset &bs, size_t offset);
-  ~Ais8_367_22_Rect() = default;
-  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const {return AIS8_366_22_SHAPE_RECT;}
+  ~Ais8_367_22_Rect() override = default;
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const override {return AIS8_366_22_SHAPE_RECT;}
 };
 
 class Ais8_367_22_Sector : public Ais8_367_22_SubArea {
@@ -1948,8 +1948,8 @@ class Ais8_367_22_Sector : public Ais8_367_22_SubArea {
   int spare;
 
   Ais8_367_22_Sector(const AisBitset &bs, size_t offset);
-  ~Ais8_367_22_Sector() = default;
-  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const {return AIS8_366_22_SHAPE_SECTOR;}
+  ~Ais8_367_22_Sector() override = default;
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const override {return AIS8_366_22_SHAPE_SECTOR;}
 };
 
 // Polyline or Polygon
@@ -1966,8 +1966,8 @@ class Ais8_367_22_Poly : public Ais8_367_22_SubArea {
 
   Ais8_367_22_Poly(const AisBitset &bs, size_t offset,
                    Ais8_366_22_AreaShapeEnum area_shape);
-  ~Ais8_367_22_Poly() = default;
-  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const {return shape;}
+  ~Ais8_367_22_Poly() override = default;
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const override {return shape;}
 };
 
 class Ais8_367_22_Text : public Ais8_367_22_SubArea {
@@ -1976,8 +1976,8 @@ class Ais8_367_22_Text : public Ais8_367_22_SubArea {
   unsigned int spare;  // 3 bits
 
   Ais8_367_22_Text(const AisBitset &bs, size_t offset);
-  ~Ais8_367_22_Text() = default;
-  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const {return AIS8_366_22_SHAPE_TEXT;}
+  ~Ais8_367_22_Text() override = default;
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const override {return AIS8_366_22_SHAPE_TEXT;}
 };
 
 class Ais8_367_22 : public Ais8 {
@@ -2110,7 +2110,7 @@ class Ais8_367_33_Location : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_Location(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_Location() = default;
+  ~Ais8_367_33_Location() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override { return AIS8_367_33_SENSOR_LOCATION; }
 };
 
@@ -2120,7 +2120,7 @@ class Ais8_367_33_Station : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_Station(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_Station() = default;
+  ~Ais8_367_33_Station() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_STATION;}
 };
 
@@ -2141,7 +2141,7 @@ class Ais8_367_33_Wind : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_Wind(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_Wind() = default;
+  ~Ais8_367_33_Wind() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_WIND;}
 };
 
@@ -2161,7 +2161,7 @@ class Ais8_367_33_WaterLevel : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_WaterLevel(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_WaterLevel() = default;
+  ~Ais8_367_33_WaterLevel() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_WATER_LEVEL;}
 };
 
@@ -2180,7 +2180,7 @@ class Ais8_367_33_Curr2D : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_Curr2D(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_Curr2D() = default;
+  ~Ais8_367_33_Curr2D() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_CURR_2D;}
 };
 
@@ -2205,7 +2205,7 @@ class Ais8_367_33_Curr3D : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_Curr3D(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_Curr3D() = default;
+  ~Ais8_367_33_Curr3D() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_CURR_3D;}
 };
 
@@ -2226,7 +2226,7 @@ class Ais8_367_33_HorzFlow : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_HorzFlow(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_HorzFlow() = default;
+  ~Ais8_367_33_HorzFlow() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_HORZ_FLOW;}
 };
 
@@ -2259,7 +2259,7 @@ class Ais8_367_33_SeaState : public Ais8_367_33_SensorReport {
   float salinity = 0.0;  // %
 
   Ais8_367_33_SeaState(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_SeaState() = default;
+  ~Ais8_367_33_SeaState() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_SEA_STATE;}
 };
 
@@ -2282,7 +2282,7 @@ class Ais8_367_33_Salinity : public Ais8_367_33_SensorReport {
   int spare2[2] = {0, 0};
 
   Ais8_367_33_Salinity(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_Salinity() = default;
+  ~Ais8_367_33_Salinity() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_SALINITY;}
 };
 
@@ -2314,7 +2314,7 @@ class Ais8_367_33_Wx : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_Wx(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_Wx() = default;
+  ~Ais8_367_33_Wx() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_WX;}
 };
 
@@ -2333,7 +2333,7 @@ class Ais8_367_33_AirGap : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_AirGap(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_AirGap() = default;
+  ~Ais8_367_33_AirGap() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_AIR_GAP;}
 };
 
@@ -2356,7 +2356,7 @@ class Ais8_367_33_Wind_V2 : public Ais8_367_33_SensorReport {
   int spare2 = 0;
 
   Ais8_367_33_Wind_V2(const AisBitset &bs, size_t offset);
-  ~Ais8_367_33_Wind_V2() = default;
+  ~Ais8_367_33_Wind_V2() override = default;
   [[nodiscard]] Ais8_367_33_SensorEnum getType() const override {return AIS8_367_33_SENSOR_WIND_REPORT_2;}
 };
 
