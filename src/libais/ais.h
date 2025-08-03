@@ -1780,7 +1780,7 @@ extern const char *shape_names[8];
 
 class Ais8_366_22_SubArea {
  public:
-    virtual Ais8_366_22_AreaShapeEnum getType() const = 0;
+    [[nodiscard]] virtual Ais8_366_22_AreaShapeEnum getType() const = 0;
     virtual ~Ais8_366_22_SubArea() = default;
 };
 
@@ -1798,7 +1798,7 @@ class Ais8_366_22_Circle final : public Ais8_366_22_SubArea {
 
   Ais8_366_22_Circle(const AisBitset &bs, size_t offset);
   ~Ais8_366_22_Circle() final = default;
-  Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_CIRCLE;}
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_CIRCLE;}
 };
 
 class Ais8_366_22_Rect final : public Ais8_366_22_SubArea {
@@ -1812,7 +1812,7 @@ class Ais8_366_22_Rect final : public Ais8_366_22_SubArea {
 
   Ais8_366_22_Rect(const AisBitset &bs, size_t offset);
   ~Ais8_366_22_Rect() final = default;
-  Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_RECT;}
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_RECT;}
 };
 
 class Ais8_366_22_Sector final : public Ais8_366_22_SubArea {
@@ -1826,7 +1826,7 @@ class Ais8_366_22_Sector final : public Ais8_366_22_SubArea {
 
   Ais8_366_22_Sector(const AisBitset &bs, size_t offset);
   ~Ais8_366_22_Sector() final = default;
-  Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_SECTOR;}
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_SECTOR;}
 };
 
 // Or Waypoint
@@ -1843,7 +1843,7 @@ class Ais8_366_22_Polyline final : public Ais8_366_22_SubArea {
 
   Ais8_366_22_Polyline(const AisBitset &bs, size_t offset);
   ~Ais8_366_22_Polyline() final = default;
-  Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_POLYLINE;}
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_POLYLINE;}
 };
 
 class Ais8_366_22_Polygon final : public Ais8_366_22_SubArea {
@@ -1858,7 +1858,7 @@ class Ais8_366_22_Polygon final : public Ais8_366_22_SubArea {
 
   Ais8_366_22_Polygon(const AisBitset &bs, size_t offset);
   ~Ais8_366_22_Polygon() final = default;
-  Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_POLYGON;}
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_POLYGON;}
 };
 
 class Ais8_366_22_Text final : public Ais8_366_22_SubArea {
@@ -1868,7 +1868,7 @@ class Ais8_366_22_Text final : public Ais8_366_22_SubArea {
 
   Ais8_366_22_Text(const AisBitset &bs, size_t offset);
   ~Ais8_366_22_Text() final = default;
-  Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_TEXT;}
+  [[nodiscard]] Ais8_366_22_AreaShapeEnum getType() const final {return AIS8_366_22_SHAPE_TEXT;}
 };
 
 class Ais8_366_22 : public Ais8 {
