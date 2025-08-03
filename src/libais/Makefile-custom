@@ -12,15 +12,13 @@ CXXFLAGS += -std=c++20
 WARN := -Wall
 WARN += -Wextra
 WARN += -Wno-sign-compare
-# WARN += -Werror
+WARN += -Werror
 
 # Disabled warnings
 # WARN += -pedantic  # long long
 # WARN += -W
 # WARN += -Weffc++
 # WARN += -Wendif-labels
-# WARN += -Wimplicit
-# WARN += -Wmissing-prototypes
 # WARN += -Wnewline-eof
 # WARN += -Wredundant-decls
 # WARN += -Wshadow
@@ -36,7 +34,8 @@ DEBUG := -g -O2
 # DEBUG += -D_GLIBCXX_DEBUG # Bad things on the mac?  May be a gtest bug.
 # DEBUG += -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCPP_CONCEPT_CHECKS
 
-OPT := -O3 -funroll-loops -fexpensive-optimizations
+OPT := -O3 -fexpensive-optimizations
+# OPT += -funroll-loops
 OPT += -DNDEBUG
 
 ifdef OPTIMIZE
@@ -138,4 +137,3 @@ ais26.o: ais.h
 ais27.o: ais.h
 ais_py.o: ais.h
 vdm.o: vdm.h ais.h
-
