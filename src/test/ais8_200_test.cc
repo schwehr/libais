@@ -77,8 +77,10 @@ void Validate8_200_24(const Ais8_200_24 &msg, const int repeat_indicator,
 TEST(Ais8_200_24, Issue162) {
   // 8:200:24 EU River Information System (RIS) Water level
   // https://github.com/schwehr/libais/issues/162
-  // \s:rORBCOMM000,q:u,c:1510617616,T:2017-11-14 00.00.16*5f\
-  //     !AIVDM,1,1,,A,801tME0j60E04QJp1hhL10G20DH1,0*11
+  /*
+     \s:rORBCOMM000,q:u,c:1510617616,T:2017-11-14 00.00.16*5f\
+         !AIVDM,1,1,,A,801tME0j60E04QJp1hhL10G20DH1,0*11
+  */
   std::unique_ptr<Ais8_200_24> msg(
       new Ais8_200_24("801tME0j60E04QJp1hhL10G20DH1", 0));
   ASSERT_NE(nullptr, msg);
