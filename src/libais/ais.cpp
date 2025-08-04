@@ -4,7 +4,6 @@
 
 #include "ais.h"
 
-extern "C" {
 int LibAisVersionMajor() {
   return LIBAIS_VERSION_MAJOR;
 }
@@ -12,7 +11,6 @@ int LibAisVersionMajor() {
 int LibAisVersionMinor() {
   return LIBAIS_VERSION_MINOR;
 }
-}  // extern "C"
 
 namespace libais {
 
