@@ -597,12 +597,12 @@ ostream& operator<< (ostream &o, const Ais5 &msg);
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
  public:
-  int seq;  // sequence number
-  int mmsi_dest;
-  bool retransmit;
-  int spare;
-  int dac;  // dac+fi = app id
-  int fi;
+  int seq{};  // sequence number
+  int mmsi_dest{};
+  bool retransmit{};
+  int spare{};
+  int dac{};  // dac+fi = app id
+  int fi{};
 
   // TODO(schwehr): how to make Ais6 protected?
   Ais6(const char *nmea_payload, size_t pad);
@@ -736,12 +736,12 @@ ostream& operator<< (ostream &o, const Ais6_1_12 &msg);
 class Ais6_1_14_Window {
  public:
   AisPoint position;
-  int utc_hour_from;
-  int utc_min_from;
-  int utc_hour_to;
-  int utc_min_to;
-  int cur_dir;
-  float cur_speed;
+  int utc_hour_from{};
+  int utc_min_from{};
+  int utc_hour_to{};
+  int utc_min_to{};
+  int cur_dir{};
+  float cur_speed{};
 };
 
 
@@ -890,10 +890,10 @@ ostream& operator<< (ostream &o, const Ais7_13 &msg);
 // AIS Binary Broadcast message ... parent to many
 class Ais8 : public AisMsg {
  public:
-  int spare;
+  int spare{};
   // TODO(schwehr): seq? // ITU M.R. 1371-3 Anex 2 5.3.1
-  int dac;  // dac+fi = app id
-  int fi;
+  int dac{};  // dac+fi = app id
+  int fi{};
 
   // TODO(schwehr): make Ais8 protected
   Ais8(const char *nmea_payload, size_t pad);
@@ -1341,10 +1341,10 @@ ais8_1_26_sensor_report_factory(const AisBitset &bs,
 class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
  public:
   AisPoint position;
-  float z;  // alt in m from MSL
-  int owner;
-  int timeout;
-  int spare;
+  float z{};  // alt in m from MSL
+  int owner{};
+  int timeout{};
+  int spare{};
 
   Ais8_1_26_Location(const AisBitset &bs, size_t offset);
   Ais8_1_26_Location() = default;
@@ -1354,7 +1354,7 @@ class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
 class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
  public:
   string name;
-  int spare;
+  int spare{};
 
   Ais8_1_26_Station(const AisBitset &bs, size_t offset);
   Ais8_1_26_Station() = default;
@@ -1363,19 +1363,19 @@ class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
  public:
-  int wind_speed;  // knots
-  int wind_gust;  // knots
-  int wind_dir;
-  int wind_gust_dir;
-  int sensor_type;
-  int wind_forecast;  // knots
-  int wind_gust_forecast;  // knots
-  int wind_dir_forecast;
-  int utc_day_forecast;
-  int utc_hour_forecast;
-  int utc_min_forecast;
-  int duration;
-  int spare;
+  int wind_speed{};  // knots
+  int wind_gust{};  // knots
+  int wind_dir{};
+  int wind_gust_dir{};
+  int sensor_type{};
+  int wind_forecast{};  // knots
+  int wind_gust_forecast{};  // knots
+  int wind_dir_forecast{};
+  int utc_day_forecast{};
+  int utc_hour_forecast{};
+  int utc_min_forecast{};
+  int duration{};
+  int spare{};
 
   Ais8_1_26_Wind(const AisBitset &bs, size_t offset);
   Ais8_1_26_Wind() = default;
@@ -1384,18 +1384,18 @@ class Ais8_1_26_Wind : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_WaterLevel : public Ais8_1_26_SensorReport {
  public:
-  int type;
-  float level;  // m.  assuming it is being stored at 0.01 m inc.
-  int trend;
-  int vdatum;
-  int sensor_type;
-  int forecast_type;
-  float level_forecast;
-  int utc_day_forecast;
-  int utc_hour_forecast;
-  int utc_min_forecast;
-  int duration;  // minutes
-  int spare;
+  int type{};
+  float level{};  // m.  assuming it is being stored at 0.01 m inc.
+  int trend{};
+  int vdatum{};
+  int sensor_type{};
+  int forecast_type{};
+  float level_forecast{};
+  int utc_day_forecast{};
+  int utc_hour_forecast{};
+  int utc_min_forecast{};
+  int duration{};  // minutes
+  int spare{};
 
   Ais8_1_26_WaterLevel(const AisBitset &bs, size_t offset);
   Ais8_1_26_WaterLevel() = default;
@@ -1411,9 +1411,9 @@ class Ais8_1_26_Curr2D_Current {
 
 class Ais8_1_26_Curr2D : public Ais8_1_26_SensorReport {
  public:
-  std::array<Ais8_1_26_Curr2D_Current, 3> currents;
-  int type;
-  int spare;
+  std::array<Ais8_1_26_Curr2D_Current, 3> currents{};
+  int type{};
+  int spare{};
 
   Ais8_1_26_Curr2D(const AisBitset &bs, size_t offset);
   Ais8_1_26_Curr2D() = default;
@@ -1430,9 +1430,9 @@ class Ais8_1_26_Curr3D_Current {
 
 class Ais8_1_26_Curr3D : public Ais8_1_26_SensorReport {
  public:
-  std::array<Ais8_1_26_Curr3D_Current, 2> currents;;
-  int type;
-  int spare;
+  std::array<Ais8_1_26_Curr3D_Current, 2> currents{};;
+  int type{};
+  int spare{};
 
   Ais8_1_26_Curr3D(const AisBitset &bs, size_t offset);
   Ais8_1_26_Curr3D() = default;
@@ -1450,8 +1450,8 @@ class Ais8_1_26_HorzFlow_Current {
 
 class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
  public:
-  std::array<Ais8_1_26_HorzFlow_Current, 2> currents;;
-  int spare;
+  std::array<Ais8_1_26_HorzFlow_Current, 2> currents{};;
+  int spare{};
 
   Ais8_1_26_HorzFlow(const AisBitset &bs, size_t offset);
   Ais8_1_26_HorzFlow() = default;
@@ -1460,19 +1460,19 @@ class Ais8_1_26_HorzFlow : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
  public:
-  float swell_height;
-  int swell_period;  // seconds
-  int swell_dir;  // deg
-  int sea_state;
-  int swell_sensor_type;
-  float water_temp;  // C
-  float water_temp_depth;  // m
-  int water_sensor_type;
-  float wave_height;
-  int wave_period;  // seconds
-  int wave_dir;  // deg
-  int wave_sensor_type;
-  float salinity;
+  float swell_height{};
+  int swell_period{};  // seconds
+  int swell_dir{};  // deg
+  int sea_state{};
+  int swell_sensor_type{};
+  float water_temp{};  // C
+  float water_temp_depth{};  // m
+  int water_sensor_type{};
+  float wave_height{};
+  int wave_period{};  // seconds
+  int wave_dir{};  // deg
+  int wave_sensor_type{};
+  float salinity{};
 
   Ais8_1_26_SeaState(const AisBitset &bs, size_t offset);
   Ais8_1_26_SeaState() = default;
@@ -1481,12 +1481,12 @@ class Ais8_1_26_SeaState : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
  public:
-  float water_temp;  // C
-  float conductivity;  // siemens/m
-  float pressure;  // decibars
-  float salinity;  // 0/00 ppt
-  int salinity_type;
-  int sensor_type;
+  float water_temp{};  // C
+  float conductivity{};  // siemens/m
+  float pressure{};  // decibars
+  float salinity{};  // 0/00 ppt
+  int salinity_type{};
+  int sensor_type{};
   std::array<int, 2> spare{0, 0};
 
   Ais8_1_26_Salinity(const AisBitset &bs, size_t offset);
@@ -1496,17 +1496,17 @@ class Ais8_1_26_Salinity : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
  public:
-  float air_temp;  // C
-  int air_temp_sensor_type;
-  int precip;
-  float horz_vis;  // nm
-  float dew_point;  // C
-  int dew_point_type;
-  float air_pressure;  // Pascals (Pa).
-  int air_pressure_trend;
-  int air_pressor_type;
-  float salinity;  // 0/00 ppt
-  int spare;
+  float air_temp{};  // C
+  int air_temp_sensor_type{};
+  int precip{};
+  float horz_vis{};  // nm
+  float dew_point{};  // C
+  int dew_point_type{};
+  float air_pressure{};  // Pascals (Pa).
+  int air_pressure_trend{};
+  int air_pressor_type{};
+  float salinity{};  // 0/00 ppt
+  int spare{};
 
   Ais8_1_26_Wx(const AisBitset &bs, size_t offset);
   Ais8_1_26_Wx() = default;
@@ -1515,14 +1515,14 @@ class Ais8_1_26_Wx : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
  public:
-  float draught;
-  float gap;
-  float forecast_gap;
-  int trend;
-  int utc_day_forecast;
-  int utc_hour_forecast;
-  int utc_min_forecast;
-  int spare;
+  float draught{};
+  float gap{};
+  float forecast_gap{};
+  int trend{};
+  int utc_day_forecast{};
+  int utc_hour_forecast{};
+  int utc_min_forecast{};
+  int spare{};
 
   Ais8_1_26_AirDraught(const AisBitset &bs, size_t offset);
   Ais8_1_26_AirDraught() = default;
