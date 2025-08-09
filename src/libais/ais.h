@@ -448,7 +448,7 @@ class AisMsg {
   size_t num_bits;  // Number of bits in the nmea_payload.
   AisBitset bits;  // The bitset that was constructed out of the nmea_payload.
 
-  AisMsg() : status(AIS_UNINITIALIZED), num_chars(0), num_bits(0), bits() {}
+  AisMsg() : status(AIS_UNINITIALIZED), num_chars(0), num_bits(0) {}
   AisMsg(const char *nmea_payload, size_t pad);
 
   // Returns true if the msg is in a good state "so far", i.e. either AIS_OK or
