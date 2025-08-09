@@ -74,7 +74,7 @@ extern const std::array<const char * const, AIS_STATUS_NUM_CODES> AIS_STATUS_STR
 
 enum Dac : std::int16_t {
   AIS_DAC_0_TEST = 0,
-  AIS_DAC_1_INTERNATIONAL,
+  AIS_DAC_1_INTERNATIONAL = 1,
   AIS_DAC_200_RIS = 200,
   AIS_DAC_201_ALBANIA = 201,
   AIS_DAC_202_ANDORRA = 202,
