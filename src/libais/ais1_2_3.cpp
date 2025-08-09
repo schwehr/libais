@@ -98,7 +98,7 @@ Ais1_2_3::Ais1_2_3(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-ostream& operator<< (ostream &o, const Ais1_2_3 &msg) {
+std::ostream& operator<< (std::ostream &o, const Ais1_2_3 &msg) {
   return o << msg.message_id << ": " << msg.mmsi;
 }
 

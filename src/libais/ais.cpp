@@ -110,7 +110,7 @@ AisPoint::AisPoint(double lng_deg_, double lat_deg_)
     : lng_deg(lng_deg_), lat_deg(lat_deg_) {
 }
 
-ostream& operator<< (ostream &o, const AisPoint &position) {
+std::ostream& operator<< (std::ostream &o, const AisPoint &position) {
   return o << " (" << position.lng_deg << ", " << position.lat_deg << ")";
 }
 

@@ -29,7 +29,7 @@ Ais10::Ais10(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-ostream& operator<< (ostream &o, const Ais10 &msg) {
+std::ostream& operator<< (std::ostream &o, const Ais10 &msg) {
   return o << msg.message_id << ": " << msg.mmsi
            << " dest=" << msg.dest_mmsi
            << " " << msg.spare << " " << msg.spare2;

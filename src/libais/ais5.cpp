@@ -48,7 +48,7 @@ Ais5::Ais5(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-ostream& operator<< (ostream& o, const Ais5 &msg) {
+std::ostream& operator<< (std::ostream& o, const Ais5 &msg) {
   return o << 5 << ": " << msg.mmsi << " \"" << msg.name << "\" "
            << msg.type_and_cargo << " " << msg.dim_a + msg.dim_b
            << "x" << msg.dim_c + msg.dim_d << "x" << msg.draught << "m";

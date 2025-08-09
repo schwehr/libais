@@ -209,7 +209,7 @@ Ais8_367_23::Ais8_367_23(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-ostream& operator<< (ostream &o, const Ais8_367_23 &msg) {
+std::ostream& operator<< (std::ostream &o, const Ais8_367_23 &msg) {
   return o << msg.mmsi << ": " << msg.version << ": " << msg.utc_day << ": " << msg.utc_hour << ": " << msg.utc_min << ": " << msg.position << ": " << msg.pressure << ": " << msg.air_temp << ": " << msg.wind_speed << ": " << msg.wind_gust << ": " << msg.wind_dir;
 }
 
@@ -240,7 +240,7 @@ Ais8_367_24::Ais8_367_24(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-ostream& operator<< (ostream &o, const Ais8_367_24 &msg) {
+std::ostream& operator<< (std::ostream &o, const Ais8_367_24 &msg) {
   return o << msg.mmsi << ": " << msg.version << ": " << msg.utc_hour << ": " << msg.utc_min << ": " << msg.pressure;
 }
 
@@ -274,7 +274,7 @@ Ais8_367_25::Ais8_367_25(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-ostream& operator<< (ostream &o, const Ais8_367_25 &msg) {
+std::ostream& operator<< (std::ostream &o, const Ais8_367_25 &msg) {
   return o << msg.mmsi << ": " << msg.version << ": " << msg.utc_hour << ": " << msg.utc_min << ": " << msg.pressure << ": " << msg.wind_speed << ": " << msg.wind_dir;
 }
 
@@ -606,7 +606,7 @@ Ais8_367_33::Ais8_367_33(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
-ostream& operator<< (ostream &o, const Ais8_367_33 &msg) {
+std::ostream& operator<< (std::ostream &o, const Ais8_367_33 &msg) {
   const int num_reports = msg.reports.size();
   for (int report_idx = 0; report_idx < num_reports; report_idx++) {
     Ais8_367_33_SensorEnum report_type = msg.reports[report_idx]->report_type;

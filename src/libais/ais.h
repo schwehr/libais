@@ -16,7 +16,6 @@
 #include <string>
 #include <vector>
 
-using std::ostream;
 using std::string;
 using std::unique_ptr;
 using std::vector;
@@ -374,7 +373,7 @@ class AisPoint {
   AisPoint();
   AisPoint(double lng_deg_, double lat_deg_);
 };
-ostream& operator<< (ostream &o, const AisPoint &position);
+std::ostream& operator<< (std::ostream &o, const AisPoint &position);
 
 //////////////////////////////////////////////////////////////////////
 // Support class for decoding
@@ -524,7 +523,7 @@ class Ais1_2_3 : public AisMsg {
 
   Ais1_2_3(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais1_2_3 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais1_2_3 &msg);
 
 // 4 bsreport and 11 utc date response
 class Ais4_11 : public AisMsg {
@@ -564,7 +563,7 @@ class Ais4_11 : public AisMsg {
   // **NO** ITDMA
   Ais4_11(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais4_11 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais4_11 &msg);
 
 class Ais5 : public AisMsg {
  public:
@@ -589,7 +588,7 @@ class Ais5 : public AisMsg {
 
   Ais5(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais5 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais5 &msg);
 
 // AIS Binary Broadcast message ... parent to many
 class Ais6 : public AisMsg {
@@ -607,7 +606,7 @@ class Ais6 : public AisMsg {
  protected:
   Ais6() = default;
 };
-ostream& operator<< (ostream &o, const Ais6 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6 &msg);
 
 // http://www.e-navigation.nl/content/monitoring-aids-navigation
 // Zeni Lite Buoy Co., Ltd buoy status.
@@ -624,7 +623,7 @@ class Ais6_0_0 : public Ais6 {
 
   Ais6_0_0(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_0_0 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_0_0 &msg);
 
 // Text message.  ITU 1371-1
 class Ais6_1_0 : public Ais6 {
@@ -636,7 +635,7 @@ class Ais6_1_0 : public Ais6 {
 
   Ais6_1_0(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_0 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_0 &msg);
 
 // Application ack.  ITU 1371-1
 class Ais6_1_1 : public Ais6 {
@@ -647,7 +646,7 @@ class Ais6_1_1 : public Ais6 {
 
   Ais6_1_1(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_1 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_1 &msg);
 
 // Interrogation for a DAC/FI.  ITU 1371-1
 class Ais6_1_2 : public Ais6 {
@@ -658,7 +657,7 @@ class Ais6_1_2 : public Ais6 {
 
   Ais6_1_2(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_2 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_2 &msg);
 
 // Capability interogation.  ITU 1371-1
 class Ais6_1_3 : public Ais6 {
@@ -670,7 +669,7 @@ class Ais6_1_3 : public Ais6 {
 
   Ais6_1_3(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_3 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_3 &msg);
 
 // Capability interogation reply.  ITU 1371-1
 // 5.4 International function message 4: Capability reply
@@ -687,7 +686,7 @@ class Ais6_1_4 : public Ais6 {
 
   Ais6_1_4(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_4 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_4 &msg);
 
 // International function message 5: Application ack to addr binary message.
 class Ais6_1_5 : public Ais6 {
@@ -727,7 +726,7 @@ class Ais6_1_12 : public Ais6 {
 
   Ais6_1_12(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_12 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_12 &msg);
 
 
 class Ais6_1_14_Window {
@@ -752,7 +751,7 @@ class Ais6_1_14 : public Ais6 {
 
   Ais6_1_14(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_14 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_14 &msg);
 
 
 // IMO Circ 289 Clearance time to enter port
@@ -770,7 +769,7 @@ class Ais6_1_18 : public Ais6 {
 
   Ais6_1_18(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_18 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_18 &msg);
 
 
 // IMO Circ 289 Berthing data
@@ -792,7 +791,7 @@ class Ais6_1_20 : public Ais6 {
 
   Ais6_1_20(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_20 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_20 &msg);
 
 class Ais6_1_25_Cargo {
  public:
@@ -825,7 +824,7 @@ class Ais6_1_25 : public Ais6 {
 
   Ais6_1_25(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_25 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_25 &msg);
 
 // TODO(schwehr): Addressed sensor report 6_1_26.
 // TODO(schwehr): IMO Circ 289 Route information 6_1_28.
@@ -858,7 +857,7 @@ class Ais6_1_32 : public Ais6 {
 
   Ais6_1_32(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_32 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_32 &msg);
 
 // Number of persons on board.  ITU 1371-1
 class Ais6_1_40 : public Ais6 {
@@ -868,7 +867,7 @@ class Ais6_1_40 : public Ais6 {
 
   Ais6_1_40(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais6_1_40 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais6_1_40 &msg);
 
 //////////////////////////////////////////////////////////////////////
 
@@ -882,7 +881,7 @@ class Ais7_13 : public AisMsg {
 
   Ais7_13(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais7_13 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais7_13 &msg);
 
 // AIS Binary Broadcast message ... parent to many
 class Ais8 : public AisMsg {
@@ -898,7 +897,7 @@ class Ais8 : public AisMsg {
  protected:
   Ais8() = default;
 };
-ostream& operator<< (ostream &o, const Ais8 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8 &msg);
 
 // Text telegram ITU 1371-1
 class Ais8_1_0 : public Ais8 {
@@ -910,7 +909,7 @@ class Ais8_1_0 : public Ais8 {
 
   Ais8_1_0(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_0 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_0 &msg);
 
 // 8_1_1 No message
 // 8_1_2 No message
@@ -961,7 +960,7 @@ class Ais8_1_11 : public Ais8 {
 
   Ais8_1_11(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_11 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_11 &msg);
 
 
 // IMO Circ 236 Fairway closed - Not to be transmitted after 2012-Jan-01
@@ -986,7 +985,7 @@ class Ais8_1_13 : public Ais8 {
 
   Ais8_1_13(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_13 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_13 &msg);
 
 // IMO Circ 236 Extended ship static and voyage data
 // Not to be transmitted after 2012-Jan-01
@@ -997,7 +996,7 @@ class Ais8_1_15 : public Ais8 {
 
   Ais8_1_15(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_15 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_15 &msg);
 
 // IMO Circ 236 Number of persons on board
 class Ais8_1_16 : public Ais8 {
@@ -1007,7 +1006,7 @@ class Ais8_1_16 : public Ais8 {
 
   Ais8_1_16(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_16 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_16 &msg);
 
 class Ais8_1_17_Target {
  public:
@@ -1029,7 +1028,7 @@ class Ais8_1_17 : public Ais8 {
 
   Ais8_1_17(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_17 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_17 &msg);
 
 // No 8_1_18
 
@@ -1048,7 +1047,7 @@ class Ais8_1_19 : public Ais8 {
 
   Ais8_1_19(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_19 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_19 &msg);
 
 // No message 8_1_20
 
@@ -1127,7 +1126,7 @@ class Ais8_1_21 : public Ais8 {
 
   Ais8_1_21(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_21 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_21 &msg);
 
 
 const size_t AIS8_1_22_NUM_NAMES = 128;
@@ -1264,7 +1263,7 @@ class Ais8_1_22 : public Ais8 {
 
   Ais8_1_22(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream& o, Ais8_1_22 const& msg);
+std::ostream& operator<< (std::ostream& o, Ais8_1_22 const& msg);
 
 // No message 8_1_23
 
@@ -1293,7 +1292,7 @@ class Ais8_1_24 : public Ais8 {
 
   Ais8_1_24(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_24 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_24 &msg);
 
 // No message 8_1_25
 
@@ -1534,7 +1533,7 @@ class Ais8_1_26 : public Ais8 {
   Ais8_1_26(const char *nmea_payload, size_t pad);
   ~Ais8_1_26() override;
 };
-ostream& operator<< (ostream &o, const Ais8_1_26 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_26 &msg);
 
 
 // IMO Circ 289 Route information
@@ -1552,7 +1551,7 @@ class Ais8_1_27 : public Ais8 {
 
   Ais8_1_27(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_27 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_27 &msg);
 
 
 //  No message 8_1_28
@@ -1567,7 +1566,7 @@ class Ais8_1_29 : public Ais8 {
 
   Ais8_1_29(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_29 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_29 &msg);
 
 
 // No message 8_1_30
@@ -1620,7 +1619,7 @@ class Ais8_1_31 : public Ais8 {
 
   Ais8_1_31(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_1_31 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_1_31 &msg);
 
 // TODO(schwehr): Persons on board ITU 1371-1 8_1_40.
 
@@ -1885,7 +1884,7 @@ class Ais8_366_22 : public Ais8 {
 
   Ais8_366_22(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream& o, Ais8_366_22 const& msg);
+std::ostream& operator<< (std::ostream& o, Ais8_366_22 const& msg);
 
 const size_t AIS8_366_22_NUM_NAMES = 128;
 extern const std::array<const char * const, AIS8_366_22_NUM_NAMES> ais8_366_22_notice_names;
@@ -1995,7 +1994,7 @@ class Ais8_367_22 : public Ais8 {
 
   Ais8_367_22(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream& o, Ais8_367_22 const& msg);
+std::ostream& operator<< (std::ostream& o, Ais8_367_22 const& msg);
 
 // SSW Satellite Ship Weather 1-Slot Version
 // https://www.e-navigation.nl/content/satellite-ship-weather
@@ -2019,7 +2018,7 @@ class Ais8_367_23 : public Ais8 {
 
   Ais8_367_23(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_367_23 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_367_23 &msg);
 
 // SSW Satellite Ship Weather 1-Slot Version
 // https://www.e-navigation.nl/content/satellite-ship-weather-small
@@ -2035,7 +2034,7 @@ class Ais8_367_24 : public Ais8 {
 
   Ais8_367_24(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_367_24 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_367_24 &msg);
 
 //
 // SSW Satellite Ship Weather Tiny Version
@@ -2054,7 +2053,7 @@ class Ais8_367_25 : public Ais8 {
 
   Ais8_367_25(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_367_25 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_367_25 &msg);
 
 // Environmental Message
 // https://www.e-navigation.nl/content/environmental-message-0
@@ -2366,7 +2365,7 @@ class Ais8_367_33 : public Ais8 {
 
   Ais8_367_33(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais8_367_33 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais8_367_33 &msg);
 
 class Ais9 : public AisMsg {
  public:
@@ -2417,7 +2416,7 @@ class Ais9 : public AisMsg {
 
   Ais9(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais9 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais9 &msg);
 
 // 10 ":" - UTC and date inquiry
 class Ais10 : public AisMsg {
@@ -2428,7 +2427,7 @@ class Ais10 : public AisMsg {
 
   Ais10(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais10 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais10 &msg);
 
 // 11 ';' - See 4_11
 
@@ -2444,7 +2443,7 @@ class Ais12 : public AisMsg {
 
   Ais12(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais12 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais12 &msg);
 
 // 13 '=' - See 7
 
@@ -2457,7 +2456,7 @@ class Ais14 : public AisMsg {
 
   Ais14(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais14 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais14 &msg);
 
 // 15 - '?' - Interrogation
 class Ais15 : public AisMsg {
@@ -2479,7 +2478,7 @@ class Ais15 : public AisMsg {
 
   Ais15(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais15 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais15 &msg);
 
 // 16 - '@' - Assigned mode command
 class Ais16 : public AisMsg {
@@ -2495,7 +2494,7 @@ class Ais16 : public AisMsg {
 
   Ais16(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais16 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais16 &msg);
 
 // ITU-R M.823  http://www.itu.int/rec/R-REC-M.823/en
 // 17 - 'A' - GNSS broadcast - TODO(schwehr): only partially coded
@@ -2514,7 +2513,7 @@ class Ais17 : public AisMsg {
 
   Ais17(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais17 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais17 &msg);
 
 
 // 18 - 'B' - Class B position report
@@ -2575,7 +2574,7 @@ class Ais18 : public AisMsg {
 
   Ais18(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais18 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais18 &msg);
 
 // 19 - 'C' - Class B extended ship and position
 class Ais19 : public AisMsg {
@@ -2602,7 +2601,7 @@ class Ais19 : public AisMsg {
 
   Ais19(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais19 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais19 &msg);
 
 // 20 - 'D' - Data link management
 // TODO(schwehr): consider a vector
@@ -2636,7 +2635,7 @@ class Ais20 : public AisMsg {
 
   Ais20(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais20 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais20 &msg);
 
 // 21 - 'E' - Aids to navigation report
 class Ais21 : public AisMsg {
@@ -2662,7 +2661,7 @@ class Ais21 : public AisMsg {
 
   Ais21(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais21 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais21 &msg);
 
 // 22 - 'F' - Channel Management
 class Ais22 : public AisMsg {
@@ -2691,7 +2690,7 @@ class Ais22 : public AisMsg {
 
   Ais22(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais22 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais22 &msg);
 
 // 23 - 'G' - Group Assignment Command
 class Ais23 : public AisMsg {
@@ -2711,7 +2710,7 @@ class Ais23 : public AisMsg {
 
   Ais23(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais23 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais23 &msg);
 
 // 24 - 'H' - Class B Static Data report
 class Ais24 : public AisMsg {
@@ -2736,7 +2735,7 @@ class Ais24 : public AisMsg {
 
   Ais24(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais24 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais24 &msg);
 
 // 25 - 'I' - Single slot binary message - addressed or broadcast
 // TODO(schwehr): handle payload
@@ -2754,7 +2753,7 @@ class Ais25 : public AisMsg {
 
   Ais25(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais25 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais25 &msg);
 
 // 26 - 'J' - Multi slot binary message with comm state
 // TODO(schwehr): handle payload
@@ -2804,7 +2803,7 @@ class Ais26 : public AisMsg {
 
   Ais26(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais26 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais26 &msg);
 
 // 27 - 'K' - Long-range position report - e.g. for satellite receivers
 class Ais27 : public AisMsg {
@@ -2820,7 +2819,7 @@ class Ais27 : public AisMsg {
 
   Ais27(const char *nmea_payload, size_t pad);
 };
-ostream& operator<< (ostream &o, const Ais27 &msg);
+std::ostream& operator<< (std::ostream &o, const Ais27 &msg);
 
 }  // namespace libais
 

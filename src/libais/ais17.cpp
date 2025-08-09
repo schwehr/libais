@@ -56,7 +56,7 @@ Ais17::Ais17(const char *nmea_payload, const size_t pad)
 }
 
 
-ostream& operator<< (ostream &o, const Ais17 &m) {
+std::ostream& operator<< (std::ostream &o, const Ais17 &m) {
     return o << "[" << m.message_id << "]: " << m.mmsi
              << " " << m.position << " t:"
              << m.gnss_type << ", z:" << m.z_cnt
