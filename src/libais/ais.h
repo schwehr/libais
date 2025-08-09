@@ -16,7 +16,6 @@
 #include <string>
 #include <vector>
 
-using std::bitset;
 using std::ostream;
 using std::string;
 using std::unique_ptr;
@@ -382,7 +381,7 @@ ostream& operator<< (ostream &o, const AisPoint &position);
 //////////////////////////////////////////////////////////////////////
 static const int MAX_BITS = 1192;
 
-class AisBitset : protected bitset<MAX_BITS> {
+class AisBitset : protected std::bitset<MAX_BITS> {
  public:
   AisBitset();
 

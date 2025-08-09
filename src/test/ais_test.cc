@@ -122,7 +122,7 @@ TEST(GetPadTest, SurviveMalformed) {
 
 // Can we reverse the bits in a bitset?
 TEST(ReverseBitset6Test, ReverseWorks) {
-  bitset<6> zero(0), bits1(0), bits2(0);
+  std::bitset<6> zero(0), bits1(0), bits2(0);
   ASSERT_EQ(bits1, AisBitset::Reverse(bits1));
   bits1[0] = 1;
   bits2[5] = 1;

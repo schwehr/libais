@@ -179,7 +179,7 @@ void AisBitset::InitNmeaOrd() {
   nmea_ord_initialized_ = true;
 }
 
-bitset<6> AisBitset::Reverse(const bitset<6> &bits) {
+std::bitset<6> AisBitset::Reverse(const bitset<6> &bits) {
   bitset<6> out;
   for (size_t i = 0; i < 6; i++)
     out[5 - i] = bits[i];
@@ -187,7 +187,8 @@ bitset<6> AisBitset::Reverse(const bitset<6> &bits) {
 }
 
 bool AisBitset::nmea_ord_initialized_ = false;
-bitset<6> AisBitset::nmea_ord_[128];
+
+std::bitset<6> AisBitset::nmea_ord_[128];
 // For decoding str bits inside of a binary message.
 const char AisBitset::bits_to_char_tbl_[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";
