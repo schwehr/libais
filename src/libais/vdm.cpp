@@ -59,8 +59,8 @@ std::string ChecksumHexString(const std::string &base) {
   return checksum;
 }
 
-vector<std::string> Split(const std::string &line, char delim) {
-  vector<std::string> result;
+std::vector<std::string> Split(const std::string &line, char delim) {
+  std::vector<std::string> result;
   std::stringstream ss(line);
   while (!ss.eof()) {
     std::string next;
@@ -71,7 +71,7 @@ vector<std::string> Split(const std::string &line, char delim) {
 }
 
 bool ValidateChecksum(const std::string &line) {
-  vector<std::string> fields = Split(line, '*');
+  std::vector<std::string> fields = Split(line, '*');
 
   if (fields.size() != 2 || fields[1].size() != 2) {
     return false;
@@ -100,7 +100,7 @@ std::string ReportErrorLine(const std::string &msg, const std::string &line,
 
 bool GetSentenceSequenceNumbers(const std::string & /* line */,
                                 const int64_t /* line_number */,
-                                const vector<std::string> &fields,
+                                const std::vector<std::string> &fields,
                                 int32_t *sentence_total,
                                 int32_t *sentence_number,
                                 int32_t *sequence_number, char *channel) {
@@ -165,7 +165,7 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const std::string &line,
     return nullptr;
   }
 
-  vector<std::string> fields = Split(line, ',');
+  std::vector<std::string> fields = Split(line, ',');
   if (fields.size() != 7) {
     return nullptr;
   }
@@ -215,7 +215,7 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const std::string &line,
 }
 
 // TODO(schwehr): Is if faster to just use string.append?
-std::string Join(const vector<std::string> &parts, char delim) {
+std::string Join(const std::vector<std::string> &parts, char delim) {
   ostringstream out;
   for (const auto &part : parts) {
     if (&part != &parts[0]) {
@@ -226,7 +226,7 @@ std::string Join(const vector<std::string> &parts, char delim) {
 }
 
 unique_ptr<NmeaSentence> NmeaSentence::Merge(
-    const vector<unique_ptr<NmeaSentence>> &prior_sentences) const {
+    const std::vector<unique_ptr<NmeaSentence>> &prior_sentences) const {
   if (prior_sentences.size() != sentence_total_ - 1) {
     return nullptr;
   }

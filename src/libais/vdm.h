@@ -120,7 +120,7 @@ class NmeaSentence {
   // Merging sentences from different messages or out of order messages will
   // fail.
   std::unique_ptr<NmeaSentence> Merge(
-      const vector<std::unique_ptr<NmeaSentence>> &prior_sentences) const;
+      const std::vector<std::unique_ptr<NmeaSentence>> &prior_sentences) const;
 
   // Reconstructs the NMEA AIS VDM sentence representation of this instance.
   string ToString() const;
@@ -218,7 +218,7 @@ class VdmStream {
   std::deque<std::unique_ptr<libais::AisMsg>> messages_;
   // Sentences for each sequence number that have yet to get all the required
   // parts to be complete.
-  vector<vector<std::unique_ptr<NmeaSentence>>> incoming_sentences_;
+  std::vector<std::vector<std::unique_ptr<NmeaSentence>>> incoming_sentences_;
 };
 
 }  // namespace libais

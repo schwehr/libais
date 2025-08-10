@@ -17,7 +17,6 @@
 #include <vector>
 
 using std::string;
-using std::vector;
 
 constexpr int LIBAIS_VERSION_MAJOR = 0;
 constexpr int LIBAIS_VERSION_MINOR = 17;
@@ -746,7 +745,7 @@ class Ais6_1_14 : public Ais6 {
  public:
   int utc_month;
   int utc_day;
-  vector<Ais6_1_14_Window> windows;
+  std::vector<Ais6_1_14_Window> windows;
 
   Ais6_1_14(const char *nmea_payload, size_t pad);
 };
@@ -819,7 +818,7 @@ class Ais6_1_25 : public Ais6 {
   int amount_unit;
   int amount;
 
-  vector<Ais6_1_25_Cargo> cargos;  // 0 to 17 cargo entries
+  std::vector<Ais6_1_25_Cargo> cargos;  // 0 to 17 cargo entries
 
   Ais6_1_25(const char *nmea_payload, size_t pad);
 };
@@ -852,7 +851,7 @@ class Ais6_1_32 : public Ais6 {
  public:
   int utc_month;
   int utc_day;
-  vector<Ais6_1_32_Window> windows;
+  std::vector<Ais6_1_32_Window> windows;
 
   Ais6_1_32(const char *nmea_payload, size_t pad);
 };
@@ -875,8 +874,8 @@ class Ais7_13 : public AisMsg {
  public:
   int spare;
 
-  vector<int> dest_mmsi;
-  vector<int> seq_num;
+  std::vector<int> dest_mmsi;
+  std::vector<int> seq_num;
 
   Ais7_13(const char *nmea_payload, size_t pad);
 };
@@ -1023,7 +1022,7 @@ class Ais8_1_17_Target {
 // IMO Circ 236 VTS Generated/synthetic targets
 class Ais8_1_17 : public Ais8 {
  public:
-  vector<Ais8_1_17_Target> targets;
+  std::vector<Ais8_1_17_Target> targets;
 
   Ais8_1_17(const char *nmea_payload, size_t pad);
 };
@@ -1209,8 +1208,8 @@ class Ais8_1_22_Polyline : public Ais8_1_22_SubArea {
   // TODO(schwehr): int precision; // How many decimal places for x and y.
 
   // Up to 4 points
-  vector<float> angles;
-  vector<float> dists_m;
+  std::vector<float> angles;
+  std::vector<float> dists_m;
   unsigned int spare;  // 2 bit.
 
   Ais8_1_22_Polyline(const AisBitset &bs, size_t offset);
@@ -1225,8 +1224,8 @@ class Ais8_1_22_Polygon : public Ais8_1_22_SubArea {
   // TODO(schwehr): int precision; // How many decimal places for x and y.
 
   // Up to 4 points in a first message, but aggregated if multiple sub areas
-  vector<float> angles;
-  vector<float> dists_m;
+  std::vector<float> angles;
+  std::vector<float> dists_m;
   unsigned int spare;  // 2 bit
 
   Ais8_1_22_Polygon(const AisBitset &bs, size_t offset);
@@ -1258,7 +1257,7 @@ class Ais8_1_22 : public Ais8 {
   int duration_minutes;  // Time from the start until the notice expires.
 
   // 1 or more sub messages
-  vector<std::unique_ptr<Ais8_1_22_SubArea>> sub_areas;
+  std::vector<std::unique_ptr<Ais8_1_22_SubArea>> sub_areas;
 
   Ais8_1_22(const char *nmea_payload, size_t pad);
 };
@@ -1527,7 +1526,7 @@ class Ais8_1_26_AirDraught : public Ais8_1_26_SensorReport {
 // IMO Circ 289 Environmental
 class Ais8_1_26 : public Ais8 {
  public:
-  vector<Ais8_1_26_SensorReport *> reports;
+  std::vector<Ais8_1_26_SensorReport *> reports;
 
   Ais8_1_26(const char *nmea_payload, size_t pad);
   ~Ais8_1_26() override;
@@ -1546,7 +1545,7 @@ class Ais8_1_27 : public Ais8 {
   int utc_hour;
   int utc_min;
   int duration;
-  vector<AisPoint> waypoints;
+  std::vector<AisPoint> waypoints;
 
   Ais8_1_27(const char *nmea_payload, size_t pad);
 };
@@ -1833,8 +1832,8 @@ class Ais8_366_22_Polyline final : public Ais8_366_22_SubArea {
   // TODO(schwehr): precision
 
   // Up to 4 points
-  vector<float> angles;
-  vector<float> dists_m;
+  std::vector<float> angles;
+  std::vector<float> dists_m;
   unsigned int spare;
 
   Ais8_366_22_Polyline(const AisBitset &bs, size_t offset);
@@ -1848,8 +1847,8 @@ class Ais8_366_22_Polygon final : public Ais8_366_22_SubArea {
   // TODO(schwehr): precision?
 
   // Up to 4 points in a first message, but aggregated if multiple sub areas
-  vector<float> angles;
-  vector<float> dists_m;
+  std::vector<float> angles;
+  std::vector<float> dists_m;
   unsigned int spare;
 
   Ais8_366_22_Polygon(const AisBitset &bs, size_t offset);
@@ -1879,7 +1878,7 @@ class Ais8_366_22 : public Ais8 {
   int duration_minutes;  // Time from the start until the notice expires
   // 1 or more sub messages
 
-  vector<std::unique_ptr<Ais8_366_22_SubArea>> sub_areas;
+  std::vector<std::unique_ptr<Ais8_366_22_SubArea>> sub_areas;
 
   Ais8_366_22(const char *nmea_payload, size_t pad);
 };
@@ -1894,7 +1893,7 @@ extern const std::array<const char * const, AIS8_366_22_NUM_NAMES> ais8_366_22_n
 // USCG Blue Force encrypted message.
 class Ais8_366_56 : public Ais8 {
  public:
-  vector<unsigned char> encrypted;
+  std::vector<unsigned char> encrypted;
 
   Ais8_366_56(const char *nmea_payload, size_t pad);
 };
@@ -1957,8 +1956,8 @@ class Ais8_367_22_Poly : public Ais8_367_22_SubArea {
   int precision;
 
   // Up to 4 points
-  vector<float> angles;
-  vector<float> dists_m;
+  std::vector<float> angles;
+  std::vector<float> dists_m;
   unsigned int spare;
 
   Ais8_367_22_Poly(const AisBitset &bs, size_t offset,
@@ -1989,7 +1988,7 @@ class Ais8_367_22 : public Ais8 {
   int duration_minutes;
   int spare2;
 
-  vector<std::unique_ptr<Ais8_367_22_SubArea>> sub_areas;
+  std::vector<std::unique_ptr<Ais8_367_22_SubArea>> sub_areas;
 
   Ais8_367_22(const char *nmea_payload, size_t pad);
 };
@@ -2360,7 +2359,7 @@ class Ais8_367_33_Wind_V2 : public Ais8_367_33_SensorReport {
 class Ais8_367_33 : public Ais8 {
  public:
   // 1 to 8 sensor reports
-  vector<std::unique_ptr<Ais8_367_33_SensorReport>> reports;
+  std::vector<std::unique_ptr<Ais8_367_33_SensorReport>> reports;
 
   Ais8_367_33(const char *nmea_payload, size_t pad);
 };
