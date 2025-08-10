@@ -27,8 +27,8 @@ void Validate(
     const int repeat_indicator,
     const int mmsi,
     const int spare,
-    const vector<int> dest_mmsi,
-    const vector<int> seq_num) {
+    const std::vector<int> dest_mmsi,
+    const std::vector<int> seq_num) {
   ASSERT_NE(nullptr, msg);
   EXPECT_FALSE(msg->had_error());
 
@@ -44,8 +44,8 @@ TEST(Ais713Test, Msg7Length1) {
   // Tests decoding a length 1 ack.
   std::unique_ptr<Ais7_13> msg = Init("!AIVDM,1,1,,A,7jvPoD@mMq;U,0*09");
   ASSERT_NE(nullptr, msg);
-  const vector<int> dest_mmsi = {224257209};
-  const vector<int> seq_num = {1};
+  const std::vector<int> dest_mmsi = {224257209};
+  const std::vector<int> seq_num = {1};
   Validate(msg.get(), 7, 3, 199767889, 0, dest_mmsi, seq_num);
 }
 

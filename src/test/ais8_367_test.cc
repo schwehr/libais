@@ -75,7 +75,7 @@ void ValidateCircle(const Ais8_367_22_SubArea *sub_area,
 // TODO(schwehr): Test area_type.
 void ValidatePoly(const Ais8_367_22_SubArea *sub_area,
                   const Ais8_366_22_AreaShapeEnum /* area_type */,
-                  const vector<float> &angles, const vector<float> &dists_m,
+                  const std::vector<float> &angles, const std::vector<float> &dists_m,
                   const unsigned int spare) {
   ASSERT_TRUE(AIS8_366_22_SHAPE_POLYLINE == sub_area->getType() ||
               AIS8_366_22_SHAPE_POLYGON == sub_area->getType());

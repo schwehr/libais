@@ -11,7 +11,7 @@ namespace libais {
 namespace {
 
 void Validate(const Ais8_366_56 *msg, const int repeat_indicator,
-              const int mmsi, const vector<unsigned char> &encrypted) {
+              const int mmsi, const std::vector<unsigned char> &encrypted) {
   ASSERT_NE(nullptr, msg);
   EXPECT_FALSE(msg->had_error());
 
