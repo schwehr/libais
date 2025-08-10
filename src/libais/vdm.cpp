@@ -79,9 +79,9 @@ bool ValidateChecksum(const std::string &line) {
 
   try {
     const std::string checksum_str(fields[1]);
-    int32_t checksum = std::stoi(checksum_str, nullptr, 16);
+    int32_t const checksum = std::stoi(checksum_str, nullptr, 16);
 
-    int32_t checksum_calculated = Checksum(line.substr(1, line.size() - 4));
+    int32_t const checksum_calculated = Checksum(line.substr(1, line.size() - 4));
     if (checksum_calculated != checksum) {
       return false;
     }
@@ -259,7 +259,7 @@ unique_ptr<NmeaSentence> NmeaSentence::Merge(
 std::string NmeaSentence::ToString() const {
   std::string channel;
   channel += channel_;
-  std::string sequence(
+  std::string const sequence(
       (sequence_number_ != -1) ? std::to_string(sequence_number_) : "");
 
   std::string result = "";
@@ -276,7 +276,7 @@ std::string NmeaSentence::ToString() const {
   result.append(body_);
   result.append(",");
   result.append(std::to_string(fill_bits_));
-  std::string checksum_str = ChecksumHexString(result);
+  std::string const checksum_str = ChecksumHexString(result);
   result.append("*");
   result.append(checksum_str);
   return "!" + result;
@@ -315,8 +315,8 @@ bool VdmStream::AddLine(const std::string &line) {
   if (sentence == nullptr) {
     return false;
   }
-  int seq = sentence->sequence_number();
-  int tot = sentence->sentence_total();
+  int const seq = sentence->sequence_number();
+  int const tot = sentence->sentence_total();
 
   // These are enforced by NmeaSentence, so only check when debugging.
   assert(seq < kNumSequenceChannels);
@@ -324,7 +324,7 @@ bool VdmStream::AddLine(const std::string &line) {
 
   // Convert multi-line message to single line.
   if (tot != 1) {
-    int cnt = sentence->sentence_number();
+    int const cnt = sentence->sentence_number();
 
     // Beginning of a message.
     if (cnt == 1) {

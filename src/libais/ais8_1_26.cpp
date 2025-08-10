@@ -62,7 +62,7 @@ Ais8_1_26_WaterLevel::Ais8_1_26_WaterLevel(const AisBitset &bits,
 Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const AisBitset &bits,
                                    const size_t offset) {
   for (size_t idx = 0; idx < 3; idx++) {
-    size_t start = offset + idx * 26;
+    size_t const start = offset + idx * 26;
     currents[idx].speed = bits.ToUnsignedInt(start, 8) / 10.;
     currents[idx].dir = bits.ToUnsignedInt(start + 8, 9);
     currents[idx].depth = bits.ToUnsignedInt(start + 17, 9);
@@ -74,7 +74,7 @@ Ais8_1_26_Curr2D::Ais8_1_26_Curr2D(const AisBitset &bits,
 Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const AisBitset &bits,
                                    const size_t offset) {
   for (size_t idx = 0; idx < 2; idx++) {
-    size_t start = offset + idx * 33;
+    size_t const start = offset + idx * 33;
     currents[idx].north = bits.ToUnsignedInt(start, 8) / 10.;
     currents[idx].east = bits.ToUnsignedInt(start + 8, 8) / 10.;
     currents[idx].up = bits.ToUnsignedInt(start + 16, 8) / 10.;
@@ -87,7 +87,7 @@ Ais8_1_26_Curr3D::Ais8_1_26_Curr3D(const AisBitset &bits,
 Ais8_1_26_HorzFlow::Ais8_1_26_HorzFlow(const AisBitset &bits,
                                        const size_t offset) {
   for (size_t idx = 0; idx < 2; idx++) {
-    size_t start = offset + idx * 42;
+    size_t const start = offset + idx * 42;
     currents[idx].bearing = bits.ToUnsignedInt(start, 9);
     currents[idx].dist = bits.ToUnsignedInt(start + 9, 7);
     currents[idx].speed = bits.ToUnsignedInt(start + 16, 8) / 10.;

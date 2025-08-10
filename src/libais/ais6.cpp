@@ -204,7 +204,7 @@ Ais6_1_4::Ais6_1_4(const char *nmea_payload, const size_t pad)
   ack_dac = bits.ToUnsignedInt(88, 10);
   constexpr int kNumFI = 64;
   for (size_t cap_num = 0; cap_num < kNumFI; cap_num++) {
-    size_t start = 98 + cap_num * 2;
+    size_t const start = 98 + cap_num * 2;
     capabilities[cap_num] = bits[start];
     cap_reserved[cap_num] = bits[start + 1];
   }
@@ -322,8 +322,8 @@ Ais6_1_14::Ais6_1_14(const char *nmea_payload, const size_t pad)
     Ais6_1_14_Window w;
     const size_t start = 97 + window_num * 93;
     // Reversed order for lng/lat.
-    double y = bits.ToInt(start, 27) / 600000.0;
-    double x = bits.ToInt(start + 27, 28) / 600000.0;
+    double const y = bits.ToInt(start, 27) / 600000.0;
+    double const x = bits.ToInt(start + 27, 28) / 600000.0;
     w.position = AisPoint(x, y);
     w.utc_hour_from = bits.ToUnsignedInt(start + 55, 5);
     w.utc_min_from = bits.ToUnsignedInt(start + 60, 6);
@@ -547,7 +547,7 @@ Ais6_1_40::Ais6_1_40(const char *nmea_payload, const size_t pad)
     return;
   }
 
-  AisBitset bs;
+  AisBitset const bs;
   const AIS_STATUS r = bits.ParseNmeaPayload(nmea_payload, pad);
   if (r != AIS_OK) {
     status = r;

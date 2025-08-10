@@ -33,7 +33,7 @@ Ais8_366_56::Ais8_366_56(const char *nmea_payload, const size_t pad)
   }
 
   bits.SeekTo(56);
-  int num_full_bytes = bits.GetRemaining() / 8;
+  int const num_full_bytes = bits.GetRemaining() / 8;
 
   for (int i = 0; i < num_full_bytes; i++) {
     encrypted.push_back(bits.ToUnsignedInt(56 + i * 8, 8));

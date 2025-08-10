@@ -609,7 +609,7 @@ Ais8_367_33::Ais8_367_33(const char *nmea_payload, const size_t pad)
 std::ostream& operator<< (std::ostream &o, const Ais8_367_33 &msg) {
   const int num_reports = msg.reports.size();
   for (int report_idx = 0; report_idx < num_reports; report_idx++) {
-    Ais8_367_33_SensorEnum report_type = msg.reports[report_idx]->report_type;
+    Ais8_367_33_SensorEnum const report_type = msg.reports[report_idx]->report_type;
     switch(report_type) {
       case AIS8_367_33_SENSOR_LOCATION: {
         auto *rpt = dynamic_cast<Ais8_367_33_Location *>(msg.reports[report_idx].get());

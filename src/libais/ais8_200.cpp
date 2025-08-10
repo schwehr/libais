@@ -213,7 +213,7 @@ Ais8_200_24::Ais8_200_24(const char *nmea_payload, const size_t pad)
   bits.SeekTo(56);
   country = bits.ToString(56, 12);
   for (size_t i = 0; i < 4; i++) {
-    size_t start = 68 + 25*i;
+    size_t const start = 68 + 25*i;
     gauge_ids[i] = bits.ToUnsignedInt(start, 11);
     const int sign = bits[start + 11] ? 1 : -1;  // 0 negative, 1 pos
     // ERROR: the spec has a bit listing mistake

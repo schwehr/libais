@@ -48,13 +48,13 @@ int main(int argc,  char* argv[]) {
     getline(infile, line);  // G++ problem with this and a string
     if (line.size() < 20) {continue;}
     if ('!' != line[0]  ||  'A' != line[1] ) {continue;}
-    std::string line_str(line);
+    std::string const line_str(line);
     std::vector<std::string> fields = split(line_str, ',');
     {
       if (fields.size() < 7) continue;
       if (fields[5].size() < 5) continue;
       if (fields[5][0] != '5') continue;
-      libais::Ais5 m5(fields[5].c_str(), 2);
+      libais::Ais5 const m5(fields[5].c_str(), 2);
       if (m5.had_error()) continue;
       std::cout << m5.mmsi << "," << m5.name << "," << m5.callsign << ","
                 << m5.type_and_cargo << std::endl;

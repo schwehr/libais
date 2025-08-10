@@ -33,7 +33,7 @@ std::unique_ptr<T> MakeUnique(Args &&... args) {
 }
 
 unique_ptr<AisMsg> CreateAisMsg6(const std::string &body, const int fill_bits) {
-  libais::Ais6 msg(body.c_str(), fill_bits);
+  libais::Ais6 const msg(body.c_str(), fill_bits);
   switch (msg.dac) {
     // International Maritime Organization (IMO).
     case libais::AIS_DAC_1_INTERNATIONAL:
@@ -72,7 +72,7 @@ unique_ptr<AisMsg> CreateAisMsg6(const std::string &body, const int fill_bits) {
 }
 
 unique_ptr<AisMsg> CreateAisMsg8(const std::string &body, const int fill_bits) {
-  libais::Ais8 msg(body.c_str(), fill_bits);
+  libais::Ais8 const msg(body.c_str(), fill_bits);
   switch (msg.dac) {
     // International Maritime Organization (IMO).
     case libais::AIS_DAC_1_INTERNATIONAL:

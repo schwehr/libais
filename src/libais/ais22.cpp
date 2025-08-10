@@ -31,7 +31,7 @@ Ais22::Ais22(const char *nmea_payload, const size_t pad)
 
   // WARNING: OUT OF ORDER DECODE
   bits.SeekTo(139);
-  bool addressed = bits[139];
+  bool const addressed = bits[139];
 
   bits.SeekTo(69);
   if (!addressed) {

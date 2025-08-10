@@ -35,7 +35,7 @@ AIS_STATUS AisBitset::ParseNmeaPayload(const char *nmea_payload, int pad) {
 
   size_t bit = 0;
   for (size_t idx = 0; nmea_payload[idx] != '\0' && idx < max_chars; idx++) {
-    int c = static_cast<int>(nmea_payload[idx]);
+    int const c = static_cast<int>(nmea_payload[idx]);
     if (c < 48 || c > 119 || (c >= 88 && c <= 95)) {
       // Make it clear that nothing valuable is in here.
       reset();
@@ -83,7 +83,7 @@ unsigned int AisBitset::ToUnsignedInt(const size_t start,
   assert(current_position == start);
 
   unsigned int result = 0;
-  size_t end = start + len;
+  size_t const end = start + len;
   for (size_t i = start; i < end; ++i) {
     result <<= 1;
     if (test(i))
@@ -103,9 +103,9 @@ int AisBitset::ToInt(const size_t start, const size_t len)  const {
 
   // Converting the sub-bitset to a signed number, per "Two's complement":
   // - If negative, invert all the bits, then add 1.
-  bool is_positive = (len == 32 || !test(start));
+  bool const is_positive = (len == 32 || !test(start));
   int result = 0;
-  size_t end = start + len;
+  size_t const end = start + len;
   for (size_t i = start; i < end; ++i) {
     result <<= 1;
     if (test(i) == is_positive)
@@ -157,8 +157,8 @@ const AisPoint AisBitset::ToAisPoint(const size_t start,
       assert(false);
       return AisPoint(-1, -1);
   }
-  double lng_deg = ToInt(start, lng_bits);
-  double lat_deg = ToInt(start + lng_bits, lat_bits);
+  double const lng_deg = ToInt(start, lng_bits);
+  double const lat_deg = ToInt(start + lng_bits, lat_bits);
   return AisPoint(lng_deg / divisor, lat_deg / divisor);
 }
 
@@ -171,7 +171,7 @@ void AisBitset::InitNmeaOrd() {
   }
 
   for (int c = 48; c < 88; c++) {
-    int val = c - 48;
+    int const val = c - 48;
     nmea_ord_[c] = Reverse(bitset<6>(val));
   }
   for (int c = 88; c < 128; c++) {

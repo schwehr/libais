@@ -706,7 +706,7 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
 
   // TODO(schwehr): manage all the submessage types
 
-  AIS_STATUS status = AIS_UNINITIALIZED;
+  const AIS_STATUS status = AIS_UNINITIALIZED;
 
   switch (msg.dac) {
   case AIS_DAC_1_INTERNATIONAL:  // IMO.
@@ -780,7 +780,7 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
 PyObject*
 ais7_13_to_pydict(const char *nmea_payload, const size_t pad) {
   assert(nmea_payload);
-  Ais7_13 msg(nmea_payload, pad);
+  const Ais7_13 msg(nmea_payload, pad);
   if (msg.had_error()) {
     PyErr_Format(ais_py_exception, "Ais7_13: %s",
                  AIS_STATUS_STRINGS[msg.get_error()]);
@@ -954,7 +954,7 @@ ais8_1_17_append_pydict(const char *nmea_payload, PyObject *dict,
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
-  Ais8_1_17 msg(nmea_payload, pad);
+  const Ais8_1_17 msg(nmea_payload, pad);
   if (msg.had_error()) {
     return msg.get_error();
   }
@@ -1334,7 +1334,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
-  Ais8_1_26 msg(nmea_payload, pad);
+  const Ais8_1_26 msg(nmea_payload, pad);
   if (msg.had_error()) {
     return msg.get_error();
   }
@@ -1795,7 +1795,7 @@ ais8_200_24_append_pydict(const char *nmea_payload, PyObject *dict,
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
-  Ais8_200_24 msg(nmea_payload, pad);
+  const Ais8_200_24 msg(nmea_payload, pad);
   if (msg.had_error()) {
     return msg.get_error();
   }
@@ -2199,7 +2199,7 @@ ais8_367_33_append_pydict(const char *nmea_payload, PyObject *dict,
   assert(nmea_payload);
   assert(dict);
   assert(pad < 6);
-  Ais8_367_33 msg(nmea_payload, pad);
+  const Ais8_367_33 msg(nmea_payload, pad);
   if (msg.had_error()) {
     return msg.get_error();
   }
@@ -2778,7 +2778,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
   DictSafeSetItem(dict, "dac", msg.dac);
   DictSafeSetItem(dict, "fi", msg.fi);
 
-  AIS_STATUS status = AIS_UNINITIALIZED;
+  const AIS_STATUS status = AIS_UNINITIALIZED;
 
   switch (msg.dac) {
   case AIS_DAC_1_INTERNATIONAL:  // IMO.
