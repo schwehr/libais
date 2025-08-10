@@ -406,7 +406,7 @@ class AisBitset : protected std::bitset<MAX_BITS> {
   int num_chars;
 
   static bool nmea_ord_initialized_;
-  static bitset<6> nmea_ord_[128];
+  static std::array<bitset<6>, 128> nmea_ord_;
   static const char bits_to_char_tbl_[];
 
   static void InitNmeaOrd();
