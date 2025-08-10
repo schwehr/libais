@@ -706,7 +706,7 @@ ais6_to_pydict(const char *nmea_payload, const size_t pad) {
 
   // TODO(schwehr): manage all the submessage types
 
-  const AIS_STATUS status = AIS_UNINITIALIZED;
+  AIS_STATUS status = AIS_UNINITIALIZED;
 
   switch (msg.dac) {
   case AIS_DAC_1_INTERNATIONAL:  // IMO.
@@ -2778,7 +2778,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
   DictSafeSetItem(dict, "dac", msg.dac);
   DictSafeSetItem(dict, "fi", msg.fi);
 
-  const AIS_STATUS status = AIS_UNINITIALIZED;
+  AIS_STATUS status = AIS_UNINITIALIZED;
 
   switch (msg.dac) {
   case AIS_DAC_1_INTERNATIONAL:  // IMO.
