@@ -192,7 +192,7 @@ unique_ptr<NmeaSentence> NmeaSentence::Create(const std::string &line,
     return nullptr;
   }
 
-  const string body(fields[5]);
+  const std::string body(fields[5]);
   if (body.size() < 1 || body.size() > 199) {
     // TODO(schwehr): Test this code path.
     return nullptr;

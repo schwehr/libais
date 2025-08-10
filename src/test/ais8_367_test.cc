@@ -180,8 +180,8 @@ TEST(Ais8_367_22Test, DecodeUscgWhaleBouyTest2) {
 }
 #endif
 
-std::unique_ptr<Ais8_367_23> Init_23(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais8_367_23> Init_23(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.
@@ -222,8 +222,8 @@ TEST(Ais8_367_23Test, DecodeSingleTest_23) {
   ASSERT_EQ(0, msg->spare2);
 }
 
-std::unique_ptr<Ais8_367_24> Init_24(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais8_367_24> Init_24(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.
@@ -255,8 +255,8 @@ TEST(Ais8_367_24Test, DecodeSingleTest_24) {
   ASSERT_EQ(1023, msg->pressure);
 }
 
-std::unique_ptr<Ais8_367_25> Init_25(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais8_367_25> Init_25(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   // TODO(schwehr): Switch to c++14 make_unique.
@@ -288,8 +288,8 @@ TEST(Ais8_367_25Test, DecodeSingleTest_25) {
   ASSERT_EQ(66, msg->wind_dir);
 }
 
-std::unique_ptr<Ais8_367_33> Init_33(const string &nmea_string) {
-  const string body(GetBody(nmea_string));
+std::unique_ptr<Ais8_367_33> Init_33(const std::string &nmea_string) {
+  const std::string body(GetBody(nmea_string));
   const int pad = GetPad(nmea_string);
 
   std::unique_ptr<Ais8_367_33> msg(new Ais8_367_33(body.c_str(), pad));

@@ -16,8 +16,6 @@
 #include <string>
 #include <vector>
 
-using std::string;
-
 constexpr int LIBAIS_VERSION_MAJOR = 0;
 constexpr int LIBAIS_VERSION_MINOR = 17;
 
@@ -29,15 +27,15 @@ namespace libais {
 
 // Returns the text in the nth field starting with the first field being 0.
 // Empty delim_str is not allowed.
-string GetNthField(const string &str, size_t n, const string &delim_str);
+std::string GetNthField(const std::string &str, size_t n, const std::string &delim_str);
 
 // Returns the number of pad bits in an AIS AIVDM NMEA string.
 // Returns -1 if there is an error.
-int GetPad(const string &nmea_str);
+int GetPad(const std::string &nmea_str);
 
 // Returns the armored payload of an AIS AIVDM NMEA string.
 // Returns an empty string if there was an error.
-string GetBody(const string &nmea_str);
+std::string GetBody(const std::string &nmea_str);
 
 
 // Note: Needs to be kept in sync with AIS_STATUS_STRINGS list in ais.cpp.
@@ -396,7 +394,7 @@ class AisBitset : protected std::bitset<MAX_BITS> {
 
   unsigned int ToUnsignedInt(size_t start, size_t len) const;
   int ToInt(size_t start, size_t len) const;
-  string ToString(size_t start, size_t len) const;
+  std::string ToString(size_t start, size_t len) const;
 
   const AisPoint ToAisPoint(size_t start, size_t point_size) const;
 
@@ -567,8 +565,8 @@ class Ais5 : public AisMsg {
  public:
   int ais_version;
   int imo_num;
-  string callsign;
-  string name;
+  std::string callsign;
+  std::string name;
   int type_and_cargo;
   int dim_a;
   int dim_b;
@@ -580,7 +578,7 @@ class Ais5 : public AisMsg {
   int eta_hour;
   int eta_minute;
   float draught;  // present static draft. m
-  string destination;
+  std::string destination;
   int dte;
   int spare;
 
@@ -628,7 +626,7 @@ class Ais6_1_0 : public Ais6 {
  public:
   bool ack_required;
   int msg_seq;
-  string text;
+  std::string text;
   int spare2;
 
   Ais6_1_0(const char *nmea_payload, size_t pad);
@@ -705,18 +703,18 @@ class Ais6_1_5 : public Ais6 {
 // Not to be transmitted after 2012-Jan-01
 class Ais6_1_12 : public Ais6 {
  public:
-  string last_port;
+  std::string last_port;
   int utc_month_dep;  // actual time of departure
   int utc_day_dep;
   int utc_hour_dep;
   int utc_min_dep;
-  string next_port;
+  std::string next_port;
   int utc_month_next;  // estimated arrival
   int utc_day_next;
   int utc_hour_next;
   int utc_min_next;
-  string main_danger;
-  string imo_cat;
+  std::string main_danger;
+  std::string imo_cat;
   int un;
   int value;  // TODO(schwehr): units?
   int value_unit;
@@ -760,8 +758,8 @@ class Ais6_1_18 : public Ais6 {
   int utc_day;
   int utc_hour;
   int utc_min;
-  string port_berth;
-  string dest;
+  std::string port_berth;
+  std::string dest;
   AisPoint position;
   std::array<int, 2> spare2;  // 32 bits per spare
 
@@ -784,7 +782,7 @@ class Ais6_1_20 : public Ais6 {
   bool services_known;
   // TODO(schwehr): enum of service types
   std::array<int, 26> services;
-  string name;
+  std::string name;
   AisPoint position;
 
   Ais6_1_20(const char *nmea_payload, size_t pad);
@@ -902,7 +900,7 @@ class Ais8_1_0 : public Ais8 {
  public:
   bool ack_required;
   int msg_seq;
-  string text;
+  std::string text;
   int spare2;
 
   Ais8_1_0(const char *nmea_payload, size_t pad);
@@ -964,9 +962,9 @@ std::ostream& operator<< (std::ostream &o, const Ais8_1_11 &msg);
 // IMO Circ 236 Fairway closed - Not to be transmitted after 2012-Jan-01
 class Ais8_1_13 : public Ais8 {
  public:
-  string reason;
-  string location_from;
-  string location_to;
+  std::string reason;
+  std::string location_from;
+  std::string location_to;
   int radius;
   int units;
   // TODO(schwehr): utc?  warning: day/month out of order
@@ -1009,7 +1007,7 @@ std::ostream& operator<< (std::ostream &o, const Ais8_1_16 &msg);
 class Ais8_1_17_Target {
  public:
   int type;
-  string id;
+  std::string id;
   int spare;
   AisPoint position;
   int cog;
@@ -1034,7 +1032,7 @@ std::ostream& operator<< (std::ostream &o, const Ais8_1_17 &msg);
 class Ais8_1_19 : public Ais8 {
  public:
   int link_id;
-  string name;
+  std::string name;
   AisPoint position;  // funny bit count
   int status;
   int signal;
@@ -1055,7 +1053,7 @@ class Ais8_1_21 : public Ais8 {
   int type_wx_report;
 
   // TYPE 0
-  string location;
+  std::string location;
   AisPoint position;  // 25, 24 bits
   int utc_day;
   int utc_hour;
@@ -1236,7 +1234,7 @@ class Ais8_1_22_Polygon : public Ais8_1_22_SubArea {
 
 class Ais8_1_22_Text : public Ais8_1_22_SubArea {
  public:
-  string text;
+  std::string text;
   // TODO(schwehr): spare?
 
   Ais8_1_22_Text(const AisBitset &bs, size_t offset);
@@ -1270,7 +1268,7 @@ class Ais8_1_24 : public Ais8 {
  public:
   int link_id;
   float air_draught;  // m
-  string last_port;
+  std::string last_port;
   std::array<std::string, 2> next_ports;
 
   // TODO(schwehr): enum list of param types
@@ -1278,7 +1276,7 @@ class Ais8_1_24 : public Ais8 {
   int ice_class;
   int shaft_power;  // horses
   int vhf;
-  string lloyds_ship_type;
+  std::string lloyds_ship_type;
   int gross_tonnage;
   int laden_ballast;
   int heavy_oil;
@@ -1347,7 +1345,7 @@ class Ais8_1_26_Location : public Ais8_1_26_SensorReport {
 
 class Ais8_1_26_Station : public Ais8_1_26_SensorReport {
  public:
-  string name;
+  std::string name;
   int spare{};
 
   Ais8_1_26_Station(const AisBitset &bs, size_t offset);
@@ -1559,7 +1557,7 @@ std::ostream& operator<< (std::ostream &o, const Ais8_1_27 &msg);
 class Ais8_1_29 : public Ais8 {
  public:
   int link_id;
-  string text;
+  std::string text;
   int spare2;
 
   Ais8_1_29(const char *nmea_payload, size_t pad);
@@ -1625,7 +1623,7 @@ std::ostream& operator<< (std::ostream &o, const Ais8_1_31 &msg);
 // Inland ship static and voyage related data
 class Ais8_200_10 : public Ais8 {
  public:
-  string eu_id;  // European Vessel ID - 8 characters
+  std::string eu_id;  // European Vessel ID - 8 characters
   float length;  // m
   float beam;  // m
   int ship_type;
@@ -1645,11 +1643,11 @@ class Ais8_200_10 : public Ais8 {
 // ETA at lock/bridge/terminal
 class Ais8_200_21 : public Ais8 {
  public:
-  string country;         // UN country code         0 = not available = default
-  string location;        // UN location code        0 = not available = default
-  string section;         // Fairway section number  0 = not available = default
-  string terminal;        // Terminal code           0 = not available = default
-  string hectometre;      // Fairway hectometre      0 = not available = default
+  std::string country;         // UN country code         0 = not available = default
+  std::string location;        // UN location code        0 = not available = default
+  std::string section;         // Fairway section number  0 = not available = default
+  std::string terminal;        // Terminal code           0 = not available = default
+  std::string hectometre;      // Fairway hectometre      0 = not available = default
   // Examples for previous fields.  See:
   // http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
 
@@ -1670,11 +1668,11 @@ class Ais8_200_21 : public Ais8 {
 // RTA at lock/bridge/terminal
 class Ais8_200_22 : public Ais8 {
  public:
-  string country;         // UN country code         0 = not available
-  string location;        // UN location code        0 = not available
-  string section;         // Fairway section number  0 = not available
-  string terminal;        // Terminal code           0 = not available
-  string hectometre;      // Fairway hectometre      0 = not available
+  std::string country;         // UN country code         0 = not available
+  std::string location;        // UN location code        0 = not available
+  std::string section;         // Fairway section number  0 = not available
+  std::string terminal;        // Terminal code           0 = not available
+  std::string hectometre;      // Fairway hectometre      0 = not available
   // Examples for previous fields.  See:
   // http://www.ris.eu/docs/File/427/implementation_location_code_austria.pdf
 
@@ -1725,7 +1723,7 @@ class Ais8_200_24 : public Ais8 {
  public:
   // UN 2 letter code.  See Comtrade Country Code and Name.
   // https://unstats.un.org/unsd/tradekb/Knowledgebase/50377/Comtrade-Country-Code-and-Name
-  string country;
+  std::string country;
   std::array<int, 4> gauge_ids;
   std::array<float, 4> levels;  // m
 
@@ -1858,7 +1856,7 @@ class Ais8_366_22_Polygon final : public Ais8_366_22_SubArea {
 
 class Ais8_366_22_Text final : public Ais8_366_22_SubArea {
  public:
-  string text;
+  std::string text;
   unsigned int spare;  // 3 bits
 
   Ais8_366_22_Text(const AisBitset &bs, size_t offset);
@@ -1968,7 +1966,7 @@ class Ais8_367_22_Poly : public Ais8_367_22_SubArea {
 
 class Ais8_367_22_Text : public Ais8_367_22_SubArea {
  public:
-  string text;
+  std::string text;
   unsigned int spare;  // 3 bits
 
   Ais8_367_22_Text(const AisBitset &bs, size_t offset);
@@ -2436,7 +2434,7 @@ class Ais12 : public AisMsg {
   int dest_mmsi;
   bool retransmitted;
   int spare;
-  string text;
+  std::string text;
   int spare2;
 
   Ais12(const char *nmea_payload, size_t pad);
@@ -2449,7 +2447,7 @@ std::ostream& operator<< (std::ostream &o, const Ais12 &msg);
 class Ais14 : public AisMsg {
  public:
   int spare;
-  string text;
+  std::string text;
   int spare2;
 
   Ais14(const char *nmea_payload, size_t pad);
@@ -2585,7 +2583,7 @@ class Ais19 : public AisMsg {
   int true_heading;
   int timestamp;
   int spare2;
-  string name;
+  std::string name;
   int type_and_cargo;
   int dim_a;
   int dim_b;
@@ -2639,7 +2637,7 @@ std::ostream& operator<< (std::ostream &o, const Ais20 &msg);
 class Ais21 : public AisMsg {
  public:
   int aton_type;
-  string name;
+  std::string name;
   int position_accuracy;
   AisPoint position;
   int dim_a;
@@ -2716,12 +2714,12 @@ class Ais24 : public AisMsg {
   int part_num;
 
   // Part A
-  string name;
+  std::string name;
 
   // Part B
   int type_and_cargo;
-  string vendor_id;
-  string callsign;
+  std::string vendor_id;
+  std::string callsign;
   int dim_a;
   int dim_b;
   int dim_c;

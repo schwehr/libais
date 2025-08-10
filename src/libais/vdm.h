@@ -81,19 +81,19 @@ static const int kMaxSentences = 10;
 static const int kNumSequenceChannels = 10;
 
 // Computes the xor checksum of a string.
-uint8_t Checksum(const string &content);
+uint8_t Checksum(const std::string &content);
 // Convert a number to a two character hex string.
-string ToHex2(int32_t val);
+std::string ToHex2(int32_t val);
 // Returns the 2 upper case character xor checksum of a string.
-string ChecksumHexString(const string &base);
-bool ValidateChecksum(const string &line);
+std::string ChecksumHexString(const std::string &base);
+bool ValidateChecksum(const std::string &line);
 
 // Manages single lines of NMEA AIS VDM text.
 class NmeaSentence {
  public:
-  NmeaSentence(const string &talker, const string &sentence_type,
+  NmeaSentence(const std::string &talker, const std::string &sentence_type,
                int sentence_total, int sentence_number, int sequence_number,
-               char channel, const string &body, int fill_bits,
+               char channel, const std::string &body, int fill_bits,
                int64_t line_number)
       : talker_(talker),
         sentence_type_(sentence_type),
@@ -109,7 +109,7 @@ class NmeaSentence {
   // line of text.  Returns nullptr on failure.  The line_number argument
   // tracks the source location in a file or the count of lines pushed through
   // a channel.
-  static std::unique_ptr<NmeaSentence> Create(const string &line,
+  static std::unique_ptr<NmeaSentence> Create(const std::string &line,
                                               int64_t line_number);
 
   // Returns a composite NmeaSentence from multiple prior sentences that make up
@@ -123,11 +123,11 @@ class NmeaSentence {
       const std::vector<std::unique_ptr<NmeaSentence>> &prior_sentences) const;
 
   // Reconstructs the NMEA AIS VDM sentence representation of this instance.
-  string ToString() const;
+  std::string ToString() const;
   // Returns the hex digest of the 6-bit encoded body.  Used for detection of
   // multiple instances of a line in an input stream.
   // TODO(schwehr): Consider mixing in the VHF channel into the text.
-  string ToMd5Digest() const;
+  std::string ToMd5Digest() const;
 
   // Returns true if another sentence is a part of the same multiline message.
   // The given sentence must have the same channel, sequence number and total
@@ -156,22 +156,22 @@ class NmeaSentence {
   bool VerifyInSameMessage(const NmeaSentence &sentence) const;
 
   // Accessors to get each of the fields or sub-fields of the sentence.
-  string talker() const { return talker_; }
-  string sentence_type() const { return sentence_type_; }
+  std::string talker() const { return talker_; }
+  std::string sentence_type() const { return sentence_type_; }
   int sentence_total() const { return sentence_total_; }
   int sentence_number() const { return sentence_number_; }
   int sequence_number() const { return sequence_number_; }
   char channel() const { return channel_; }
-  string body() const { return body_; }
+  std::string body() const { return body_; }
   int fill_bits() const { return fill_bits_; }
 
   int64_t line_number() const { return line_number_; }
 
  private:
   // Which device type sent the message.  AI is an AIS transceiver.
-  const string talker_;
+  const std::string talker_;
   // This will be VDM for an AIS message received and VDO for "own ship."
-  const string sentence_type_;
+  const std::string sentence_type_;
   // Total number of lines that compose the message this is a part of.
   const int sentence_total_;
   // Which sentence is this?  Ranges from 1 to sentence_total_.
@@ -183,7 +183,7 @@ class NmeaSentence {
   // VHF channel.  Will be either A or B.  Some receivers do not record this.
   const char channel_;
   // The VDM 6-bit encoded/armored payload of the message.
-  const string body_;
+  const std::string body_;
   // The number of padding.  Should be zero for all messages except the last.
   // Must be 0, 2, or 4.
   const int fill_bits_;
@@ -203,7 +203,7 @@ class VdmStream {
   // Returns true if the sentence was used or false if the line was ignored.
   // A line will be ignored if it is not a valid VDM line or if it is a later
   // part of a multi-line message but missing one or more initial lines.
-  bool AddLine(const string &line);  // Was push
+  bool AddLine(const std::string &line);  // Was push
   // Returns nullptr if there are not decoded messages currently available.
   std::unique_ptr<libais::AisMsg> PopOldestMessage();
 

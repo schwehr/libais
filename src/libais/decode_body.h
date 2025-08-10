@@ -31,7 +31,7 @@ namespace libais {
 // The fill_bits are the number of pad bits in the last character of the
 // body.  AIS messages are 8-bit aligned and the characters in the armored
 // body are 6-bit aligned.
-std::unique_ptr<libais::AisMsg> CreateAisMsg(const string &body,
+std::unique_ptr<libais::AisMsg> CreateAisMsg(const std::string &body,
                                              const int fill_bits);
 
 }  // namespace libais
