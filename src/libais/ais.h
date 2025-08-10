@@ -17,7 +17,6 @@
 #include <vector>
 
 using std::string;
-using std::unique_ptr;
 using std::vector;
 
 constexpr int LIBAIS_VERSION_MAJOR = 0;
@@ -1156,7 +1155,7 @@ class Ais8_1_22_SubArea {
   virtual ~Ais8_1_22_SubArea() = default;
 };
 
-unique_ptr<Ais8_1_22_SubArea>
+std::unique_ptr<Ais8_1_22_SubArea>
 ais8_1_22_subarea_factory(const AisBitset &bs,
                           size_t offset);
 
@@ -1259,7 +1258,7 @@ class Ais8_1_22 : public Ais8 {
   int duration_minutes;  // Time from the start until the notice expires.
 
   // 1 or more sub messages
-  vector<unique_ptr<Ais8_1_22_SubArea>> sub_areas;
+  vector<std::unique_ptr<Ais8_1_22_SubArea>> sub_areas;
 
   Ais8_1_22(const char *nmea_payload, size_t pad);
 };
@@ -1781,7 +1780,7 @@ class Ais8_366_22_SubArea {
     virtual ~Ais8_366_22_SubArea() = default;
 };
 
-unique_ptr<Ais8_366_22_SubArea>
+std::unique_ptr<Ais8_366_22_SubArea>
 ais8_366_22_subarea_factory(const AisBitset &bs,
                             size_t offset);
 
@@ -1880,7 +1879,7 @@ class Ais8_366_22 : public Ais8 {
   int duration_minutes;  // Time from the start until the notice expires
   // 1 or more sub messages
 
-  vector<unique_ptr<Ais8_366_22_SubArea>> sub_areas;
+  vector<std::unique_ptr<Ais8_366_22_SubArea>> sub_areas;
 
   Ais8_366_22(const char *nmea_payload, size_t pad);
 };
@@ -1906,7 +1905,7 @@ class Ais8_367_22_SubArea {
   virtual ~Ais8_367_22_SubArea() = default;
 };
 
-unique_ptr<Ais8_367_22_SubArea>
+std::unique_ptr<Ais8_367_22_SubArea>
 ais8_367_22_subarea_factory(const AisBitset &bs,
                             size_t offset);
 
@@ -1990,7 +1989,7 @@ class Ais8_367_22 : public Ais8 {
   int duration_minutes;
   int spare2;
 
-  vector<unique_ptr<Ais8_367_22_SubArea>> sub_areas;
+  vector<std::unique_ptr<Ais8_367_22_SubArea>> sub_areas;
 
   Ais8_367_22(const char *nmea_payload, size_t pad);
 };
@@ -2092,7 +2091,7 @@ class Ais8_367_33_SensorReport {
   virtual ~Ais8_367_33_SensorReport() = default;
 };
 
-unique_ptr<Ais8_367_33_SensorReport>
+std::unique_ptr<Ais8_367_33_SensorReport>
 ais8_367_33_sensor_report_factory(const AisBitset &bs,
                                   size_t offset);
 
@@ -2361,7 +2360,7 @@ class Ais8_367_33_Wind_V2 : public Ais8_367_33_SensorReport {
 class Ais8_367_33 : public Ais8 {
  public:
   // 1 to 8 sensor reports
-  vector<unique_ptr<Ais8_367_33_SensorReport>> reports;
+  vector<std::unique_ptr<Ais8_367_33_SensorReport>> reports;
 
   Ais8_367_33(const char *nmea_payload, size_t pad);
 };
