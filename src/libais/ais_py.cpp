@@ -97,7 +97,7 @@ DictSafeSetItem(
 }
 
 void
-DictSafeSetItem(PyObject *dict, const std::string &key, const string &val) {
+DictSafeSetItem(PyObject *dict, const std::string &key, const std::string &val) {
   PyObject *val_obj = PyUnicode_FromString(val.c_str());
   assert(val_obj);
   PyDict_SetItemString(dict, key.c_str(), val_obj);
@@ -154,7 +154,7 @@ DictSafeSetItem(PyObject *dict, const std::string &key, const double val) {
 }
 
 void
-DictSafeSetItem(PyObject *dict, const std::string &x_key, const string& y_key,
+DictSafeSetItem(PyObject *dict, const std::string &x_key, const std::string& y_key,
                 const AisPoint& position) {
   DictSafeSetItem(dict, x_key, position.lng_deg);
   DictSafeSetItem(dict, y_key, position.lat_deg);
