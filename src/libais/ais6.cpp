@@ -9,8 +9,7 @@
 namespace libais {
 
 Ais6::Ais6(const char *nmea_payload, const size_t pad)
-    : AisMsg(nmea_payload, pad), seq(0), mmsi_dest(0), retransmit(false),
-      spare(0), dac(0), fi(0) {
+    : AisMsg(nmea_payload, pad) {
 
   if (!CheckStatus()) {
     return;
@@ -239,7 +238,7 @@ Ais6_1_5::Ais6_1_5(const char *nmea_payload, const size_t pad)
   ack_dac = bits.ToUnsignedInt(88, 10);
   ack_fi = bits.ToUnsignedInt(98, 6);
   seq_num = bits.ToUnsignedInt(104, 11);
-  ai_available = static_cast<bool>(bits[115]);
+  ai_available = bits[115];
   ai_response = bits.ToUnsignedInt(116, 3);
   spare = bits.ToUnsignedInt(119, 32);
   spare2 = bits.ToUnsignedInt(151, 17);
