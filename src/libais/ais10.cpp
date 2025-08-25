@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <ostream>
 
 #include "ais.h"
 

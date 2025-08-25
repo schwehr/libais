@@ -1,6 +1,8 @@
 #include <array>
 #include <bitset>
+#include <cassert>
 #include <cstddef>
+#include <cstring>
 #include <iostream>
 #include <string>
 

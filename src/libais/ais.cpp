@@ -1,5 +1,8 @@
 // General helper functions for working with AIS and NMEA.
+#include <array>
+#include <cassert>
 #include <cstddef>
+#include <ostream>
 #include <string>
 
 #include "ais.h"
