@@ -5,8 +5,13 @@
 # cmake .
 # make
 
-cmake_minimum_required (VERSION 2.8)
-project (libais)
+cmake_minimum_required(VERSION 3.25)
+project (
+  libais
+  DESCRIPTION "A library for parsing Automatic Identification System messages."
+  LANGUAGES CXX
+  VERSION 0.17
+)
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
