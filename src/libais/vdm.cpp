@@ -44,6 +44,8 @@ using std::unique_ptr;
 
 namespace libais {
 
+constexpr size_t kNoSequenceNumber = 999999;
+
 uint8_t Checksum(const std::string &line) {
   return std::accumulate(line.begin(), line.end(), 0, std::bit_xor<uint8_t>());
 }
@@ -129,7 +131,7 @@ bool GetSentenceSequenceNumbers(const std::string & /* line */,
   }
 
   if (fields[3].empty()) {
-    *sequence_number = -1;
+    *sequence_number = kNoSequenceNumber;
   } else {
     try {
       *sequence_number = std::stoi(fields[3]);
@@ -141,7 +143,7 @@ bool GetSentenceSequenceNumbers(const std::string & /* line */,
       if (fields[3] != "") {
         return false;
       }
-      *sequence_number = -1;
+      *sequence_number = kNoSequenceNumber;
     }
   }
 
@@ -240,7 +242,7 @@ unique_ptr<NmeaSentence> NmeaSentence::Merge(
   }
 
   // Check the order.
-  for (int i = 0; i < prior_sentences.size(); ++i) {
+  for (size_t i = 0; i < prior_sentences.size(); ++i) {
     if (prior_sentences[i]->sentence_number() != i + 1) {
       return nullptr;
     }
@@ -261,7 +263,7 @@ std::string NmeaSentence::ToString() const {
   std::string channel;
   channel += channel_;
   std::string const sequence(
-      (sequence_number_ != -1) ? std::to_string(sequence_number_) : "");
+      (sequence_number_ != kNoSequenceNumber) ? std::to_string(sequence_number_) : "");
 
   std::string result = "";
   result.append(talker_ + sentence_type_);
@@ -316,8 +318,8 @@ bool VdmStream::AddLine(const std::string &line) {
   if (sentence == nullptr) {
     return false;
   }
-  int const seq = sentence->sequence_number();
-  int const tot = sentence->sentence_total();
+  size_t const seq = sentence->sequence_number();
+  size_t const tot = sentence->sentence_total();
 
   // These are enforced by NmeaSentence, so only check when debugging.
   assert(seq < kNumSequenceChannels);
@@ -325,7 +327,7 @@ bool VdmStream::AddLine(const std::string &line) {
 
   // Convert multi-line message to single line.
   if (tot != 1) {
-    int const cnt = sentence->sentence_number();
+    size_t const cnt = sentence->sentence_number();
 
     // Beginning of a message.
     if (cnt == 1) {

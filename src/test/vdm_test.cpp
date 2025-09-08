@@ -152,7 +152,7 @@ TEST(NmeaSentenceTest, SingleLines) {
   EXPECT_EQ("VDM", sentence->sentence_type());
   EXPECT_EQ(1, sentence->sentence_total());
   EXPECT_EQ(1, sentence->sentence_number());
-  EXPECT_EQ(-1, sentence->sequence_number());
+  EXPECT_EQ(999999, sentence->sequence_number());
   EXPECT_EQ('B', sentence->channel());
   EXPECT_EQ("K8VSqb9LdU28WP8P", sentence->body());
   EXPECT_EQ(0, sentence->fill_bits());

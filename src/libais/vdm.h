@@ -92,7 +92,7 @@ bool ValidateChecksum(const std::string &line);
 class NmeaSentence {
  public:
   NmeaSentence(const std::string &talker, const std::string &sentence_type,
-               int sentence_total, int sentence_number, int sequence_number,
+               size_t sentence_total, size_t sentence_number, size_t sequence_number,
                char channel, const std::string &body, int fill_bits,
                int64_t line_number)
       : talker_(talker),
@@ -158,9 +158,9 @@ class NmeaSentence {
   // Accessors to get each of the fields or sub-fields of the sentence.
   std::string talker() const { return talker_; }
   std::string sentence_type() const { return sentence_type_; }
-  int sentence_total() const { return sentence_total_; }
-  int sentence_number() const { return sentence_number_; }
-  int sequence_number() const { return sequence_number_; }
+  size_t sentence_total() const { return sentence_total_; }
+  size_t sentence_number() const { return sentence_number_; }
+  size_t sequence_number() const { return sequence_number_; }
   char channel() const { return channel_; }
   std::string body() const { return body_; }
   int fill_bits() const { return fill_bits_; }
@@ -173,13 +173,13 @@ class NmeaSentence {
   // This will be VDM for an AIS message received and VDO for "own ship."
   const std::string sentence_type_;
   // Total number of lines that compose the message this is a part of.
-  const int sentence_total_;
+  const size_t sentence_total_;
   // Which sentence is this?  Ranges from 1 to sentence_total_.
-  const int sentence_number_;
+  const size_t sentence_number_;
   // Logical channel for the AIS receiver.  A receiver will put a multi-line
   // message on a single channel and then move to the next channel.  Ranges from
   // 0 to 9, but most receivers will not use 0.
-  const int sequence_number_;  // -1 if not valid.
+  const size_t sequence_number_;  // -1 if not valid.
   // VHF channel.  Will be either A or B.  Some receivers do not record this.
   const char channel_;
   // The VDM 6-bit encoded/armored payload of the message.
