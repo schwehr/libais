@@ -11,6 +11,7 @@ CXXFLAGS += -std=c++20
 
 WARN := -Wall
 WARN += -Wextra
+WARN += -Wno-sign-compare
 WARN += -Werror
 
 # Disabled warnings
