@@ -1,7 +1,12 @@
 // A - GNSS broadcast -
 // TODO(schwehr): only partially coded - need to finish
 // http://www.itu.int/rec/R-REC-M.823/en
+//
+// This no longer exists. See archive.org for a copy.
 // http://www.iala-aism.org/iala/publications/documentspdf/doc_348_eng.pdf
+// IALA Recommendation A-124, APPENDIX 16, DGNSS Broadcasts from an
+// AIS Service, Edition 2, December 2011
+
 
 // In 823, 30 bit words = 24 bits data followed by 6 parity bits.
 // Parity bits are left out of the AIS payload?
