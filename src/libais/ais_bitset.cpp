@@ -196,6 +196,6 @@ bool AisBitset::nmea_ord_initialized_ = false;
 std::array<std::bitset<6>, 128> AisBitset::nmea_ord_;
 // For decoding str bits inside of a binary message.
 const char AisBitset::bits_to_char_tbl_[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "[\\]^- !\"#$%&`()*+,-./0123456789:;<=>?";
+    "[\\]^- !\"#$%&\'()*+,-./0123456789:;<=>?";
 
 }  // namespace libais
