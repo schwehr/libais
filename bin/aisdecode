@@ -70,18 +70,54 @@ Available opptions:
 
     --uscg=False
     --validate_checksum=False
+
+    --file=NAME Write to named file, not stdout
+    --split=NUM Write NUM lines of output to each file, appending an
+      index to the filename
+
 """)
     sys.exit(0)
 
+file_name = args.pop('file', 'None')
+if file_name is not None:
+    file_base, file_ext = file_name.rsplit(".", 1)
+split = int(args.pop('split', 'None'))
+
+lines_in_current_file = 0
+current_file = None
+current_file_idx = 0
+def get_file():
+    global lines_in_current_file
+    global current_file
+    global current_file_idx
+    
+    if file_name is None:
+        return sys.stdout
+    if split is None:
+        if current_file is None:
+            current_file = open(file_name, "w")
+        return current_file
+    else:
+        if current_file is None or lines_in_current_file >= split:
+            if current_file:
+                current_file.close()
+            current_file = open("%s-%s.%s" % (file_base, current_file_idx, file_ext), "w")
+            current_file_idx += 1
+            lines_in_current_file = 1
+        else:
+            lines_in_current_file += 1
+        return current_file
+        
 encoding = args.pop('encoding', 'json')
 if encoding == 'json':
     def write(msg):
-        json.dump(msg, sys.stdout)
-        sys.stdout.write("\n")
+        out = get_file()
+        json.dump(msg, out)
+        out.write("\n")
 
 if encoding == 'msgpack':
     def write(msg):
-        msgpack.pack(msg, sys.stdout)
+        msgpack.pack(msg, get_file())
 
 use_gpsd = args.pop("gpsd", False)
 copy_tagblock_timestamp = args.pop("copy-tagblock-timestamp", True)
