@@ -49,7 +49,7 @@
 // The library is structured around NmeaSentence, which manages each line of
 // text.  It validates the checksum and separates the field components.
 //
-// VdmStream takes a series of sentences, converts them to NmeaScentences, and
+// VdmStream takes a series of sentences, converts them to NmeaSentences, and
 // then assembles the parts into complete messages.  When it has all of the
 // constituent sentences, it uses libais to decode the armored 6-bit payload
 // into AisMsg instances.
@@ -184,7 +184,7 @@ class NmeaSentence {
   const char channel_;
   // The VDM 6-bit encoded/armored payload of the message.
   const std::string body_;
-  // The number of padding.  Should be zero for all messages except the last.
+  // The number of fill bits for padding. Should be zero for all messages except the last.
   // Must be 0, 2, or 4.
   const int fill_bits_;
 
