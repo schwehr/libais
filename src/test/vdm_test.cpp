@@ -467,8 +467,13 @@ TEST_F(VdmTest, ThreeLineAisMessage) {
 
 TEST_F(VdmTest, OverRangeSequence) {
   // The sequence number should be [0..9].  Reject others.
-  stream_.AddLine("!BSVDM,1,1,10,B,36So=l5000o?uF0K>pnpV0Nf0000,0*56");
+  EXPECT_FALSE(stream_.AddLine("!BSVDM,1,1,10,B,36So=l5000o?uF0K>pnpV0Nf0000,0*56"));
   auto ais_msg = stream_.PopOldestMessage();
+  ASSERT_EQ(nullptr, ais_msg);
+
+  // Reject multi-fragment sentences with empty/missing sequence ID.
+  EXPECT_FALSE(stream_.AddLine("!AIVDM,2,1,,A,177KQ@,0*4E"));
+  ais_msg = stream_.PopOldestMessage();
   ASSERT_EQ(nullptr, ais_msg);
 }
 
