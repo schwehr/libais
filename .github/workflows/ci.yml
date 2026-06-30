@@ -2,9 +2,9 @@ name: libais CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -26,8 +26,8 @@ jobs:
     steps:
       - name: Add required sources and pkgs
         run: |
-          sudo add-apt-repository --update --yes 'deb http://archive.ubuntu.com/ubuntu/ bionic main universe'
-          sudo apt-get install gcc g++
+          sudo apt-get update
+          sudo apt-get install --yes gcc g++ cmake ninja-build
 
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -49,5 +49,5 @@ jobs:
         
       - name: Script
         run: |
-          (cd src && CC=gcc CXX=g++ make -f Makefile-custom -j 4 test)
+          cmake -G Ninja -B build -S . -DENABLE_ASAN=ON && ninja -C build && ctest --test-dir build --output-on-failure
           py.test ais test --cov=ais --cov-report term-missing
