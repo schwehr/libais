@@ -32,4 +32,8 @@ Ais7_13::Ais7_13(const char *nmea_payload, const size_t pad)
   status = AIS_OK;
 }
 
+std::ostream& operator<< (std::ostream &o, const Ais7_13 &msg) {
+  return o << msg.message_id << ": " << msg.mmsi;
+}
+
 }  // namespace libais

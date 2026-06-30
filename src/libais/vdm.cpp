@@ -321,12 +321,16 @@ bool VdmStream::AddLine(const std::string &line) {
   size_t const seq = sentence->sequence_number();
   size_t const tot = sentence->sentence_total();
 
-  // These are enforced by NmeaSentence, so only check when debugging.
-  assert(seq < kNumSequenceChannels);
-  assert(tot < kMaxSentences);
+  if (tot > kMaxSentences) {
+    return false;  // More sentences than allowed.
+  }
 
   // Convert multi-line message to single line.
   if (tot != 1) {
+    if (tot > 1 && seq > kNumSequenceChannels) {
+      return false;  // Sequence number is too large or empty (kNoSequenceNumber).
+    }
+
     size_t const cnt = sentence->sentence_number();
 
     // Beginning of a message.
