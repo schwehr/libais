@@ -2,7 +2,7 @@
 Introduction
 ============
 
-.. image:: https://travis-ci.org/schwehr/libais.svg?branch=master
+.. image:: https://travis-ci.org/schwehr/libais.svg?branch=main
     :target: https://travis-ci.org/schwehr/libais
 
 .. image:: https://scan.coverity.com/projects/5519/badge.svg
