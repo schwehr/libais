@@ -12,4 +12,5 @@ recursive-include bin *
 recursive-include docs *.txt *.org Makefile *.csv
 recursive-include src *.cpp *.h Makefile-custom
 recursive-include test *.py Makefile-custom
+recursive-include test/data *
 recursive-include utils *
