@@ -67,6 +67,7 @@ Available opptions:
     --treat_ab_equal
     --pass_invalid_checksums
     --allow_missing_timestamps
+    --missing_timestamp_to_now
 
     --uscg=False
     --validate_checksum=False
