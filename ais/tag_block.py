@@ -81,6 +81,8 @@ def Parse(data):
                  for k, v in result.items() if k in NUMERIC_FIELDS})
 
   actual = nmea.Checksum(result['metadata'])
+  if not result['tag_checksum']:
+    return
   expected = result['tag_checksum'].upper()
   if actual != expected:
     return
@@ -220,4 +222,4 @@ def DecodeTagMultiple(tag_block_message):
                  tag_block_message)
     return
   msg = q.get()
-  return msg['decoded']
+  return msg.get('decoded')
