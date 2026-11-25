@@ -50,6 +50,31 @@ TEST(Ais8_200_10Test, DecodeAnything) {
                    0, 0, 0, 0, 0, 0);
 }
 
+TEST(Ais8_200_10Test, DraughtUsesCentimetres) {
+  // Existing fixture with only the 11-bit inland draught field changed.
+  // Inland AIS FI 10 uses centimetres; length and beam use decimetres.
+  {
+    Ais8_200_10 msg("85NLn@0j2d<8000000BhI?`50000", 0);
+    Validate8_200_10(&msg, 0, 367474240, "foo", 15, 5, 8000, 5,
+                     0.0, 0, 0, 0, 0, 0);
+  }
+  {
+    Ais8_200_10 msg("85NLn@0j2d<8000000BhI?`50200", 0);
+    Validate8_200_10(&msg, 0, 367474240, "foo", 15, 5, 8000, 5,
+                     0.01, 0, 0, 0, 0, 0);
+  }
+  {
+    Ais8_200_10 msg("85NLn@0j2d<8000000BhI?`53n00", 0);
+    Validate8_200_10(&msg, 0, 367474240, "foo", 15, 5, 8000, 5,
+                     1.23, 0, 0, 0, 0, 0);
+  }
+  {
+    Ais8_200_10 msg("85NLn@0j2d<8000000BhI?`5vP00", 0);
+    Validate8_200_10(&msg, 0, 367474240, "foo", 15, 5, 8000, 5,
+                     20.0, 0, 0, 0, 0, 0);
+  }
+}
+
 // TODO(pyrog): Test messages for 8:200:21.
 // TODO(pyrog): Test messages for 8:200:22.
 
