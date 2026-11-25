@@ -1346,6 +1346,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
   for (size_t rpt_num = 0; rpt_num < msg.reports.size(); rpt_num++) {
     PyObject *rpt_dict = PyDict_New();
     PyList_SetItem(rpt_list, rpt_num, rpt_dict);
+    ais8_1_26_append_pydict_sensor_hdr(rpt_dict, msg.reports[rpt_num]);
 
     switch (msg.reports[rpt_num]->report_type) {
       // case AIS8_1_26_SENSOR_ERROR:
@@ -1353,7 +1354,6 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
       {
         Ais8_1_26_Location *rpt =
             reinterpret_cast<Ais8_1_26_Location *>(msg.reports[rpt_num]);
-        ais8_1_26_append_pydict_sensor_hdr(rpt_dict, rpt);
         DictSafeSetItem(rpt_dict, "x", "y", rpt->position);
         DictSafeSetItem(rpt_dict, "z", rpt->z);
         DictSafeSetItem(rpt_dict, "owner", rpt->owner);
@@ -1415,7 +1415,7 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
 
         PyObject *curr_list = PyList_New(3);
-        DictSafeSetItem(dict, "currents", curr_list);
+        DictSafeSetItem(rpt_dict, "currents", curr_list);
         for (size_t idx = 0; idx < 3; idx++) {
           PyObject *curr_dict = PyDict_New();
           DictSafeSetItem(curr_dict, "speed", rpt->currents[idx].speed);
@@ -1433,8 +1433,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
         DictSafeSetItem(rpt_dict, "type", rpt->type);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
 
-        PyObject *curr_list = PyList_New(3);
-        DictSafeSetItem(dict, "currents", curr_list);
+        PyObject *curr_list = PyList_New(2);
+        DictSafeSetItem(rpt_dict, "currents", curr_list);
         for (size_t idx = 0; idx < 2; idx++) {
           // ERROR: no way to specify negative direction
           PyObject *curr_dict = PyDict_New();
@@ -1453,8 +1453,8 @@ ais8_1_26_append_pydict(const char *nmea_payload, PyObject *dict,
             reinterpret_cast<Ais8_1_26_HorzFlow *>(msg.reports[rpt_num]);
         DictSafeSetItem(rpt_dict, "spare", rpt->spare);
 
-        PyObject *curr_list = PyList_New(3);
-        DictSafeSetItem(dict, "currents", curr_list);
+        PyObject *curr_list = PyList_New(2);
+        DictSafeSetItem(rpt_dict, "currents", curr_list);
         for (size_t idx = 0; idx < 2; idx++) {
           PyObject *curr_dict = PyDict_New();
           PyList_SetItem(curr_list, idx, curr_dict);
