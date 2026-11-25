@@ -30,7 +30,7 @@ Ais8_200_10::Ais8_200_10(const char *nmea_payload, const size_t pad)
   beam = bits.ToUnsignedInt(117, 10) / 10.;  // m
   ship_type = bits.ToUnsignedInt(127, 14);
   haz_cargo = bits.ToUnsignedInt(141, 3);
-  draught = bits.ToUnsignedInt(144, 11) / 10.;  // m
+  draught = bits.ToUnsignedInt(144, 11) / 100.;  // m
   loaded = bits.ToUnsignedInt(155, 2);
   speed_qual = bits[157];
   course_qual = bits[158];
