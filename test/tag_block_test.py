@@ -60,6 +60,24 @@ class TagTestCase(unittest.TestCase):
 
 class TagBlockTest(TagTestCase):
 
+  def testAdsWithoutTime(self):
+    line = (r'\n:449592,s:r08ACERDC,c:1434585600*27\$'
+            'ANADS,L3 AIS ID,,A,4,I,N*02')
+    queue = tag_block.TagQueue()
+    queue.put(line, 4009)
+    message = queue.get()
+    self.assertEqual(message['decoded']['message'], 'ADS')
+    self.assertIsNone(message['decoded']['when'])
+    self.assertEqual(message['times'], [1434585600])
+    self.assertEqual(message['lines'], [line])
+    self.assertTrue(queue.empty())
+
+    following = SINGLE_LINE_MESSAGES.splitlines()[2]
+    queue.put(following, 4010)
+    message = queue.get()
+    self.assertEqual(message['decoded']['id'], 1)
+    self.assertTrue(queue.empty())
+
   def testFractionalTime(self):
     # TAG BLOCK only allows for integer times, but allow for greater precision.
     line = '\\c:1425327399.*70\\'

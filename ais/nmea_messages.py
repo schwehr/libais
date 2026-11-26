@@ -49,6 +49,10 @@ NMEA_CHECKSUM_RE = re.compile(NMEA_CHECKSUM_RE_STR)
 
 # TODO(schwehr): Rename TimeUtc.
 def TimeUtc(fields):
+  if fields['time_utc'] is None:
+    fields['when'] = None
+    return
+
   seconds, fractional_seconds = FloatSplit(float(fields['seconds']))
   microseconds = int(math.floor(fractional_seconds * 1e6))
 
