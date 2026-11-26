@@ -41,6 +41,19 @@ class AbkTest(unittest.TestCase):
 
 class AdsTest(unittest.TestCase):
 
+  def testMissingTime(self):
+    # Recorded sentence from issues #111 and #217.
+    message = nmea_messages.DecodeLine('$ANADS,L3 AIS ID,,A,4,I,N*02')
+    self.assertIsNone(message['when'])
+    self.assertEqual(message['id'], 'L3 AIS ID')
+    self.assertEqual(message['time_sync_method'], 4)
+    self.assertEqual(message['pos_src'], 'I')
+    self.assertEqual(message['time_src'], 'N')
+
+  def testMidnightIsNotMissing(self):
+    message = nmea_messages.DecodeLine('$ANADS,L3 AIS ID,000000.00,A,4,I,N*2C')
+    self.assertEqual(message['when'], datetime.time(0, 0))
+
   def testRegex(self):
     line = '$ANADS,L3 AIS ID,024358.79,V,0,I,I*3E'
     message = nmea_messages.ADS_RE.search(line).groupdict()
