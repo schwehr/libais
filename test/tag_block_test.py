@@ -3,7 +3,7 @@
 
 import unittest
 
-from ais import tag_block
+from ais import nmea, tag_block
 
 
 # Large sequence of single sentence AIS messages in TAG block format.
@@ -303,6 +303,41 @@ class TagQueueGroupsTest(TagTestCase):
 
 
 class DecodeTagBlockTest(TagTestCase):
+
+  def testSingleSentenceGroups(self):
+    # Add an explicit one-sentence group to the recorded single-line fixtures.
+    # Reusing the group ID must not lose messages or retain a completed group.
+    queue = tag_block.TagQueue()
+    for line_no, line in enumerate(SINGLE_LINE_MESSAGES.splitlines()):
+      if 'VD' not in line:
+        continue
+      with self.subTest(line=line):
+        original = tag_block.Parse(line)
+        metadata = 'g:1-1-7,' + original['metadata'].split('*')[0]
+        prefix = '\\' + metadata + '*00'
+        grouped = prefix[:-2] + nmea.Checksum(prefix) + '\\' + original['payload']
+        queue.put(grouped, line_no)
+        self.assertEqual(queue.qsize(), 1)
+        result = queue.get_nowait()
+        self.assertEqual(result['decoded'], tag_block.DecodeTagSingle({
+            'matches': [original]}))
+        self.assertEqual(result['line_nums'], [line_no])
+        self.assertEqual(result['lines'], [grouped])
+        self.assertEqual(result['times'], [original['time']])
+        self.assertEqual(result['matches'][0]['group'], '1-1-7')
+        self.assertEqual(queue.groups, {})
+
+  def testSingleSentenceGroupWithoutAis(self):
+    # Undecodable groups must still be delivered and removed from the cache,
+    # as for multi-sentence groups with no AIS payload.
+    queue = tag_block.TagQueue()
+    line = r'\g:1-1-7*6A\not-an-ais-message'
+    queue.put(line)
+    self.assertEqual(queue.qsize(), 1)
+    result = queue.get_nowait()
+    self.assertEqual(result['lines'], [line])
+    self.assertNotIn('decoded', result)
+    self.assertEqual(queue.groups, {})
 
   def testSingleLineMessage(self):
     # Do one detailed comparison.
