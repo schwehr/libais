@@ -1870,10 +1870,13 @@ ais8_200_55_append_pydict(const char *nmea_payload, PyObject *dict,
   return AIS_OK;
 }
 
-void
+AIS_STATUS
 ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
                           const size_t pad) {
-  Ais8_367_22 msg(nmea_payload, pad);  // TODO(schwehr): check for errors
+  Ais8_367_22 msg(nmea_payload, pad);
+  if (msg.had_error()) {
+    return msg.get_error();
+  }
 
   DictSafeSetItem(dict, "version", msg.version);
   DictSafeSetItem(dict, "link_id", msg.link_id);
@@ -2006,6 +2009,7 @@ ais8_367_22_append_pydict(const char *nmea_payload, PyObject *dict,
   }
   DictSafeSetItem(dict, "sub_areas", sub_area_list);
   Py_DECREF(sub_area_list);
+  return AIS_OK;
 }
 
 AIS_STATUS
@@ -2876,7 +2880,7 @@ ais8_to_pydict(const char *nmea_payload, const size_t pad) {
   case 367:  // United states.
     switch (msg.fi) {
     case 22:  // USCG Area Notice 2012 (v5?).
-      ais8_367_22_append_pydict(nmea_payload, dict, pad);
+      status = ais8_367_22_append_pydict(nmea_payload, dict, pad);
       break;
     case AIS_FI_8_367_23_SSW:
       status = ais8_367_23_append_pydict(nmea_payload, dict, pad);
