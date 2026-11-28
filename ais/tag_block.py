@@ -144,12 +144,11 @@ class TagQueue(Queue.Queue):
 
     if sentence_num == 1:
       self.groups[group_id] = {
-          'line_nums': [self.line_num],
-          'lines': [line],
-          'matches': [match],
-          'times': [time],
+          'line_nums': [],
+          'lines': [],
+          'matches': [],
+          'times': [],
       }
-      return
 
     if group_id not in self.groups:
       logger.error('group_id not in groups: %d', group_id)
